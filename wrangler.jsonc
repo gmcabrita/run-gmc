@@ -13,12 +13,7 @@
   "vars": {
     "ENVIRONMENT": "production",
     "COVERFLEX_EMAIL": "goncalo@mendescabrita.com",
-    // "COVERFLEX_PASSWORD": "",
-    // "COVERFLEX_USER_AGENT_TOKEN": "",
-    // "PRIVATE_BASIC_AUTH_USERNAME": "",
-    // "PRIVATE_BASIC_AUTH_PASSWORD": "",
     "ICLOUD_USER": "goncalo@mendescabrita.com",
-    // "ICLOUD_PASSWORD": "",
   },
   "kv_namespaces": [
     {
