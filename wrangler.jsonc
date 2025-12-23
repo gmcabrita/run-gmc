@@ -13,6 +13,7 @@
     "nodejs_compat"
   ],
   "vars": {
+    "ENVIRONMENT": "production",
     "COVERFLEX_EMAIL": "",
     "COVERFLEX_PASSWORD": "",
     "COVERFLEX_USER_AGENT_TOKEN": "",

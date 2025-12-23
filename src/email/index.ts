@@ -10,8 +10,13 @@ export async function sendEmail(
     to: string;
     subject: string;
     body: string;
-  }
+  },
 ) {
+  if (env.ENVIRONMENT !== "production") {
+    console.log(`[sendEmail] ${JSON.stringify({ to, subject, body }, null, 2)}`);
+    return;
+  }
+
   await WorkerMailer.send(
     {
       host: "smtp.mail.me.com",
@@ -29,6 +34,6 @@ export async function sendEmail(
       to: { email: to },
       subject,
       html: body,
-    }
+    },
   );
 }
