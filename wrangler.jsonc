@@ -3,6 +3,7 @@
   "name": "run-gmc",
   "main": "src/index.ts",
   "compatibility_date": "2025-12-23",
+  "upload_source_maps": true,
   "routes": [
     {
       "pattern": "run.gmcabrita.com",
