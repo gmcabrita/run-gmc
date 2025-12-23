@@ -8,6 +8,7 @@
     "coverflex-uat": "pnpm dlx tsx bin/coverflex-uat.ts"
   },
   "dependencies": {
+    "@sentry/cloudflare": "^10.31.0",
     "hono": "^4.11.1",
     "worker-mailer": "^1.2.1"
   },
