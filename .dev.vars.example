@@ -1,6 +1,8 @@
 # Environment (set to "production" to enable email sending)
 ENVIRONMENT=development
 
+SENTRY_AUTH_TOKEN=
+
 # Coverflex credentials
 COVERFLEX_EMAIL=your-email@example.com
 COVERFLEX_PASSWORD=your-password
