@@ -1,5 +1,5 @@
 import { Hono } from "hono";
-import { addCoverflexEndpoints } from "./coverflex";
+import { addCoverflexEndpoints } from "@coverflex";
 
 const app = new Hono<{ Bindings: CloudflareBindings }>();
 addCoverflexEndpoints(app);
