@@ -16,6 +16,7 @@ export async function idempotentSendEmail(
 ): Promise<boolean> {
   const existing = await env.RUN_GMC_EMAIL_IDEMPOTENCY_KV.get(idempotencyKey);
   if (existing !== null) {
+    console.log("Skipping email due to idempotency key hit.");
     return false;
   }
 
