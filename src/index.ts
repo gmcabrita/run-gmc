@@ -1,9 +1,7 @@
 import { Hono } from "hono";
+import { addCoverflexEndpoints } from "./coverflex";
 
 const app = new Hono<{ Bindings: CloudflareBindings }>();
-
-app.get("/", (c) => {
-  return c.text("Hello again, Cloudflare Workers!");
-});
+addCoverflexEndpoints(app);
 
 export default app;

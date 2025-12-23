@@ -1,0 +1,13 @@
+# Coverflex credentials
+COVERFLEX_EMAIL=your-email@example.com
+COVERFLEX_PASSWORD=your-password
+# Generated using `pnpm coverflex-uat`
+COVERFLEX_USER_AGENT_TOKEN=your-user-agent-token
+
+# Basic auth for API endpoints
+PRIVATE_BASIC_AUTH_USERNAME=your-username
+PRIVATE_BASIC_AUTH_PASSWORD=your-password
+
+# iCloud SMTP credentials (use app-specific password)
+ICLOUD_USER=your-email@example.com
+ICLOUD_PASSWORD=your-app-specific-password
