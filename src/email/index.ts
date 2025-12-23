@@ -1,5 +1,31 @@
 import { WorkerMailer } from "worker-mailer";
 
+export async function idempotentSendEmail(
+  env: CloudflareBindings,
+  {
+    idempotencyKey,
+    to,
+    subject,
+    body,
+  }: {
+    idempotencyKey: string;
+    to: string;
+    subject: string;
+    body: string;
+  },
+): Promise<boolean> {
+  const existing = await env.RUN_GMC_EMAIL_IDEMPOTENCY_KV.get(idempotencyKey);
+  if (existing !== null) {
+    return false;
+  }
+
+  await sendEmail(env, { to, subject, body });
+
+  await env.RUN_GMC_EMAIL_IDEMPOTENCY_KV.put(idempotencyKey, "1");
+
+  return true;
+}
+
 export async function sendEmail(
   env: CloudflareBindings,
   {

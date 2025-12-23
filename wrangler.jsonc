@@ -9,9 +9,7 @@
       "custom_domain": true,
     },
   ],
-  "compatibility_flags": [
-    "nodejs_compat"
-  ],
+  "compatibility_flags": ["nodejs_compat"],
   "vars": {
     "ENVIRONMENT": "production",
     "COVERFLEX_EMAIL": "",
@@ -20,14 +18,14 @@
     "PRIVATE_BASIC_AUTH_USERNAME": "",
     "PRIVATE_BASIC_AUTH_PASSWORD": "",
     "ICLOUD_USER": "",
-    "ICLOUD_PASSWORD": ""
+    "ICLOUD_PASSWORD": "",
   },
-  // "kv_namespaces": [
-  //   {
-  //     "binding": "MY_KV_NAMESPACE",
-  //     "id": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
-  //   }
-  // ],
+  "kv_namespaces": [
+    {
+      "binding": "RUN_GMC_EMAIL_IDEMPOTENCY_KV",
+      "id": "67a6fccf562346b386524702eca9f08a",
+    },
+  ],
   // "r2_buckets": [
   //   {
   //     "binding": "MY_BUCKET",

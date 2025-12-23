@@ -1,7 +1,7 @@
 import { Hono } from "hono";
 import { getAuthenticationToken } from "./util";
 import { basicAuth } from "hono/basic-auth";
-import { sendEmail } from "@email";
+import { idempotentSendEmail } from "@email";
 
 async function getAppleCatalogueFile(env: CloudflareBindings) {
   const url = "https://menhir-api.coverflex.com/api/employee/benefits/technology";
@@ -80,41 +80,54 @@ async function getCoverflexBudget(env: CloudflareBindings) {
 }
 
 export function addCoverflexEndpoints(app: Hono<{ Bindings: CloudflareBindings }>) {
-  app.get("/coverflex.getBudget", async (c, next) => {
-    const auth = basicAuth({
-      username: c.env.PRIVATE_BASIC_AUTH_USERNAME,
-      password: c.env.PRIVATE_BASIC_AUTH_PASSWORD,
-    });
-    return auth(c, next);
-  }, async (c) => {
-    return c.json(await getCoverflexBudget(c.env));
-  });
+  app.get(
+    "/coverflex.getBudget",
+    async (c, next) => {
+      const auth = basicAuth({
+        username: c.env.PRIVATE_BASIC_AUTH_USERNAME,
+        password: c.env.PRIVATE_BASIC_AUTH_PASSWORD,
+      });
+      return auth(c, next);
+    },
+    async (c) => {
+      return c.json(await getCoverflexBudget(c.env));
+    },
+  );
 
-  app.get("/coverflex.getAppleCatalogue", async (c, next) => {
-    const auth = basicAuth({
-      username: c.env.PRIVATE_BASIC_AUTH_USERNAME,
-      password: c.env.PRIVATE_BASIC_AUTH_PASSWORD,
-    });
-    return auth(c, next);
-  }, async (c) => {
-    return c.json(await getAppleCatalogueFile(c.env));
-  });
+  app.get(
+    "/coverflex.getAppleCatalogue",
+    async (c, next) => {
+      const auth = basicAuth({
+        username: c.env.PRIVATE_BASIC_AUTH_USERNAME,
+        password: c.env.PRIVATE_BASIC_AUTH_PASSWORD,
+      });
+      return auth(c, next);
+    },
+    async (c) => {
+      return c.json(await getAppleCatalogueFile(c.env));
+    },
+  );
 
-  app.get("/coverflex.sendAppleCatalogueByEmail", async (c, next) => {
-    const auth = basicAuth({
-      username: c.env.PRIVATE_BASIC_AUTH_USERNAME,
-      password: c.env.PRIVATE_BASIC_AUTH_PASSWORD,
-    });
-    return auth(c, next);
-  }, async (c) => {
-    const { name, url } = await getAppleCatalogueFile(c.env);
+  app.get(
+    "/coverflex.sendAppleCatalogueByEmail",
+    async (c, next) => {
+      const auth = basicAuth({
+        username: c.env.PRIVATE_BASIC_AUTH_USERNAME,
+        password: c.env.PRIVATE_BASIC_AUTH_PASSWORD,
+      });
+      return auth(c, next);
+    },
+    async (c) => {
+      const { name, url } = await getAppleCatalogueFile(c.env);
 
-    await sendEmail(c.env, {
-      to: "goncalo@mendescabrita.com",
-      subject: `New Coverflex Apple catalogue available: ${name}`,
-      body: `<a href="${url}" target="_blank">${url}</a>`,
-    });
+      await idempotentSendEmail(c.env, {
+        to: "goncalo@mendescabrita.com",
+        subject: `New Coverflex Apple catalogue available: ${name}`,
+        body: `<a href="${url}" target="_blank">${url}</a>`,
+        idempotencyKey: `coverflex-apple-catalogue-${name}`,
+      });
 
-    return c.text("");
-  });
+      return c.text("");
+    },
+  );
 }
