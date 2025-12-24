@@ -46,7 +46,7 @@ function* generateNext31Dates() {
 }
 
 export function addFetchToRssEndpoints(app: Hono<{ Bindings: CloudflareBindings }>) {
-  app.get("/rss.agendalx", async (c) => {
+  app.get("/rss.agendaLx", async (c) => {
     const feed = new Feed({
       title: `AgendaLX Events`,
       id: `https://www.agendalx.pt`,
