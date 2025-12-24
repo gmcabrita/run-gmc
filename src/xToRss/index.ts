@@ -193,6 +193,7 @@ export function addXToRssEndpoints(app: Hono<{ Bindings: CloudflareBindings }>) 
         return c.text("no userName provided");
       }
 
+      await new Promise((resolve) => setTimeout(resolve, Math.random() * 30000));
       try {
         const userId = await fetchUserId(c.env, userName);
         const data = await fetchPosts(c.env, userId);
