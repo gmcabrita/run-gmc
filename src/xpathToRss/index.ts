@@ -80,7 +80,7 @@ export async function xpathToRss(
       title: postTitle || "",
       link: postUrl,
       id: postUrl,
-      content: `${content}<a href="${link}">${link}</a>${image}`.trim(),
+      content: `${content}<a href="${postUrl}">${postUrl}</a>${image}`.trim(),
       date: datetimeText ? new Date(datetimeText) : new Date(),
     });
   });
