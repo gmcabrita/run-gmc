@@ -4,7 +4,7 @@ import { basicAuth } from "hono/basic-auth";
 import { addCoverflexEndpoints, sendAppleCatalogueByEmail } from "@coverflex";
 import { addXpathToRssEndpoints, sendCinecartazEntriesByEmail } from "@xpathToRss";
 import { addXToRssEndpoints } from "@xToRss";
-import { addFetchToRssEndpoints } from "@fetchToRss";
+import { addFetchToRssEndpoints, cacheAgendaLx } from "@fetchToRss";
 
 const app = new Hono<{ Bindings: CloudflareBindings }>();
 addCoverflexEndpoints(app);
@@ -97,6 +97,21 @@ export default Sentry.withSentry(
     fetch: app.fetch,
     async scheduled(controller, env, ctx) {
       switch (controller.cron) {
+        case "0 1 * * *":
+          await Sentry.withMonitor(
+            "rss.cacheAgendaLx",
+            async () => {
+              await cacheAgendaLx(env);
+            },
+            {
+              schedule: {
+                type: "crontab",
+                value: "0 1 * * *",
+              },
+              checkinMargin: 10,
+            },
+          );
+          break;
         case "*/10 * * * *":
           await Sentry.withMonitor(
             "coverflex.sendCinecartazEntriesByEmail",

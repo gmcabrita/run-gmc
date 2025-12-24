@@ -11,7 +11,7 @@
     },
   ],
   "triggers": {
-    "crons": ["*/10 * * * *", "*/15 * * * *"],
+    "crons": ["*/10 * * * *", "*/15 * * * *", "0 1 * * *"],
   },
   "compatibility_flags": ["nodejs_compat"],
   "version_metadata": {
@@ -30,6 +30,10 @@
     {
       "binding": "RUN_GMC_X_CACHE_KV",
       "id": "729bee60cd2e4a8381aa4f0a96954a0f",
+    },
+    {
+      "binding": "RUN_GMC_GENERIC_CACHE_KV",
+      "id": "0fcd98a6cb4e4c649546900e489714a3",
     },
   ],
   // "r2_buckets": [
