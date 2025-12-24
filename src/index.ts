@@ -53,8 +53,8 @@ app.get(
   },
 );
 
-export default {
-  fetch: Sentry.withSentry((env: CloudflareBindings) => {
+export default Sentry.withSentry(
+  (env: CloudflareBindings) => {
     const { id: versionId } = env.CF_VERSION_METADATA;
     return {
       dsn: "https://fc27b2ddd92ca2ed76a89cb8a5124dbb@o4510586740342784.ingest.us.sentry.io/4510586741981184",
@@ -65,12 +65,14 @@ export default {
       enableLogs: true,
       enabled: env.ENVIRONMENT === "production",
     };
-  }, app satisfies ExportedHandler<CloudflareBindings>).fetch,
-  async scheduled(controller: ScheduledController, env: CloudflareBindings, ctx: ExecutionContext) {
-    switch (controller.cron) {
-      case "*/1 * * * *":
-        ctx.waitUntil(
-          Sentry.withMonitor(
+  },
+  {
+    fetch: app.fetch,
+    async scheduled(controller, env, ctx) {
+      console.log({ controller });
+      switch (controller.cron) {
+        case "*/1 * * * *":
+          await Sentry.withMonitor(
             "coverflex.sendAppleCatalogueByEmail",
             async () => {
               await fetch(
@@ -84,9 +86,9 @@ export default {
               },
               checkinMargin: 2,
             },
-          ),
-        );
-        break;
-    }
-  },
-};
+          );
+          break;
+      }
+    },
+  } satisfies ExportedHandler<CloudflareBindings>,
+);
