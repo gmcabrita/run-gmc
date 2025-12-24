@@ -30,7 +30,9 @@ app.get(
     return auth(c, next);
   },
   (c) => {
-    Sentry.logger.info("Logging something for debugging!");
+    console.debug("Debug log!");
+    console.log("Normal log!");
+    console.error("Error log!");
     return c.text("Logged something!");
   },
 );
