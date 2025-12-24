@@ -74,7 +74,7 @@ export default Sentry.withSentry(
           await Sentry.withMonitor(
             "coverflex.sendAppleCatalogueByEmail",
             async () => {
-              await sendAppleCatalogueByEmail();
+              await sendAppleCatalogueByEmail(env);
             },
             {
               schedule: {
