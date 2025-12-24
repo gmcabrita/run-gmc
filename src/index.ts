@@ -127,7 +127,10 @@ app.get(
     return c.text(
       app.routes
         .map((route) => {
-          return `${route.method} ${route.path}`;
+          return new URL(
+            `${route.method} ${route.path}`,
+            "https://run.gmcabrita.com/rss.filmspotEstreias",
+          ).href;
         })
         .filter((value, index, self) => self.indexOf(value) === index)
         .join("\n"),
