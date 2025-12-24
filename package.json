@@ -14,6 +14,7 @@
     "@xmldom/xmldom": "^0.8.11",
     "feed": "^5.1.0",
     "hono": "^4.11.1",
+    "linkedom": "^0.18.12",
     "worker-mailer": "^1.2.1",
     "xml2js": "^0.6.2",
     "xpath": "^0.0.34"

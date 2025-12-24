@@ -2,19 +2,53 @@ import { Hono } from "hono";
 import { Feed } from "feed";
 import XPath from "xpath";
 import { DOMParser } from "@xmldom/xmldom";
+import { DOMParser as HTMLDOMParser } from "linkedom";
 import xml2js from "xml2js";
 
-function dateToDateString(date: Date): string {
+function dateToDateStringFilmspot(date: Date): string {
   return date.toISOString().split("T")[0].replaceAll("-", "");
 }
 
-function sevenDaysFromNow(): string {
-  return dateToDateString(new Date(new Date().setDate(new Date().getDate() + 7)));
+function sevenDaysFromNowFilmspot(): string {
+  return dateToDateStringFilmspot(new Date(new Date().setDate(new Date().getDate() + 7)));
 }
 
-function parseDate(dateString: string): Date {
+function parseDateFilmspot(dateString: string): Date {
   const dateStr = dateString.replaceAll("-", "");
   return new Date(`${dateStr.slice(0, 4)}-${dateStr.slice(4, 6)}-${dateStr.slice(6, 8)}`);
+}
+
+function parseDateTimeInformacaoLisboa(dateStr: string) {
+  const months = {
+    jan: 0,
+    fev: 1,
+    mar: 2,
+    abr: 3,
+    mai: 4,
+    jun: 5,
+    jul: 6,
+    ago: 7,
+    set: 8,
+    out: 9,
+    nov: 10,
+    dez: 11,
+  };
+
+  // Regex to capture: day, month, year, hour, minute
+  const match = dateStr.match(/(\d{1,2})\s+(\w{3})\s+(\d{4}),?\s*(\d{1,2})h(\d{2})/i);
+
+  if (!match) {
+    throw new Error(`Invalid date format: ${dateStr}`);
+  }
+
+  const [, day, month, year, hour, minute] = match;
+  const monthIndex = months[month.toLowerCase()];
+
+  if (monthIndex === undefined) {
+    throw new Error(`Invalid month abbreviation: ${dateStr}`);
+  }
+
+  return new Date(year, monthIndex, day, hour, minute);
 }
 
 function parseDateFundoAmbiental(dateString: string): Date {
@@ -22,9 +56,20 @@ function parseDateFundoAmbiental(dateString: string): Date {
   return new Date(`${dateStr.slice(4, 8)}-${dateStr.slice(2, 4)}-${dateStr.slice(0, 2)}`);
 }
 
-function parseDateTimeStr(dateTimeStr: string): Date {
+function parseDateTimeStrNimas(dateTimeStr: string): Date {
   const dateStr = dateTimeStr.split(" ")[0].trim().replaceAll(".", "");
   const timeStr = dateTimeStr.split(" ")[1].trim().replaceAll(":", "");
+  return new Date(
+    `${dateStr.slice(4, 8)}-${dateStr.slice(2, 4)}-${dateStr.slice(0, 2)} ${timeStr.slice(
+      0,
+      2,
+    )}:${timeStr.slice(2, 4)}`,
+  );
+}
+
+function parseDateTimeStrCinemateca(dateTimeStr: string): Date {
+  const dateStr = dateTimeStr.split(",")[0].trim().replaceAll("/", "");
+  const timeStr = dateTimeStr.split(",")[1].trim().replaceAll("h", "");
   return new Date(
     `${dateStr.slice(4, 8)}-${dateStr.slice(2, 4)}-${dateStr.slice(0, 2)} ${timeStr.slice(
       0,
@@ -146,6 +191,361 @@ export async function cacheAgendaLx(env: CloudflareBindings) {
 }
 
 export function addFetchToRssEndpoints(app: Hono<{ Bindings: CloudflareBindings }>) {
+  app.get("/rss.filmspotEstreias", async (c) => {
+    const url = "https://filmspot.pt/estreias";
+    const feed = new Feed({
+      title: "filmSPOT – Próximas estreias",
+      id: url,
+      link: url,
+      language: "pt",
+      copyright: "",
+      updated: new Date(),
+    });
+    const r = await fetch(url);
+    const html = await r.text();
+    const document = new HTMLDOMParser().parseFromString(html, "text/html");
+
+    const movies = Array.from(document.querySelectorAll(".estreiasH2"))
+      .filter(
+        (premiereNode: any) => premiereNode.id.match(/\d{8}$/)[0] <= sevenDaysFromNowFilmspot(),
+      )
+      .flatMap((premiereNode: any) => {
+        const dateInText = premiereNode.textContent;
+        const dateString = premiereNode.id.match(/\d{8}$/)[0];
+        const date = parseDateFilmspot(dateString);
+
+        return Array.from(premiereNode.nextSibling.querySelectorAll(".filmeLista")).map(
+          (movieNode: any) => ({
+            imgUrl: movieNode
+              .querySelector(".filmeListaPoster > a > img")
+              .getAttribute("src")
+              ?.replace("/thumb", ""),
+            originalTitle: movieNode.querySelector(".tituloOriginal")?.textContent,
+            title: movieNode.querySelector(".filmeListaInfo > h3 > a > span")?.textContent,
+            url: movieNode.querySelector("* > a").getAttribute("href"),
+            metadata: Array.from(movieNode.querySelectorAll(".zsmall"))
+              .map((node: any) => node.textContent)
+              .filter((text: string) => text != "Ver trailer")
+              .join("\n"),
+            date,
+            dateString: dateInText,
+          }),
+        );
+      });
+
+    movies.forEach((m: any) => {
+      const imgUrl = m?.imgUrl;
+      const link = `https://filmspot.pt${m?.url}`;
+      const title = m.originalTitle ? `${m.title} (${m.originalTitle})` : m.title;
+      const desc = `<strong>Estreia:</strong> ${m.dateString}<br/><br/>
+          <strong>Metadata:</strong> ${m.metadata ?? ""}<br/><br/>
+          ${imgUrl ? `<img src="${imgUrl}" alt="${title}" /><br/>` : ""}`;
+
+      feed.addItem({
+        title,
+        id: link,
+        link,
+        content: desc,
+        date: m.date,
+      });
+    });
+
+    c.header("Content-Type", "application/rss+xml");
+    c.header("Cache-Control", "public, max-age=600");
+    return c.text(feed.rss2());
+  });
+  app.get("/rss.lbbonlineInternational", async (c) => {
+    const baseUrl = "https://lbbonline.com/news?edition=international";
+
+    const feed = new Feed({
+      title: "Little Black Book",
+      id: baseUrl,
+      link: baseUrl,
+      language: "en",
+      copyright: "",
+      updated: new Date(),
+    });
+
+    const options = {
+      method: "POST",
+      headers: {
+        "user-agent":
+          "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36",
+        // If this Bearer token stops working we can always:
+        // - Fetch the baseUrl -> Find the relevant .js -> Find the Bearer token inside the .js
+        Authorization: "Bearer 0282cf3b4b18a23017eb4e2a7dabd69092783b710ea98f926a5bc1bf02e10b67",
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        q: "",
+        offset: 0,
+        limit: 150,
+        sort: ["date:desc"],
+      }),
+    };
+
+    const response = await fetch("https://search.lbbonline.com/indexes/lbb_news/search", options);
+    const json: any = await response.json();
+
+    const now = new Date();
+    json.hits.forEach((post) => {
+      const id = post.id;
+      const title = post.title;
+      const link = new URL(`news/${post.slug}`, baseUrl).href;
+      const description = post.description;
+      const imageUrl = post.image
+        ? new URL(post.image, "https://d3q27bh1u24u2o.cloudfront.net").href
+        : null;
+      const image = imageUrl && imageUrl != "" ? `<br><img src="${imageUrl}"></img>` : "";
+      const date = new Date(post.date);
+
+      if (date < now) {
+        feed.addItem({
+          id,
+          title,
+          link,
+          content: `<a href="${link}">${link}</a><br><p>${description}</p>${image}`.trim(),
+          date,
+        });
+      }
+    });
+
+    c.header("Content-Type", "application/rss+xml");
+    c.header("Cache-Control", "public, max-age=600");
+    return c.text(feed.rss2());
+  });
+
+  app.get("/rss.informacaoLisboaAgenda", async (c) => {
+    const baseUrl = "https://informacao.lisboa.pt";
+    const feed = new Feed({
+      title: `Informação Lisboa Agenda`,
+      id: baseUrl,
+      link: baseUrl,
+      description: "Informação Lisboa Agenda",
+      language: "pt",
+      copyright: "",
+      updated: new Date(),
+    });
+    const response = await fetch(
+      "https://informacao.lisboa.pt/agenda?extensao=sfeventmgt&ambito=filter_sem_paginacao&pid=25&lang=0&cat_pai=19&offset=0",
+      {
+        headers: {
+          accept: "application/json",
+        },
+      },
+    );
+
+    const json: any = await response.json();
+    json.forEach((m: any) => {
+      const link = `${baseUrl}/agenda/o-que-fazer/${m.slug}/`;
+      const desc = `<strong>Categorias:</strong> ${m.categories.map((c: any) => c.title).join(", ")}<br/>${m.title}<br/>De ${m.startdate?.date} a ${m.enddate?.date}`;
+
+      feed.addItem({
+        title: m.title,
+        id: m.uid,
+        link,
+        content: desc,
+        date: new Date(m.startdate?.date),
+      });
+    });
+
+    c.header("Content-Type", "application/rss+xml");
+    c.header("Cache-Control", "public, max-age=600");
+    return c.text(feed.rss2());
+  });
+  app.get("/rss.informacaoLisboa", async (c) => {
+    const baseUrl = "https://informacao.lisboa.pt";
+    const feed = new Feed({
+      title: `Informação Lisboa`,
+      id: baseUrl,
+      link: baseUrl,
+      description: "Informação Lisboa",
+      language: "pt",
+      copyright: "",
+      updated: new Date(),
+    });
+
+    const response = await fetch(
+      "https://informacao.lisboa.pt/noticias?extensao=news&ambito=news_filter&pid=6&lang=0&offset=0",
+      {
+        headers: {
+          accept: "application/json",
+        },
+      },
+    );
+
+    const json: any = await response.json();
+    json.registos.forEach((m: any) => {
+      const link = `${baseUrl}/noticias/detalhe/${m.url}`;
+      const desc = `<strong>Categorias:</strong> ${m.categorias.map((c: any) => c.nome).join(", ")}<br/>${m.noticia}`;
+      feed.addItem({
+        title: m.titulo,
+        id: m.uid,
+        link,
+        content: desc,
+        date: parseDateTimeInformacaoLisboa(`${m.data}, ${m.hora}`),
+      });
+    });
+
+    c.header("Content-Type", "application/rss+xml");
+    c.header("Cache-Control", "public, max-age=600");
+    return c.text(feed.rss2());
+  });
+  app.get("/rss.fundoAmbiental", async (c) => {
+    const feed = new Feed({
+      title: `Fundo Ambiental – Últimas notícias`,
+      id: `https://www.fundoambiental.pt/listagem-noticias.aspx`,
+      link: `https://www.fundoambiental.pt/listagem-noticias.aspx`,
+      description: "Fundo Ambiental – Últimas notícias",
+      language: "pt",
+      copyright: "",
+      updated: new Date(),
+    });
+
+    const url = "https://www.fundoambiental.pt/listagem-noticias.aspx";
+    const r = await fetch(url);
+    const html = await r.text();
+    const document = new HTMLDOMParser().parseFromString(html, "text/html");
+
+    Array.from(document.querySelectorAll(".register")).forEach((node: any) => {
+      const title = node.querySelector(".register-title")?.textContent;
+      const url = node.querySelector(".register-title > a")?.getAttribute("href");
+      const body = node.querySelector(".register-text")?.textContent;
+      const dateString = node.querySelector(".register-date")?.textContent;
+      const date = parseDateFundoAmbiental(dateString);
+
+      feed.addItem({
+        title,
+        id: url,
+        link: url,
+        content: body,
+        date,
+      });
+    });
+
+    c.header("Content-Type", "application/rss+xml");
+    c.header("Cache-Control", "public, max-age=600");
+    return c.text(feed.rss2());
+  });
+
+  app.get("/rss.cinemateca", async (c) => {
+    const feed = new Feed({
+      title: `Programação Cinemateca`,
+      id: `https://www.cinemateca.pt/Programacao.aspx`,
+      link: `https://www.cinemateca.pt/Programacao.aspx`,
+      description: "Programação da Cinemateca",
+      language: "pt",
+      copyright: "",
+      updated: new Date(),
+    });
+
+    // Returns all agenda items
+    const scrapeUrls = Array.from(generateNext31Dates()).map(
+      (date) => `https://www.cinemateca.pt/Programacao.aspx?date=${date}`,
+    );
+    const responseTexts = await Promise.all(
+      scrapeUrls.map((url) => fetch(url).then((r) => r.text())),
+    );
+
+    responseTexts.forEach((text) => {
+      const document = new HTMLDOMParser().parseFromString(text, "text/html");
+      Array.from(document.querySelectorAll(".content > .w315")).forEach((node: any) => {
+        const infoBiblioNodes = Array.from(node.querySelectorAll(".infoBiblio"));
+        const title = node.querySelector(".infoTitle").textContent;
+        const director = infoBiblioNodes?.[1].textContent;
+        const extra = infoBiblioNodes?.[0]?.textContent || "";
+        const extra2 = infoBiblioNodes?.[2]?.textContent || "";
+        const infoDate = node.querySelector(".infoDate").textContent;
+        const room = infoDate.split("|")?.[1]?.trim();
+        const dateTimeStr = infoDate.split("|")?.[0]?.trim();
+        const dateTime = parseDateTimeStrCinemateca(dateTimeStr);
+        const link = `https://www.cinemateca.pt/Programacao.aspx${node.parentNode.parentNode.parentNode.getAttribute(
+          "href",
+        )}`;
+
+        feed.addItem({
+          title: `${title}, ${director}`,
+          id: link,
+          link,
+          content: `${dateTimeStr}<br>${extra}<br>${extra2}<br>${room}<br><a href="https://letterboxd.com/search/${encodeURIComponent(
+            title,
+          )}/?adult">Letterboxd</a>`,
+          date: dateTime,
+        });
+      });
+    });
+
+    c.header("Content-Type", "application/rss+xml");
+    c.header("Cache-Control", "public, max-age=600");
+    return c.text(feed.rss2());
+  });
+  app.get("/rss.nimas", async (c) => {
+    const feed = new Feed({
+      title: `Programação Nimas`,
+      id: `https://medeiafilmes.com/cinemas/cinema-medeia-nimas`,
+      link: `https://medeiafilmes.com/cinemas/cinema-medeia-nimas`,
+      description: "Programação do Cinema Medeia Nimas",
+      language: "pt",
+      copyright: "",
+      updated: new Date(),
+    });
+
+    // Returns all agenda items
+    const scrapeUrl = "https://medeiafilmes.com/cinemas/cinema-medeia-nimas";
+    const response = await fetch(scrapeUrl);
+    const text = await response.text();
+
+    const document = new HTMLDOMParser().parseFromString(text, "text/html");
+    Array.from(document.querySelectorAll("section > div > section[data-sticky-slug]")).forEach(
+      (grouped: any) => {
+        const dateStr = grouped
+          .querySelector(".header-title > h1")
+          .textContent.trim()
+          .replaceAll("\n", "");
+        Array.from(grouped.querySelectorAll("article")).forEach((movie: any) => {
+          const timeStr = movie
+            .querySelector(".schedule-designation")
+            .textContent.trim()
+            .replaceAll("\n", "");
+          const dateTimeStr = `${dateStr} ${timeStr}`;
+          const dateTime = parseDateTimeStrNimas(dateTimeStr);
+
+          const link = movie.querySelector(".schedule-content a ").getAttribute("href");
+          const titleNode = movie.querySelector(".schedule-content .t-headline");
+          const title = titleNode.textContent;
+          const director = titleNode.nextElementSibling.textContent;
+          const cycle = titleNode.nextElementSibling.nextElementSibling?.textContent?.trim() || "";
+          const poster =
+            movie
+              .querySelector(".schedule-content .schedule-cell--poster div.object-image")
+              .getAttribute("data-src") || "";
+          const extra =
+            movie
+              .querySelector(
+                ".schedule-content .schedule-cell:last-child > .t-text:nth-last-child(2)",
+              )
+              ?.textContent?.trim()
+              ?.replaceAll("\n", "")
+              ?.replaceAll(/\s+/g, " ") || "";
+
+          feed.addItem({
+            title: `${title}, ${director}`,
+            id: link,
+            link,
+            content: `${dateTimeStr}<br>${extra}<br>Ciclo: ${cycle}<br><a href="https://letterboxd.com/search/${encodeURIComponent(
+              title,
+            )}/?adult">Letterboxd</a><br><img src="${poster}"></img>`,
+            image: poster,
+            date: dateTime,
+          });
+        });
+      },
+    );
+
+    c.header("Content-Type", "application/rss+xml");
+    c.header("Cache-Control", "public, max-age=600");
+    return c.text(feed.rss2());
+  });
   app.get("/rss.agendaLxPdf", async (c) => {
     const feed = new Feed({
       title: `AgendaLX`,
