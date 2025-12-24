@@ -270,16 +270,4 @@ export function addXpathToRssEndpoints(app: Hono<{ Bindings: CloudflareBindings 
       },
     });
   });
-
-  app.get("/rss.flawlessDevBlog", async (c) => {
-    return await xpathToRss(c, {
-      title: "Flawless",
-      link: "https://flawless.dev/",
-      xpath: {
-        post: "/html/body/main/section[4]/ul/li/a",
-        title: "./child::node()[substring(., 12)]",
-        link: "./ancestor-or-self::node()/@href",
-      },
-    });
-  });
 }
