@@ -68,7 +68,7 @@ export default {
   }, app satisfies ExportedHandler<CloudflareBindings>).fetch,
   async scheduled(controller: ScheduledController, env: CloudflareBindings, ctx: ExecutionContext) {
     switch (controller.cron) {
-      case "*/15 * * * *":
+      case "*/5 * * * *":
         ctx.waitUntil(
           Sentry.withMonitor(
             "coverflex.sendAppleCatalogueByEmail",
@@ -80,7 +80,7 @@ export default {
             {
               schedule: {
                 type: "crontab",
-                value: "*/15 * * * *",
+                value: "*/5 * * * *",
               },
               checkinMargin: 2,
             },
