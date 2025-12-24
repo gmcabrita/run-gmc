@@ -14,6 +14,8 @@
       "@email/*": ["src/email/*"],
       "@coverflex": ["src/coverflex/index.ts"],
       "@coverflex/*": ["src/coverflex/*"],
+      "@xpathToRss": ["src/xpathToRss/index.ts"],
+      "@xpathToRss/*": ["src/xpathToRss/*"],
     },
   },
 }

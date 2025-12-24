@@ -11,8 +11,11 @@
   },
   "dependencies": {
     "@sentry/cloudflare": "^10.31.0",
+    "@xmldom/xmldom": "^0.8.11",
+    "feed": "^5.1.0",
     "hono": "^4.11.1",
-    "worker-mailer": "^1.2.1"
+    "worker-mailer": "^1.2.1",
+    "xpath": "^0.0.34"
   },
   "devDependencies": {
     "@sentry/cli": "^2",
