@@ -55,7 +55,7 @@ async function xpathToObject({
       "Content-Type": "application/json",
     },
   });
-  const html = await response.text();
+  let html = await response.text();
 
   const domParser = new DOMParser({
     errorHandler: {
@@ -67,8 +67,13 @@ async function xpathToObject({
     },
   });
 
+  if (!html.includes("</html>")) {
+    html = `<html>${html}</html>`;
+  }
+
   const document = domParser.parseFromString(html, "text/xml");
 
+  console.log(html);
   const posts: any = XPath.select(xpath.post, document);
 
   return posts.map((postNode: Node) => {
@@ -235,9 +240,9 @@ export function addXpathToRssEndpoints(app: Hono<{ Bindings: CloudflareBindings 
       title: "Riley Walz",
       link: "https://walzr.com/",
       xpath: {
-        post: "/html/body/div[2]/div[2]/a",
-        title: ".",
-        link: "./ancestor-or-self::node()/@href",
+        post: "//a[contains(string(@href), '/blog/')]",
+        title: "./text()",
+        link: "./@href",
       },
     });
   });
