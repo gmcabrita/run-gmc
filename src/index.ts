@@ -1,13 +1,24 @@
 import { Hono } from "hono";
 import * as Sentry from "@sentry/cloudflare";
+import { basicAuth } from "hono/basic-auth";
 import { addCoverflexEndpoints } from "@coverflex";
 
 const app = new Hono<{ Bindings: CloudflareBindings }>();
 addCoverflexEndpoints(app);
 
-app.get("/debug.throwError", (c) => {
-  throw new Error(`😵‍💫 im an error on ${c.env.ENVIRONMENT}`);
-});
+app.get(
+  "/sentry.debug.throwError",
+  async (c, next) => {
+    const auth = basicAuth({
+      username: c.env.PRIVATE_BASIC_AUTH_USERNAME,
+      password: c.env.PRIVATE_BASIC_AUTH_PASSWORD,
+    });
+    return auth(c, next);
+  },
+  (c) => {
+    throw new Error(`😵‍💫 im an error on ${c.env.ENVIRONMENT}`);
+  },
+);
 
 export default Sentry.withSentry((env: CloudflareBindings) => {
   const { id: versionId } = env.CF_VERSION_METADATA;
