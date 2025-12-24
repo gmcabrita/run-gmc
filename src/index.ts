@@ -1,7 +1,7 @@
 import { Hono } from "hono";
 import * as Sentry from "@sentry/cloudflare";
 import { basicAuth } from "hono/basic-auth";
-import { addCoverflexEndpoints } from "@coverflex";
+import { addCoverflexEndpoints, sendAppleCatalogueByEmail } from "@coverflex";
 
 const app = new Hono<{ Bindings: CloudflareBindings }>();
 addCoverflexEndpoints(app);
@@ -69,15 +69,12 @@ export default Sentry.withSentry(
   {
     fetch: app.fetch,
     async scheduled(controller, env, ctx) {
-      console.log({ controller });
       switch (controller.cron) {
         case "*/1 * * * *":
           await Sentry.withMonitor(
             "coverflex.sendAppleCatalogueByEmail",
             async () => {
-              await fetch(
-                `https://${env.PRIVATE_BASIC_AUTH_USERNAME}:${env.PRIVATE_BASIC_AUTH_PASSWORD}@run.gmcabrita.com/coverflex.sendAppleCatalogueByEmail`,
-              );
+              await sendAppleCatalogueByEmail();
             },
             {
               schedule: {

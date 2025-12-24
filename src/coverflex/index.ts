@@ -3,6 +3,17 @@ import { getAuthenticationToken } from "./util";
 import { basicAuth } from "hono/basic-auth";
 import { idempotentSendEmail } from "@email";
 
+export async function sendAppleCatalogueByEmail(env: CloudflareBindings) {
+  const { name, url } = await getAppleCatalogueFile(env);
+
+  await idempotentSendEmail(env, {
+    to: "goncalo@mendescabrita.com",
+    subject: `New Coverflex Apple catalogue available: ${name}`,
+    body: `<a href="${url}" target="_blank">${url}</a>`,
+    idempotencyKey: `coverflex-apple-catalogue-${name}`,
+  });
+}
+
 async function getAppleCatalogueFile(env: CloudflareBindings) {
   const url = "https://menhir-api.coverflex.com/api/employee/benefits/technology";
   const options = {
@@ -118,14 +129,7 @@ export function addCoverflexEndpoints(app: Hono<{ Bindings: CloudflareBindings }
       return auth(c, next);
     },
     async (c) => {
-      const { name, url } = await getAppleCatalogueFile(c.env);
-
-      await idempotentSendEmail(c.env, {
-        to: "goncalo@mendescabrita.com",
-        subject: `New Coverflex Apple catalogue available: ${name}`,
-        body: `<a href="${url}" target="_blank">${url}</a>`,
-        idempotencyKey: `coverflex-apple-catalogue-${name}`,
-      });
+      await sendAppleCatalogueByEmail(c.env);
 
       return c.text("");
     },
