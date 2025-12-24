@@ -1,6 +1,25 @@
+import * as fs from "fs";
+import * as path from "path";
 import * as readline from "readline";
 
 const API_BASE = "https://menhir-api.coverflex.com/api";
+
+function loadDevVars(): Record<string, string> {
+  const devVarsPath = path.join(process.cwd(), ".dev.vars");
+  if (!fs.existsSync(devVarsPath)) return {};
+
+  const content = fs.readFileSync(devVarsPath, "utf-8");
+  const vars: Record<string, string> = {};
+
+  for (const line of content.split("\n")) {
+    const trimmed = line.trim();
+    if (!trimmed || trimmed.startsWith("#")) continue;
+    const [key, ...valueParts] = trimmed.split("=");
+    if (key && valueParts) vars[key] = valueParts.join("=");
+  }
+
+  return vars;
+}
 
 const COMMON_HEADERS = {
   accept: "application/json, text/plain, */*",
@@ -77,8 +96,9 @@ async function trustUserAgent(token: string): Promise<string> {
 }
 
 async function main() {
-  const email = await prompt("Email: ");
-  const password = await prompt("Password: ");
+  const devVars = loadDevVars();
+  const email = devVars.COVERFLEX_EMAIL || (await prompt("Email: "));
+  const password = devVars.COVERFLEX_PASSWORD || (await prompt("Password: "));
 
   // First auth request (triggers OTP)
   console.log("\nAuthenticating...");
