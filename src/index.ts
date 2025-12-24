@@ -70,7 +70,7 @@ export default Sentry.withSentry(
     fetch: app.fetch,
     async scheduled(controller, env, ctx) {
       switch (controller.cron) {
-        case "*/1 * * * *":
+        case "*/15 * * * *":
           await Sentry.withMonitor(
             "coverflex.sendAppleCatalogueByEmail",
             async () => {
@@ -79,7 +79,7 @@ export default Sentry.withSentry(
             {
               schedule: {
                 type: "crontab",
-                value: "*/1 * * * *",
+                value: "*/15 * * * *",
               },
               checkinMargin: 2,
             },

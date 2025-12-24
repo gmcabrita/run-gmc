@@ -11,7 +11,7 @@
     },
   ],
   "triggers": {
-    "crons": ["*/1 * * * *"],
+    "crons": ["*/15 * * * *"],
   },
   "compatibility_flags": ["nodejs_compat"],
   "version_metadata": {
