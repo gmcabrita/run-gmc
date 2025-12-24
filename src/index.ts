@@ -20,11 +20,46 @@ app.get(
   },
 );
 
+app.get(
+  "/sentry.debug.log",
+  async (c, next) => {
+    const auth = basicAuth({
+      username: c.env.PRIVATE_BASIC_AUTH_USERNAME,
+      password: c.env.PRIVATE_BASIC_AUTH_PASSWORD,
+    });
+    return auth(c, next);
+  },
+  (c) => {
+    console.log("Logging something for debugging!");
+    return c.text("Logged something!");
+  },
+);
+
+app.get(
+  "/sentry.debug.tracing",
+  async (c, next) => {
+    const auth = basicAuth({
+      username: c.env.PRIVATE_BASIC_AUTH_USERNAME,
+      password: c.env.PRIVATE_BASIC_AUTH_PASSWORD,
+    });
+    return auth(c, next);
+  },
+  async (c) => {
+    await fetch("https://goncalo.mendescabrita.com");
+
+    return c.text("Fetched something!");
+  },
+);
+
 export default Sentry.withSentry((env: CloudflareBindings) => {
   const { id: versionId } = env.CF_VERSION_METADATA;
   return {
     dsn: "https://fc27b2ddd92ca2ed76a89cb8a5124dbb@o4510586740342784.ingest.us.sentry.io/4510586741981184",
     release: versionId,
+    tracesSampleRate: 1,
     sendDefaultPii: true,
+    integrations: [Sentry.consoleLoggingIntegration({ levels: ["log", "warn", "error"] })],
+    enableLogs: true,
+    enabled: env.ENVIRONMENT === "production",
   };
-}, app);
+}, app satisfies ExportedHandler<CloudflareBindings>);
