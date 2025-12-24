@@ -2,36 +2,11 @@ import { Hono } from "hono";
 import * as Sentry from "@sentry/cloudflare";
 import { basicAuth } from "hono/basic-auth";
 import { addCoverflexEndpoints, sendAppleCatalogueByEmail } from "@coverflex";
-import { xpathToRss } from "@xpathToRss";
+import { addXpathToRssEndpoints, sendCinecartazEntriesByEmail } from "@xpathToRss";
 
 const app = new Hono<{ Bindings: CloudflareBindings }>();
 addCoverflexEndpoints(app);
-
-app.get("/rss.ercNoticias", async (c) => {
-  return await xpathToRss(c, {
-    title: "Noticias ERC",
-    link: "https://www.erc.pt/pt/a-erc/noticias/",
-    xpath: {
-      post: `//div[contains(string(@class), 'news__article')]/article`,
-      title: ".//h1/text()",
-      link: ".//a[contains(string(@class), 'news__article__title')]/@href",
-      content: ".//div/p/text()",
-    },
-  });
-});
-
-app.get("/rss.cinecartaz", async (c) => {
-  return await xpathToRss(c, {
-    title: "Passatempos | Cinecartaz",
-    link: "https://cinecartaz.publico.pt/passatempos",
-    xpath: {
-      post: "//div[contains(concat(' ', normalize-space(string(@class)), ' '), ' hobbie-card ')]",
-      title: ".//h3[contains(string(@class), 'hobbie-card__title')][substring(., 12)]",
-      link: ".//a[contains(string(@class), 'button--hobbie')]/@href",
-      image: ".//div[contains(string(@class), 'hobbie-card__image')]/img/@src",
-    },
-  });
-});
+addXpathToRssEndpoints(app);
 
 app.get(
   "/sentry.debug.throwError",
@@ -97,6 +72,21 @@ export default Sentry.withSentry(
     fetch: app.fetch,
     async scheduled(controller, env, ctx) {
       switch (controller.cron) {
+        case "*/10 * * * *":
+          await Sentry.withMonitor(
+            "coverflex.sendCinecartazEntriesByEmail",
+            async () => {
+              await sendCinecartazEntriesByEmail(env);
+            },
+            {
+              schedule: {
+                type: "crontab",
+                value: "*/10 * * * *",
+              },
+              checkinMargin: 2,
+            },
+          );
+          break;
         case "*/15 * * * *":
           await Sentry.withMonitor(
             "coverflex.sendAppleCatalogueByEmail",
