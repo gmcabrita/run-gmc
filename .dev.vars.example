@@ -14,3 +14,8 @@ PRIVATE_BASIC_AUTH_PASSWORD=your-password
 # iCloud SMTP credentials (use app-specific password)
 ICLOUD_USER=your-email@example.com
 ICLOUD_PASSWORD=your-app-specific-password
+
+# X Bearer Token
+X_BEARER=
+X_COOKIE=
+X_CSRF_TOKEN=

@@ -16,6 +16,8 @@
       "@coverflex/*": ["src/coverflex/*"],
       "@xpathToRss": ["src/xpathToRss/index.ts"],
       "@xpathToRss/*": ["src/xpathToRss/*"],
+      "@xToRss": ["src/xToRss/index.ts"],
+      "@xToRss/*": ["src/xToRss/*"],
     },
   },
 }

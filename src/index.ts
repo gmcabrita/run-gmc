@@ -3,10 +3,12 @@ import * as Sentry from "@sentry/cloudflare";
 import { basicAuth } from "hono/basic-auth";
 import { addCoverflexEndpoints, sendAppleCatalogueByEmail } from "@coverflex";
 import { addXpathToRssEndpoints, sendCinecartazEntriesByEmail } from "@xpathToRss";
+import { addXToRssEndpoints } from "@xToRss";
 
 const app = new Hono<{ Bindings: CloudflareBindings }>();
 addCoverflexEndpoints(app);
 addXpathToRssEndpoints(app);
+addXToRssEndpoints(app);
 
 app.get(
   "/sentry.debug.throwError",

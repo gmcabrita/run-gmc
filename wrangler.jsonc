@@ -27,6 +27,10 @@
       "binding": "RUN_GMC_EMAIL_IDEMPOTENCY_KV",
       "id": "67a6fccf562346b386524702eca9f08a",
     },
+    {
+      "binding": "RUN_GMC_X_CACHE_KV",
+      "id": "729bee60cd2e4a8381aa4f0a96954a0f",
+    },
   ],
   // "r2_buckets": [
   //   {
