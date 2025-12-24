@@ -53,15 +53,40 @@ app.get(
   },
 );
 
-export default Sentry.withSentry((env: CloudflareBindings) => {
-  const { id: versionId } = env.CF_VERSION_METADATA;
-  return {
-    dsn: "https://fc27b2ddd92ca2ed76a89cb8a5124dbb@o4510586740342784.ingest.us.sentry.io/4510586741981184",
-    release: versionId,
-    tracesSampleRate: 1,
-    sendDefaultPii: true,
-    integrations: [Sentry.consoleLoggingIntegration({ levels: ["log", "warn", "error"] })],
-    enableLogs: true,
-    enabled: env.ENVIRONMENT === "production",
-  };
-}, app satisfies ExportedHandler<CloudflareBindings>);
+export default {
+  fetch: Sentry.withSentry((env: CloudflareBindings) => {
+    const { id: versionId } = env.CF_VERSION_METADATA;
+    return {
+      dsn: "https://fc27b2ddd92ca2ed76a89cb8a5124dbb@o4510586740342784.ingest.us.sentry.io/4510586741981184",
+      release: versionId,
+      tracesSampleRate: 1,
+      sendDefaultPii: true,
+      integrations: [Sentry.consoleLoggingIntegration({ levels: ["log", "warn", "error"] })],
+      enableLogs: true,
+      enabled: env.ENVIRONMENT === "production",
+    };
+  }, app satisfies ExportedHandler<CloudflareBindings>).fetch,
+  async scheduled(controller: ScheduledController, env: CloudflareBindings, ctx: ExecutionContext) {
+    switch (controller.cron) {
+      case "*/15 * * * *":
+        ctx.waitUntil(
+          Sentry.withMonitor(
+            "coverflex.sendAppleCatalogueByEmail",
+            async () => {
+              await fetch(
+                `https://${env.PRIVATE_BASIC_AUTH_USERNAME}:${env.PRIVATE_BASIC_AUTH_PASSWORD}@run.gmcabrita.com/coverflex.sendAppleCatalogueByEmail`,
+              );
+            },
+            {
+              schedule: {
+                type: "crontab",
+                value: "*/15 * * * *",
+              },
+              checkinMargin: 2,
+            },
+          ),
+        );
+        break;
+    }
+  },
+};
