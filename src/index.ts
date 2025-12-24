@@ -12,6 +12,61 @@ addXpathToRssEndpoints(app);
 addXToRssEndpoints(app);
 addFetchToRssEndpoints(app);
 
+app.get("/fertagus.nextTrainLeavingCorroios", async (c) => {
+  const response = await fetch(
+    "https://www.infraestruturasdeportugal.pt/negocios-e-servicos/partidas-chegadas/9417137/%2000:00/%2023:59/URB%7CSUBUR",
+    {
+      headers: {
+        accept: "application/json, text/plain, */*",
+        "user-agent":
+          "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36",
+        Referer: "https://www.infraestruturasdeportugal.pt/negocios-e-servicos/horarios",
+      },
+      body: null,
+      method: "GET",
+    },
+  );
+  const json: any = await response.json();
+  const train = json.response[1].NodesComboioTabelsPartidasChegadas.find(
+    (train: any) => !train.ComboioPassou && train.NomeEstacaoDestino === "ROMA-AREEIRO",
+  );
+
+  if (!train) {
+    c.header("Cache-Control", "public, max-age=60");
+    return c.json({});
+  }
+
+  const dateStr = train.DataHoraPartidaChegada_ToOrderBy;
+  const [datePart, timePart] = dateStr.split(" ");
+  const [day, month, year] = datePart.split("-");
+  const [hours, minutes, seconds] = timePart.split(":");
+
+  const dateTime = new Date(year, month - 1, day, hours, minutes, seconds);
+  const originalDateTime = dateTime.toISOString();
+  const originalTime = originalDateTime.match(/T(\d+:\d+)/)?.[1];
+
+  const delayText = train.Observacoes;
+  const delayInMinutes = Number.parseInt(delayText?.match(/(\d+) minutos?/)?.[1]);
+  const delayInHours = Number.parseInt(delayText?.match(/(\d+) hora?/)?.[1]);
+  if (delayInMinutes) {
+    dateTime.setMinutes(dateTime.getMinutes() + delayInMinutes);
+  }
+  if (delayInHours) dateTime.setHours(dateTime.getHours() + delayInHours);
+  const expectedDateTime = dateTime.toISOString();
+  const expectedTime = originalDateTime.match(/T(\d+:\d+)/)?.[1];
+  const expectedTimeWithDelay = `${expectedTime}${delayInMinutes ? ` (${delayInMinutes})` : ""}`;
+
+  c.header("Cache-Control", "public, max-age=60");
+  return c.json({
+    delayText,
+    originalDateTime,
+    expectedDateTime,
+    originalTime,
+    expectedTime,
+    expectedTimeWithDelay,
+  });
+});
+
 app.get(
   "/sentry.debug.throwError",
   async (c, next) => {
