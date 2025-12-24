@@ -232,11 +232,11 @@ export function addXpathToRssEndpoints(app: Hono<{ Bindings: CloudflareBindings 
 
   app.get("/rss.walzrBlog", async (c) => {
     return await xpathToRss(c, {
-      title: "Kit Langton",
-      link: "https://www.kitlangton.com/",
+      title: "Riley Walz",
+      link: "https://walzr.com/",
       xpath: {
-        post: "/html/body/main/div[7]/div/div[1]/div[2]/a",
-        title: "./child::node()[substring(., 12)]",
+        post: "/html/body/div[2]/div[2]/a",
+        title: ".",
         link: "./ancestor-or-self::node()/@href",
       },
     });
