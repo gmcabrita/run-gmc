@@ -3,10 +3,10 @@
   "type": "module",
   "scripts": {
     "dev": "wrangler dev",
-    "deploy": "wrangler deploy --minify --outdir dist --upload-source-maps --var SENTRY_RELEASE:$(sentry-cli releases propose-version)",
+    "deploy": "wrangler deploy --minify --outdir dist --upload-source-maps",
     "cf-typegen": "wrangler types --env-interface CloudflareBindings",
     "coverflex-uat": "pnpm dlx tsx bin/coverflex-uat.ts",
-    "sentry:sourcemaps": "_SENTRY_RELEASE=$(sentry-cli releases propose-version) && sentry-cli releases new $_SENTRY_RELEASE --org=gmcabrita-2q --project=run-gmc && sentry-cli sourcemaps upload --org=gmcabrita-2q --project=run-gmc --release=$_SENTRY_RELEASE --strip-prefix 'dist/..' dist",
+    "sentry:sourcemaps": "sentry-cli sourcemaps inject dist && sentry-cli sourcemaps upload --org=gmcabrita-2q --project=run-gmc dist",
     "postdeploy": "pnpm sentry:sourcemaps"
   },
   "dependencies": {
