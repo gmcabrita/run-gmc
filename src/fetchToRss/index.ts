@@ -146,6 +146,46 @@ export async function cacheAgendaLx(env: CloudflareBindings) {
 }
 
 export function addFetchToRssEndpoints(app: Hono<{ Bindings: CloudflareBindings }>) {
+  app.get("/rss.agendaLxPdf", async (c) => {
+    const feed = new Feed({
+      title: `AgendaLX`,
+      id: `https://www.agendalx.pt`,
+      link: `https://www.agendalx.pt`,
+      description: "AgendaLX",
+      language: "pt",
+      copyright: "",
+      updated: new Date(),
+    });
+
+    const response = await fetch("https://www.agendalx.pt");
+    const html = await response.text();
+
+    const domParser = new DOMParser({
+      errorHandler: {
+        warning: () => {},
+        error: () => {},
+        fatalError: (err) => {
+          throw new Error(err);
+        },
+      },
+    });
+    const document = domParser.parseFromString(html, "text/xml");
+    const hrefs: any = XPath.select("//a[contains(string(@href), '.pdf')]/@href", document);
+
+    for (const href of hrefs) {
+      feed.addItem({
+        title: href.value,
+        id: href.value,
+        link: href.value,
+        content: `<a href="${href.value}">${href.value}</a>`,
+      });
+    }
+
+    c.header("Content-Type", "application/rss+xml");
+    c.header("Cache-Control", "public, max-age=600");
+    return c.text(feed.rss2());
+  });
+
   app.get("/rss.agendaLx", async (c) => {
     const rss2 = (await c.env.RUN_GMC_GENERIC_CACHE_KV.get("agenda-lx-eventos")) || "";
 
