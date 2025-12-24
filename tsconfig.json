@@ -18,6 +18,8 @@
       "@xpathToRss/*": ["src/xpathToRss/*"],
       "@xToRss": ["src/xToRss/index.ts"],
       "@xToRss/*": ["src/xToRss/*"],
+      "@fetchToRss": ["src/fetchToRss/index.ts"],
+      "@fetchToRss/*": ["src/fetchToRss/*"],
     },
   },
 }

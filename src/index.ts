@@ -4,11 +4,13 @@ import { basicAuth } from "hono/basic-auth";
 import { addCoverflexEndpoints, sendAppleCatalogueByEmail } from "@coverflex";
 import { addXpathToRssEndpoints, sendCinecartazEntriesByEmail } from "@xpathToRss";
 import { addXToRssEndpoints } from "@xToRss";
+import { addFetchToRssEndpoints } from "@fetchToRss";
 
 const app = new Hono<{ Bindings: CloudflareBindings }>();
 addCoverflexEndpoints(app);
 addXpathToRssEndpoints(app);
 addXToRssEndpoints(app);
+addFetchToRssEndpoints(app);
 
 app.get(
   "/sentry.debug.throwError",
@@ -54,6 +56,27 @@ app.get(
     await fetch("https://goncalo.mendescabrita.com");
 
     return c.text("Fetched something!");
+  },
+);
+
+app.get(
+  "/routes",
+  async (c, next) => {
+    const auth = basicAuth({
+      username: c.env.PRIVATE_BASIC_AUTH_USERNAME,
+      password: c.env.PRIVATE_BASIC_AUTH_PASSWORD,
+    });
+    return auth(c, next);
+  },
+  async (c) => {
+    return c.text(
+      app.routes
+        .map((route) => {
+          return `${route.method} ${route.path}`;
+        })
+        .filter((value, index, self) => self.indexOf(value) === index)
+        .join("\n"),
+    );
   },
 );
 
