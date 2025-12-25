@@ -178,6 +178,11 @@ export function addXpathToRssEndpoints(app: Hono<{ Bindings: CloudflareBindings 
     });
   });
 
+  app.get("/rss.sendCinecartazEntriesByEmail", async (c) => {
+    await sendCinecartazEntriesByEmail(c.env);
+    return c.text("");
+  });
+
   app.get("/rss.cinecartaz", async (c) => {
     return await xpathToRss(c, CINECARTAZ_XPATH_CONFIG);
   });
