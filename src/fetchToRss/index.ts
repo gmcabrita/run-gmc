@@ -19,7 +19,7 @@ function parseDateFilmspot(dateString: string): Date {
 }
 
 function parseDateTimeInformacaoLisboa(dateStr: string) {
-  const months = {
+  const months: Record<string, number> = {
     jan: 0,
     fev: 1,
     mar: 2,
@@ -48,7 +48,7 @@ function parseDateTimeInformacaoLisboa(dateStr: string) {
     throw new Error(`Invalid month abbreviation: ${dateStr}`);
   }
 
-  return new Date(year, monthIndex, day, hour, minute);
+  return new Date(Number(year), monthIndex, Number(day), Number(hour), Number(minute));
 }
 
 function parseDateFundoAmbiental(dateString: string): Date {
@@ -123,7 +123,7 @@ export async function cacheAgendaLx(env: CloudflareBindings) {
 
     let venue = "";
     if (event.venue) {
-      const venueObj = Object.values(event.venue)[0];
+      const venueObj = Object.values(event.venue)[0] as { name?: string } | undefined;
       if (venueObj && venueObj.name) {
         venue = venueObj.name;
       }
@@ -131,12 +131,12 @@ export async function cacheAgendaLx(env: CloudflareBindings) {
 
     const categories = event.categories_name_list
       ? Object.values(event.categories_name_list)
-          .map((cat) => cat.name)
+          .map((cat: any) => cat.name)
           .join(", ")
       : "";
     const tags = event.tags_name_list
       ? Object.values(event.tags_name_list)
-          .map((tag) => tag.name)
+          .map((tag: any) => tag.name)
           .join(", ")
       : "";
 
@@ -288,7 +288,7 @@ export function addFetchToRssEndpoints(app: Hono<{ Bindings: CloudflareBindings 
     const json: any = await response.json();
 
     const now = new Date();
-    json.hits.forEach((post) => {
+    json.hits.forEach((post: any) => {
       const id = post.id;
       const title = post.title;
       const link = new URL(`news/${post.slug}`, baseUrl).href;
@@ -450,9 +450,9 @@ export function addFetchToRssEndpoints(app: Hono<{ Bindings: CloudflareBindings 
     responseTexts.forEach((text) => {
       const document = new HTMLDOMParser().parseFromString(text, "text/html");
       Array.from(document.querySelectorAll(".content > .w315")).forEach((node: any) => {
-        const infoBiblioNodes = Array.from(node.querySelectorAll(".infoBiblio"));
+        const infoBiblioNodes = Array.from(node.querySelectorAll(".infoBiblio")) as any[];
         const title = node.querySelector(".infoTitle").textContent;
-        const director = infoBiblioNodes?.[1].textContent;
+        const director = infoBiblioNodes?.[1]?.textContent;
         const extra = infoBiblioNodes?.[0]?.textContent || "";
         const extra2 = infoBiblioNodes?.[2]?.textContent || "";
         const infoDate = node.querySelector(".infoDate").textContent;
@@ -578,6 +578,7 @@ export function addFetchToRssEndpoints(app: Hono<{ Bindings: CloudflareBindings 
         id: href.value,
         link: href.value,
         content: `<a href="${href.value}">${href.value}</a>`,
+        date: new Date(),
       });
     }
 
@@ -970,6 +971,7 @@ export function addFetchToRssEndpoints(app: Hono<{ Bindings: CloudflareBindings 
           title: link,
           link: link,
           content: `<a href="${link}">${link}</a>`,
+          date: new Date(),
         });
       });
 
