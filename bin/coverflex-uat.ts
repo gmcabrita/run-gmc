@@ -91,7 +91,7 @@ async function trustUserAgent(token: string): Promise<string> {
     throw new Error(`Trust user agent failed: ${response.status} - ${text}`);
   }
 
-  const json: any = await response.json();
+  const json: { user_agent_token: string } = await response.json();
   return json.user_agent_token;
 }
 
