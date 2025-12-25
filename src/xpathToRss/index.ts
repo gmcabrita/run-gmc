@@ -73,7 +73,6 @@ async function xpathToObject({
 
   const document = domParser.parseFromString(html, "text/xml");
 
-  console.log(html);
   const posts = XPath.select(xpath.post, document) as Node[];
 
   return posts.map((postNode: Node) => {
