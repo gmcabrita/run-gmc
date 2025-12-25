@@ -91,10 +91,10 @@ function parseDateTimeStrCinemateca(dateTimeStr: string): Date {
   );
 }
 
-function* generateNext62Dates() {
+function* generateNextDatesCinemateca() {
   const today = new Date();
 
-  for (let i = 0; i < 62; i++) {
+  for (let i = 0; i < 50; i++) {
     // Yield the date in ISO 8601 format (e.g., "2025-08-04")
     yield today.toISOString().split("T")[0];
 
@@ -460,7 +460,7 @@ export function addFetchToRssEndpoints(app: Hono<{ Bindings: CloudflareBindings 
     });
 
     // Returns all agenda items
-    const scrapeUrls = Array.from(generateNext62Dates()).map(
+    const scrapeUrls = Array.from(generateNextDatesCinemateca()).map(
       (date) => `https://www.cinemateca.pt/Programacao.aspx?date=${date}`,
     );
     const responseTexts = await Promise.all(
