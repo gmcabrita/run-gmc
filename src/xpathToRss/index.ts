@@ -4,6 +4,7 @@ import XPath from "xpath";
 import { DOMParser } from "@xmldom/xmldom";
 import type { Context } from "hono";
 import { idempotentSendEmail } from "@email";
+import type { XPathRssPost } from "@types";
 
 const CINECARTAZ_XPATH_CONFIG = {
   title: "Passatempos | Cinecartaz",
@@ -31,7 +32,6 @@ export async function sendCinecartazEntriesByEmail(env: CloudflareBindings) {
 }
 
 async function xpathToObject({
-  title,
   link,
   fetchUrl,
   xpath,
@@ -47,7 +47,7 @@ async function xpathToObject({
     image?: string;
     datetime?: string;
   };
-}) {
+}): Promise<XPathRssPost[]> {
   const response = await fetch(fetchUrl || link, {
     headers: {
       "user-agent":
@@ -74,7 +74,7 @@ async function xpathToObject({
   const document = domParser.parseFromString(html, "text/xml");
 
   console.log(html);
-  const posts: any = XPath.select(xpath.post, document);
+  const posts = XPath.select(xpath.post, document) as Node[];
 
   return posts.map((postNode: Node) => {
     const titleNode = XPath.select1(xpath.title, postNode) as Node | undefined;
@@ -129,6 +129,7 @@ async function xpathToRss(
 ): Promise<Response> {
   const feed = new Feed({
     title,
+    description: title,
     id: link,
     link,
     language: "en",
@@ -142,7 +143,7 @@ async function xpathToRss(
     fetchUrl,
     xpath,
   });
-  posts.forEach((post: any) => {
+  posts.forEach((post) => {
     feed.addItem(post);
   });
 

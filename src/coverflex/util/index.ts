@@ -1,4 +1,6 @@
-export async function getAuthenticationToken(env: CloudflareBindings) {
+import type { CoverflexAuthResponse } from "@types";
+
+export async function getAuthenticationToken(env: CloudflareBindings): Promise<string> {
   const authUrl = "https://menhir-api.coverflex.com/api/employee/sessions";
   const authOptions = {
     headers: {
@@ -22,6 +24,6 @@ export async function getAuthenticationToken(env: CloudflareBindings) {
     method: "POST",
   };
   const authResponse = await fetch(authUrl, authOptions);
-  const authJson: any = await authResponse.json();
+  const authJson = (await authResponse.json()) as CoverflexAuthResponse;
   return authJson.token;
 }

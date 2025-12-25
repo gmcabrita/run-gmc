@@ -5,6 +5,7 @@ import { addCoverflexEndpoints, sendAppleCatalogueByEmail } from "@coverflex";
 import { addXpathToRssEndpoints, sendCinecartazEntriesByEmail } from "@xpathToRss";
 import { addXToRssEndpoints } from "@xToRss";
 import { addFetchToRssEndpoints, cacheAgendaLx } from "@fetchToRss";
+import type { FertagusResponse } from "@types";
 
 const app = new Hono<{ Bindings: CloudflareBindings }>();
 addCoverflexEndpoints(app);
@@ -26,9 +27,9 @@ app.get("/fertagus.nextTrainLeavingCorroios", async (c) => {
       method: "GET",
     },
   );
-  const json: any = await response.json();
+  const json = (await response.json()) as FertagusResponse;
   const train = json.response[1].NodesComboioTabelsPartidasChegadas.find(
-    (train: any) => !train.ComboioPassou && train.NomeEstacaoDestino === "ROMA-AREEIRO",
+    (train) => !train.ComboioPassou && train.NomeEstacaoDestino === "ROMA-AREEIRO",
   );
 
   if (!train) {
@@ -41,13 +42,20 @@ app.get("/fertagus.nextTrainLeavingCorroios", async (c) => {
   const [day, month, year] = datePart.split("-");
   const [hours, minutes, seconds] = timePart.split(":");
 
-  const dateTime = new Date(year, month - 1, day, hours, minutes, seconds);
+  const dateTime = new Date(
+    Number(year),
+    Number(month) - 1,
+    Number(day),
+    Number(hours),
+    Number(minutes),
+    Number(seconds),
+  );
   const originalDateTime = dateTime.toISOString();
   const originalTime = originalDateTime.match(/T(\d+:\d+)/)?.[1];
 
   const delayText = train.Observacoes;
-  const delayInMinutes = Number.parseInt(delayText?.match(/(\d+) minutos?/)?.[1]);
-  const delayInHours = Number.parseInt(delayText?.match(/(\d+) hora?/)?.[1]);
+  const delayInMinutes = Number.parseInt(delayText?.match(/(\d+) minutos?/)?.[1] ?? "0");
+  const delayInHours = Number.parseInt(delayText?.match(/(\d+) hora?/)?.[1] ?? "0");
   if (delayInMinutes) {
     dateTime.setMinutes(dateTime.getMinutes() + delayInMinutes);
   }
@@ -124,14 +132,16 @@ app.get(
     return auth(c, next);
   },
   async (c) => {
-    return c.text(
-      app.routes
+    return c.html(`<html>
+    <body>
+      ${app.routes
         .map((route) => {
-          return `${route.method} ${new URL(route.path, "https://run.gmcabrita.com/rss.filmspotEstreias").href}`;
+          return `<code>${route.method} <a href="${route.path}" target="_blank">${route.path}</a><br></code>`;
         })
         .filter((value, index, self) => self.indexOf(value) === index)
-        .join("\n"),
-    );
+        .join("\n")}
+    </body>
+    </html>`);
   },
 );
 

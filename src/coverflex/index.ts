@@ -2,6 +2,7 @@ import { Hono } from "hono";
 import { getAuthenticationToken } from "./util";
 import { basicAuth } from "hono/basic-auth";
 import { idempotentSendEmail } from "@email";
+import type { CoverflexTechnologyResponse, CoverflexPocketsResponse } from "@types";
 
 export async function sendAppleCatalogueByEmail(env: CloudflareBindings) {
   const { name, url } = await getAppleCatalogueFile(env);
@@ -43,13 +44,17 @@ async function getAppleCatalogueFile(env: CloudflareBindings) {
     throw new Error(`Error:  ${response.status}`);
   }
 
-  const json: any = await response.json();
+  const json = (await response.json()) as CoverflexTechnologyResponse;
   if (json.benefit.slug != "technology") {
     throw new Error(`Response: ${JSON.stringify(json)}`);
   }
 
-  const product = json.benefit.products.find((product: any) => product.slug == "apple");
-  const file = product.files.find((file: any) => file.slug.includes("-en-"));
+  const product = json.benefit.products.find((product) => product.slug == "apple");
+  const file = product?.files.find((file) => file.slug.includes("-en-"));
+
+  if (!file) {
+    throw new Error("Apple catalogue file not found");
+  }
 
   return { name: file.name, url: file.url };
 }
@@ -83,8 +88,13 @@ async function getCoverflexBudget(env: CloudflareBindings) {
     throw new Error(`Error:  ${response.status}`);
   }
 
-  const json: any = await response.json();
-  const pocket = json.pockets.find((pocket: any) => pocket.type == "meals");
+  const json = (await response.json()) as CoverflexPocketsResponse;
+  const pocket = json.pockets.find((pocket) => pocket.type == "meals");
+
+  if (!pocket) {
+    throw new Error("Meals pocket not found");
+  }
+
   const currentBudget = pocket.balance.amount / 100;
 
   return { budget: `${currentBudget}€` };

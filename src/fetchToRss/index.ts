@@ -4,6 +4,19 @@ import XPath from "xpath";
 import { DOMParser } from "@xmldom/xmldom";
 import { DOMParser as HTMLDOMParser } from "linkedom";
 import xml2js from "xml2js";
+import type {
+  AgendaLxEvent,
+  FilmspotMovie,
+  LbbOnlineResponse,
+  InformacaoLisboaAgendaItem,
+  InformacaoLisboaNoticiasResponse,
+  PrimeGamingResponse,
+  EpicMobileDiscoverResponse,
+  EpicDesktopFreeGamesResponse,
+  ScyllaDbEventsResponse,
+  ImagensDeMarcaResponse,
+  AnteEstreiasRssParsed,
+} from "@types";
 
 function dateToDateStringFilmspot(date: Date): string {
   return date.toISOString().split("T")[0].replaceAll("-", "");
@@ -109,7 +122,7 @@ export async function cacheAgendaLx(env: CloudflareBindings) {
   }
 
   const now = new Date();
-  const events: any = await response.json();
+  const events = (await response.json()) as AgendaLxEvent[];
 
   for (const event of events) {
     const title = event.title?.rendered || "Untitled Event";
@@ -131,16 +144,17 @@ export async function cacheAgendaLx(env: CloudflareBindings) {
 
     const categories = event.categories_name_list
       ? Object.values(event.categories_name_list)
-          .map((cat: any) => cat.name)
+          .map((cat) => cat.name)
           .join(", ")
       : "";
     const tags = event.tags_name_list
       ? Object.values(event.tags_name_list)
-          .map((tag: any) => tag.name)
+          .map((tag) => tag.name)
           .join(", ")
       : "";
 
-    const startDate = event.occurences?.length > 0 ? event.occurences[0] : event.StartDate;
+    const startDate =
+      event.occurences && event.occurences.length > 0 ? event.occurences[0] : event.StartDate;
     const dates = event.string_dates || "";
     const times = event.string_times || "";
 
@@ -195,6 +209,7 @@ export function addFetchToRssEndpoints(app: Hono<{ Bindings: CloudflareBindings 
     const url = "https://filmspot.pt/estreias";
     const feed = new Feed({
       title: "filmSPOT – Próximas estreias",
+      description: "filmSPOT – Próximas estreias",
       id: url,
       link: url,
       language: "pt",
@@ -206,38 +221,41 @@ export function addFetchToRssEndpoints(app: Hono<{ Bindings: CloudflareBindings 
     const document = new HTMLDOMParser().parseFromString(html, "text/html");
 
     const movies = Array.from(document.querySelectorAll(".estreiasH2"))
-      .filter(
-        (premiereNode: any) => premiereNode.id.match(/\d{8}$/)[0] <= sevenDaysFromNowFilmspot(),
-      )
-      .flatMap((premiereNode: any) => {
-        const dateInText = premiereNode.textContent;
-        const dateString = premiereNode.id.match(/\d{8}$/)[0];
+      .filter((premiereNode) => {
+        const el = premiereNode as Element;
+        return el.id.match(/\d{8}$/)?.[0]! <= sevenDaysFromNowFilmspot();
+      })
+      .flatMap((premiereNode) => {
+        const el = premiereNode as Element & { nextSibling: Element };
+        const dateInText = el.textContent;
+        const dateString = el.id.match(/\d{8}$/)?.[0] ?? "";
         const date = parseDateFilmspot(dateString);
 
-        return Array.from(premiereNode.nextSibling.querySelectorAll(".filmeLista")).map(
-          (movieNode: any) => ({
-            imgUrl: movieNode
+        return Array.from(el.nextSibling.querySelectorAll(".filmeLista")).map((movieNode) => {
+          const movieEl = movieNode as Element;
+          return {
+            imgUrl: movieEl
               .querySelector(".filmeListaPoster > a > img")
-              .getAttribute("src")
+              ?.getAttribute("src")
               ?.replace("/thumb", ""),
-            originalTitle: movieNode.querySelector(".tituloOriginal")?.textContent,
-            title: movieNode.querySelector(".filmeListaInfo > h3 > a > span")?.textContent,
-            url: movieNode.querySelector("* > a").getAttribute("href"),
-            metadata: Array.from(movieNode.querySelectorAll(".zsmall"))
-              .map((node: any) => node.textContent)
-              .filter((text: string) => text != "Ver trailer")
+            originalTitle: movieEl.querySelector(".tituloOriginal")?.textContent,
+            title: movieEl.querySelector(".filmeListaInfo > h3 > a > span")?.textContent,
+            url: movieEl.querySelector("* > a")?.getAttribute("href"),
+            metadata: Array.from(movieEl.querySelectorAll(".zsmall"))
+              .map((node) => (node as Element).textContent)
+              .filter((text): text is string => text != null && text != "Ver trailer")
               .join("\n"),
             date,
             dateString: dateInText,
-          }),
-        );
+          } as FilmspotMovie;
+        });
       });
 
-    movies.forEach((m: any) => {
+    movies.forEach((m) => {
       const imgUrl = m?.imgUrl;
-      const link = `https://filmspot.pt${m?.url}`;
-      const title = m.originalTitle ? `${m.title} (${m.originalTitle})` : m.title;
-      const desc = `<strong>Estreia:</strong> ${m.dateString}<br/><br/>
+      const link = `https://filmspot.pt${m?.url ?? ""}`;
+      const title = m.originalTitle ? `${m.title} (${m.originalTitle})` : (m.title ?? "");
+      const desc = `<strong>Estreia:</strong> ${m.dateString ?? ""}<br/><br/>
           <strong>Metadata:</strong> ${m.metadata ?? ""}<br/><br/>
           ${imgUrl ? `<img src="${imgUrl}" alt="${title}" /><br/>` : ""}`;
 
@@ -259,6 +277,7 @@ export function addFetchToRssEndpoints(app: Hono<{ Bindings: CloudflareBindings 
 
     const feed = new Feed({
       title: "Little Black Book",
+      description: "Little Black Book",
       id: baseUrl,
       link: baseUrl,
       language: "en",
@@ -285,10 +304,10 @@ export function addFetchToRssEndpoints(app: Hono<{ Bindings: CloudflareBindings 
     };
 
     const response = await fetch("https://search.lbbonline.com/indexes/lbb_news/search", options);
-    const json: any = await response.json();
+    const json = (await response.json()) as LbbOnlineResponse;
 
     const now = new Date();
-    json.hits.forEach((post: any) => {
+    json.hits.forEach((post) => {
       const id = post.id;
       const title = post.title;
       const link = new URL(`news/${post.slug}`, baseUrl).href;
@@ -335,17 +354,17 @@ export function addFetchToRssEndpoints(app: Hono<{ Bindings: CloudflareBindings 
       },
     );
 
-    const json: any = await response.json();
-    json.forEach((m: any) => {
+    const json = (await response.json()) as InformacaoLisboaAgendaItem[];
+    json.forEach((m) => {
       const link = `${baseUrl}/agenda/o-que-fazer/${m.slug}/`;
-      const desc = `<strong>Categorias:</strong> ${m.categories.map((c: any) => c.title).join(", ")}<br/>${m.title}<br/>De ${m.startdate?.date} a ${m.enddate?.date}`;
+      const desc = `<strong>Categorias:</strong> ${m.categories.map((c) => c.title).join(", ")}<br/>${m.title}<br/>De ${m.startdate?.date} a ${m.enddate?.date}`;
 
       feed.addItem({
         title: m.title,
         id: m.uid,
         link,
         content: desc,
-        date: new Date(m.startdate?.date),
+        date: new Date(m.startdate?.date ?? new Date()),
       });
     });
 
@@ -374,10 +393,10 @@ export function addFetchToRssEndpoints(app: Hono<{ Bindings: CloudflareBindings 
       },
     );
 
-    const json: any = await response.json();
-    json.registos.forEach((m: any) => {
+    const json = (await response.json()) as InformacaoLisboaNoticiasResponse;
+    json.registos.forEach((m) => {
       const link = `${baseUrl}/noticias/detalhe/${m.url}`;
-      const desc = `<strong>Categorias:</strong> ${m.categorias.map((c: any) => c.nome).join(", ")}<br/>${m.noticia}`;
+      const desc = `<strong>Categorias:</strong> ${m.categorias.map((c) => c.nome).join(", ")}<br/>${m.noticia}`;
       feed.addItem({
         title: m.titulo,
         id: m.uid,
@@ -407,11 +426,12 @@ export function addFetchToRssEndpoints(app: Hono<{ Bindings: CloudflareBindings 
     const html = await r.text();
     const document = new HTMLDOMParser().parseFromString(html, "text/html");
 
-    Array.from(document.querySelectorAll(".register")).forEach((node: any) => {
-      const title = node.querySelector(".register-title")?.textContent;
-      const url = node.querySelector(".register-title > a")?.getAttribute("href");
-      const body = node.querySelector(".register-text")?.textContent;
-      const dateString = node.querySelector(".register-date")?.textContent;
+    Array.from(document.querySelectorAll(".register")).forEach((node) => {
+      const el = node as Element;
+      const title = el.querySelector(".register-title")?.textContent ?? "";
+      const url = el.querySelector(".register-title > a")?.getAttribute("href") ?? "";
+      const body = el.querySelector(".register-text")?.textContent ?? "";
+      const dateString = el.querySelector(".register-date")?.textContent ?? "";
       const date = parseDateFundoAmbiental(dateString);
 
       feed.addItem({
@@ -449,19 +469,21 @@ export function addFetchToRssEndpoints(app: Hono<{ Bindings: CloudflareBindings 
 
     responseTexts.forEach((text) => {
       const document = new HTMLDOMParser().parseFromString(text, "text/html");
-      Array.from(document.querySelectorAll(".content > .w315")).forEach((node: any) => {
-        const infoBiblioNodes = Array.from(node.querySelectorAll(".infoBiblio")) as any[];
-        const title = node.querySelector(".infoTitle").textContent;
-        const director = infoBiblioNodes?.[1]?.textContent;
+      Array.from(document.querySelectorAll(".content > .w315")).forEach((node) => {
+        const el = node as Element;
+        const infoBiblioNodes = Array.from(el.querySelectorAll(".infoBiblio")) as Element[];
+        const title = el.querySelector(".infoTitle")?.textContent ?? "";
+        const director = infoBiblioNodes?.[1]?.textContent ?? "";
         const extra = infoBiblioNodes?.[0]?.textContent || "";
         const extra2 = infoBiblioNodes?.[2]?.textContent || "";
-        const infoDate = node.querySelector(".infoDate").textContent;
-        const room = infoDate.split("|")?.[1]?.trim();
-        const dateTimeStr = infoDate.split("|")?.[0]?.trim();
+        const infoDate = el.querySelector(".infoDate")?.textContent ?? "";
+        const room = infoDate.split("|")?.[1]?.trim() ?? "";
+        const dateTimeStr = infoDate.split("|")?.[0]?.trim() ?? "";
         const dateTime = parseDateTimeStrCinemateca(dateTimeStr);
-        const link = `https://www.cinemateca.pt/Programacao.aspx${node.parentNode.parentNode.parentNode.getAttribute(
-          "href",
-        )}`;
+        const parentEl = el.parentNode as Element | null;
+        const grandParentEl = parentEl?.parentNode as Element | null;
+        const greatGrandParentEl = grandParentEl?.parentNode as Element | null;
+        const link = `https://www.cinemateca.pt/Programacao.aspx${greatGrandParentEl?.getAttribute("href") ?? ""}`;
 
         feed.addItem({
           title: `${title}, ${director}`,
@@ -497,30 +519,33 @@ export function addFetchToRssEndpoints(app: Hono<{ Bindings: CloudflareBindings 
 
     const document = new HTMLDOMParser().parseFromString(text, "text/html");
     Array.from(document.querySelectorAll("section > div > section[data-sticky-slug]")).forEach(
-      (grouped: any) => {
-        const dateStr = grouped
-          .querySelector(".header-title > h1")
-          .textContent.trim()
-          .replaceAll("\n", "");
-        Array.from(grouped.querySelectorAll("article")).forEach((movie: any) => {
-          const timeStr = movie
-            .querySelector(".schedule-designation")
-            .textContent.trim()
-            .replaceAll("\n", "");
+      (grouped) => {
+        const groupEl = grouped as Element;
+        const dateStr =
+          groupEl.querySelector(".header-title > h1")?.textContent?.trim().replaceAll("\n", "") ??
+          "";
+        Array.from(groupEl.querySelectorAll("article")).forEach((movie) => {
+          const movieEl = movie as Element;
+          const timeStr =
+            movieEl
+              .querySelector(".schedule-designation")
+              ?.textContent?.trim()
+              .replaceAll("\n", "") ?? "";
           const dateTimeStr = `${dateStr} ${timeStr}`;
           const dateTime = parseDateTimeStrNimas(dateTimeStr);
 
-          const link = movie.querySelector(".schedule-content a ").getAttribute("href");
-          const titleNode = movie.querySelector(".schedule-content .t-headline");
-          const title = titleNode.textContent;
-          const director = titleNode.nextElementSibling.textContent;
-          const cycle = titleNode.nextElementSibling.nextElementSibling?.textContent?.trim() || "";
+          const link = movieEl.querySelector(".schedule-content a ")?.getAttribute("href") ?? "";
+          const titleNode = movieEl.querySelector(".schedule-content .t-headline");
+          const title = titleNode?.textContent ?? "";
+          const director = titleNode?.nextElementSibling?.textContent ?? "";
+          const cycle =
+            titleNode?.nextElementSibling?.nextElementSibling?.textContent?.trim() || "";
           const poster =
-            movie
+            movieEl
               .querySelector(".schedule-content .schedule-cell--poster div.object-image")
-              .getAttribute("data-src") || "";
+              ?.getAttribute("data-src") || "";
           const extra =
-            movie
+            movieEl
               .querySelector(
                 ".schedule-content .schedule-cell:last-child > .t-text:nth-last-child(2)",
               )
@@ -570,7 +595,7 @@ export function addFetchToRssEndpoints(app: Hono<{ Bindings: CloudflareBindings 
       },
     });
     const document = domParser.parseFromString(html, "text/xml");
-    const hrefs: any = XPath.select("//a[contains(string(@href), '.pdf')]/@href", document);
+    const hrefs = XPath.select("//a[contains(string(@href), '.pdf')]/@href", document) as Attr[];
 
     for (const href of hrefs) {
       feed.addItem({
@@ -622,7 +647,8 @@ export function addFetchToRssEndpoints(app: Hono<{ Bindings: CloudflareBindings 
     const result = await xml2js.parseStringPromise(xmlText);
 
     // Filter items with exactly one category that is "- bilhetes cinema"
-    const filteredItems = result.rss.channel[0].item.filter((item: any) => {
+    const parsedResult = result as AnteEstreiasRssParsed;
+    const filteredItems = parsedResult.rss.channel[0].item.filter((item) => {
       const categories = item.category || [];
       return categories.length === 1 && categories[0] === "- bilhetes cinema";
     });
@@ -682,11 +708,10 @@ export function addFetchToRssEndpoints(app: Hono<{ Bindings: CloudflareBindings 
       updated: new Date(),
     });
 
-    const initialResponse: any = await fetch("https://gaming.amazon.com/home");
-    const cookie = initialResponse.headers
-      .get("set-cookie")
+    const initialResponse = await fetch("https://gaming.amazon.com/home");
+    const cookie = (initialResponse.headers.get("set-cookie") ?? "")
       .split("Secure, ")
-      .map((item: any) => item.split(";")[0])
+      .map((item: string) => item.split(";")[0])
       .join("; ");
     const html = await initialResponse.text();
 
@@ -734,8 +759,8 @@ export function addFetchToRssEndpoints(app: Hono<{ Bindings: CloudflareBindings 
       mode: "cors",
       credentials: "include",
     });
-    const json: any = await response.json();
-    json.data.games.items.forEach((game: any) => {
+    const json = (await response.json()) as PrimeGamingResponse;
+    json.data.games.items.forEach((game) => {
       const title = game.assets.title;
       const link = game.assets.externalClaimLink;
       const id = game.assets.id;
@@ -771,16 +796,16 @@ export function addFetchToRssEndpoints(app: Hono<{ Bindings: CloudflareBindings 
     const response = await fetch(
       "https://http-proxy.val.run/?finalUrl=https%3A%2F%2Fegs-platform-service.store.epicgames.com%2Fapi%2Fv2%2Fpublic%2Fdiscover%2Fhome%3Fcount%3D10%26country%3DPT%26locale%3Den%26platform%3Dios%26start%3D0%26store%3DEGS",
     );
-    const json: any = await response.json();
-    const freeGames = json.data.find((item: any) => item.type === "freeGame");
+    const json = (await response.json()) as EpicMobileDiscoverResponse;
+    const freeGames = json.data.find((item) => item.type === "freeGame");
 
-    freeGames.offers
-      .filter((game: any) => {
+    freeGames?.offers
+      .filter((game) => {
         return game.content.purchase?.find(
-          (purchase: any) => purchase.purchaseType === "Claim" && purchase.price.decimalPrice == 0,
+          (purchase) => purchase.purchaseType === "Claim" && purchase.price.decimalPrice == 0,
         );
       })
-      .forEach((game: any) => {
+      .forEach((game) => {
         const title = game.content.title;
         const pageSlug = game.content.mapping.slug;
         const link = `https://store.epicgames.com/en-US/p/${pageSlug}`;
@@ -816,16 +841,16 @@ export function addFetchToRssEndpoints(app: Hono<{ Bindings: CloudflareBindings 
     const response = await fetch(
       "https://http-proxy.val.run/?finalUrl=https%3A%2F%2Fegs-platform-service.store.epicgames.com%2Fapi%2Fv2%2Fpublic%2Fdiscover%2Fhome%3Fcount%3D10%26country%3DPT%26locale%3Den%26platform%3Dandroid%26start%3D0%26store%3DEGS",
     );
-    const json: any = await response.json();
-    const freeGames = json.data.find((item: any) => item.type === "freeGame");
+    const json2 = (await response.json()) as EpicMobileDiscoverResponse;
+    const freeGames2 = json2.data.find((item) => item.type === "freeGame");
 
-    freeGames.offers
-      .filter((game: any) => {
+    freeGames2?.offers
+      .filter((game) => {
         return game.content.purchase?.find(
-          (purchase: any) => purchase.purchaseType === "Claim" && purchase.price.decimalPrice == 0,
+          (purchase) => purchase.purchaseType === "Claim" && purchase.price.decimalPrice == 0,
         );
       })
-      .forEach((game: any) => {
+      .forEach((game) => {
         const title = game.content.title;
         const pageSlug = game.content.mapping.slug;
         const link = `https://store.epicgames.com/en-US/p/${pageSlug}`;
@@ -862,13 +887,13 @@ export function addFetchToRssEndpoints(app: Hono<{ Bindings: CloudflareBindings 
     const response = await fetch(
       "https://store-site-backend-static-ipv4.ak.epicgames.com/freeGamesPromotions?locale=en-US&country=PT&allowCountries=PT",
     );
-    const json: any = await response.json();
+    const json = (await response.json()) as EpicDesktopFreeGamesResponse;
     const nowDate = new Date();
     json.data.Catalog.searchStore.elements
-      .filter((offer: any) => {
+      .filter((offer) => {
         if (offer.promotions) {
-          return offer.promotions.promotionalOffers.some((innerOffers: any) => {
-            return innerOffers.promotionalOffers.some((pOffer: any) => {
+          return offer.promotions.promotionalOffers.some((innerOffers) => {
+            return innerOffers.promotionalOffers.some((pOffer) => {
               const startDate = new Date(pOffer.startDate);
               const endDate = new Date(pOffer.endDate);
               const isFree = pOffer.discountSetting.discountPercentage === 0;
@@ -879,27 +904,27 @@ export function addFetchToRssEndpoints(app: Hono<{ Bindings: CloudflareBindings 
           return false;
         }
       })
-      .forEach((game: any) => {
+      .forEach((game) => {
         const pageSlug =
-          game?.catalogNs?.mappings?.find((mapping: any) => mapping.pageType === "productHome")
+          game?.catalogNs?.mappings?.find((mapping) => mapping.pageType === "productHome")
             ?.pageSlug ??
-          game?.catalogNs?.offerMappings?.find((mapping: any) => mapping.pageType === "productHome")
+          game?.catalogNs?.offerMappings?.find((mapping) => mapping.pageType === "productHome")
             ?.pageSlug ??
           game.productSlug;
         const title = game.title;
         const link = `https://store.epicgames.com/en-US/p/${pageSlug}`;
         const id = game.id;
         const date = new Date(
-          game.promotions.promotionalOffers
-            .map((innerOffers: any) =>
-              innerOffers.promotionalOffers.find((pOffer: any) => {
+          game
+            .promotions!.promotionalOffers.map((innerOffers) =>
+              innerOffers.promotionalOffers.find((pOffer) => {
                 const startDate = new Date(pOffer.startDate);
                 const endDate = new Date(pOffer.endDate);
                 const isFree = pOffer.discountSetting.discountPercentage === 0;
                 return startDate <= nowDate && nowDate <= endDate && isFree;
               }),
             )
-            .filter(Boolean)[0].startDate,
+            .filter(Boolean)[0]!.startDate,
         );
 
         if (title == null) {
@@ -927,6 +952,7 @@ export function addFetchToRssEndpoints(app: Hono<{ Bindings: CloudflareBindings 
     const baseUrl = "https://www.scylladb.com/company/events/";
     const feed = new Feed({
       title: "ScyllaDB Masterclass Events",
+      description: "ScyllaDB Masterclass Events",
       id: baseUrl,
       link: baseUrl,
       language: "en",
@@ -961,11 +987,11 @@ export function addFetchToRssEndpoints(app: Hono<{ Bindings: CloudflareBindings 
     if (response.status != 200) {
       throw `${response.status}: ${response.statusText} – https://www.scylladb.com/wp-admin/admin-ajax.php`;
     }
-    const json: any = await response.json();
+    const json = (await response.json()) as ScyllaDbEventsResponse;
 
     (json.past + json.upcoming)
       .match(/https:\/\/lp\.scylladb\.com[^\s"'<>\[\]]*/g)
-      .forEach((link: string) => {
+      ?.forEach((link: string) => {
         feed.addItem({
           id: link,
           title: link,
@@ -984,6 +1010,7 @@ export function addFetchToRssEndpoints(app: Hono<{ Bindings: CloudflareBindings 
     const baseUrl = "https://www.imagensdemarca.pt/";
     const feed = new Feed({
       title: "Imagens de Marca",
+      description: "Imagens de Marca News",
       id: baseUrl,
       link: baseUrl,
       language: "pt",
@@ -1023,10 +1050,10 @@ export function addFetchToRssEndpoints(app: Hono<{ Bindings: CloudflareBindings 
     };
 
     const response = await fetch("https://repeater.bondlayer.com/fetch", options);
-    const json: any = await response.json();
+    const json = (await response.json()) as ImagensDeMarcaResponse;
 
     const now = new Date();
-    json.items.forEach((post: any) => {
+    json.items.forEach((post) => {
       const id = post.id;
       const title = post._title.all;
       const link = new URL(`artigo/${post._slug.all}`, baseUrl).href;
@@ -1040,7 +1067,7 @@ export function addFetchToRssEndpoints(app: Hono<{ Bindings: CloudflareBindings 
           id,
           title,
           link,
-          content: `<a href="${link}">${link}</a>${image}`.trim(),
+          content: `<a href="${link}">${link}</a>${image ?? ""}`.trim(),
           date,
         });
       }
