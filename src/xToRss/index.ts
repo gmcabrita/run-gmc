@@ -141,9 +141,12 @@ async function getEmbed(env: CloudflareBindings, postUrl: string): Promise<strin
 }
 
 async function x2Rss(env: CloudflareBindings, userName: string, data: XUserTweetsResponse) {
-  const firstUser = data.data.user.result.timeline_v2.timeline.instructions.find(
-    (instruction) => instruction.entries,
-  )?.entries?.[0]?.content?.itemContent?.tweet_results?.result?.core?.user_results?.result?.legacy;
+  const entries =
+    data.data.user.result.timeline_v2.timeline.instructions.find(
+      (instruction) => instruction.entries,
+    )?.entries || [];
+  const firstUser =
+    entries?.[0]?.content?.itemContent?.tweet_results?.result?.core?.user_results?.result?.legacy;
 
   const feed = new Feed({
     title: `X // ${firstUser?.name || userName}`,
@@ -161,11 +164,6 @@ async function x2Rss(env: CloudflareBindings, userName: string, data: XUserTweet
       link: `https://x.com/${firstUser?.screen_name}`,
     },
   });
-
-  const entries =
-    data.data.user.result.timeline_v2.timeline.instructions.find(
-      (instruction) => instruction.entries,
-    )?.entries || [];
 
   for (const entry of entries) {
     const post = await transformPost(env, entry.content?.itemContent?.tweet_results?.result);

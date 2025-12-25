@@ -653,18 +653,16 @@ export function addFetchToRssEndpoints(app: Hono<{ Bindings: CloudflareBindings 
       return categories.length === 1 && categories[0] === "- bilhetes cinema";
     });
 
+    const trRegex = /<tr[^>]*>([\s\S]*?)<\/tr>/gi;
+    const firstATagRegex = /<a[^>]*title=["']([^"']+)["'][^>]*>/i;
     for (const item of filteredItems) {
       const description = item.description[0];
 
-      // Split the description into tr elements
-      const trRegex = /<tr[^>]*>([\s\S]*?)<\/tr>/gi;
       let trMatch;
 
       while ((trMatch = trRegex.exec(description)) !== null) {
         const trContent = trMatch[1];
 
-        // Find the first a tag with a title attribute in this tr
-        const firstATagRegex = /<a[^>]*title=["']([^"']+)["'][^>]*>/i;
         const firstATagMatch = trContent.match(firstATagRegex);
 
         let movieTitle = "";
