@@ -77,13 +77,13 @@ async function xpathToObject({
 
   return posts.map((postNode: Node) => {
     const titleNode = XPath.select1(xpath.title, postNode) as Node | undefined;
-    const postTitle = titleNode?.textContent?.trim()?.split("\n")?.join(" | ");
+    const postTitle = titleNode?.textContent?.trim()?.replace(/\n/g, " | ");
     const linkNode = XPath.select1(xpath.link, postNode) as Attr | undefined;
     const postUrl = new URL(linkNode?.value || "", link).href;
     const contentNode = xpath.content
       ? (XPath.select1(xpath.content, postNode) as Node | undefined)
       : null;
-    const contentText = contentNode?.textContent?.trim()?.split("\n")?.join(" | ");
+    const contentText = contentNode?.textContent?.trim()?.replace(/\n/g, " | ");
     const content = contentText ? `<p>${contentText}</p>` : "";
     const imageNode = xpath.image
       ? (XPath.select1(xpath.image, postNode) as Attr | undefined)
