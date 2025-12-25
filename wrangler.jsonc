@@ -36,6 +36,18 @@
       "id": "0fcd98a6cb4e4c649546900e489714a3",
     },
   ],
+  "observability": {
+    "logs": {
+      "enabled": true,
+      "head_sampling_rate": 1,
+      "invocation_logs": true,
+      "persist": true,
+    },
+    "traces": {
+      "enabled": true,
+      "persist": true,
+    },
+  },
   // "r2_buckets": [
   //   {
   //     "binding": "MY_BUCKET",
@@ -52,8 +64,4 @@
   // "ai": {
   //   "binding": "AI"
   // },
-  // "observability": {
-  //   "enabled": true,
-  //   "head_sampling_rate": 1
-  // }
 }
