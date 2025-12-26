@@ -260,11 +260,13 @@ export interface XTimelineEntry {
   content?: {
     itemContent?: {
       tweet_results?: XTweetResult;
+      promotedMetadata?: unknown;
     };
     items?: Array<{
       item?: {
         itemContent?: {
           tweet_results?: XTweetResult;
+          promotedMetadata?: unknown;
         };
       };
     }>;

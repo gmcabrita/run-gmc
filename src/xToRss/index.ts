@@ -166,11 +166,14 @@ async function x2Rss(env: CloudflareBindings, userName: string, data: XUserTweet
   });
 
   for (const entry of entries) {
+    if (entry.content?.itemContent?.promotedMetadata) continue;
+
     const post = await transformPost(env, entry.content?.itemContent?.tweet_results?.result);
     if (post) {
       feed.addItem(post);
     }
 
+    if (entry.content?.items?.[0]?.item?.itemContent?.promotedMetadata) continue;
     const threadedPost = await transformPost(
       env,
       entry.content?.items?.[0]?.item?.itemContent?.tweet_results?.result,
