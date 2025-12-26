@@ -114,7 +114,7 @@ export async function cacheAgendaLx(env: CloudflareBindings) {
     updated: new Date(),
   });
   const response = await fetch(
-    "https://www.agendalx.pt/wp-json/agendalx/v1/events?per_page=1000000",
+    "https://www.agendalx.pt/wp-json/agendalx/v1/events?per_page=5000&categories=ciencias,artes,musica,teatro,cinema,visitas-guiadas",
   );
 
   if (!response.ok) {
