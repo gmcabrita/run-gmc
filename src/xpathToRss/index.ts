@@ -190,7 +190,7 @@ export function addXpathToRssEndpoints(app: Hono<{ Bindings: CloudflareBindings 
   app.get("/rss.impresaInvestidores", async (c) => {
     return await xpathToRss(c, {
       title: "Impresa – Investidores",
-      link: "https://thewaltdisneycompany.com/press-releases/",
+      link: "https://www.impresa.pt/pt/investidores",
       fetchUrl: "https://www.impresa.pt/api/molecule/category/pt/investidores?types=MEDIA&limit=50",
       xpath: {
         post: `//li/div[contains(string(@class), 'wrapper-news')]`,
