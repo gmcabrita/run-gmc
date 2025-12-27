@@ -26,8 +26,8 @@ export async function parse(response: Response): Promise<RSSData> {
       text(text) {
         const lastEntry = entries[entries.length - 1];
         if (lastEntry && text.text) {
-          lastEntry.title = text.text;
-          lastEntry.text = text.text;
+          lastEntry.title += text.text;
+          lastEntry.text += text.text;
         }
       },
     })
