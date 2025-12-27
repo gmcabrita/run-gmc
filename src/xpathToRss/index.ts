@@ -201,20 +201,6 @@ export function addXpathToRssEndpoints(app: Hono<{ Bindings: CloudflareBindings 
     });
   });
 
-  app.get("/rss.waltDisneyPressReleases", async (c) => {
-    return await xpathToRss(c, {
-      title: "Press Releases Archives - The Walt Disney Company",
-      link: "https://thewaltdisneycompany.com/press-releases/",
-      xpath: {
-        post: `//div[contains(string(@class), 'press-releases-container')]/article`,
-        title: ".//h2/a/text()",
-        link: ".//h2/a/@href",
-        content: ".//h2/a/text()",
-        datetime: ".//time/@datetime",
-      },
-    });
-  });
-
   app.get("/rss.adsOfTheWorldBlog", async (c) => {
     return await xpathToRss(c, {
       title: "Highlighted Campaigns – Ads of the World",

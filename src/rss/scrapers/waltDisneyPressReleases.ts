@@ -1,18 +1,16 @@
 import { USERAGENT, isValidRSSEntry } from "@rss/common";
 import type { RSSData, RSSEntry } from "@rss/types";
 
-export async function get(): Promise<RSSData> {
-  const response = await fetch("https://thewaltdisneycompany.com/press-releases/", {
-    headers: {
-      "user-agent": USERAGENT,
-      "Content-Type": "text/html",
-    },
-  });
+async function consume(stream: ReadableStream) {
+  const reader = stream.getReader();
+  while (!(await reader.read()).done) {}
+}
 
+export async function parse(response: Response): Promise<RSSData> {
   const entries: Array<RSSEntry> = [];
   const rewriter = new HTMLRewriter()
     .on(".press-releases-container > article", {
-      element(el) {
+      element() {
         entries.push({
           id: "",
           link: "",
@@ -48,11 +46,6 @@ export async function get(): Promise<RSSData> {
       },
     });
 
-  async function consume(stream: ReadableStream) {
-    const reader = stream.getReader();
-    while (!(await reader.read()).done) {}
-  }
-
   await consume(rewriter.transform(response).body!);
   return {
     id: "https://thewaltdisneycompany.com/press-releases/",
@@ -62,4 +55,15 @@ export async function get(): Promise<RSSData> {
     language: "en",
     entries: entries.filter((entry: RSSEntry) => isValidRSSEntry(entry)),
   };
+}
+
+export async function get(): Promise<RSSData> {
+  const response = await fetch("https://thewaltdisneycompany.com/press-releases/", {
+    headers: {
+      "user-agent": USERAGENT,
+      "Content-Type": "text/html",
+    },
+  });
+
+  return parse(response);
 }

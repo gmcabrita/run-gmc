@@ -1,9 +1,9 @@
 import { Hono } from "hono";
 import { Feed } from "feed";
-import { get as getDisney } from "./disney";
+import { get as getDisney } from "./scrapers/waltDisneyPressReleases";
 
 export function addScrapedRssEndpoints(app: Hono<{ Bindings: CloudflareBindings }>) {
-  app.get("/rss.waltDisneyPressReleases2", async (c) => {
+  app.get("/rss.waltDisneyPressReleases", async (c) => {
     const { title, description, id, link, language, entries } = await getDisney();
 
     const now = new Date();
