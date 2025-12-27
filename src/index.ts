@@ -5,6 +5,7 @@ import { addCoverflexEndpoints, sendAppleCatalogueByEmail } from "@coverflex";
 import { addXpathToRssEndpoints, sendCinecartazEntriesByEmail } from "@xpathToRss";
 import { addXToRssEndpoints } from "@xToRss";
 import { addFetchToRssEndpoints, cacheAgendaLx } from "@fetchToRss";
+import { addScrapedRssEndpoints } from "@rss/scrapers";
 import type { FertagusResponse } from "@types";
 
 const app = new Hono<{ Bindings: CloudflareBindings }>();
@@ -12,6 +13,7 @@ addCoverflexEndpoints(app);
 addXpathToRssEndpoints(app);
 addXToRssEndpoints(app);
 addFetchToRssEndpoints(app);
+addScrapedRssEndpoints(app);
 
 app.get("/fertagus.nextTrainLeavingCorroios", async (c) => {
   const response = await fetch(

@@ -20,6 +20,8 @@
       "@xToRss/*": ["src/xToRss/*"],
       "@fetchToRss": ["src/fetchToRss/index.ts"],
       "@fetchToRss/*": ["src/fetchToRss/*"],
+      "@rss": ["src/rss/index.ts"],
+      "@rss*": ["src/rss/*"],
       "@types": ["src/types.ts"],
     },
   },
