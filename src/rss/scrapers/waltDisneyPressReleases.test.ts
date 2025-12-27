@@ -2,7 +2,7 @@ import { describe, it, expect } from "vitest";
 import { parse } from "./waltDisneyPressReleases";
 import html from "./__fixtures__/disney-press-releases.html";
 
-describe("disney scraper", () => {
+describe("waltDisneyPressReleases scraper", () => {
   it("parses press releases from HTML", async () => {
     const response = new Response(html, {
       headers: { "Content-Type": "text/html" },
@@ -20,10 +20,10 @@ describe("disney scraper", () => {
 
     const firstEntry = result.entries[0];
     expect(firstEntry.id).toBe(
-      "https://thewaltdisneycompany.com/the-walt-disney-company-and-openai-reach-landmark-agreement-to-bring-beloved-characters-from-across-disneys-brands-to-sora/"
+      "https://thewaltdisneycompany.com/the-walt-disney-company-and-openai-reach-landmark-agreement-to-bring-beloved-characters-from-across-disneys-brands-to-sora/",
     );
     expect(firstEntry.link).toBe(
-      "https://thewaltdisneycompany.com/the-walt-disney-company-and-openai-reach-landmark-agreement-to-bring-beloved-characters-from-across-disneys-brands-to-sora/"
+      "https://thewaltdisneycompany.com/the-walt-disney-company-and-openai-reach-landmark-agreement-to-bring-beloved-characters-from-across-disneys-brands-to-sora/",
     );
     expect(firstEntry.title).toContain("OpenAI");
     expect(firstEntry.datetime).toEqual(new Date("2025-12-11T06:01:00-08:00"));
