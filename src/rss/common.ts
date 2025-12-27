@@ -6,3 +6,8 @@ export const USERAGENT =
 export function isValidRSSEntry(entry: RSSEntry) {
   return new Boolean(entry.id) && new Boolean(entry.link) && new Boolean(entry.title);
 }
+
+export async function consume(stream: ReadableStream) {
+  const reader = stream.getReader();
+  while (!(await reader.read()).done) {}
+}

@@ -3,13 +3,31 @@ import { Feed } from "feed";
 import type { RSSData } from "@rss/types";
 
 import * as waltDisneyPressReleases from "./scrapers/waltDisneyPressReleases";
+import * as ercNoticias from "./scrapers/ercNoticias";
+import * as ercDeliberacoes from "./scrapers/ercDeliberacoes";
+import * as cinecartaz from "./scrapers/cinecartaz";
+import * as impresaInvestidores from "./scrapers/impresaInvestidores";
+import * as adsOfTheWorldBlog from "./scrapers/adsOfTheWorldBlog";
+import * as kitLangtonBlog from "./scrapers/kitLangtonBlog";
+import * as walzrBlog from "./scrapers/walzrBlog";
+import * as jeremyEvansBlog from "./scrapers/jeremyEvansBlog";
+import * as kirShatrovBlog from "./scrapers/kirShatrovBlog";
 
 type ScraperModule = {
   get: () => Promise<RSSData>;
 };
 
 const scrapers: Record<string, ScraperModule> = {
+  adsOfTheWorldBlog,
+  cinecartaz,
+  ercDeliberacoes,
+  ercNoticias,
+  impresaInvestidores,
+  jeremyEvansBlog,
+  kirShatrovBlog,
+  kitLangtonBlog,
   waltDisneyPressReleases,
+  walzrBlog,
 };
 
 export function addScrapedRssEndpoints(app: Hono<{ Bindings: CloudflareBindings }>) {
