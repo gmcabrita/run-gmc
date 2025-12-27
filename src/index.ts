@@ -2,7 +2,6 @@ import { Hono } from "hono";
 import * as Sentry from "@sentry/cloudflare";
 import { basicAuth } from "hono/basic-auth";
 import { addCoverflexEndpoints, sendAppleCatalogueByEmail } from "@coverflex";
-import { addXpathToRssEndpoints } from "@xpathToRss";
 import { sendCinecartazEntriesByEmail } from "@rss/scrapers/cinecartaz";
 import { addXToRssEndpoints } from "@xToRss";
 import { addFetchToRssEndpoints, cacheAgendaLx } from "@fetchToRss";
@@ -11,10 +10,13 @@ import type { FertagusResponse } from "@types";
 
 const app = new Hono<{ Bindings: CloudflareBindings }>();
 addCoverflexEndpoints(app);
-addXpathToRssEndpoints(app);
 addXToRssEndpoints(app);
 addFetchToRssEndpoints(app);
 addScrapedRssEndpoints(app);
+
+app.get("/rss.sendCinecartazEntriesByEmail", async (c) => {
+  return c.json(await sendCinecartazEntriesByEmail(c.env));
+});
 
 app.get("/fertagus.nextTrainLeavingCorroios", async (c) => {
   const response = await fetch(

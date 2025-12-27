@@ -198,18 +198,6 @@ export interface ImagensDeMarcaResponse {
 }
 
 // =====================================================
-// XPath RSS Post Types
-// =====================================================
-
-export interface XPathRssPost {
-  id: string;
-  title: string;
-  link: string;
-  content: string;
-  date: Date;
-}
-
-// =====================================================
 // X/Twitter Types
 // =====================================================
 

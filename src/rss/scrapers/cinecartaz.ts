@@ -84,4 +84,6 @@ export async function sendCinecartazEntriesByEmail(env: CloudflareBindings) {
       idempotencyKey: `cinecartaz-${entry.id}`,
     });
   }
+
+  return data;
 }
