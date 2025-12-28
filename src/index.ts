@@ -18,6 +18,45 @@ app.get("/rss.sendCinecartazEntriesByEmail", async (c) => {
   return c.json(await sendCinecartazEntriesByEmail(c.env));
 });
 
+app.get("/ip.getStation/:name", async (c) => {
+  const name = c.req.param("name");
+  const response = await fetch(
+    `https://www.infraestruturasdeportugal.pt/negocios-e-servicos/estacao-nome/${name}`,
+    {
+      headers: {
+        accept: "application/json, text/plain, */*",
+        "user-agent":
+          "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36",
+        Referer: "https://www.infraestruturasdeportugal.pt/negocios-e-servicos/horarios",
+      },
+      method: "GET",
+    },
+  );
+  const json = await response.json();
+  return c.json(json);
+});
+
+app.get("/ip.getTimetables/:stationId/:startDate/:endDate/:trainTypes", async (c) => {
+  const stationId = c.req.param("stationId");
+  const startDate = c.req.param("startDate");
+  const endDate = c.req.param("endDate");
+  const trainTypes = c.req.param("trainTypes");
+  const response = await fetch(
+    `https://www.infraestruturasdeportugal.pt/negocios-e-servicos/partidas-chegadas/${stationId}/${startDate}/${endDate}/${trainTypes}`,
+    {
+      headers: {
+        accept: "application/json, text/plain, */*",
+        "user-agent":
+          "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36",
+        Referer: "https://www.infraestruturasdeportugal.pt/negocios-e-servicos/horarios",
+      },
+      method: "GET",
+    },
+  );
+  const json = await response.json();
+  return c.json(json);
+});
+
 app.get("/fertagus.nextTrainLeavingCorroios", async (c) => {
   const response = await fetch(
     "https://www.infraestruturasdeportugal.pt/negocios-e-servicos/partidas-chegadas/9417137/%2000:00/%2023:59/URB%7CSUBUR",
