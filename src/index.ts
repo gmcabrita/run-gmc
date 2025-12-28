@@ -1,6 +1,7 @@
 import { Hono } from "hono";
 import * as Sentry from "@sentry/cloudflare";
 import { basicAuth } from "hono/basic-auth";
+import { cors } from "hono/cors";
 import { addCoverflexEndpoints, sendAppleCatalogueByEmail } from "@coverflex";
 import { sendCinecartazEntriesByEmail } from "@rss/scrapers/cinecartaz";
 import { addXToRssEndpoints } from "@xToRss";
@@ -18,7 +19,7 @@ app.get("/rss.sendCinecartazEntriesByEmail", async (c) => {
   return c.json(await sendCinecartazEntriesByEmail(c.env));
 });
 
-app.get("/ip.getStations/:name", async (c) => {
+app.get("/ip.getStations/:name", cors({ origin: "*" }), async (c) => {
   const name = c.req.param("name");
   const response = await fetch(
     `https://www.infraestruturasdeportugal.pt/negocios-e-servicos/estacao-nome/${name}`,
@@ -36,7 +37,7 @@ app.get("/ip.getStations/:name", async (c) => {
   return c.json(json);
 });
 
-app.get("/ip.getTimetables/:stationId/:startDate/:endDate/:trainTypes", async (c) => {
+app.get("/ip.getTimetables/:stationId/:startDate/:endDate/:trainTypes", cors({ origin: "*" }), async (c) => {
   const stationId = c.req.param("stationId");
   const startDate = c.req.param("startDate");
   const endDate = c.req.param("endDate");
