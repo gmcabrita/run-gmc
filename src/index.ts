@@ -23,7 +23,7 @@ app.get("/ip.getTrainInformation/:trainId/:date", cors({ origin: "*" }), async (
   const trainId = c.req.param("trainId");
   const date = c.req.param("date");
   const response = await fetch(
-    `https://www.infraestruturasdeportugal.pt/negocios-e-servicos/horarios-ncombio/${trainId}/${date}}`,
+    `https://www.infraestruturasdeportugal.pt/negocios-e-servicos/horarios-ncombio/${trainId}/${date}`,
     {
       headers: {
         accept: "application/json, text/plain, */*",
