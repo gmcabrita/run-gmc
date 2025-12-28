@@ -19,6 +19,25 @@ app.get("/rss.sendCinecartazEntriesByEmail", async (c) => {
   return c.json(await sendCinecartazEntriesByEmail(c.env));
 });
 
+app.get("/ip.getTrainInformation/:trainId/:date", cors({ origin: "*" }), async (c) => {
+  const trainId = c.req.param("trainId");
+  const date = c.req.param("date");
+  const response = await fetch(
+    `https://www.infraestruturasdeportugal.pt/negocios-e-servicos/horarios-ncombio/${trainId}/${date}}`,
+    {
+      headers: {
+        accept: "application/json, text/plain, */*",
+        "user-agent":
+          "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36",
+        Referer: "https://www.infraestruturasdeportugal.pt/negocios-e-servicos/horarios",
+      },
+      method: "GET",
+    },
+  );
+  const json = await response.json();
+  return c.json(json);
+});
+
 app.get("/ip.getStations/:name", cors({ origin: "*" }), async (c) => {
   const name = c.req.param("name");
   const response = await fetch(
@@ -37,26 +56,30 @@ app.get("/ip.getStations/:name", cors({ origin: "*" }), async (c) => {
   return c.json(json);
 });
 
-app.get("/ip.getTimetables/:stationId/:startDate/:endDate/:trainTypes", cors({ origin: "*" }), async (c) => {
-  const stationId = c.req.param("stationId");
-  const startDate = c.req.param("startDate");
-  const endDate = c.req.param("endDate");
-  const trainTypes = c.req.param("trainTypes");
-  const response = await fetch(
-    `https://www.infraestruturasdeportugal.pt/negocios-e-servicos/partidas-chegadas/${stationId}/${startDate}/${endDate}/${trainTypes}`,
-    {
-      headers: {
-        accept: "application/json, text/plain, */*",
-        "user-agent":
-          "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36",
-        Referer: "https://www.infraestruturasdeportugal.pt/negocios-e-servicos/horarios",
+app.get(
+  "/ip.getTimetables/:stationId/:startDate/:endDate/:trainTypes",
+  cors({ origin: "*" }),
+  async (c) => {
+    const stationId = c.req.param("stationId");
+    const startDate = c.req.param("startDate");
+    const endDate = c.req.param("endDate");
+    const trainTypes = c.req.param("trainTypes");
+    const response = await fetch(
+      `https://www.infraestruturasdeportugal.pt/negocios-e-servicos/partidas-chegadas/${stationId}/${startDate}/${endDate}/${trainTypes}`,
+      {
+        headers: {
+          accept: "application/json, text/plain, */*",
+          "user-agent":
+            "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36",
+          Referer: "https://www.infraestruturasdeportugal.pt/negocios-e-servicos/horarios",
+        },
+        method: "GET",
       },
-      method: "GET",
-    },
-  );
-  const json = await response.json();
-  return c.json(json);
-});
+    );
+    const json = await response.json();
+    return c.json(json);
+  },
+);
 
 app.get("/fertagus.nextTrainLeavingCorroios", async (c) => {
   const response = await fetch(
