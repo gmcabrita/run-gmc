@@ -6,6 +6,7 @@ import * as waltDisneyPressReleases from "./scrapers/waltDisneyPressReleases";
 import * as ercNoticias from "./scrapers/ercNoticias";
 import * as ercDeliberacoes from "./scrapers/ercDeliberacoes";
 import * as cinecartaz from "./scrapers/cinecartaz";
+import * as impresaComunicados from "./scrapers/impresaComunicados";
 import * as impresaInvestidores from "./scrapers/impresaInvestidores";
 import * as adsOfTheWorldBlog from "./scrapers/adsOfTheWorldBlog";
 import * as kitLangtonBlog from "./scrapers/kitLangtonBlog";
@@ -22,6 +23,7 @@ const scrapers: Record<string, ScraperModule> = {
   cinecartaz,
   ercDeliberacoes,
   ercNoticias,
+  impresaComunicados,
   impresaInvestidores,
   jeremyEvansBlog,
   kirShatrovBlog,
