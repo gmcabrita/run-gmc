@@ -18,7 +18,7 @@ app.get("/rss.sendCinecartazEntriesByEmail", async (c) => {
   return c.json(await sendCinecartazEntriesByEmail(c.env));
 });
 
-app.get("/ip.getStation/:name", async (c) => {
+app.get("/ip.getStations/:name", async (c) => {
   const name = c.req.param("name");
   const response = await fetch(
     `https://www.infraestruturasdeportugal.pt/negocios-e-servicos/estacao-nome/${name}`,
