@@ -5,14 +5,12 @@ import { cors } from "hono/cors";
 import { addCoverflexEndpoints, sendAppleCatalogueByEmail } from "@coverflex";
 import { sendCinecartazEntriesByEmail } from "@rss/scrapers/cinecartaz";
 import { addXEndpoints } from "@x";
-import { addFetchToRssEndpoints, cacheAgendaLx } from "@fetchToRss";
-import { addScrapedRssEndpoints } from "@rss/scrapers";
+import { addScrapedRssEndpoints, cacheAgendaLx } from "@rss/scrapers";
 import type { FertagusResponse } from "@types";
 
 const app = new Hono<{ Bindings: CloudflareBindings }>();
 addCoverflexEndpoints(app);
 addXEndpoints(app);
-addFetchToRssEndpoints(app);
 addScrapedRssEndpoints(app);
 
 app.get("/rss.sendCinecartazEntriesByEmail", async (c) => {

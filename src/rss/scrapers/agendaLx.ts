@@ -1,4 +1,3 @@
-import { Hono } from "hono";
 import { Feed } from "feed";
 import type { AgendaLxEvent } from "@types";
 
@@ -121,24 +120,4 @@ export async function cacheAgendaLx(env: CloudflareBindings) {
   await env.RUN_GMC_GENERIC_CACHE_KV.put("agenda-lx-eventos", rss2);
 
   return rss2;
-}
-
-export function addFetchToRssEndpoints(app: Hono<{ Bindings: CloudflareBindings }>) {
-  app.get("/rss.agendaLx", async (c) => {
-    const rss2 = (await c.env.RUN_GMC_GENERIC_CACHE_KV.get("agenda-lx-eventos")) || "";
-
-    if (rss2) {
-      c.header("Content-Type", "application/rss+xml");
-      c.header("Cache-Control", "public, max-age=600");
-    }
-    return c.text(rss2);
-  });
-
-  app.get("/rss.cacheAgendaLx", async (c) => {
-    const rss2 = await cacheAgendaLx(c.env);
-
-    c.header("Content-Type", "application/rss+xml");
-    c.header("Cache-Control", "public, max-age=600");
-    return c.text(rss2);
-  });
 }

@@ -16,8 +16,6 @@
       "@coverflex/*": ["src/coverflex/*"],
       "@x": ["src/x/index.ts"],
       "@x/*": ["src/x/*"],
-      "@fetchToRss": ["src/fetchToRss/index.ts"],
-      "@fetchToRss/*": ["src/fetchToRss/*"],
       "@rss": ["src/rss/scrapers.ts"],
       "@rss/*": ["src/rss/*"],
       "@types": ["src/types.ts"],
