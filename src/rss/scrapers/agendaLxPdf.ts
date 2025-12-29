@@ -1,32 +1,28 @@
-import XPath from "xpath";
-import { DOMParser } from "@xmldom/xmldom";
-import { USERAGENT, isValidRSSEntry } from "@rss/common";
+import { USERAGENT, isValidRSSEntry, consume } from "@rss/common";
 import type { RSSData, RSSEntry } from "@rss/types";
 
 const BASE_URL = "https://www.agendalx.pt";
 
-export async function parse(html: string): Promise<RSSData> {
-  const domParser = new DOMParser({
-    errorHandler: {
-      warning: () => {},
-      error: () => {},
-      fatalError: (err) => {
-        throw new Error(err);
-      },
+export async function parse(response: Response): Promise<RSSData> {
+  const now = new Date();
+  const entries: RSSEntry[] = [];
+
+  const rewriter = new HTMLRewriter().on("a[href*='.pdf']", {
+    element(el) {
+      const href = el.getAttribute("href");
+      if (href && href.includes(".pdf")) {
+        entries.push({
+          id: href,
+          link: href,
+          title: href,
+          text: href,
+          datetime: now,
+        });
+      }
     },
   });
 
-  const document = domParser.parseFromString(html, "text/xml");
-  const hrefs = XPath.select("//a[contains(string(@href), '.pdf')]/@href", document) as Attr[];
-
-  const now = new Date();
-  const entries: RSSEntry[] = hrefs.map((href) => ({
-    id: href.value,
-    link: href.value,
-    title: href.value,
-    text: href.value,
-    datetime: now,
-  }));
+  await consume(rewriter.transform(response).body!);
 
   return {
     id: BASE_URL,
@@ -45,6 +41,5 @@ export async function get(): Promise<RSSData> {
     },
   });
 
-  const html = await response.text();
-  return parse(html);
+  return parse(response);
 }
