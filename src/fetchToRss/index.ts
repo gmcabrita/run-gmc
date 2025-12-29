@@ -7,7 +7,6 @@ import xml2js from "xml2js";
 import type {
   AgendaLxEvent,
   FilmspotMovie,
-  LbbOnlineResponse,
   InformacaoLisboaAgendaItem,
   InformacaoLisboaNoticiasResponse,
   PrimeGamingResponse,
@@ -286,67 +285,6 @@ export function addFetchToRssEndpoints(app: Hono<{ Bindings: CloudflareBindings 
         content: desc,
         date: m.date,
       });
-    });
-
-    c.header("Content-Type", "application/rss+xml");
-    c.header("Cache-Control", "public, max-age=600");
-    return c.text(feed.rss2());
-  });
-  app.get("/rss.lbbonlineInternational", async (c) => {
-    const baseUrl = "https://lbbonline.com/news?edition=international";
-
-    const feed = new Feed({
-      title: "Little Black Book",
-      description: "Little Black Book",
-      id: baseUrl,
-      link: baseUrl,
-      language: "en",
-      copyright: "",
-      updated: new Date(),
-    });
-
-    const options = {
-      method: "POST",
-      headers: {
-        "user-agent":
-          "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36",
-        // If this Bearer token stops working we can always:
-        // - Fetch the baseUrl -> Find the relevant .js -> Find the Bearer token inside the .js
-        Authorization: "Bearer 0282cf3b4b18a23017eb4e2a7dabd69092783b710ea98f926a5bc1bf02e10b67",
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        q: "",
-        offset: 0,
-        limit: 150,
-        sort: ["date:desc"],
-      }),
-    };
-
-    const response = await fetch("https://search.lbbonline.com/indexes/lbb_news/search", options);
-    const json = (await response.json()) as LbbOnlineResponse;
-
-    const now = new Date();
-    json.hits.forEach((post) => {
-      const id = post.id;
-      const title = post.title;
-      const link = new URL(`news/${post.slug}`, baseUrl).href;
-      const description = post.description;
-      const imageUrl = post.image
-        ? new URL(post.image, "https://d3q27bh1u24u2o.cloudfront.net").href
-        : null;
-      const image = imageUrl && imageUrl != "" ? `<br><img src="${imageUrl}"></img>` : "";
-      const date = new Date(post.date);
-
-      if (date < now) {
-        feed.addItem({
-          id,
-          title,
-          link,
-          content: `<a href="${link}">${link}</a><br><p>${description}</p>${image}`.trim(),
-          date,
-        });
-      }
     });
 
     c.header("Content-Type", "application/rss+xml");

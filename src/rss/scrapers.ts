@@ -13,6 +13,7 @@ import * as kitLangtonBlog from "./scrapers/kitLangtonBlog";
 import * as walzrBlog from "./scrapers/walzrBlog";
 import * as jeremyEvansBlog from "./scrapers/jeremyEvansBlog";
 import * as kirShatrovBlog from "./scrapers/kirShatrovBlog";
+import * as lbbonlineInternational from "./scrapers/lbbonlineInternational";
 
 type ScraperModule = {
   get: () => Promise<RSSData>;
@@ -28,6 +29,7 @@ const scrapers: Record<string, ScraperModule> = {
   jeremyEvansBlog,
   kirShatrovBlog,
   kitLangtonBlog,
+  lbbonlineInternational,
   waltDisneyPressReleases,
   walzrBlog,
 };

@@ -1,0 +1,35 @@
+{
+  "hits": [
+    {
+      "id": "abc123",
+      "title": "Test Campaign Title",
+      "slug": "test-campaign-title",
+      "description": "This is a test campaign description for LBB Online.",
+      "image": "/images/test-image.jpg",
+      "date": "2025-12-28T10:00:00Z"
+    },
+    {
+      "id": "def456",
+      "title": "Another Great Ad",
+      "slug": "another-great-ad",
+      "description": "Description of another great advertising campaign.",
+      "image": "/images/another-image.png",
+      "date": "2025-12-27T15:30:00Z"
+    },
+    {
+      "id": "ghi789",
+      "title": "Campaign Without Image",
+      "slug": "campaign-without-image",
+      "description": "This campaign has no image.",
+      "date": "2025-12-26T08:00:00Z"
+    },
+    {
+      "id": "future123",
+      "title": "Future Campaign",
+      "slug": "future-campaign",
+      "description": "This campaign is in the future and should be filtered out.",
+      "image": "/images/future.jpg",
+      "date": "2099-12-31T23:59:59Z"
+    }
+  ]
+}
