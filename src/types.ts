@@ -54,7 +54,7 @@ export interface LbbOnlineResponse {
 // =====================================================
 
 export interface InformacaoLisboaAgendaItem {
-  uid: string;
+  uid: number;
   slug: string;
   title: string;
   categories: Array<{ title: string }>;
@@ -63,11 +63,11 @@ export interface InformacaoLisboaAgendaItem {
 }
 
 export interface InformacaoLisboaNoticia {
-  uid: string;
+  uid: number;
   url: string;
   titulo: string;
   noticia: string;
-  categorias: Array<{ nome: string }>;
+  categorias?: Array<{ nome: string }>;
   data: string;
   hora: string;
 }
@@ -190,7 +190,7 @@ export interface ImagensDeMarcaPost {
   image_cHyPyUtO1f?: { all: string };
   image_cSyfYQnEab?: { all: string };
   image_crJeRfSWfz?: { all: string };
-  datetime_cB1vB7YcXz: string;
+  datetime_cB1vB7YcXz?: string;
 }
 
 export interface ImagensDeMarcaResponse {

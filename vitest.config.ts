@@ -3,11 +3,11 @@ import { resolve } from "node:path";
 import { readFileSync } from "node:fs";
 import type { Plugin } from "vite";
 
-function rawHtmlPlugin(): Plugin {
+function rawTextPlugin(): Plugin {
   return {
-    name: "raw-html",
+    name: "raw-text",
     transform(_code, id) {
-      if (id.endsWith(".html")) {
+      if (id.endsWith(".html") || id.endsWith(".xml")) {
         const content = readFileSync(id, "utf-8");
         return {
           code: `export default ${JSON.stringify(content)};`,
@@ -19,7 +19,7 @@ function rawHtmlPlugin(): Plugin {
 }
 
 export default defineWorkersConfig({
-  plugins: [rawHtmlPlugin()],
+  plugins: [rawTextPlugin()],
   resolve: {
     alias: {
       "@email": resolve(__dirname, "src/email/index.ts"),

@@ -1,0 +1,1832 @@
+<!DOCTYPE html>
+<html dir="ltr" lang="pt-PT" prefix="og: http://ogp.me/ns# fb: http://ogp.me/ns/fb# video: http://ogp.me/ns/video#">
+	<head>
+        <!--
+        
+         Web development:                     @                    
+         https://www.webdados.pt            @                      
+                                           (                       
+                                         #*                        
+                                         @                         
+                                        @%                         
+                                        @&                         
+                                  (     @@                         
+                                @       @@/                        
+                              @          @@                        
+                            /*           @@@                       
+                           @              @@@                      
+                          @               ,@@@                     
+                         @                 @@@@                    
+                        @&                  @@@@                   
+                       @@                    @@@@                  
+                       @@        @@           @@@@                 
+                      @@.      @@@@           /@@@@                
+                      @@     @@@@@&            @@@@@               
+                     .@@    @@@ @@@             @@@@@              
+                     /@@   @@@  @@@             @@@@@              
+                     *@@/ @@@@  @@@/            @@@@@,             
+                      @@@ @@@@  @@@@            @@@@@%             
+                      @@@ @@@@  ,@@@@          @@@@@@,             
+                      %@@@@@@@   @@@@@*       @@@@@@@              
+                       @@@@@@@    @@@@@@&   @@@@@@@@*              
+                        @@@@@@%    @@@@@@@@@@@@@@@@,               
+                         .@@@@@     @@@@@@@@@@@@@@                 
+                            @@@@      @@@@@@@@@,                   
+        
+        -->
+		<script type="text/javascript">
+			/* Pre-load sprite image used in CSS to speed rendering up */
+			var sprite_image=new Image();
+			sprite_image.src='https://filmspot.com.pt/images/sprite.png?v=20250131.03';
+		</script>
+
+		<!--<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>-->
+		<!--<link href="//fonts.googleapis.com/css?family=Exo+2:400,500,600&display=swap" rel="stylesheet" type="text/css" media="print" onload="this.onload=null;this.removeAttribute('media');" />-->
+		<!--<link rel="preload" href="/fonts/7cHmv4okm5zmbtYoK-4W4nIp.woff2" as="font" type="font/woff2" crossorigin/>-->
+
+		<!-- Removed 2023-10-02 -->
+		<!--<script src="https://ajax.googleapis.com/ajax/libs/webfont/1.5.10/webfont.js"></script>
+		<script>
+			WebFont.load({
+				custom: {
+					families: ['Exo']
+				}
+			});
+		</script>-->
+
+		<link href="/css/css.php?v=20250131.03" rel="stylesheet" type="text/css" />
+
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+		<!-- SEO -->
+		<meta name="robots" content="index, follow">
+		<title>Datas de estreias de cinema em Portugal - filmSPOT</title>
+		<meta name="description" content="Calend&aacute;rio das pr&oacute;ximas estreias de filmes em Portugal. Fichas dos filmes e sinopses. Trailers e posters."/>
+		<link rel="canonical" href="https://filmspot.pt/estreias/" />
+		<meta name="twitter:card" content="summary_large_image"/>
+		<meta name="twitter:url" content="https://filmspot.pt/estreias/"/>
+		<meta property="og:locale" content="pt_PT"/>
+		<meta property="og:site_name" content="filmSPOT"/>
+		<meta property="fb:pages" content="277025642358938"/>
+		<meta property="og:title" content="Datas de estreias de cinema em Portugal"/>
+		<meta property="og:url" content="https://filmspot.pt/estreias/"/>
+		<meta property="og:type" content="article"/>
+		<meta property="article:publisher" content="https://www.facebook.com/filmspot.pt"/>
+		<meta property="twitter:site" content="@filmSPOTpt"/>
+		<meta name="author" content="filmSPOT"/>
+		<meta property="article:author" content="https://www.facebook.com/filmspot.pt"/>
+		<meta name="twitter:creator" content="@filmSPOTpt"/>
+		<meta property="og:description" content="Calend&aacute;rio das pr&oacute;ximas estreias de filmes em Portugal. Fichas dos filmes e sinopses. Trailers e posters."/>
+		<meta property="og:image" content="https://filmspot.pt/images/layout/logo_share.jpg"/>
+		<meta itemprop="name" content="Datas de estreias de cinema em Portugal"/>
+		<meta name="twitter:title" content="Datas de estreias de cinema em Portugal"/>
+		<meta itemprop="description" content="Calend&aacute;rio das pr&oacute;ximas estreias de filmes em Portugal. Fichas dos filmes e sinopses. Trailers e posters."/>
+		<meta name="twitter:description" content="Calend&aacute;rio das pr&oacute;ximas estreias de filmes em Portugal. Fichas dos filmes e sinopses. Trailers e posters."/>
+		<meta itemprop="image" content="https://filmspot.pt/images/layout/logo_share.jpg"/>
+					<meta name="twitter:image:src" content="https://filmspot.pt/images/layout/logo_share.jpg"/>
+			<!-- RSS -->
+		<link rel="alternate" type="application/rss+xml" title="Feed RSS filmSPOT" href="https://filmspot.pt/feed/estreias/" />
+		<!-- Favicon -->
+		<link rel="shortcut icon" type="image/x-icon" href="https://filmspot.com.pt/favicon.ico"/>
+		<!-- Apple stuff -->
+		<meta name="apple-mobile-web-app-title" content="filmSPOT" />
+		<meta name="apple-mobile-web-app-capable" content="yes"/>
+		<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+		<meta name="format-detection" content="telephone=no"/>
+		<!-- iOS standalone - open links same page -->
+		<script type="text/javascript">
+			(function(document,navigator,standalone) {
+				// prevents links from apps from oppening in mobile safari
+				// this javascript must be the first script in your <head>
+				if ((standalone in navigator) && navigator[standalone]) {
+					var curnode, location=document.location, stop=/^(a|html)$/i;
+					document.addEventListener('click', function(e) {
+						curnode=e.target;
+						while (!(stop).test(curnode.nodeName)) {
+							curnode=curnode.parentNode;
+						}
+						// Condidions to do this only on links to your own app
+						// if you want all links, use if('href' in curnode) instead.
+						if(
+							'href' in curnode && // is a link
+							(chref=curnode.href).replace(location.href,'').indexOf('#') && // is not an anchor
+							(	!(/^[a-z\+\.\-]+:/i).test(chref) ||                       // either does not have a proper scheme (relative links)
+								chref.indexOf(location.protocol+'//'+location.host)===0 ) // or is in the same protocol and domain
+						) {
+							e.preventDefault();
+							location.href = curnode.href;
+						}
+					},false);
+				}
+			})(document,window.navigator,'standalone');
+		</script>
+		<!-- Apple Touch Icons - Old sizes -->
+		<link rel="apple-touch-icon" href="https://filmspot.com.pt/images/layout/logo_apple_57.png"/>
+		<link rel="apple-touch-icon" sizes="72x72" href="https://filmspot.com.pt/images/layout/logo_apple_72.png"/>
+		<link rel="apple-touch-icon" sizes="114x114" href="https://filmspot.com.pt/images/layout/logo_apple_114.png"/>
+		<!-- Apple Touch Icons - New IOS8 sizes -->
+		<link rel="apple-touch-icon" sizes="180x180" href="https://filmspot.com.pt/images/layout/apple-touch-icon-180x180.png"/>
+		<link rel="apple-touch-icon" sizes="152x152" href="https://filmspot.com.pt/images/layout/apple-touch-icon-152x152.png"/>
+		<link rel="apple-touch-icon" sizes="120x120" href="https://filmspot.com.pt/images/layout/apple-touch-icon-120x120.png"/>
+		<link rel="apple-touch-icon" sizes="76x76" href="https://filmspot.com.pt/images/layout/apple-touch-icon-76x76.png"/>
+		<!-- Android stuff -->
+		<meta name="mobile-web-app-capable" content="yes"/>
+		<link rel="manifest" href="/manifest.json"/>
+		<link rel="icon" type="image/png" sizes="192x192" href="https://filmspot.com.pt/images/layout/android-touch-icon-192x192.png"/>
+		<link rel="icon" type="image/png" sizes="48x48" href="https://filmspot.com.pt/images/layout/android-touch-icon-48x48.png"/>
+		<!-- Hi there Google -->
+		<script type="application/ld+json">{"@context":"http:\/\/schema.org","@type":"WebSite","@id":"https:\/\/filmspot.pt#Website","url":"https:\/\/filmspot.pt","potentialAction":{"@type":"SearchAction","target":"https:\/\/filmspot.pt\/pesquisa\/{search_term_string}\/","query-input":"required name=search_term_string"},"publisher":{"@context":"http:\/\/schema.org","@type":"Organization","@id":"https:\/\/filmspot.pt#Organization","name":"filmSPOT","url":"https:\/\/filmspot.pt","logo":{"@type":"ImageObject","url":"https:\/\/filmspot.pt\/images\/layout\/logo_20140103.png"},"sameAs":["https:\/\/www.facebook.com\/filmspot.pt","https:\/\/twitter.com\/filmspotpt"]}}</script>		<!-- Hi there Google Chrome / Open search -->
+		<link type="application/opensearchdescription+xml" rel="search" href="/osdd.xml"/>
+				<!-- OneSignal -->
+		<script src="https://cdn.onesignal.com/sdks/OneSignalSDK.js" async></script>
+		<script>
+			var OneSignal = window.OneSignal || [];
+			OneSignal.push(["init", {
+				appId: "890afbef-46ad-4234-b61c-335e6bd75442",
+				safari_web_id: "web.onesignal.auto.5d6ab6d2-4d0b-4ad8-b336-7f8ff3aff850",
+				autoRegister: true,
+				notifyButton: {
+					enable: true /* Set to false to hide */,
+					prenotify: true,
+					showCredit: false,
+					position: 'bottom-right',
+					colors: {
+					},
+					text: {
+						'tip.state.unsubscribed': 'Subscreva as notificações filmSPOT.pt',
+						'tip.state.subscribed': 'Subscreveu as notificações filmSPOT.pt',
+						'tip.state.blocked': 'Bloqueou as notificações filmSPOT.pt',
+						'message.prenotify': 'Clique aqui para subscrever notificações filmSPOT.pt',
+						'message.action.subscribed': 'Obrigado por ter subscrito as notificações filmSPOT.pt!',
+						'message.action.resubscribed': 'Subscreveu as notificações filmSPOT.pt',
+						'message.action.unsubscribed': 'Notificações canceladas. Clique aqui para receber de novo as notificações filmSPOT.pt',
+						'dialog.main.title': 'Gerir notificações filmSPOT.pt',
+						'dialog.main.button.subscribe': 'SUBSCREVER',
+						'dialog.main.button.unsubscribe': 'CANCELAR',
+						'dialog.blocked.title': 'Desbloquear notificações filmSPOT.pt',
+						'dialog.blocked.message': 'Siga estas instruções para desbloquear as notificações filmSPOT.pt'
+					}
+				},
+				welcomeNotification: {
+					//"title": "filmSPOT",
+					//"message": "Obrigado por subscrever as notificações filmSPOT.pt!"
+					//"url": "https://filmspot.pt"
+					disable: true
+				},
+				persistNotification: true, //Chrome desktop
+			}]);
+			/*document.addEventListener('DOMContentLoaded', function() {
+				OneSignal.registerForPushNotifications({
+					modalPrompt: true
+				});
+			});*/
+		</script>
+					<!-- Facebook Pixel Code -->
+			<script>
+			!function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+			n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;
+			n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;
+			t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,
+			document,'script','https://connect.facebook.net/en_US/fbevents.js');
+			fbq('init', '860719850761231'); // Insert your pixel ID here.
+			fbq('track', 'PageView');
+			</script>
+			<noscript><img height="1" width="1" style="display:none"
+			src="https://www.facebook.com/tr?id=860719850761231&ev=PageView&noscript=1"
+			/></noscript>
+			<!-- DO NOT MODIFY -->
+			<!-- End Facebook Pixel Code -->
+							<!-- Google AdSense Auto Ads -->
+			<script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+<script>
+  (adsbygoogle = window.adsbygoogle || []).push({
+    google_ad_client: "ca-pub-5910706815683379",
+    enable_page_level_ads: true
+  });
+</script>						<!-- End Google AdSense Auto Ads -->
+				<!-- InMobi Choice. Consent Manager Tag v3.0 (for TCF 2.2) -->
+		<script type="text/javascript" async=true>
+		(function() {
+		  var host = window.location.hostname;
+		  var element = document.createElement('script');
+		  var firstScript = document.getElementsByTagName('script')[0];
+		  var url = 'https://cmp.inmobi.com'
+		    .concat('/choice/', 'ygGU4ZXuW_01r', '/', host, '/choice.js?tag_version=V3');
+		  var uspTries = 0;
+		  var uspTriesLimit = 3;
+		  element.async = true;
+		  element.type = 'text/javascript';
+		  element.src = url;
+		
+		  firstScript.parentNode.insertBefore(element, firstScript);
+		
+		  function makeStub() {
+		    var TCF_LOCATOR_NAME = '__tcfapiLocator';
+		    var queue = [];
+		    var win = window;
+		    var cmpFrame;
+		
+		    function addFrame() {
+		      var doc = win.document;
+		      var otherCMP = !!(win.frames[TCF_LOCATOR_NAME]);
+			
+		      if (!otherCMP) {
+		        if (doc.body) {
+		          var iframe = doc.createElement('iframe');
+				
+		          iframe.style.cssText = 'display:none';
+		          iframe.name = TCF_LOCATOR_NAME;
+		          doc.body.appendChild(iframe);
+		        } else {
+		          setTimeout(addFrame, 5);
+		        }
+		      }
+		      return !otherCMP;
+		    }
+		
+		    function tcfAPIHandler() {
+		      var gdprApplies;
+		      var args = arguments;
+			
+		      if (!args.length) {
+		        return queue;
+		      } else if (args[0] === 'setGdprApplies') {
+		        if (
+		          args.length > 3 &&
+		          args[2] === 2 &&
+		          typeof args[3] === 'boolean'
+		        ) {
+		          gdprApplies = args[3];
+		          if (typeof args[2] === 'function') {
+		            args[2]('set', true);
+		          }
+		        }
+		      } else if (args[0] === 'ping') {
+		        var retr = {
+		          gdprApplies: gdprApplies,
+		          cmpLoaded: false,
+		          cmpStatus: 'stub'
+		        };
+			
+		        if (typeof args[2] === 'function') {
+		          args[2](retr);
+		        }
+		      } else {
+		        if(args[0] === 'init' && typeof args[3] === 'object') {
+		          args[3] = Object.assign(args[3], { tag_version: 'V3' });
+		        }
+		        queue.push(args);
+		      }
+		    }
+		
+		    function postMessageEventHandler(event) {
+		      var msgIsString = typeof event.data === 'string';
+		      var json = {};
+			
+		      try {
+		        if (msgIsString) {
+		          json = JSON.parse(event.data);
+		        } else {
+		          json = event.data;
+		        }
+		      } catch (ignore) {}
+		  
+		      var payload = json.__tcfapiCall;
+		  
+		      if (payload) {
+		        window.__tcfapi(
+		          payload.command,
+		          payload.version,
+		          function(retValue, success) {
+		            var returnMsg = {
+		              __tcfapiReturn: {
+		                returnValue: retValue,
+		                success: success,
+		                callId: payload.callId
+		              }
+		            };
+		            if (msgIsString) {
+		              returnMsg = JSON.stringify(returnMsg);
+		            }
+		            if (event && event.source && event.source.postMessage) {
+		              event.source.postMessage(returnMsg, '*');
+		            }
+		          },
+		          payload.parameter
+		        );
+		      }
+		    }
+		
+		    while (win) {
+		      try {
+		        if (win.frames[TCF_LOCATOR_NAME]) {
+		          cmpFrame = win;
+		          break;
+		        }
+		      } catch (ignore) {}
+		  
+		      if (win === window.top) {
+		        break;
+		      }
+		      win = win.parent;
+		    }
+		    if (!cmpFrame) {
+		      addFrame();
+		      win.__tcfapi = tcfAPIHandler;
+		      win.addEventListener('message', postMessageEventHandler, false);
+		    }
+		  };
+	  
+		  makeStub();
+	  
+		  function makeGppStub() {
+		    const CMP_ID = 10;
+		    const SUPPORTED_APIS = [
+		      '2:tcfeuv2',
+		      '6:uspv1',
+		      '7:usnatv1',
+		      '8:usca',
+		      '9:usvav1',
+		      '10:uscov1',
+		      '11:usutv1',
+		      '12:usctv1'
+		    ];
+		
+		    window.__gpp_addFrame = function (n) {
+		      if (!window.frames[n]) {
+		        if (document.body) {
+		          var i = document.createElement("iframe");
+		          i.style.cssText = "display:none";
+		          i.name = n;
+		          document.body.appendChild(i);
+		        } else {
+		          window.setTimeout(window.__gpp_addFrame, 10, n);
+		        }
+		      }
+		    };
+		    window.__gpp_stub = function () {
+		      var b = arguments;
+		      __gpp.queue = __gpp.queue || [];
+		      __gpp.events = __gpp.events || [];
+			
+		      if (!b.length || (b.length == 1 && b[0] == "queue")) {
+		        return __gpp.queue;
+		      }
+		  
+		      if (b.length == 1 && b[0] == "events") {
+		        return __gpp.events;
+		      }
+		  
+		      var cmd = b[0];
+		      var clb = b.length > 1 ? b[1] : null;
+		      var par = b.length > 2 ? b[2] : null;
+		      if (cmd === "ping") {
+		        clb(
+		          {
+		            gppVersion: "1.1", // must be “Version.Subversion”, current: “1.1”
+		            cmpStatus: "stub", // possible values: stub, loading, loaded, error
+		            cmpDisplayStatus: "hidden", // possible values: hidden, visible, disabled
+		            signalStatus: "not ready", // possible values: not ready, ready
+		            supportedAPIs: SUPPORTED_APIS, // list of supported APIs
+		            cmpId: CMP_ID, // IAB assigned CMP ID, may be 0 during stub/loading
+		            sectionList: [],
+		            applicableSections: [-1],
+		            gppString: "",
+		            parsedSections: {},
+		          },
+		          true
+		        );
+		      } else if (cmd === "addEventListener") {
+		        if (!("lastId" in __gpp)) {
+		          __gpp.lastId = 0;
+		        }
+		        __gpp.lastId++;
+		        var lnr = __gpp.lastId;
+		        __gpp.events.push({
+		          id: lnr,
+		          callback: clb,
+		          parameter: par,
+		        });
+		        clb(
+		          {
+		            eventName: "listenerRegistered",
+		            listenerId: lnr, // Registered ID of the listener
+		            data: true, // positive signal
+		            pingData: {
+		              gppVersion: "1.1", // must be “Version.Subversion”, current: “1.1”
+		              cmpStatus: "stub", // possible values: stub, loading, loaded, error
+		              cmpDisplayStatus: "hidden", // possible values: hidden, visible, disabled
+		              signalStatus: "not ready", // possible values: not ready, ready
+		              supportedAPIs: SUPPORTED_APIS, // list of supported APIs
+		              cmpId: CMP_ID, // list of supported APIs
+		              sectionList: [],
+		              applicableSections: [-1],
+		              gppString: "",
+		              parsedSections: {},
+		            },
+		          },
+		          true
+		        );
+		      } else if (cmd === "removeEventListener") {
+		        var success = false;
+		        for (var i = 0; i < __gpp.events.length; i++) {
+		          if (__gpp.events[i].id == par) {
+		            __gpp.events.splice(i, 1);
+		            success = true;
+		            break;
+		          }
+		        }
+		        clb(
+		          {
+		            eventName: "listenerRemoved",
+		            listenerId: par, // Registered ID of the listener
+		            data: success, // status info
+		            pingData: {
+		              gppVersion: "1.1", // must be “Version.Subversion”, current: “1.1”
+		              cmpStatus: "stub", // possible values: stub, loading, loaded, error
+		              cmpDisplayStatus: "hidden", // possible values: hidden, visible, disabled
+		              signalStatus: "not ready", // possible values: not ready, ready
+		              supportedAPIs: SUPPORTED_APIS, // list of supported APIs
+		              cmpId: CMP_ID, // CMP ID
+		              sectionList: [],
+		              applicableSections: [-1],
+		              gppString: "",
+		              parsedSections: {},
+		            },
+		          },
+		          true
+		        );
+		      } else if (cmd === "hasSection") {
+		        clb(false, true);
+		      } else if (cmd === "getSection" || cmd === "getField") {
+		        clb(null, true);
+		      }
+		      //queue all other commands
+		      else {
+		        __gpp.queue.push([].slice.apply(b));
+		      }
+		    };
+		    window.__gpp_msghandler = function (event) {
+		      var msgIsString = typeof event.data === "string";
+		      try {
+		        var json = msgIsString ? JSON.parse(event.data) : event.data;
+		      } catch (e) {
+		        var json = null;
+		      }
+		      if (typeof json === "object" && json !== null && "__gppCall" in json) {
+		        var i = json.__gppCall;
+		        window.__gpp(
+		          i.command,
+		          function (retValue, success) {
+		            var returnMsg = {
+		              __gppReturn: {
+		                returnValue: retValue,
+		                success: success,
+		                callId: i.callId,
+		              },
+		            };
+		            event.source.postMessage(msgIsString ? JSON.stringify(returnMsg) : returnMsg, "*");
+		          },
+		          "parameter" in i ? i.parameter : null,
+		          "version" in i ? i.version : "1.1"
+		        );
+		      }
+		    };
+		    if (!("__gpp" in window) || typeof window.__gpp !== "function") {
+		      window.__gpp = window.__gpp_stub;
+		      window.addEventListener("message", window.__gpp_msghandler, false);
+		      window.__gpp_addFrame("__gppLocator");
+		    }
+		  };
+	  
+		  makeGppStub();
+	  
+		  var uspStubFunction = function() {
+		    var arg = arguments;
+		    if (typeof window.__uspapi !== uspStubFunction) {
+		      setTimeout(function() {
+		        if (typeof window.__uspapi !== 'undefined') {
+		          window.__uspapi.apply(window.__uspapi, arg);
+		        }
+		      }, 500);
+		    }
+		  };
+	  
+		  var checkIfUspIsReady = function() {
+		    uspTries++;
+		    if (window.__uspapi === uspStubFunction && uspTries < uspTriesLimit) {
+		      console.warn('USP is not accessible');
+		    } else {
+		      clearInterval(uspInterval);
+		    }
+		  };
+	  
+		  if (typeof window.__uspapi === 'undefined') {
+		    window.__uspapi = uspStubFunction;
+		    var uspInterval = setInterval(checkIfUspIsReady, 6000);
+		  }
+		})();
+		</script>
+		<!-- End InMobi Choice. Consent Manager Tag v3.0 (for TCF 2.2) -->
+		<!-- Rel ME links (Facebook and Twitter on the page) -->
+			</head>
+	<body class="">
+		
+		<div id="top">
+			<div class="wrap">
+							<div id="logonew">
+					<a href="/" class="spriteRetina">Cartaz de Cinema filmSPOT</a>
+				</div>
+								<div id="topUtils">
+					<form name="searchBox" id="searchBox" action="/pesquisar.php" method="post">
+						<input type="text" name="search_term_string" id="texto" value=""/>
+						<input type="submit" name="search" id="search" value="Pesquisar"/>
+					</form>
+					<div id="social">
+						<a href="/feed/estreias/" rel="nofollow" target="_blank" title="Subscreva o Feed RSS" class="sprite socialFeed"></a>						
+						<a href="https://twitter.com/filmSPOTpt" rel="me" target="_blank" title="Siga-nos no Twitter" rel="nofollow" class="sprite socialTwitter"></a>
+						<a href="https://www.facebook.com/filmspot.pt" rel="me" target="_blank" title="Siga-nos no Facebook" rel="nofollow" class="sprite socialFacebook"></a>
+					</div>
+				</div>
+			</div>
+		</div>
+		
+		<div id="menu">
+			<div class="wrap">
+				<!--<form name="searchBox" id="searchBox" action="/pesquisar.php" method="post">
+					<input type="text" name="texto" id="texto" value=""/>
+					<input type="submit" name="search" id="search" value="Pesq."/>
+				</form>-->
+				<ul>
+					<li><a href="/noticias/" title="Notícias de cinema">notícias</a></li>
+					<li><a href="/televisao/" title="Notícias de televisão">notícias tv </a></li>
+					<li><a href="/filmes/" title="Filmes em exibição em Portugal">filmes em exibição</a></li>
+					<li><a href="/estreias/202601/" class="active" title="Datas de estreias de cinema em Portugal">estreias</a></li>
+					<li><a href="/estreiastvportugal/#mesestreia202512||" title="Estreias de séries de televisão em Portugal e no Mundo">estreias tv</a></li>
+					<li><a href="/trailers/" title="Os últimos trailers de filmes">trailers</a></li>
+					<!--<li><a href="/passatempos/" title="Passatempos de cinema">passatempos</a></li>-->
+					<li><a href="/opiniao/" title="Artigos de opinião">opinião</a></li>
+				</ul>
+			</div>
+		</div>
+
+		<div id="topBannerNovo">
+						<!-- on the footer -->
+					</div>		
+			<div id="novocartaz">
+				<div class="wrap">
+					<div id="novocartazbarraoutter">
+						<div id="novocartazbarra">
+							<h3>Cartaz de cinema</h3>
+							<ul>
+								<li><a href="/salas/" id="novocartazsalas" title="Salas de cinema">Salas</a></li>
+								<li><a href="/filmes/" id="novocartazfilmes" title="Filmes em exibição">Filmes</a></li>
+								<li><a href="#" id="novocartazlocalidades">Localidades</a></li>
+							</ul>
+							<div class="clear"></div>
+						</div>
+						<span id="novoCartazTicket" class="sprite"></span>
+					</div>
+					<div class="clear"></div>
+					<div id="novocartazcontent"></div>
+					<div class="clear"></div>
+				</div>
+			</div>
+		
+		<div id="contents" class="wrap">
+				<input type="hidden" id="v1" value="estreias"/>
+	
+		<div id="contentsNoSidebar" class="estreias_lado_lado">
+			
+			
+			
+			
+			
+			<div>
+				<h1>Estreias de cinema</h1>
+				<div>
+					<select id="filtraMesesEstreias1" class="small filtraGenerosEstreias1">
+						<option value="0">Todas as estreias futuras</option>
+																<option value="2012">2012</option>
+																				<option value="2013">2013</option>
+																				<option value="2014">2014</option>
+																				<option value="2015">2015</option>
+																				<option value="2016">2016</option>
+																				<option value="2017">2017</option>
+																				<option value="2018">2018</option>
+																				<option value="2019">2019</option>
+																				<option value="2020">2020</option>
+																				<option value="2021">2021</option>
+																				<option value="2022">2022</option>
+																				<option value="2023">2023</option>
+																				<option value="2024">2024</option>
+																				<option value="2025">2025</option>
+																				<option value="202512"> &nbsp; dezembro de 2025</option>
+																				<option value="2026">2026</option>
+																				<option value="202601"> &nbsp; janeiro de 2026</option>
+																				<option value="202602"> &nbsp; fevereiro de 2026</option>
+																				<option value="202603"> &nbsp; março de 2026</option>
+																				<option value="202604"> &nbsp; abril de 2026</option>
+																				<option value="202605"> &nbsp; maio de 2026</option>
+																				<option value="202606"> &nbsp; junho de 2026</option>
+																				<option value="202607"> &nbsp; julho de 2026</option>
+																				<option value="202608"> &nbsp; agosto de 2026</option>
+																				<option value="202609"> &nbsp; setembro de 2026</option>
+																				<option value="202610"> &nbsp; outubro de 2026</option>
+																				<option value="202611"> &nbsp; novembro de 2026</option>
+																				<option value="202612"> &nbsp; dezembro de 2026</option>
+																				<option value="2027">2027</option>
+																				<option value="2028">2028</option>
+																				<option value="2029">2029</option>
+																				<option value="2031">2031</option>
+															</select>
+											<select id="filtraGeneros1" class="small filtraGenerosEstreias1">
+							<option value="0">Todos os géneros</option>
+															<option value="16">Animação</option>
+																<option value="12">Aventura</option>
+																<option value="28">Ação</option>
+																<option value="99999">Biografia</option>
+																<option value="35">Comédia</option>
+																<option value="80">Crime</option>
+																<option value="99">Documentário</option>
+																<option value="18">Drama</option>
+																<option value="14">Fantasia</option>
+																<option value="878">Ficção Científica</option>
+																<option value="10752">Guerra</option>
+																<option value="36">Histórico</option>
+																<option value="9648">Mistério</option>
+																<option value="22">Musical</option>
+																<option value="10749">Romance</option>
+																<option value="27">Terror</option>
+																<option value="53">Thriller</option>
+																<option value="37">Western</option>
+														</select>
+										</div>
+
+				<!-- Alternative menu -->
+				<div style="display: none;"><ul><li><a href="/estreias/2012/">2012</a></li><li><a href="/estreias/201201/">janeiro de 2012</a></li><li><a href="/estreias/201202/">fevereiro de 2012</a></li><li><a href="/estreias/201203/">março de 2012</a></li><li><a href="/estreias/201204/">abril de 2012</a></li><li><a href="/estreias/201205/">maio de 2012</a></li><li><a href="/estreias/201206/">junho de 2012</a></li><li><a href="/estreias/201207/">julho de 2012</a></li><li><a href="/estreias/201208/">agosto de 2012</a></li><li><a href="/estreias/201209/">setembro de 2012</a></li><li><a href="/estreias/201210/">outubro de 2012</a></li><li><a href="/estreias/201211/">novembro de 2012</a></li><li><a href="/estreias/201212/">dezembro de 2012</a></li><li><a href="/estreias/2013/">2013</a></li><li><a href="/estreias/201301/">janeiro de 2013</a></li><li><a href="/estreias/201302/">fevereiro de 2013</a></li><li><a href="/estreias/201303/">março de 2013</a></li><li><a href="/estreias/201304/">abril de 2013</a></li><li><a href="/estreias/201305/">maio de 2013</a></li><li><a href="/estreias/201306/">junho de 2013</a></li><li><a href="/estreias/201307/">julho de 2013</a></li><li><a href="/estreias/201308/">agosto de 2013</a></li><li><a href="/estreias/201309/">setembro de 2013</a></li><li><a href="/estreias/201310/">outubro de 2013</a></li><li><a href="/estreias/201311/">novembro de 2013</a></li><li><a href="/estreias/201312/">dezembro de 2013</a></li><li><a href="/estreias/2014/">2014</a></li><li><a href="/estreias/201401/">janeiro de 2014</a></li><li><a href="/estreias/201402/">fevereiro de 2014</a></li><li><a href="/estreias/201403/">março de 2014</a></li><li><a href="/estreias/201404/">abril de 2014</a></li><li><a href="/estreias/201405/">maio de 2014</a></li><li><a href="/estreias/201406/">junho de 2014</a></li><li><a href="/estreias/201407/">julho de 2014</a></li><li><a href="/estreias/201408/">agosto de 2014</a></li><li><a href="/estreias/201409/">setembro de 2014</a></li><li><a href="/estreias/201410/">outubro de 2014</a></li><li><a href="/estreias/201411/">novembro de 2014</a></li><li><a href="/estreias/201412/">dezembro de 2014</a></li><li><a href="/estreias/2015/">2015</a></li><li><a href="/estreias/201501/">janeiro de 2015</a></li><li><a href="/estreias/201502/">fevereiro de 2015</a></li><li><a href="/estreias/201503/">março de 2015</a></li><li><a href="/estreias/201504/">abril de 2015</a></li><li><a href="/estreias/201505/">maio de 2015</a></li><li><a href="/estreias/201506/">junho de 2015</a></li><li><a href="/estreias/201507/">julho de 2015</a></li><li><a href="/estreias/201508/">agosto de 2015</a></li><li><a href="/estreias/201509/">setembro de 2015</a></li><li><a href="/estreias/201510/">outubro de 2015</a></li><li><a href="/estreias/201511/">novembro de 2015</a></li><li><a href="/estreias/201512/">dezembro de 2015</a></li><li><a href="/estreias/2016/">2016</a></li><li><a href="/estreias/201601/">janeiro de 2016</a></li><li><a href="/estreias/201602/">fevereiro de 2016</a></li><li><a href="/estreias/201603/">março de 2016</a></li><li><a href="/estreias/201604/">abril de 2016</a></li><li><a href="/estreias/201605/">maio de 2016</a></li><li><a href="/estreias/201606/">junho de 2016</a></li><li><a href="/estreias/201607/">julho de 2016</a></li><li><a href="/estreias/201608/">agosto de 2016</a></li><li><a href="/estreias/201609/">setembro de 2016</a></li><li><a href="/estreias/201610/">outubro de 2016</a></li><li><a href="/estreias/201611/">novembro de 2016</a></li><li><a href="/estreias/201612/">dezembro de 2016</a></li><li><a href="/estreias/2017/">2017</a></li><li><a href="/estreias/201701/">janeiro de 2017</a></li><li><a href="/estreias/201702/">fevereiro de 2017</a></li><li><a href="/estreias/201703/">março de 2017</a></li><li><a href="/estreias/201704/">abril de 2017</a></li><li><a href="/estreias/201705/">maio de 2017</a></li><li><a href="/estreias/201706/">junho de 2017</a></li><li><a href="/estreias/201707/">julho de 2017</a></li><li><a href="/estreias/201708/">agosto de 2017</a></li><li><a href="/estreias/201709/">setembro de 2017</a></li><li><a href="/estreias/201710/">outubro de 2017</a></li><li><a href="/estreias/201711/">novembro de 2017</a></li><li><a href="/estreias/201712/">dezembro de 2017</a></li><li><a href="/estreias/2018/">2018</a></li><li><a href="/estreias/201801/">janeiro de 2018</a></li><li><a href="/estreias/201802/">fevereiro de 2018</a></li><li><a href="/estreias/201803/">março de 2018</a></li><li><a href="/estreias/201804/">abril de 2018</a></li><li><a href="/estreias/201805/">maio de 2018</a></li><li><a href="/estreias/201806/">junho de 2018</a></li><li><a href="/estreias/201807/">julho de 2018</a></li><li><a href="/estreias/201808/">agosto de 2018</a></li><li><a href="/estreias/201809/">setembro de 2018</a></li><li><a href="/estreias/201810/">outubro de 2018</a></li><li><a href="/estreias/201811/">novembro de 2018</a></li><li><a href="/estreias/201812/">dezembro de 2018</a></li><li><a href="/estreias/2019/">2019</a></li><li><a href="/estreias/201901/">janeiro de 2019</a></li><li><a href="/estreias/201902/">fevereiro de 2019</a></li><li><a href="/estreias/201903/">março de 2019</a></li><li><a href="/estreias/201904/">abril de 2019</a></li><li><a href="/estreias/201905/">maio de 2019</a></li><li><a href="/estreias/201906/">junho de 2019</a></li><li><a href="/estreias/201907/">julho de 2019</a></li><li><a href="/estreias/201908/">agosto de 2019</a></li><li><a href="/estreias/201909/">setembro de 2019</a></li><li><a href="/estreias/201910/">outubro de 2019</a></li><li><a href="/estreias/201911/">novembro de 2019</a></li><li><a href="/estreias/201912/">dezembro de 2019</a></li><li><a href="/estreias/2020/">2020</a></li><li><a href="/estreias/202001/">janeiro de 2020</a></li><li><a href="/estreias/202002/">fevereiro de 2020</a></li><li><a href="/estreias/202003/">março de 2020</a></li><li><a href="/estreias/202004/">abril de 2020</a></li><li><a href="/estreias/202005/">maio de 2020</a></li><li><a href="/estreias/202006/">junho de 2020</a></li><li><a href="/estreias/202007/">julho de 2020</a></li><li><a href="/estreias/202008/">agosto de 2020</a></li><li><a href="/estreias/202009/">setembro de 2020</a></li><li><a href="/estreias/202010/">outubro de 2020</a></li><li><a href="/estreias/202011/">novembro de 2020</a></li><li><a href="/estreias/202012/">dezembro de 2020</a></li><li><a href="/estreias/2021/">2021</a></li><li><a href="/estreias/202101/">janeiro de 2021</a></li><li><a href="/estreias/202102/">fevereiro de 2021</a></li><li><a href="/estreias/202103/">março de 2021</a></li><li><a href="/estreias/202104/">abril de 2021</a></li><li><a href="/estreias/202105/">maio de 2021</a></li><li><a href="/estreias/202106/">junho de 2021</a></li><li><a href="/estreias/202107/">julho de 2021</a></li><li><a href="/estreias/202108/">agosto de 2021</a></li><li><a href="/estreias/202109/">setembro de 2021</a></li><li><a href="/estreias/202110/">outubro de 2021</a></li><li><a href="/estreias/202111/">novembro de 2021</a></li><li><a href="/estreias/202112/">dezembro de 2021</a></li><li><a href="/estreias/2022/">2022</a></li><li><a href="/estreias/202201/">janeiro de 2022</a></li><li><a href="/estreias/202202/">fevereiro de 2022</a></li><li><a href="/estreias/202203/">março de 2022</a></li><li><a href="/estreias/202204/">abril de 2022</a></li><li><a href="/estreias/202205/">maio de 2022</a></li><li><a href="/estreias/202206/">junho de 2022</a></li><li><a href="/estreias/202207/">julho de 2022</a></li><li><a href="/estreias/202208/">agosto de 2022</a></li><li><a href="/estreias/202209/">setembro de 2022</a></li><li><a href="/estreias/202210/">outubro de 2022</a></li><li><a href="/estreias/202211/">novembro de 2022</a></li><li><a href="/estreias/202212/">dezembro de 2022</a></li><li><a href="/estreias/2023/">2023</a></li><li><a href="/estreias/202301/">janeiro de 2023</a></li><li><a href="/estreias/202302/">fevereiro de 2023</a></li><li><a href="/estreias/202303/">março de 2023</a></li><li><a href="/estreias/202304/">abril de 2023</a></li><li><a href="/estreias/202305/">maio de 2023</a></li><li><a href="/estreias/202306/">junho de 2023</a></li><li><a href="/estreias/202307/">julho de 2023</a></li><li><a href="/estreias/202308/">agosto de 2023</a></li><li><a href="/estreias/202309/">setembro de 2023</a></li><li><a href="/estreias/202310/">outubro de 2023</a></li><li><a href="/estreias/202311/">novembro de 2023</a></li><li><a href="/estreias/202312/">dezembro de 2023</a></li><li><a href="/estreias/2024/">2024</a></li><li><a href="/estreias/202401/">janeiro de 2024</a></li><li><a href="/estreias/202402/">fevereiro de 2024</a></li><li><a href="/estreias/202403/">março de 2024</a></li><li><a href="/estreias/202404/">abril de 2024</a></li><li><a href="/estreias/202405/">maio de 2024</a></li><li><a href="/estreias/202406/">junho de 2024</a></li><li><a href="/estreias/202407/">julho de 2024</a></li><li><a href="/estreias/202408/">agosto de 2024</a></li><li><a href="/estreias/202409/">setembro de 2024</a></li><li><a href="/estreias/202410/">outubro de 2024</a></li><li><a href="/estreias/202411/">novembro de 2024</a></li><li><a href="/estreias/202412/">dezembro de 2024</a></li><li><a href="/estreias/2025/">2025</a></li><li><a href="/estreias/202501/">janeiro de 2025</a></li><li><a href="/estreias/202502/">fevereiro de 2025</a></li><li><a href="/estreias/202503/">março de 2025</a></li><li><a href="/estreias/202504/">abril de 2025</a></li><li><a href="/estreias/202505/">maio de 2025</a></li><li><a href="/estreias/202506/">junho de 2025</a></li><li><a href="/estreias/202507/">julho de 2025</a></li><li><a href="/estreias/202508/">agosto de 2025</a></li><li><a href="/estreias/202509/">setembro de 2025</a></li><li><a href="/estreias/202510/">outubro de 2025</a></li><li><a href="/estreias/202511/">novembro de 2025</a></li><li><a href="/estreias/202512/">dezembro de 2025</a></li><li><a href="/estreias/2026/">2026</a></li><li><a href="/estreias/202601/">janeiro de 2026</a></li><li><a href="/estreias/202602/">fevereiro de 2026</a></li><li><a href="/estreias/202603/">março de 2026</a></li><li><a href="/estreias/202604/">abril de 2026</a></li><li><a href="/estreias/202605/">maio de 2026</a></li><li><a href="/estreias/202606/">junho de 2026</a></li><li><a href="/estreias/202607/">julho de 2026</a></li><li><a href="/estreias/202608/">agosto de 2026</a></li><li><a href="/estreias/202609/">setembro de 2026</a></li><li><a href="/estreias/202610/">outubro de 2026</a></li><li><a href="/estreias/202611/">novembro de 2026</a></li><li><a href="/estreias/202612/">dezembro de 2026</a></li><li><a href="/estreias/2027/">2027</a></li><li><a href="/estreias/202701/">janeiro de 2027</a></li><li><a href="/estreias/202702/">fevereiro de 2027</a></li><li><a href="/estreias/202703/">março de 2027</a></li><li><a href="/estreias/202704/">abril de 2027</a></li><li><a href="/estreias/202705/">maio de 2027</a></li><li><a href="/estreias/202706/">junho de 2027</a></li><li><a href="/estreias/202707/">julho de 2027</a></li><li><a href="/estreias/202708/">agosto de 2027</a></li><li><a href="/estreias/202709/">setembro de 2027</a></li><li><a href="/estreias/202711/">novembro de 2027</a></li><li><a href="/estreias/202712/">dezembro de 2027</a></li><li><a href="/estreias/2028/">2028</a></li><li><a href="/estreias/202803/">março de 2028</a></li><li><a href="/estreias/202804/">abril de 2028</a></li><li><a href="/estreias/202807/">julho de 2028</a></li><li><a href="/estreias/202811/">novembro de 2028</a></li><li><a href="/estreias/2029/">2029</a></li><li><a href="/estreias/202912/">dezembro de 2029</a></li><li><a href="/estreias/2031/">2031</a></li><li><a href="/estreias/203112/">dezembro de 2031</a></li></ul></div>
+				
+										<div class="clear"></div> </div>
+							<!--<h1 class="mesestreia202512">Estreias de cinema</h1>-->
+							<div>
+							<div class="clear"></div></div><h2 class="estreiasH2 gen27 gen35 gen12 gen18 gen10752 gen9648 gen53 gen878 gen16 mesestreia202512" id="estreiasH220251224">24 de dezembro de 2025</h2><div>				<div class="filmeLista gen27 gen35 gen12 mesestreia202512" id="filmeLista1234731">
+					<div class="filmeListaPoster"><a href="/filme/anaconda-1234731/"><img loading="lazy" class="filmePosterShadow" src="https://filmspot.com.pt/images/filmes/posters/thumb/1234731_pt.jpg" alt="Anaconda" title="Anaconda"/></a></div>
+				<div class="filmeListaInfo">
+									<H3><a href="/filme/anaconda-1234731/" name="1234731"><span>Anaconda</span></a></H3>					<p class="zsmall">2025 | Terror, Comédia, Aventura | 99 min</p>						<p class="zsmall"><b>Com</b> Paul Rudd, Jack Black, Daniela Melchior</p>
+																<p class="zsmall"><b>Realização</b> Tom Gormican</p>
+																<!--<p class="zsmall"><b>Género</b> Terror, Comédia, Aventura</p>-->
+																<!--<p class="zsmall"><b>Duração</b> 99 minutos</p>-->
+																											<p class="zsmall filmeListaDistribuidor"><b>Distribuidor</b> Big Picture</p>
+																		<p class="zsmall filmeListaTrailerP"><b><a href="/trailer/anaconda-1234731/" class="filmeListaTrailer">Ver trailer</a></b></p>
+															<!--<div class="clear"></div>-->
+									</div>
+					<div class="clear"></div>
+				</div>
+										<div class="filmeLista gen18 gen10752 gen9648 mesestreia202512" id="filmeLista46738">
+					<div class="filmeListaPoster"><a href="/filme/incendies-46738/"><img loading="lazy" class="filmePosterShadow" src="https://filmspot.com.pt/images/filmes/posters/thumb/46738_pt.jpg" alt="Incendies - A Mulher Que Canta (reposi&ccedil;&atilde;o)" title="Incendies - A Mulher Que Canta (reposi&ccedil;&atilde;o)"/></a></div>
+				<div class="filmeListaInfo">
+									<H3><a href="/filme/incendies-46738/" name="46738"><span>Incendies - A Mulher Que Canta (reposição)</span> <span class="tituloOriginal"><span>Incendies</span></span></a></H3>					<p class="zsmall">2010 | Drama, Guerra, Mistério | 131 min</p>						<p class="zsmall"><b>Com</b> Lubna Azabal, Mélissa Désormeaux-Poulin, Maxim Gaudette</p>
+																<p class="zsmall"><b>Realização</b> Denis Villeneuve</p>
+																<!--<p class="zsmall"><b>Género</b> Drama, Guerra, Mistério</p>-->
+																<!--<p class="zsmall"><b>Duração</b> 131 minutos</p>-->
+																											<p class="zsmall filmeListaDistribuidor"><b>Distribuidor</b> Outsider Films</p>
+																		<p class="zsmall filmeListaTrailerP"><b><a href="/trailer/incendies-46738/" class="filmeListaTrailer">Ver trailer</a></b></p>
+															<!--<div class="clear"></div>-->
+									</div>
+					<div class="clear"></div>
+				</div>
+										<div class="filmeLista gen27 gen53 gen878 mesestreia202512" id="filmeLista1314452">
+					<div class="filmeListaPoster"><a href="/filme/o-t-h-e-r-1314452/"><img loading="lazy" class="filmePosterShadow" src="https://filmspot.com.pt/images/filmes/posters/thumb/1314452_pt.jpg" alt="Outro" title="Outro"/></a></div>
+				<div class="filmeListaInfo">
+									<H3><a href="/filme/o-t-h-e-r-1314452/" name="1314452"><span>Outro</span> <span class="tituloOriginal"><span>O.T.H.E.R.</span></span></a></H3>					<p class="zsmall">2025 | Terror, Thriller, Ficção Científica | 95 min</p>						<p class="zsmall"><b>Com</b> Olga Kurylenko, Jean Schatz, Philip Schurer</p>
+																<p class="zsmall"><b>Realização</b> David Moreau</p>
+																<!--<p class="zsmall"><b>Género</b> Terror, Thriller, Ficção Científica</p>-->
+																<!--<p class="zsmall"><b>Duração</b> 95 minutos</p>-->
+																											<p class="zsmall filmeListaDistribuidor"><b>Distribuidor</b> Cinemundo</p>
+																		<p class="zsmall filmeListaTrailerP"><b><a href="/trailer/o-t-h-e-r-1314452/" class="filmeListaTrailer">Ver trailer</a></b></p>
+															<!--<div class="clear"></div>-->
+									</div>
+					<div class="clear"></div>
+				</div>
+										<div class="filmeLista gen35 gen12 gen16 mesestreia202512" id="filmeLista991494">
+					<div class="filmeListaPoster"><a href="/filme/the-spongebob-movie-search-for-squarepants-991494/"><img loading="lazy" class="filmePosterShadow" src="https://filmspot.com.pt/images/filmes/posters/thumb/991494_pt.jpg" alt="Spongebob o Filme: &Agrave; Procura das Cal&ccedil;as Quadradas" title="Spongebob o Filme: &Agrave; Procura das Cal&ccedil;as Quadradas"/></a></div>
+				<div class="filmeListaInfo">
+									<H3><a href="/filme/the-spongebob-movie-search-for-squarepants-991494/" name="991494"><span>Spongebob o Filme: À Procura das Calças Quadradas</span> <span class="tituloOriginal"><span>The SpongeBob Movie: Search for SquarePants</span></span></a></H3>					<p class="zsmall">2025 | Comédia, Aventura, Animação | 96 min</p>						<p class="zsmall"><b>Vozes</b> Tom Kenny, Clancy Brown, Rodger Bumpass</p>
+																<p class="zsmall"><b>Realização</b> Derek Drymon</p>
+																<!--<p class="zsmall"><b>Género</b> Comédia, Aventura, Animação</p>-->
+																<!--<p class="zsmall"><b>Duração</b> 96 minutos</p>-->
+																											<p class="zsmall filmeListaDistribuidor"><b>Distribuidor</b> NOS Audiovisuais</p>
+																		<p class="zsmall filmeListaTrailerP"><b><a href="/trailer/the-spongebob-movie-search-for-squarepants-991494/" class="filmeListaTrailer">Ver trailer</a></b></p>
+															<!--<div class="clear"></div>-->
+									</div>
+					<div class="clear"></div>
+				</div>
+													<div class="clear"></div> </div><!--<h1>Próximas estreias</h1>--><div>
+							<div class="clear"></div><div class="horizBanner hideAdSenseWhenFilter"><script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5910706815683379"
+     crossorigin="anonymous"></script>
+<!-- Desktop 970x90 Na página -->
+<ins class="adsbygoogle"
+     style="display:inline-block;width:970px;height:90px"
+     data-ad-client="ca-pub-5910706815683379"
+     data-ad-slot="1541726112"></ins>
+<script>
+     (adsbygoogle = window.adsbygoogle || []).push({});
+</script></div></div><h2 class="estreiasH2 gen53 gen9648 gen28 gen80 gen18 mesestreia202601" id="estreiasH220260101">1 de janeiro de 2026</h2><div>				<div class="filmeLista gen53 gen9648 mesestreia202601" id="filmeLista1368166">
+					<div class="filmeListaPoster"><a href="/filme/the-housemaid-1368166/"><img loading="lazy" class="filmePosterShadow" src="https://filmspot.com.pt/images/filmes/posters/thumb/1368166_pt.jpg" alt="A Criada" title="A Criada"/></a></div>
+				<div class="filmeListaInfo">
+									<H3><a href="/filme/the-housemaid-1368166/" name="1368166"><span>A Criada</span> <span class="tituloOriginal"><span>The Housemaid</span></span></a></H3>					<p class="zsmall">2025 | Thriller, Mistério | 131 min</p>						<p class="zsmall"><b>Com</b> Sydney Sweeney, Amanda Seyfried, Brandon Sklenar</p>
+																<p class="zsmall"><b>Realização</b> Paul Feig</p>
+																<!--<p class="zsmall"><b>Género</b> Thriller, Mistério</p>-->
+																<!--<p class="zsmall"><b>Duração</b> 131 minutos</p>-->
+																											<p class="zsmall filmeListaDistribuidor"><b>Distribuidor</b> Pris</p>
+																		<p class="zsmall filmeListaTrailerP"><b><a href="/trailer/the-housemaid-1368166/" class="filmeListaTrailer">Ver trailer</a></b></p>
+															<!--<div class="clear"></div>-->
+									</div>
+					<div class="clear"></div>
+				</div>
+										<div class="filmeLista gen28 gen80 gen53 mesestreia202601" id="filmeLista1047373">
+					<div class="filmeListaPoster"><a href="/filme/the-silent-hour-1047373/"><img loading="lazy" class="filmePosterShadow" src="https://filmspot.com.pt/images/filmes/posters/thumb/1047373_pt.jpg" alt="A Hora Silenciosa" title="A Hora Silenciosa"/></a></div>
+				<div class="filmeListaInfo">
+									<H3><a href="/filme/the-silent-hour-1047373/" name="1047373"><span>A Hora Silenciosa</span> <span class="tituloOriginal"><span>The Silent Hour</span></span></a></H3>					<p class="zsmall">2024 | Ação, Crime, Thriller | 95 min</p>						<p class="zsmall"><b>Com</b> Joel Kinnaman, Mark Strong, Sandra Mae Frank</p>
+																<p class="zsmall"><b>Realização</b> Brad Anderson</p>
+																<!--<p class="zsmall"><b>Género</b> Ação, Crime, Thriller</p>-->
+																<!--<p class="zsmall"><b>Duração</b> 95 minutos</p>-->
+																											<p class="zsmall filmeListaDistribuidor"><b>Distribuidor</b> NOS Audiovisuais</p>
+																		<p class="zsmall filmeListaTrailerP"><b><a href="/trailer/the-silent-hour-1047373/" class="filmeListaTrailer">Ver trailer</a></b></p>
+															<!--<div class="clear"></div>-->
+									</div>
+					<div class="clear"></div>
+				</div>
+										<div class="filmeLista gen18 mesestreia202601" id="filmeLista1178602">
+					<div class="filmeListaPoster"><a href="/filme/miroirs-no-3-1178602/"><img loading="lazy" class="filmePosterShadow" src="https://filmspot.com.pt/images/filmes/posters/thumb/1178602_pt.jpg" alt="Miroirs No. 3" title="Miroirs No. 3"/></a></div>
+				<div class="filmeListaInfo">
+									<H3><a href="/filme/miroirs-no-3-1178602/" name="1178602"><span>Miroirs No. 3</span></a></H3>					<p class="zsmall">2025 | Drama | 86 min</p>						<p class="zsmall"><b>Com</b> Paula Beer, Barbara Auer, Matthias Brandt</p>
+																<p class="zsmall"><b>Realização</b> Christian Petzold</p>
+																<!--<p class="zsmall"><b>Género</b> Drama</p>-->
+																<!--<p class="zsmall"><b>Duração</b> 86 minutos</p>-->
+																											<p class="zsmall filmeListaDistribuidor"><b>Distribuidor</b> Leopardo Filmes</p>
+																		<p class="zsmall filmeListaTrailerP"><b><a href="/trailer/miroirs-no-3-1178602/" class="filmeListaTrailer">Ver trailer</a></b></p>
+															<!--<div class="clear"></div>-->
+									</div>
+					<div class="clear"></div>
+				</div>
+										<div class="filmeLista gen18 mesestreia202601" id="filmeLista1115187">
+					<div class="filmeListaPoster"><a href="/filme/os-enforcados-1115187/"><img loading="lazy" class="filmePosterShadow" src="https://filmspot.com.pt/images/filmes/posters/thumb/1115187_pt.jpg" alt="Os Enforcados" title="Os Enforcados"/></a></div>
+				<div class="filmeListaInfo">
+									<H3><a href="/filme/os-enforcados-1115187/" name="1115187"><span>Os Enforcados</span></a></H3>					<p class="zsmall">2025 | Drama | 123 min</p>						<p class="zsmall"><b>Com</b> Leandra Leal, Irandhir Santos, Irene Ravache</p>
+																<p class="zsmall"><b>Realização</b> Fernando Coimbra</p>
+																<!--<p class="zsmall"><b>Género</b> Drama</p>-->
+																<!--<p class="zsmall"><b>Duração</b> 123 minutos</p>-->
+																											<p class="zsmall filmeListaDistribuidor"><b>Distribuidor</b> Outsider Films</p>
+																		<p class="zsmall filmeListaTrailerP"><b><a href="/trailer/os-enforcados-1115187/" class="filmeListaTrailer">Ver trailer</a></b></p>
+															<!--<div class="clear"></div>-->
+									</div>
+					<div class="clear"></div>
+				</div>
+						<div class="clear"></div><div class="horizBanner hideAdSenseWhenFilter"><script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5910706815683379"
+     crossorigin="anonymous"></script>
+<!-- Desktop 970x90 Na página -->
+<ins class="adsbygoogle"
+     style="display:inline-block;width:970px;height:90px"
+     data-ad-client="ca-pub-5910706815683379"
+     data-ad-slot="1541726112"></ins>
+<script>
+     (adsbygoogle = window.adsbygoogle || []).push({});
+</script></div></div><h2 class="estreiasH2 gen18 gen35 gen878 gen53 gen12 gen10749 mesestreia202601" id="estreiasH220260108">8 de janeiro de 2026</h2><div>				<div class="filmeLista gen18 gen35 mesestreia202601" id="filmeLista1208348">
+					<div class="filmeListaPoster"><a href="/filme/rental-family-1208348/"><img loading="lazy" class="filmePosterShadow" src="https://filmspot.com.pt/images/filmes/posters/thumb/1208348_pt.jpg" alt="Fam&iacute;lia de Aluguer" title="Fam&iacute;lia de Aluguer"/></a></div>
+				<div class="filmeListaInfo">
+									<H3><a href="/filme/rental-family-1208348/" name="1208348"><span>Família de Aluguer</span> <span class="tituloOriginal"><span>Rental Family</span></span></a></H3>					<p class="zsmall">2025 | Drama, Comédia | 103 min</p>						<p class="zsmall"><b>Com</b> Brendan Fraser, Akira Emoto, Mari Yamamoto</p>
+																<p class="zsmall"><b>Realização</b> HIKARI</p>
+																<!--<p class="zsmall"><b>Género</b> Drama, Comédia</p>-->
+																<!--<p class="zsmall"><b>Duração</b> 103 minutos</p>-->
+																											<p class="zsmall filmeListaDistribuidor"><b>Distribuidor</b> NOS Audiovisuais</p>
+																		<p class="zsmall filmeListaTrailerP"><b><a href="/trailer/rental-family-1208348/" class="filmeListaTrailer">Ver trailer</a></b></p>
+															<!--<div class="clear"></div>-->
+									</div>
+					<div class="clear"></div>
+				</div>
+										<div class="filmeLista gen878 gen53 gen12 mesestreia202601" id="filmeLista840464">
+					<div class="filmeListaPoster"><a href="/filme/greenland-2-migration-840464/"><img loading="lazy" class="filmePosterShadow" src="https://filmspot.com.pt/images/filmes/posters/thumb/840464_pt.jpg" alt="Greenland: Um Novo Come&ccedil;o" title="Greenland: Um Novo Come&ccedil;o"/></a></div>
+				<div class="filmeListaInfo">
+									<H3><a href="/filme/greenland-2-migration-840464/" name="840464"><span>Greenland: Um Novo Começo</span> <span class="tituloOriginal"><span>Greenland 2: Migration</span></span></a></H3>					<p class="zsmall">2026 | Ficção Científica, Thriller, Aventura | 98 min</p>						<p class="zsmall"><b>Com</b> Gerard Butler, Morena Baccarin, William Abadie</p>
+																<p class="zsmall"><b>Realização</b> Ric Roman Waugh</p>
+																<!--<p class="zsmall"><b>Género</b> Ficção Científica, Thriller, Aventura</p>-->
+																<!--<p class="zsmall"><b>Duração</b> 98 minutos</p>-->
+																											<p class="zsmall filmeListaDistribuidor"><b>Distribuidor</b> Cinemundo</p>
+																		<p class="zsmall filmeListaTrailerP"><b><a href="/trailer/greenland-2-migration-840464/" class="filmeListaTrailer">Ver trailer</a></b></p>
+															<!--<div class="clear"></div>-->
+									</div>
+					<div class="clear"></div>
+				</div>
+										<div class="filmeLista gen18 mesestreia202601" id="filmeLista1410189">
+					<div class="filmeListaPoster"><a href="/filme/kontinental-25-1410189/"><img loading="lazy" class="filmePosterShadow" src="https://filmspot.com.pt/images/filmes/posters/thumb/1410189_pt.jpg" alt="Kontinental &#039;25" title="Kontinental &#039;25"/></a></div>
+				<div class="filmeListaInfo">
+									<H3><a href="/filme/kontinental-25-1410189/" name="1410189"><span>Kontinental '25</span></a></H3>					<p class="zsmall">2025 | Drama | 109 min</p>						<p class="zsmall"><b>Com</b> Eszter Tompa, Gabriel Spahiu, Adonis Tanța</p>
+																<p class="zsmall"><b>Realização</b> Radu Jude</p>
+																<!--<p class="zsmall"><b>Género</b> Drama</p>-->
+																<!--<p class="zsmall"><b>Duração</b> 109 minutos</p>-->
+																											<p class="zsmall filmeListaDistribuidor"><b>Distribuidor</b> Films4You</p>
+																		<p class="zsmall filmeListaTrailerP"><b><a href="/trailer/kontinental-25-1410189/" class="filmeListaTrailer">Ver trailer</a></b></p>
+															<!--<div class="clear"></div>-->
+									</div>
+					<div class="clear"></div>
+				</div>
+										<div class="filmeLista gen18 gen53 gen35 mesestreia202601" id="filmeLista1033148">
+					<div class="filmeListaPoster"><a href="/filme/die-my-love-1033148/"><img loading="lazy" class="filmePosterShadow" src="https://filmspot.com.pt/images/filmes/posters/thumb/1033148_pt.jpg" alt="Mata-te, Amor" title="Mata-te, Amor"/></a></div>
+				<div class="filmeListaInfo">
+									<H3><a href="/filme/die-my-love-1033148/" name="1033148"><span>Mata-te, Amor</span> <span class="tituloOriginal"><span>Die My Love</span></span></a></H3>					<p class="zsmall">2025 | Drama, Thriller, Comédia | 118 min</p>						<p class="zsmall"><b>Com</b> Jennifer Lawrence, Robert Pattinson, LaKeith Stanfield</p>
+																<p class="zsmall"><b>Realização</b> Lynne Ramsay</p>
+																<!--<p class="zsmall"><b>Género</b> Drama, Thriller, Comédia</p>-->
+																<!--<p class="zsmall"><b>Duração</b> 118 minutos</p>-->
+																											<p class="zsmall filmeListaDistribuidor"><b>Distribuidor</b> NOS Audiovisuais</p>
+																		<p class="zsmall filmeListaTrailerP"><b><a href="/trailer/die-my-love-1033148/" class="filmeListaTrailer">Ver trailer</a></b></p>
+															<!--<div class="clear"></div>-->
+									</div>
+					<div class="clear"></div>
+				</div>
+										<div class="filmeLista gen18 gen35 mesestreia202601" id="filmeLista1159206">
+					<div class="filmeListaPoster"><a href="/filme/father-mother-sister-brother-1159206/"><img loading="lazy" class="filmePosterShadow" src="https://filmspot.com.pt/images/filmes/posters/thumb/1159206_pt.jpg" alt="Pai, M&atilde;e, Irm&atilde;, Irm&atilde;o" title="Pai, M&atilde;e, Irm&atilde;, Irm&atilde;o"/></a></div>
+				<div class="filmeListaInfo">
+									<H3><a href="/filme/father-mother-sister-brother-1159206/" name="1159206"><span>Pai, Mãe, Irmã, Irmão</span> <span class="tituloOriginal"><span>Father Mother Sister Brother</span></span></a></H3>					<p class="zsmall">2025 | Drama, Comédia | 110 min</p>						<p class="zsmall"><b>Com</b> Tom Waits, Adam Driver, Mayim Bialik</p>
+																<p class="zsmall"><b>Realização</b> Jim Jarmusch</p>
+																<!--<p class="zsmall"><b>Género</b> Drama, Comédia</p>-->
+																<!--<p class="zsmall"><b>Duração</b> 110 minutos</p>-->
+																											<p class="zsmall filmeListaDistribuidor"><b>Distribuidor</b> NOS Audiovisuais</p>
+																		<p class="zsmall filmeListaTrailerP"><b><a href="/trailer/father-mother-sister-brother-1159206/" class="filmeListaTrailer">Ver trailer</a></b></p>
+															<!--<div class="clear"></div>-->
+									</div>
+					<div class="clear"></div>
+				</div>
+										<div class="filmeLista gen18 gen10749 mesestreia202601" id="filmeLista1371185">
+					<div class="filmeListaPoster"><a href="/filme/song-sung-blue-1371185/"><img loading="lazy" class="filmePosterShadow" src="https://filmspot.com.pt/images/filmes/posters/thumb/1371185_pt.jpg" alt="Song Sung Blue" title="Song Sung Blue"/></a></div>
+				<div class="filmeListaInfo">
+									<H3><a href="/filme/song-sung-blue-1371185/" name="1371185"><span>Song Sung Blue</span></a></H3>					<p class="zsmall">2025 | Drama, Romance | 132 min</p>						<p class="zsmall"><b>Com</b> Hugh Jackman, Kate Hudson, Michael Imperioli</p>
+																<p class="zsmall"><b>Realização</b> Craig Brewer</p>
+																<!--<p class="zsmall"><b>Género</b> Drama, Romance</p>-->
+																<!--<p class="zsmall"><b>Duração</b> 132 minutos</p>-->
+																											<p class="zsmall filmeListaDistribuidor"><b>Distribuidor</b> Cinemundo</p>
+																		<p class="zsmall filmeListaTrailerP"><b><a href="/trailer/song-sung-blue-1371185/" class="filmeListaTrailer">Ver trailer</a></b></p>
+															<!--<div class="clear"></div>-->
+									</div>
+					<div class="clear"></div>
+				</div>
+						<div class="clear"></div><div class="horizBanner hideAdSenseWhenFilter"><script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5910706815683379"
+     crossorigin="anonymous"></script>
+<!-- Desktop 970x90 Na página -->
+<ins class="adsbygoogle"
+     style="display:inline-block;width:970px;height:90px"
+     data-ad-client="ca-pub-5910706815683379"
+     data-ad-slot="1541726112"></ins>
+<script>
+     (adsbygoogle = window.adsbygoogle || []).push({});
+</script></div></div><h2 class="estreiasH2 gen878 gen53 gen27 gen18 gen16 gen12 gen14 gen35 gen36 gen28 mesestreia202601" id="estreiasH220260115">15 de janeiro de 2026</h2><div>				<div class="filmeLista gen878 gen53 gen27 mesestreia202601" id="filmeLista1272837">
+					<div class="filmeListaPoster"><a href="/filme/28-years-later-the-bone-temple-1272837/"><img loading="lazy" class="filmePosterShadow" src="https://filmspot.com.pt/images/filmes/posters/thumb/1272837_pt.jpg" alt="28 Anos Depois: O Templo dos Ossos" title="28 Anos Depois: O Templo dos Ossos"/></a></div>
+				<div class="filmeListaInfo">
+									<H3><a href="/filme/28-years-later-the-bone-temple-1272837/" name="1272837"><span>28 Anos Depois: O Templo dos Ossos</span> <span class="tituloOriginal"><span>28 Years Later: The Bone Temple</span></span></a></H3>					<p class="zsmall">2026 | Ficção Científica, Thriller, Terror | 109 min</p>						<p class="zsmall"><b>Com</b> Ralph Fiennes, Alfie Williams, Jack O'Connell</p>
+																<p class="zsmall"><b>Realização</b> Nia DaCosta</p>
+																<!--<p class="zsmall"><b>Género</b> Ficção Científica, Thriller, Terror</p>-->
+																<!--<p class="zsmall"><b>Duração</b> 109 minutos</p>-->
+																											<p class="zsmall filmeListaDistribuidor"><b>Distribuidor</b> Big Picture</p>
+																		<p class="zsmall filmeListaTrailerP"><b><a href="/trailer/28-years-later-the-bone-temple-1272837/" class="filmeListaTrailer">Ver trailer</a></b></p>
+															<!--<div class="clear"></div>-->
+									</div>
+					<div class="clear"></div>
+				</div>
+										<div class="filmeLista gen18 mesestreia202601" id="filmeLista1212271">
+					<div class="filmeListaPoster"><a href="/filme/eleanor-the-great-1212271/"><img loading="lazy" class="filmePosterShadow" src="https://filmspot.com.pt/images/filmes/posters/thumb/1212271_pt.jpg" alt="A Grande Eleanor" title="A Grande Eleanor"/></a></div>
+				<div class="filmeListaInfo">
+									<H3><a href="/filme/eleanor-the-great-1212271/" name="1212271"><span>A Grande Eleanor</span> <span class="tituloOriginal"><span>Eleanor the Great</span></span></a></H3>					<p class="zsmall">2025 | Drama | 98 min</p>						<p class="zsmall"><b>Com</b> June Squibb, Erin Kellyman, Chiwetel Ejiofor</p>
+																<p class="zsmall"><b>Realização</b> Scarlett Johansson</p>
+																<!--<p class="zsmall"><b>Género</b> Drama</p>-->
+																<!--<p class="zsmall"><b>Duração</b> 98 minutos</p>-->
+																											<p class="zsmall filmeListaDistribuidor"><b>Distribuidor</b> Pris</p>
+																						<!--<div class="clear"></div>-->
+									</div>
+					<div class="clear"></div>
+				</div>
+										<div class="filmeLista gen16 gen12 gen878 gen14 mesestreia202601" id="filmeLista804370">
+					<div class="filmeListaPoster"><a href="/filme/arco-804370/"><img loading="lazy" class="filmePosterShadow" src="https://filmspot.com.pt/images/filmes/posters/thumb/804370_pt.jpg" alt="Arco" title="Arco"/></a></div>
+				<div class="filmeListaInfo">
+									<H3><a href="/filme/arco-804370/" name="804370"><span>Arco</span></a></H3>					<p class="zsmall">2025 | Animação, Aventura, Ficção Científica, Fantasia | 82 min</p>						<p class="zsmall"><b>Vozes</b> Alma Jodorowsky, Swann Arlaud, Vincent Macaigne</p>
+																<p class="zsmall"><b>Realização</b> Ugo Bienvenu</p>
+																<!--<p class="zsmall"><b>Género</b> Animação, Aventura, Ficção Científica, Fantasia</p>-->
+																<!--<p class="zsmall"><b>Duração</b> 82 minutos</p>-->
+																											<p class="zsmall filmeListaDistribuidor"><b>Distribuidor</b> Cinemundo</p>
+																		<p class="zsmall filmeListaTrailerP"><b><a href="/trailer/arco-804370/" class="filmeListaTrailer">Ver trailer</a></b></p>
+															<!--<div class="clear"></div>-->
+									</div>
+					<div class="clear"></div>
+				</div>
+										<div class="filmeLista gen16 gen35 mesestreia202601" id="filmeLista1497970">
+					<div class="filmeListaPoster"><a href="/filme/mao-he-laosha-xing-pan-qi-yuan-1497970/"><img loading="lazy" class="filmePosterShadow" src="https://filmspot.com.pt/images/filmes/posters/thumb/1497970.jpg" alt="M&acirc;o H&eacute; L&acirc;osh&acirc;: X&icirc;ng P&aacute;n Q&iacute; Yu&aacute;n" title="M&acirc;o H&eacute; L&acirc;osh&acirc;: X&icirc;ng P&aacute;n Q&iacute; Yu&aacute;n"/></a></div>
+				<div class="filmeListaInfo">
+									<H3><a href="/filme/mao-he-laosha-xing-pan-qi-yuan-1497970/" name="1497970"><span>Mâo Hé Lâoshâ: Xîng Pán Qí Yuán</span> <span class="tituloOriginal">Tom and Jerry: Forbidden Compass</span></a></H3>					<p class="zsmall">2025 | Animação, Comédia | 104 min</p>						<p class="zsmall"><b>Com</b> Jiang Wen, Shun Zi, Tu Xiongfei</p>
+																<p class="zsmall"><b>Realização</b> Zhang Gang</p>
+																<!--<p class="zsmall"><b>Género</b> Animação, Comédia</p>-->
+																<!--<p class="zsmall"><b>Duração</b> 104 minutos</p>-->
+																											<p class="zsmall filmeListaDistribuidor"><b>Distribuidor</b> Cinemundo</p>
+																						<!--<div class="clear"></div>-->
+									</div>
+					<div class="clear"></div>
+				</div>
+										<div class="filmeLista gen18 gen36 mesestreia202601" id="filmeLista1464883">
+					<div class="filmeListaPoster"><a href="/filme/mamlaket-al-qasab-1464883/"><img loading="lazy" class="filmePosterShadow" src="https://filmspot.com.pt/images/filmes/posters/thumb/1464883_pt.jpg" alt="O Bolo do Presidente" title="O Bolo do Presidente"/></a></div>
+				<div class="filmeListaInfo">
+									<H3><a href="/filme/mamlaket-al-qasab-1464883/" name="1464883"><span>O Bolo do Presidente</span> <span class="tituloOriginal"><span>Mamlaket al-qasab</span> / <span>The President's Cake</span></span></a></H3>					<p class="zsmall">2025 | Drama, Histórico | 102 min</p>						<p class="zsmall"><b>Com</b> Banin Ahmad Nayef, Sajad Mohamad Qasem, Waheed Thabet Khreibat</p>
+																<p class="zsmall"><b>Realização</b> Hasan Hadi</p>
+																<!--<p class="zsmall"><b>Género</b> Drama, Histórico</p>-->
+																<!--<p class="zsmall"><b>Duração</b> 102 minutos</p>-->
+																											<p class="zsmall filmeListaDistribuidor"><b>Distribuidor</b> Nitrato</p>
+																		<p class="zsmall filmeListaTrailerP"><b><a href="/trailer/mamlaket-al-qasab-1464883/" class="filmeListaTrailer">Ver trailer</a></b></p>
+															<!--<div class="clear"></div>-->
+									</div>
+					<div class="clear"></div>
+				</div>
+										<div class="filmeLista gen35 gen16 gen28 mesestreia202601" id="filmeLista1215638">
+					<div class="filmeListaPoster"><a href="/filme/ternet-ninja-3-1215638/"><img loading="lazy" class="filmePosterShadow" src="https://filmspot.com.pt/images/filmes/posters/thumb/1215638_pt.jpg" alt="O Meu Amigo &Eacute; Ninja 3" title="O Meu Amigo &Eacute; Ninja 3"/></a></div>
+				<div class="filmeListaInfo">
+									<H3><a href="/filme/ternet-ninja-3-1215638/" name="1215638"><span>O Meu Amigo É Ninja 3</span> <span class="tituloOriginal"><span>Ternet Ninja 3</span></span></a></H3>					<p class="zsmall">2025 | Comédia, Animação, Ação | 84 min</p>						<p class="zsmall"><b>Vozes</b> Anders Matthesen, Flora Ofelia Hofmann Lindahl, Louis Næss-Schmidt</p>
+																<p class="zsmall"><b>Realização</b> Thorbjørn Christoffersen, Anders Matthesen</p>
+																<!--<p class="zsmall"><b>Género</b> Comédia, Animação, Ação</p>-->
+																<!--<p class="zsmall"><b>Duração</b> 84 minutos</p>-->
+																											<p class="zsmall filmeListaDistribuidor"><b>Distribuidor</b> Outsider Films</p>
+																		<p class="zsmall filmeListaTrailerP"><b><a href="/trailer/ternet-ninja-3-1215638/" class="filmeListaTrailer">Ver trailer</a></b></p>
+															<!--<div class="clear"></div>-->
+									</div>
+					<div class="clear"></div>
+				</div>
+						<div class="clear"></div><div class="horizBanner hideAdSenseWhenFilter"><script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5910706815683379"
+     crossorigin="anonymous"></script>
+<!-- Desktop 970x90 Na página -->
+<ins class="adsbygoogle"
+     style="display:inline-block;width:970px;height:90px"
+     data-ad-client="ca-pub-5910706815683379"
+     data-ad-slot="1541726112"></ins>
+<script>
+     (adsbygoogle = window.adsbygoogle || []).push({});
+</script></div></div><h2 class="estreiasH2 gen18 gen12 gen16 gen35 gen53 gen28 gen878 gen99 gen27 gen10749 gen37 mesestreia202601" id="estreiasH220260122">22 de janeiro de 2026</h2><div>				<div class="filmeLista gen18 mesestreia202601" id="filmeLista524635">
+					<div class="filmeListaPoster"><a href="/filme/the-chronology-of-water-524635/"><img loading="lazy" class="filmePosterShadow" src="https://filmspot.com.pt/images/filmes/posters/thumb/524635.jpg" alt="A Cronologia da &Aacute;gua" title="A Cronologia da &Aacute;gua"/></a></div>
+				<div class="filmeListaInfo">
+									<H3><a href="/filme/the-chronology-of-water-524635/" name="524635"><span>A Cronologia da Água</span> <span class="tituloOriginal"><span>The Chronology of Water</span></span></a></H3>					<p class="zsmall">2025 | Drama | 127 min</p>						<p class="zsmall"><b>Com</b> Imogen Poots, Thora Birch, Charlie Carrick</p>
+																<p class="zsmall"><b>Realização</b> Kristen Stewart</p>
+																<!--<p class="zsmall"><b>Género</b> Drama</p>-->
+																<!--<p class="zsmall"><b>Duração</b> 127 minutos</p>-->
+																											<p class="zsmall filmeListaDistribuidor"><b>Distribuidor</b> Leopardo Filmes</p>
+																						<!--<div class="clear"></div>-->
+									</div>
+					<div class="clear"></div>
+				</div>
+										<div class="filmeLista gen12 gen16 mesestreia202601" id="filmeLista999160">
+					<div class="filmeListaPoster"><a href="/filme/angelo-dans-la-foret-mysterieuse-999160/"><img loading="lazy" class="filmePosterShadow" src="https://filmspot.com.pt/images/filmes/posters/thumb/999160.jpg" alt="Angelo na Floresta M&aacute;gica" title="Angelo na Floresta M&aacute;gica"/></a></div>
+				<div class="filmeListaInfo">
+									<H3><a href="/filme/angelo-dans-la-foret-mysterieuse-999160/" name="999160"><span>Angelo na Floresta Mágica</span> <span class="tituloOriginal"><span>Angelo dans la forêt mystérieuse</span></span></a></H3>					<p class="zsmall">2024 | Aventura, Animação | 81 min</p>						<p class="zsmall"><b>Vozes</b> Yolande Moreau, Philippe Katerine, José Garcia</p>
+																<p class="zsmall"><b>Realização</b> Vincent Paronnaud, Alexis Ducord</p>
+																<!--<p class="zsmall"><b>Género</b> Aventura, Animação</p>-->
+																<!--<p class="zsmall"><b>Duração</b> 81 minutos</p>-->
+																											<p class="zsmall filmeListaDistribuidor"><b>Distribuidor</b> Pris</p>
+																		<p class="zsmall filmeListaTrailerP"><b><a href="/trailer/angelo-dans-la-foret-mysterieuse-999160/" class="filmeListaTrailer">Ver trailer</a></b></p>
+															<!--<div class="clear"></div>-->
+									</div>
+					<div class="clear"></div>
+				</div>
+										<div class="filmeLista gen35 gen18 mesestreia202601" id="filmeLista1317288">
+					<div class="filmeListaPoster"><a href="/filme/marty-supreme-1317288/"><img loading="lazy" class="filmePosterShadow" src="https://filmspot.com.pt/images/filmes/posters/thumb/1317288_pt.jpg" alt="Marty Supreme" title="Marty Supreme"/></a></div>
+				<div class="filmeListaInfo">
+									<H3><a href="/filme/marty-supreme-1317288/" name="1317288"><span>Marty Supreme</span></a></H3>					<p class="zsmall">2025 | Comédia, Drama | 150 min</p>						<p class="zsmall"><b>Com</b> Timothée Chalamet, Gwyneth Paltrow, Odessa A'zion</p>
+																<p class="zsmall"><b>Realização</b> Josh Safdie</p>
+																<!--<p class="zsmall"><b>Género</b> Comédia, Drama</p>-->
+																<!--<p class="zsmall"><b>Duração</b> 150 minutos</p>-->
+																											<p class="zsmall filmeListaDistribuidor"><b>Distribuidor</b> Cinemundo</p>
+																		<p class="zsmall filmeListaTrailerP"><b><a href="/trailer/marty-supreme-1317288/" class="filmeListaTrailer">Ver trailer</a></b></p>
+															<!--<div class="clear"></div>-->
+									</div>
+					<div class="clear"></div>
+				</div>
+										<div class="filmeLista gen53 gen28 gen878 mesestreia202601" id="filmeLista1236153">
+					<div class="filmeListaPoster"><a href="/filme/mercy-1236153/"><img loading="lazy" class="filmePosterShadow" src="https://filmspot.com.pt/images/filmes/posters/thumb/1236153.jpg" alt="Mercy: Prova de Culpa" title="Mercy: Prova de Culpa"/></a></div>
+				<div class="filmeListaInfo">
+									<H3><a href="/filme/mercy-1236153/" name="1236153"><span>Mercy: Prova de Culpa</span> <span class="tituloOriginal"><span>Mercy</span></span></a></H3>					<p class="zsmall">2026 | Thriller, Ação, Ficção Científica | 100 min</p>						<p class="zsmall"><b>Com</b> Chris Pratt, Rebecca Ferguson, Annabelle Wallis</p>
+																<p class="zsmall"><b>Realização</b> Timur Bekmambetov</p>
+																<!--<p class="zsmall"><b>Género</b> Thriller, Ação, Ficção Científica</p>-->
+																<!--<p class="zsmall"><b>Duração</b> 100 minutos</p>-->
+																											<p class="zsmall filmeListaDistribuidor"><b>Distribuidor</b> Big Picture</p>
+																						<!--<div class="clear"></div>-->
+									</div>
+					<div class="clear"></div>
+				</div>
+										<div class="filmeLista gen99 mesestreia202601" id="filmeLista1098534">
+					<div class="filmeListaPoster"><a href="/filme/orwell-2-2-5-1098534/"><img loading="lazy" class="filmePosterShadow" src="https://filmspot.com.pt/images/filmes/posters/thumb/1098534.jpg" alt="Orwell: 2+2=5" title="Orwell: 2+2=5"/></a></div>
+				<div class="filmeListaInfo">
+									<H3><a href="/filme/orwell-2-2-5-1098534/" name="1098534"><span>Orwell: 2+2=5</span></a></H3>					<p class="zsmall">2025 | Documentário | 119 min</p>						<p class="zsmall"><b>Com</b> Damian Lewis</p>
+																<p class="zsmall"><b>Realização</b> Raoul Peck</p>
+																<!--<p class="zsmall"><b>Género</b> Documentário</p>-->
+																<!--<p class="zsmall"><b>Duração</b> 119 minutos</p>-->
+																											<p class="zsmall filmeListaDistribuidor"><b>Distribuidor</b> Midas Filmes</p>
+																						<!--<div class="clear"></div>-->
+									</div>
+					<div class="clear"></div>
+				</div>
+										<div class="filmeLista gen27 mesestreia202601" id="filmeLista1315303">
+					<div class="filmeListaPoster"><a href="/filme/primate-1315303/"><img loading="lazy" class="filmePosterShadow" src="https://filmspot.com.pt/images/filmes/posters/thumb/1315303_pt.jpg" alt="Primata" title="Primata"/></a></div>
+				<div class="filmeListaInfo">
+									<H3><a href="/filme/primate-1315303/" name="1315303"><span>Primata</span> <span class="tituloOriginal"><span>Primate</span></span></a></H3>					<p class="zsmall">2026 | Terror | 89 min</p>						<p class="zsmall"><b>Com</b> Johnny Sequoyah, Troy Kotsur, Jessica Alexander</p>
+																<p class="zsmall"><b>Realização</b> Johannes Roberts</p>
+																<!--<p class="zsmall"><b>Género</b> Terror</p>-->
+																<!--<p class="zsmall"><b>Duração</b> 89 minutos</p>-->
+																											<p class="zsmall filmeListaDistribuidor"><b>Distribuidor</b> NOS Audiovisuais</p>
+																		<p class="zsmall filmeListaTrailerP"><b><a href="/trailer/primate-1315303/" class="filmeListaTrailer">Ver trailer</a></b></p>
+															<!--<div class="clear"></div>-->
+									</div>
+					<div class="clear"></div>
+				</div>
+										<div class="filmeLista gen18 gen10749 mesestreia202601" id="filmeLista1134463">
+					<div class="filmeListaPoster"><a href="/filme/dreams-1134463/"><img loading="lazy" class="filmePosterShadow" src="https://filmspot.com.pt/images/filmes/posters/thumb/1134463.jpg" alt="Sonhos" title="Sonhos"/></a></div>
+				<div class="filmeListaInfo">
+									<H3><a href="/filme/dreams-1134463/" name="1134463"><span>Sonhos</span> <span class="tituloOriginal"><span>Dreams</span></span></a></H3>					<p class="zsmall">2025 | Drama, Romance | 95 min</p>						<p class="zsmall"><b>Com</b> Jessica Chastain, Isaac Hernández, Rupert Friend</p>
+																<p class="zsmall"><b>Realização</b> Michel Franco</p>
+																<!--<p class="zsmall"><b>Género</b> Drama, Romance</p>-->
+																<!--<p class="zsmall"><b>Duração</b> 95 minutos</p>-->
+																											<p class="zsmall filmeListaDistribuidor"><b>Distribuidor</b> Films4You</p>
+																						<!--<div class="clear"></div>-->
+									</div>
+					<div class="clear"></div>
+				</div>
+										<div class="filmeLista gen18 gen28 gen37 mesestreia202601" id="filmeLista1126915">
+					<div class="filmeListaPoster"><a href="/filme/tornado-1126915/"><img loading="lazy" class="filmePosterShadow" src="https://filmspot.com.pt/images/filmes/posters/thumb/1126915.jpg" alt="Tornado" title="Tornado"/></a></div>
+				<div class="filmeListaInfo">
+									<H3><a href="/filme/tornado-1126915/" name="1126915"><span>Tornado</span></a></H3>					<p class="zsmall">2025 | Drama, Ação, Western | 91 min</p>						<p class="zsmall"><b>Com</b> Kōki, Nathan Malone, Tim Roth</p>
+																<p class="zsmall"><b>Realização</b> John Maclean</p>
+																<!--<p class="zsmall"><b>Género</b> Drama, Ação, Western</p>-->
+																<!--<p class="zsmall"><b>Duração</b> 91 minutos</p>-->
+																											<p class="zsmall filmeListaDistribuidor"><b>Distribuidor</b> NOS Audiovisuais</p>
+																						<!--<div class="clear"></div>-->
+									</div>
+					<div class="clear"></div>
+				</div>
+						<div class="clear"></div><div class="horizBanner hideAdSenseWhenFilter"><script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5910706815683379"
+     crossorigin="anonymous"></script>
+<!-- Desktop 970x90 Na página -->
+<ins class="adsbygoogle"
+     style="display:inline-block;width:970px;height:90px"
+     data-ad-client="ca-pub-5910706815683379"
+     data-ad-slot="1541726112"></ins>
+<script>
+     (adsbygoogle = window.adsbygoogle || []).push({});
+</script></div></div><h2 class="estreiasH2 gen99 gen878 gen35 gen27 gen16 gen18 gen9648 gen53 mesestreia202601" id="estreiasH220260129">29 de janeiro de 2026</h2><div>				<div class="filmeLista gen99 mesestreia202601" id="filmeLista1273044">
+					<div class="filmeListaPoster"><a href="/filme/apprendre-1273044/"><img loading="lazy" class="filmePosterShadow" src="https://filmspot.com.pt/images/filmes/posters/thumb/1273044.jpg" alt="Aprender" title="Aprender"/></a></div>
+				<div class="filmeListaInfo">
+									<H3><a href="/filme/apprendre-1273044/" name="1273044"><span>Aprender</span> <span class="tituloOriginal"><span>Apprendre</span></span></a></H3>					<p class="zsmall">2025 | Documentário | 105 min</p>											<p class="zsmall"><b>Realização</b> Claire Simon</p>
+																<!--<p class="zsmall"><b>Género</b> Documentário</p>-->
+																<!--<p class="zsmall"><b>Duração</b> 105 minutos</p>-->
+																											<p class="zsmall filmeListaDistribuidor"><b>Distribuidor</b> Leopardo Filmes</p>
+																						<!--<div class="clear"></div>-->
+									</div>
+					<div class="clear"></div>
+				</div>
+										<div class="filmeLista gen878 gen35 gen27 mesestreia202601" id="filmeLista696393">
+					<div class="filmeListaPoster"><a href="/filme/cold-storage-696393/"><img loading="lazy" class="filmePosterShadow" src="https://filmspot.com.pt/images/filmes/posters/thumb/696393_pt.jpg" alt="Cold Storage - Amea&ccedil;a Mortal" title="Cold Storage - Amea&ccedil;a Mortal"/></a></div>
+				<div class="filmeListaInfo">
+									<H3><a href="/filme/cold-storage-696393/" name="696393"><span>Cold Storage - Ameaça Mortal</span> <span class="tituloOriginal"><span>Cold Storage</span></span></a></H3>					<p class="zsmall">2026 | Ficção Científica, Comédia, Terror | 99 min</p>						<p class="zsmall"><b>Com</b> Georgina Campbell, Joe Keery, Liam Neeson</p>
+																<p class="zsmall"><b>Realização</b> Jonny Campbell</p>
+																<!--<p class="zsmall"><b>Género</b> Ficção Científica, Comédia, Terror</p>-->
+																<!--<p class="zsmall"><b>Duração</b> 99 minutos</p>-->
+																											<p class="zsmall filmeListaDistribuidor"><b>Distribuidor</b> NOS Audiovisuais</p>
+																		<p class="zsmall filmeListaTrailerP"><b><a href="/trailer/cold-storage-696393/" class="filmeListaTrailer">Ver trailer</a></b></p>
+															<!--<div class="clear"></div>-->
+									</div>
+					<div class="clear"></div>
+				</div>
+										<div class="filmeLista gen16 mesestreia202601" id="filmeLista1214130">
+					<div class="filmeListaPoster"><a href="/filme/stitch-head-1214130/"><img loading="lazy" class="filmePosterShadow" src="https://filmspot.com.pt/images/filmes/posters/thumb/1214130_pt.jpg" alt="Frankie e os Monstros" title="Frankie e os Monstros"/></a></div>
+				<div class="filmeListaInfo">
+									<H3><a href="/filme/stitch-head-1214130/" name="1214130"><span>Frankie e os Monstros</span> <span class="tituloOriginal"><span>Stitch Head</span></span></a></H3>					<p class="zsmall">2025 | Animação</p>						<p class="zsmall"><b>Vozes</b> Asa Butterfield, Joel Fry, Alison Steadman</p>
+																<p class="zsmall"><b>Realização</b> Steve Hudson</p>
+																<!--<p class="zsmall"><b>Género</b> Animação</p>-->
+																																<p class="zsmall filmeListaDistribuidor"><b>Distribuidor</b> NOS Audiovisuais</p>
+																		<p class="zsmall filmeListaTrailerP"><b><a href="/trailer/stitch-head-1214130/" class="filmeListaTrailer">Ver trailer</a></b></p>
+															<!--<div class="clear"></div>-->
+									</div>
+					<div class="clear"></div>
+				</div>
+										<div class="filmeLista gen99 mesestreia202601" id="filmeLista1278656">
+					<div class="filmeListaPoster"><a href="/filme/liza-a-truly-terrific-absolutely-true-story-1278656/"><img loading="lazy" class="filmePosterShadow" src="https://filmspot.com.pt/images/filmes/posters/thumb/1278656.jpg" alt="Liza: A Truly Terrific Absolutely True Story" title="Liza: A Truly Terrific Absolutely True Story"/></a></div>
+				<div class="filmeListaInfo">
+									<H3><a href="/filme/liza-a-truly-terrific-absolutely-true-story-1278656/" name="1278656"><span>Liza: A Truly Terrific Absolutely True Story</span></a></H3>					<p class="zsmall">2025 | Documentário | 104 min</p>						<p class="zsmall"><b>Com</b> Liza Minnelli, Mia Farrow, Ben Vereen</p>
+																<p class="zsmall"><b>Realização</b> Bruce David Klein</p>
+																<!--<p class="zsmall"><b>Género</b> Documentário</p>-->
+																<!--<p class="zsmall"><b>Duração</b> 104 minutos</p>-->
+																											<p class="zsmall filmeListaDistribuidor"><b>Distribuidor</b> Zero em Comportamento</p>
+																						<!--<div class="clear"></div>-->
+									</div>
+					<div class="clear"></div>
+				</div>
+										<div class="filmeLista gen18 mesestreia202601" id="filmeLista1313229">
+					<div class="filmeListaPoster"><a href="/filme/nino-1313229/"><img loading="lazy" class="filmePosterShadow" src="https://filmspot.com.pt/images/filmes/posters/thumb/1313229.jpg" alt="Nino" title="Nino"/></a></div>
+				<div class="filmeListaInfo">
+									<H3><a href="/filme/nino-1313229/" name="1313229"><span>Nino</span></a></H3>					<p class="zsmall">2025 | Drama | 96 min</p>						<p class="zsmall"><b>Com</b> Théodore Pellerin, Salomé Dewaels, Jeanne Balibar</p>
+																<p class="zsmall"><b>Realização</b> Pauline Loquès</p>
+																<!--<p class="zsmall"><b>Género</b> Drama</p>-->
+																<!--<p class="zsmall"><b>Duração</b> 96 minutos</p>-->
+																											<p class="zsmall filmeListaDistribuidor"><b>Distribuidor</b> The Stone and The Plot</p>
+																						<!--<div class="clear"></div>-->
+									</div>
+					<div class="clear"></div>
+				</div>
+										<div class="filmeLista gen27 gen9648 mesestreia202601" id="filmeLista680493">
+					<div class="filmeListaPoster"><a href="/filme/return-to-silent-hill-680493/"><img loading="lazy" class="filmePosterShadow" src="https://filmspot.com.pt/images/filmes/posters/thumb/680493.jpg" alt="Regresso a Silent Hill" title="Regresso a Silent Hill"/></a></div>
+				<div class="filmeListaInfo">
+									<H3><a href="/filme/return-to-silent-hill-680493/" name="680493"><span>Regresso a Silent Hill</span> <span class="tituloOriginal"><span>Return to Silent Hill</span></span></a></H3>					<p class="zsmall">2026 | Terror, Mistério | 96 min</p>						<p class="zsmall"><b>Com</b> Jeremy Irvine, Hannah Emily Anderson, Evie Templeton</p>
+																<p class="zsmall"><b>Realização</b> Christophe Gans</p>
+																<!--<p class="zsmall"><b>Género</b> Terror, Mistério</p>-->
+																<!--<p class="zsmall"><b>Duração</b> 96 minutos</p>-->
+																											<p class="zsmall filmeListaDistribuidor"><b>Distribuidor</b> Cinemundo</p>
+																						<!--<div class="clear"></div>-->
+									</div>
+					<div class="clear"></div>
+				</div>
+										<div class="filmeLista gen35 gen53 gen27 mesestreia202601" id="filmeLista1198994">
+					<div class="filmeListaPoster"><a href="/filme/send-help-1198994/"><img loading="lazy" class="filmePosterShadow" src="https://filmspot.com.pt/images/filmes/posters/thumb/1198994_pt.jpg" alt="Socorro!" title="Socorro!"/></a></div>
+				<div class="filmeListaInfo">
+									<H3><a href="/filme/send-help-1198994/" name="1198994"><span>Socorro!</span> <span class="tituloOriginal"><span>Send Help</span></span></a></H3>					<p class="zsmall">2026 | Comédia, Thriller, Terror</p>						<p class="zsmall"><b>Com</b> Rachel McAdams, Dylan O'Brien, Edyll Ismail</p>
+																<p class="zsmall"><b>Realização</b> Sam Raimi</p>
+																<!--<p class="zsmall"><b>Género</b> Comédia, Thriller, Terror</p>-->
+																																<p class="zsmall filmeListaDistribuidor"><b>Distribuidor</b> NOS Audiovisuais</p>
+																		<p class="zsmall filmeListaTrailerP"><b><a href="/trailer/send-help-1198994/" class="filmeListaTrailer">Ver trailer</a></b></p>
+															<!--<div class="clear"></div>-->
+									</div>
+					<div class="clear"></div>
+				</div>
+										<div class="filmeLista gen35 gen18 mesestreia202601" id="filmeLista1124566">
+					<div class="filmeListaPoster"><a href="/filme/affeksjonsverdi-1124566/"><img loading="lazy" class="filmePosterShadow" src="https://filmspot.com.pt/images/filmes/posters/thumb/1124566_pt.jpg" alt="Valor Sentimental" title="Valor Sentimental"/></a></div>
+				<div class="filmeListaInfo">
+									<H3><a href="/filme/affeksjonsverdi-1124566/" name="1124566"><span>Valor Sentimental</span> <span class="tituloOriginal"><span>Affeksjonsverdi</span></span></a></H3>					<p class="zsmall">2025 | Comédia, Drama | 133 min</p>						<p class="zsmall"><b>Com</b> Renate Reinsve, Inga Ibsdotter Lilleaas, Stellan Skarsgård</p>
+																<p class="zsmall"><b>Realização</b> Joachim Trier</p>
+																<!--<p class="zsmall"><b>Género</b> Comédia, Drama</p>-->
+																<!--<p class="zsmall"><b>Duração</b> 133 minutos</p>-->
+																											<p class="zsmall filmeListaDistribuidor"><b>Distribuidor</b> Alambique</p>
+																		<p class="zsmall filmeListaTrailerP"><b><a href="/trailer/affeksjonsverdi-1124566/" class="filmeListaTrailer">Ver trailer</a></b></p>
+															<!--<div class="clear"></div>-->
+									</div>
+					<div class="clear"></div>
+				</div>
+						<div class="clear"></div><div class="horizBanner hideAdSenseWhenFilter"><script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5910706815683379"
+     crossorigin="anonymous"></script>
+<!-- Desktop 970x90 Na página -->
+<ins class="adsbygoogle"
+     style="display:inline-block;width:970px;height:90px"
+     data-ad-client="ca-pub-5910706815683379"
+     data-ad-slot="1541726112"></ins>
+<script>
+     (adsbygoogle = window.adsbygoogle || []).push({});
+</script></div></div><h2 class="estreiasH2 gen99 mesestreia202601" id="estreiasH220260130">30 de janeiro de 2026</h2><div>				<div class="filmeLista gen99 mesestreia202601" id="filmeLista1413097">
+					<div class="filmeListaPoster"><a href="/filme/melania-1413097/"><img loading="lazy" class="filmePosterShadow" src="https://filmspot.com.pt/images/filmes/posters/thumb/1413097.jpg" alt="Melania" title="Melania"/></a></div>
+				<div class="filmeListaInfo">
+									<H3><a href="/filme/melania-1413097/" name="1413097"><span>Melania</span></a></H3>					<p class="zsmall">2026 | Documentário</p>						<p class="zsmall"><b>Com</b> Melania Trump, Donald Trump, Barron Trump</p>
+																<p class="zsmall"><b>Realização</b> Brett Ratner</p>
+																<!--<p class="zsmall"><b>Género</b> Documentário</p>-->
+																																<p class="zsmall filmeListaDistribuidor"><b>Distribuidor</b> NOS Audiovisuais</p>
+																		<p class="zsmall filmeListaTrailerP"><b><a href="/trailer/melania-1413097/" class="filmeListaTrailer">Ver trailer</a></b></p>
+															<!--<div class="clear"></div>-->
+									</div>
+					<div class="clear"></div>
+				</div>
+						<div class="clear"></div></div><h2 class="estreiasH2 gen35 gen10749 gen16 gen18 gen36 gen53 gen27 gen28 gen80 mesestreia202602" id="estreiasH220260205">5 de fevereiro de 2026</h2><div>				<div class="filmeLista gen35 gen10749 mesestreia202602" id="filmeLista1312157">
+					<div class="filmeListaPoster"><a href="/filme/follemente-1312157/"><img loading="lazy" class="filmePosterShadow" src="https://filmspot.com.pt/images/filmes/posters/thumb/1312157.jpg" alt="FolleMente" title="FolleMente"/></a></div>
+				<div class="filmeListaInfo">
+									<H3><a href="/filme/follemente-1312157/" name="1312157"><span>FolleMente</span></a></H3>					<p class="zsmall">2025 | Comédia, Romance | 97 min</p>						<p class="zsmall"><b>Com</b> Edoardo Leo, Pilar Fogliati, Emanuela Fanelli</p>
+																<p class="zsmall"><b>Realização</b> Paolo Genovese</p>
+																<!--<p class="zsmall"><b>Género</b> Comédia, Romance</p>-->
+																<!--<p class="zsmall"><b>Duração</b> 97 minutos</p>-->
+																											<p class="zsmall filmeListaDistribuidor"><b>Distribuidor</b> Risi Film</p>
+																						<!--<div class="clear"></div>-->
+									</div>
+					<div class="clear"></div>
+				</div>
+										<div class="filmeLista gen16 gen35 mesestreia202602" id="filmeLista1360785">
+					<div class="filmeListaPoster"><a href="/filme/groove-tails-1360785/"><img loading="lazy" class="filmePosterShadow" src="https://filmspot.com.pt/images/layout/poster_thumb_default.jpg" alt="Groove Tails" title="Groove Tails"/></a></div>
+				<div class="filmeListaInfo">
+									<H3><a href="/filme/groove-tails-1360785/" name="1360785"><span>Groove Tails</span></a></H3>					<p class="zsmall">2026 | Animação, Comédia</p>						<p class="zsmall"><b>Vozes</b> Jamie Foxx, Dave Bautista</p>
+																<p class="zsmall"><b>Realização</b> Bob Logan</p>
+																<!--<p class="zsmall"><b>Género</b> Animação, Comédia</p>-->
+																																<p class="zsmall filmeListaDistribuidor"><b>Distribuidor</b> NOS Audiovisuais</p>
+																						<!--<div class="clear"></div>-->
+									</div>
+					<div class="clear"></div>
+				</div>
+										<div class="filmeLista gen18 gen36 gen10749 mesestreia202602" id="filmeLista858024">
+					<div class="filmeListaPoster"><a href="/filme/hamnet-858024/"><img loading="lazy" class="filmePosterShadow" src="https://filmspot.com.pt/images/filmes/posters/thumb/858024_pt.jpg" alt="Hamnet" title="Hamnet"/></a></div>
+				<div class="filmeListaInfo">
+									<H3><a href="/filme/hamnet-858024/" name="858024"><span>Hamnet</span></a></H3>					<p class="zsmall">2025 | Drama, Histórico, Romance | 125 min</p>						<p class="zsmall"><b>Com</b> Jessie Buckley, Paul Mescal, Emily Watson</p>
+																<p class="zsmall"><b>Realização</b> Chloé Zhao</p>
+																<!--<p class="zsmall"><b>Género</b> Drama, Histórico, Romance</p>-->
+																<!--<p class="zsmall"><b>Duração</b> 125 minutos</p>-->
+																											<p class="zsmall filmeListaDistribuidor"><b>Distribuidor</b> NOS Audiovisuais</p>
+																		<p class="zsmall filmeListaTrailerP"><b><a href="/trailer/hamnet-858024/" class="filmeListaTrailer">Ver trailer</a></b></p>
+															<!--<div class="clear"></div>-->
+									</div>
+					<div class="clear"></div>
+				</div>
+										<div class="filmeLista gen16 mesestreia202602" id="filmeLista1327825">
+					<div class="filmeListaPoster"><a href="/filme/kaptein-sabeltann-og-grevinnen-av-gral-1327825/"><img loading="lazy" class="filmePosterShadow" src="https://filmspot.com.pt/images/filmes/posters/thumb/1327825.jpg" alt="Kaptein Sabeltann og Grevinnen av Gral" title="Kaptein Sabeltann og Grevinnen av Gral"/></a></div>
+				<div class="filmeListaInfo">
+									<H3><a href="/filme/kaptein-sabeltann-og-grevinnen-av-gral-1327825/" name="1327825"><span>Kaptein Sabeltann og Grevinnen av Gral</span> <span class="tituloOriginal">Captain Sabertooth and the Countess of Grel</span></a></H3>					<p class="zsmall">2024 | Animação</p>											<p class="zsmall"><b>Realização</b> Are Austnes, Yaprak Morali, Rasmus A. Sivertsen</p>
+																<!--<p class="zsmall"><b>Género</b> Animação</p>-->
+																																<p class="zsmall filmeListaDistribuidor"><b>Distribuidor</b> Films4You</p>
+																						<!--<div class="clear"></div>-->
+									</div>
+					<div class="clear"></div>
+				</div>
+										<div class="filmeLista gen53 gen27 mesestreia202602" id="filmeLista1010755">
+					<div class="filmeListaPoster"><a href="/filme/the-strangers-chapter-3-1010755/"><img loading="lazy" class="filmePosterShadow" src="https://filmspot.com.pt/images/filmes/posters/thumb/1010755.jpg" alt="Os Estranhos: Cap&iacute;tulo 3" title="Os Estranhos: Cap&iacute;tulo 3"/></a></div>
+				<div class="filmeListaInfo">
+									<H3><a href="/filme/the-strangers-chapter-3-1010755/" name="1010755"><span>Os Estranhos: Capítulo 3</span> <span class="tituloOriginal"><span>The Strangers: Chapter 3</span></span></a></H3>					<p class="zsmall">2026 | Thriller, Terror | 135 min</p>						<p class="zsmall"><b>Com</b> Madelaine Petsch, Richard Brake, Rachel Shenton</p>
+																<p class="zsmall"><b>Realização</b> Renny Harlin</p>
+																<!--<p class="zsmall"><b>Género</b> Thriller, Terror</p>-->
+																<!--<p class="zsmall"><b>Duração</b> 135 minutos</p>-->
+																											<p class="zsmall filmeListaDistribuidor"><b>Distribuidor</b> Pris</p>
+																						<!--<div class="clear"></div>-->
+									</div>
+					<div class="clear"></div>
+				</div>
+										<div class="filmeLista gen18 mesestreia202602" id="filmeLista1480382">
+					<div class="filmeListaPoster"><a href="/filme/sawt-hind-rajab-1480382/"><img loading="lazy" class="filmePosterShadow" src="https://filmspot.com.pt/images/filmes/posters/thumb/1480382.jpg" alt="Sawt Hind Rajab" title="Sawt Hind Rajab"/></a></div>
+				<div class="filmeListaInfo">
+									<H3><a href="/filme/sawt-hind-rajab-1480382/" name="1480382"><span>Sawt Hind Rajab</span> <span class="tituloOriginal">The Voice of Hind Rajab</span></a></H3>					<p class="zsmall">2025 | Drama | 81 min</p>						<p class="zsmall"><b>Com</b> Motaz Malhees, Saja Kilani, Amer Hlehel</p>
+																<p class="zsmall"><b>Realização</b> Kaouther Ben Hania</p>
+																<!--<p class="zsmall"><b>Género</b> Drama</p>-->
+																<!--<p class="zsmall"><b>Duração</b> 81 minutos</p>-->
+																											<p class="zsmall filmeListaDistribuidor"><b>Distribuidor</b> Nitrato</p>
+																						<!--<div class="clear"></div>-->
+									</div>
+					<div class="clear"></div>
+				</div>
+										<div class="filmeLista gen28 gen80 gen53 mesestreia202602" id="filmeLista1290821">
+					<div class="filmeListaPoster"><a href="/filme/shelter-1290821/"><img loading="lazy" class="filmePosterShadow" src="https://filmspot.com.pt/images/layout/poster_thumb_default.jpg" alt="Shelter" title="Shelter"/></a></div>
+				<div class="filmeListaInfo">
+									<H3><a href="/filme/shelter-1290821/" name="1290821"><span>Shelter</span></a></H3>					<p class="zsmall">2026 | Ação, Crime, Thriller</p>						<p class="zsmall"><b>Com</b> Jason Statham, Bodhi Rae Breathnach, Bill Nighy</p>
+																<p class="zsmall"><b>Realização</b> Ric Roman Waugh</p>
+																<!--<p class="zsmall"><b>Género</b> Ação, Crime, Thriller</p>-->
+																																<p class="zsmall filmeListaDistribuidor"><b>Distribuidor</b> Cinemundo</p>
+																						<!--<div class="clear"></div>-->
+									</div>
+					<div class="clear"></div>
+				</div>
+										<div class="filmeLista gen18 mesestreia202602" id="filmeLista1275332">
+					<div class="filmeListaPoster"><a href="/filme/xiang-fei-de-nu-hai-1275332/"><img loading="lazy" class="filmePosterShadow" src="https://filmspot.com.pt/images/filmes/posters/thumb/1275332.jpg" alt="Xiang fei de n&uuml; hai" title="Xiang fei de n&uuml; hai"/></a></div>
+				<div class="filmeListaInfo">
+									<H3><a href="/filme/xiang-fei-de-nu-hai-1275332/" name="1275332"><span>Xiang fei de nü hai</span> <span class="tituloOriginal">Girls on Wire</span></a></H3>					<p class="zsmall">2025 | Drama | 115 min</p>						<p class="zsmall"><b>Com</b> Liu Haocun, Wen Qi, Zhang Youhao</p>
+																<p class="zsmall"><b>Realização</b> Vivian Qu</p>
+																<!--<p class="zsmall"><b>Género</b> Drama</p>-->
+																<!--<p class="zsmall"><b>Duração</b> 115 minutos</p>-->
+																											<p class="zsmall filmeListaDistribuidor"><b>Distribuidor</b> Films4You</p>
+																						<!--<div class="clear"></div>-->
+									</div>
+					<div class="clear"></div>
+				</div>
+						<div class="clear"></div><div class="horizBanner hideAdSenseWhenFilter"><script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5910706815683379"
+     crossorigin="anonymous"></script>
+<!-- Desktop 970x90 Na página -->
+<ins class="adsbygoogle"
+     style="display:inline-block;width:970px;height:90px"
+     data-ad-client="ca-pub-5910706815683379"
+     data-ad-slot="1541726112"></ins>
+<script>
+     (adsbygoogle = window.adsbygoogle || []).push({});
+</script></div></div><h2 class="estreiasH2 gen80 gen53 gen35 gen16 gen18 gen10749 gen27 gen9648 mesestreia202602" id="estreiasH220260212">12 de fevereiro de 2026</h2><div>				<div class="filmeLista gen80 gen53 mesestreia202602" id="filmeLista1171145">
+					<div class="filmeListaPoster"><a href="/filme/crime-101-1171145/"><img loading="lazy" class="filmePosterShadow" src="https://filmspot.com.pt/images/layout/poster_thumb_default.jpg" alt="Crime 101" title="Crime 101"/></a></div>
+				<div class="filmeListaInfo">
+									<H3><a href="/filme/crime-101-1171145/" name="1171145"><span>Crime 101</span></a></H3>					<p class="zsmall">2026 | Crime, Thriller</p>						<p class="zsmall"><b>Com</b> Chris Hemsworth, Mark Ruffalo, Barry Keoghan</p>
+																<p class="zsmall"><b>Realização</b> Bart Layton</p>
+																<!--<p class="zsmall"><b>Género</b> Crime, Thriller</p>-->
+																																<p class="zsmall filmeListaDistribuidor"><b>Distribuidor</b> Big Picture</p>
+																						<!--<div class="clear"></div>-->
+									</div>
+					<div class="clear"></div>
+				</div>
+										<div class="filmeLista gen80 gen53 gen35 mesestreia202602" id="filmeLista639988">
+					<div class="filmeListaPoster"><a href="/filme/eojjeolsuga-eobsda-639988/"><img loading="lazy" class="filmePosterShadow" src="https://filmspot.com.pt/images/filmes/posters/thumb/639988.jpg" alt="Eojjeolsuga eobsda" title="Eojjeolsuga eobsda"/></a></div>
+				<div class="filmeListaInfo">
+									<H3><a href="/filme/eojjeolsuga-eobsda-639988/" name="639988"><span>Eojjeolsuga eobsda</span> <span class="tituloOriginal">No Other Choice</span></a></H3>					<p class="zsmall">2025 | Crime, Thriller, Comédia | 139 min</p>						<p class="zsmall"><b>Com</b> Lee Byung-hun, Son Ye-jin, Park Hee-soon</p>
+																<p class="zsmall"><b>Realização</b> Park Chan-wook</p>
+																<!--<p class="zsmall"><b>Género</b> Crime, Thriller, Comédia</p>-->
+																<!--<p class="zsmall"><b>Duração</b> 139 minutos</p>-->
+																											<p class="zsmall filmeListaDistribuidor"><b>Distribuidor</b> Alambique</p>
+																		<p class="zsmall filmeListaTrailerP"><b><a href="/trailer/eojjeolsuga-eobsda-639988/" class="filmeListaTrailer">Ver trailer</a></b></p>
+															<!--<div class="clear"></div>-->
+									</div>
+					<div class="clear"></div>
+				</div>
+										<div class="filmeLista gen35 gen16 mesestreia202602" id="filmeLista1297842">
+					<div class="filmeListaPoster"><a href="/filme/goat-1297842/"><img loading="lazy" class="filmePosterShadow" src="https://filmspot.com.pt/images/filmes/posters/thumb/1297842.jpg" alt="GOAT: O Maior de Todos" title="GOAT: O Maior de Todos"/></a></div>
+				<div class="filmeListaInfo">
+									<H3><a href="/filme/goat-1297842/" name="1297842"><span>GOAT: O Maior de Todos</span> <span class="tituloOriginal"><span>GOAT</span></span></a></H3>					<p class="zsmall">2026 | Comédia, Animação | 93 min</p>						<p class="zsmall"><b>Vozes</b> Caleb McLaughlin, Gabrielle Union, Jenifer Lewis</p>
+																<p class="zsmall"><b>Realização</b> Tyree Dillihay, Aaron Legends</p>
+																<!--<p class="zsmall"><b>Género</b> Comédia, Animação</p>-->
+																<!--<p class="zsmall"><b>Duração</b> 93 minutos</p>-->
+																											<p class="zsmall filmeListaDistribuidor"><b>Distribuidor</b> Big Picture</p>
+																		<p class="zsmall filmeListaTrailerP"><b><a href="/trailer/goat-1297842/" class="filmeListaTrailer">Ver trailer</a></b></p>
+															<!--<div class="clear"></div>-->
+									</div>
+					<div class="clear"></div>
+				</div>
+										<div class="filmeLista gen18 mesestreia202602" id="filmeLista933490">
+					<div class="filmeListaPoster"><a href="/filme/hot-milk-933490/"><img loading="lazy" class="filmePosterShadow" src="https://filmspot.com.pt/images/filmes/posters/thumb/933490_pt.jpg" alt="Hot Milk" title="Hot Milk"/></a></div>
+				<div class="filmeListaInfo">
+									<H3><a href="/filme/hot-milk-933490/" name="933490"><span>Hot Milk</span></a></H3>					<p class="zsmall">2025 | Drama | 93 min</p>						<p class="zsmall"><b>Com</b> Emma Mackey, Fiona Shaw, Vincent Perez</p>
+																<p class="zsmall"><b>Realização</b> Rebecca Lenkiewicz</p>
+																<!--<p class="zsmall"><b>Género</b> Drama</p>-->
+																<!--<p class="zsmall"><b>Duração</b> 93 minutos</p>-->
+																											<p class="zsmall filmeListaDistribuidor"><b>Distribuidor</b> NOS Audiovisuais</p>
+																		<p class="zsmall filmeListaTrailerP"><b><a href="/trailer/hot-milk-933490/" class="filmeListaTrailer">Ver trailer</a></b></p>
+															<!--<div class="clear"></div>-->
+									</div>
+					<div class="clear"></div>
+				</div>
+										<div class="filmeLista mesestreia202602" id="filmeLista1499609">
+					<div class="filmeListaPoster"><a href="/filme/la-vie-de-maria-manuela-1499609/"><img loading="lazy" class="filmePosterShadow" src="https://filmspot.com.pt/images/filmes/posters/thumb/1499609_pt.jpg" alt="La Vie de Maria Manuela" title="La Vie de Maria Manuela"/></a></div>
+				<div class="filmeListaInfo">
+									<H3><a href="/filme/la-vie-de-maria-manuela-1499609/" name="1499609"><span>La Vie de Maria Manuela</span></a></H3>					<p class="zsmall">2026 | 70 min</p>						<p class="zsmall"><b>Com</b> Marie, Cristina Ferreira, João Marques</p>
+																<p class="zsmall"><b>Realização</b> João Marques</p>
+																					<!--<p class="zsmall"><b>Duração</b> 70 minutos</p>-->
+																																			<!--<div class="clear"></div>-->
+									</div>
+					<div class="clear"></div>
+				</div>
+										<div class="filmeLista gen18 gen10749 mesestreia202602" id="filmeLista1316092">
+					<div class="filmeListaPoster"><a href="/filme/wuthering-heights-1316092/"><img loading="lazy" class="filmePosterShadow" src="https://filmspot.com.pt/images/filmes/posters/thumb/1316092.jpg" alt="O Monte dos Vendavais" title="O Monte dos Vendavais"/></a></div>
+				<div class="filmeListaInfo">
+									<H3><a href="/filme/wuthering-heights-1316092/" name="1316092"><span>O Monte dos Vendavais</span> <span class="tituloOriginal"><span>Wuthering Heights</span></span></a></H3>					<p class="zsmall">2026 | Drama, Romance</p>						<p class="zsmall"><b>Com</b> Jacob Elordi, Margot Robbie, Hong Chau</p>
+																<p class="zsmall"><b>Realização</b> Emerald Fennell</p>
+																<!--<p class="zsmall"><b>Género</b> Drama, Romance</p>-->
+																																<p class="zsmall filmeListaDistribuidor"><b>Distribuidor</b> Cinemundo</p>
+																		<p class="zsmall filmeListaTrailerP"><b><a href="/trailer/wuthering-heights-1316092/" class="filmeListaTrailer">Ver trailer</a></b></p>
+															<!--<div class="clear"></div>-->
+									</div>
+					<div class="clear"></div>
+				</div>
+										<div class="filmeLista gen27 gen9648 gen53 mesestreia202602" id="filmeLista937941">
+					<div class="filmeListaPoster"><a href="/filme/shelby-oaks-937941/"><img loading="lazy" class="filmePosterShadow" src="https://filmspot.com.pt/images/filmes/posters/thumb/937941_pt.jpg" alt="Shelby Oaks" title="Shelby Oaks"/></a></div>
+				<div class="filmeListaInfo">
+									<H3><a href="/filme/shelby-oaks-937941/" name="937941"><span>Shelby Oaks</span></a></H3>					<p class="zsmall">2025 | Terror, Mistério, Thriller | 102 min</p>						<p class="zsmall"><b>Com</b> Camille Sullivan, Brendan Sexton III, Michael Beach</p>
+																<p class="zsmall"><b>Realização</b> Chris Stuckmann</p>
+																<!--<p class="zsmall"><b>Género</b> Terror, Mistério, Thriller</p>-->
+																<!--<p class="zsmall"><b>Duração</b> 102 minutos</p>-->
+																											<p class="zsmall filmeListaDistribuidor"><b>Distribuidor</b> NOS Audiovisuais</p>
+																		<p class="zsmall filmeListaTrailerP"><b><a href="/trailer/shelby-oaks-937941/" class="filmeListaTrailer">Ver trailer</a></b></p>
+															<!--<div class="clear"></div>-->
+									</div>
+					<div class="clear"></div>
+				</div>
+						<div class="clear"></div><div class="horizBanner hideAdSenseWhenFilter"><script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5910706815683379"
+     crossorigin="anonymous"></script>
+<!-- Desktop 970x90 Na página -->
+<ins class="adsbygoogle"
+     style="display:inline-block;width:970px;height:90px"
+     data-ad-client="ca-pub-5910706815683379"
+     data-ad-slot="1541726112"></ins>
+<script>
+     (adsbygoogle = window.adsbygoogle || []).push({});
+</script></div></div><h2 class="estreiasH2 gen18 gen53 gen35 gen36 gen27 gen9648 mesestreia202602" id="estreiasH220260219">19 de fevereiro de 2026</h2><div>				<div class="filmeLista gen18 gen53 mesestreia202602" id="filmeLista1193128">
+					<div class="filmeListaPoster"><a href="/filme/i-was-a-stranger-1193128/"><img loading="lazy" class="filmePosterShadow" src="https://filmspot.com.pt/images/filmes/posters/thumb/1193128.jpg" alt="I Was a Stranger" title="I Was a Stranger"/></a></div>
+				<div class="filmeListaInfo">
+									<H3><a href="/filme/i-was-a-stranger-1193128/" name="1193128"><span>I Was a Stranger</span></a></H3>					<p class="zsmall">2026 | Drama, Thriller | 103 min</p>						<p class="zsmall"><b>Com</b> Yasmine Al Massri, Yahya Mahayni, Omar Sy</p>
+																<p class="zsmall"><b>Realização</b> Brandt Andersen</p>
+																<!--<p class="zsmall"><b>Género</b> Drama, Thriller</p>-->
+																<!--<p class="zsmall"><b>Duração</b> 103 minutos</p>-->
+																											<p class="zsmall filmeListaDistribuidor"><b>Distribuidor</b> NOS Audiovisuais</p>
+																						<!--<div class="clear"></div>-->
+									</div>
+					<div class="clear"></div>
+				</div>
+										<div class="filmeLista gen35 gen18 mesestreia202602" id="filmeLista1206008">
+					<div class="filmeListaPoster"><a href="/filme/ella-mccay-1206008/"><img loading="lazy" class="filmePosterShadow" src="https://filmspot.com.pt/images/filmes/posters/thumb/1206008_pt.jpg" alt="Imperfeitamente Perfeita" title="Imperfeitamente Perfeita"/></a></div>
+				<div class="filmeListaInfo">
+									<H3><a href="/filme/ella-mccay-1206008/" name="1206008"><span>Imperfeitamente Perfeita</span> <span class="tituloOriginal"><span>Ella McCay</span></span></a></H3>					<p class="zsmall">2025 | Comédia, Drama</p>						<p class="zsmall"><b>Com</b> Emma Mackey, Jamie Lee Curtis, Woody Harrelson</p>
+																<p class="zsmall"><b>Realização</b> James L. Brooks</p>
+																<!--<p class="zsmall"><b>Género</b> Comédia, Drama</p>-->
+																																<p class="zsmall filmeListaDistribuidor"><b>Distribuidor</b> NOS Audiovisuais</p>
+																		<p class="zsmall filmeListaTrailerP"><b><a href="/trailer/ella-mccay-1206008/" class="filmeListaTrailer">Ver trailer</a></b></p>
+															<!--<div class="clear"></div>-->
+									</div>
+					<div class="clear"></div>
+				</div>
+										<div class="filmeLista gen18 gen36 mesestreia202602" id="filmeLista1221061">
+					<div class="filmeListaPoster"><a href="/filme/in-die-sonne-schauen-1221061/"><img loading="lazy" class="filmePosterShadow" src="https://filmspot.com.pt/images/filmes/posters/thumb/1221061.jpg" alt="In die Sonne schauen" title="In die Sonne schauen"/></a></div>
+				<div class="filmeListaInfo">
+									<H3><a href="/filme/in-die-sonne-schauen-1221061/" name="1221061"><span>In die Sonne schauen</span> <span class="tituloOriginal">Sound of Falling</span></a></H3>					<p class="zsmall">2025 | Drama, Histórico</p>						<p class="zsmall"><b>Com</b> Luise Heyer, Lena Urzendowsky, Claudia Geisler-Bading</p>
+																<p class="zsmall"><b>Realização</b> Mascha Schilinski</p>
+																<!--<p class="zsmall"><b>Género</b> Drama, Histórico</p>-->
+																																								<!--<div class="clear"></div>-->
+									</div>
+					<div class="clear"></div>
+				</div>
+										<div class="filmeLista gen18 mesestreia202602" id="filmeLista1023962">
+					<div class="filmeListaPoster"><a href="/filme/lubo-1023962/"><img loading="lazy" class="filmePosterShadow" src="https://filmspot.com.pt/images/filmes/posters/thumb/1023962_pt.jpg" alt="Lubo" title="Lubo"/></a></div>
+				<div class="filmeListaInfo">
+									<H3><a href="/filme/lubo-1023962/" name="1023962"><span>Lubo</span></a></H3>					<p class="zsmall">2023 | Drama | 175 min</p>						<p class="zsmall"><b>Com</b> Franz Rogowski, Christophe Sermet, Valentina Bellè</p>
+																<p class="zsmall"><b>Realização</b> Giorgio Diritti</p>
+																<!--<p class="zsmall"><b>Género</b> Drama</p>-->
+																<!--<p class="zsmall"><b>Duração</b> 175 minutos</p>-->
+																											<p class="zsmall filmeListaDistribuidor"><b>Distribuidor</b> Outsider Films</p>
+																		<p class="zsmall filmeListaTrailerP"><b><a href="/trailer/lubo-1023962/" class="filmeListaTrailer">Ver trailer</a></b></p>
+															<!--<div class="clear"></div>-->
+									</div>
+					<div class="clear"></div>
+				</div>
+										<div class="filmeLista gen18 mesestreia202602" id="filmeLista1403872">
+					<div class="filmeListaPoster"><a href="/filme/primeira-pessoa-do-plural-1403872/"><img loading="lazy" class="filmePosterShadow" src="https://filmspot.com.pt/images/layout/poster_thumb_default.jpg" alt="Primeira pessoa do plural" title="Primeira pessoa do plural"/></a></div>
+				<div class="filmeListaInfo">
+									<H3><a href="/filme/primeira-pessoa-do-plural-1403872/" name="1403872"><span>Primeira pessoa do plural</span></a></H3>					<p class="zsmall">2025 | Drama | 119 min</p>						<p class="zsmall"><b>Com</b> Albano Jerónimo, Isabel Abreu, Eduardo Aguilar</p>
+																<p class="zsmall"><b>Realização</b> Sandro Aguilar</p>
+																<!--<p class="zsmall"><b>Género</b> Drama</p>-->
+																<!--<p class="zsmall"><b>Duração</b> 119 minutos</p>-->
+																											<p class="zsmall filmeListaDistribuidor"><b>Distribuidor</b> Desforra Apache</p>
+																		<p class="zsmall filmeListaTrailerP"><b><a href="/trailer/primeira-pessoa-do-plural-1403872/" class="filmeListaTrailer">Ver trailer</a></b></p>
+															<!--<div class="clear"></div>-->
+									</div>
+					<div class="clear"></div>
+				</div>
+										<div class="filmeLista gen35 gen18 mesestreia202602" id="filmeLista1160360">
+					<div class="filmeListaPoster"><a href="/filme/if-i-had-legs-i-d-kick-you-1160360/"><img loading="lazy" class="filmePosterShadow" src="https://filmspot.com.pt/images/filmes/posters/thumb/1160360.jpg" alt="Se Eu Tivesse Pernas Dava-te um Pontap&eacute;" title="Se Eu Tivesse Pernas Dava-te um Pontap&eacute;"/></a></div>
+				<div class="filmeListaInfo">
+									<H3><a href="/filme/if-i-had-legs-i-d-kick-you-1160360/" name="1160360"><span>Se Eu Tivesse Pernas Dava-te um Pontapé</span> <span class="tituloOriginal"><span>If I Had Legs I'd Kick You</span></span></a></H3>					<p class="zsmall">2025 | Comédia, Drama | 113 min</p>						<p class="zsmall"><b>Com</b> Rose Byrne, Delaney Quinn, Mary Bronstein</p>
+																<p class="zsmall"><b>Realização</b> Mary Bronstein</p>
+																<!--<p class="zsmall"><b>Género</b> Comédia, Drama</p>-->
+																<!--<p class="zsmall"><b>Duração</b> 113 minutos</p>-->
+																											<p class="zsmall filmeListaDistribuidor"><b>Distribuidor</b> NOS Audiovisuais</p>
+																		<p class="zsmall filmeListaTrailerP"><b><a href="/trailer/if-i-had-legs-i-d-kick-you-1160360/" class="filmeListaTrailer">Ver trailer</a></b></p>
+															<!--<div class="clear"></div>-->
+									</div>
+					<div class="clear"></div>
+				</div>
+										<div class="filmeLista gen53 gen27 mesestreia202602" id="filmeLista1198984">
+					<div class="filmeListaPoster"><a href="/filme/we-bury-the-dead-1198984/"><img loading="lazy" class="filmePosterShadow" src="https://filmspot.com.pt/images/layout/poster_thumb_default.jpg" alt="We Bury the Dead" title="We Bury the Dead"/></a></div>
+				<div class="filmeListaInfo">
+									<H3><a href="/filme/we-bury-the-dead-1198984/" name="1198984"><span>We Bury the Dead</span></a></H3>					<p class="zsmall">2024 | Thriller, Terror | 92 min</p>						<p class="zsmall"><b>Com</b> Daisy Ridley, Mark Coles Smith, Brenton Thwaites</p>
+																<p class="zsmall"><b>Realização</b> Zak Hilditch</p>
+																<!--<p class="zsmall"><b>Género</b> Thriller, Terror</p>-->
+																<!--<p class="zsmall"><b>Duração</b> 92 minutos</p>-->
+																											<p class="zsmall filmeListaDistribuidor"><b>Distribuidor</b> Pris</p>
+																						<!--<div class="clear"></div>-->
+									</div>
+					<div class="clear"></div>
+				</div>
+										<div class="filmeLista gen27 gen9648 mesestreia202602" id="filmeLista1193501">
+					<div class="filmeListaPoster"><a href="/filme/whistle-1193501/"><img loading="lazy" class="filmePosterShadow" src="https://filmspot.com.pt/images/filmes/posters/thumb/1193501.jpg" alt="Whistle" title="Whistle"/></a></div>
+				<div class="filmeListaInfo">
+									<H3><a href="/filme/whistle-1193501/" name="1193501"><span>Whistle</span></a></H3>					<p class="zsmall">2026 | Terror, Mistério | 85 min</p>						<p class="zsmall"><b>Com</b> Dafne Keen, Sophie Nélisse, Sky Yang</p>
+																<p class="zsmall"><b>Realização</b> Corin Hardy</p>
+																<!--<p class="zsmall"><b>Género</b> Terror, Mistério</p>-->
+																<!--<p class="zsmall"><b>Duração</b> 85 minutos</p>-->
+																											<p class="zsmall filmeListaDistribuidor"><b>Distribuidor</b> Cinemundo</p>
+																						<!--<div class="clear"></div>-->
+									</div>
+					<div class="clear"></div>
+				</div>
+						<div class="clear"></div><div class="horizBanner hideAdSenseWhenFilter"><script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5910706815683379"
+     crossorigin="anonymous"></script>
+<!-- Desktop 970x90 Na página -->
+<ins class="adsbygoogle"
+     style="display:inline-block;width:970px;height:90px"
+     data-ad-client="ca-pub-5910706815683379"
+     data-ad-slot="1541726112"></ins>
+<script>
+     (adsbygoogle = window.adsbygoogle || []).push({});
+</script></div></div><h2 class="estreiasH2 gen35 gen18 gen9648 gen27 gen16 gen28 gen10749 gen14 mesestreia202602" id="estreiasH220260226">26 de fevereiro de 2026</h2><div>				<div class="filmeLista gen35 gen18 mesestreia202602" id="filmeLista1140498">
+					<div class="filmeListaPoster"><a href="/filme/is-this-thing-on-1140498/"><img loading="lazy" class="filmePosterShadow" src="https://filmspot.com.pt/images/filmes/posters/thumb/1140498_pt.jpg" alt="Ainda Funciona?" title="Ainda Funciona?"/></a></div>
+				<div class="filmeListaInfo">
+									<H3><a href="/filme/is-this-thing-on-1140498/" name="1140498"><span>Ainda Funciona?</span> <span class="tituloOriginal"><span>Is This Thing On?</span></span></a></H3>					<p class="zsmall">2025 | Comédia, Drama | 124 min</p>						<p class="zsmall"><b>Com</b> Will Arnett, Laura Dern, Bradley Cooper</p>
+																<p class="zsmall"><b>Realização</b> Bradley Cooper</p>
+																<!--<p class="zsmall"><b>Género</b> Comédia, Drama</p>-->
+																<!--<p class="zsmall"><b>Duração</b> 124 minutos</p>-->
+																											<p class="zsmall filmeListaDistribuidor"><b>Distribuidor</b> NOS Audiovisuais</p>
+																		<p class="zsmall filmeListaTrailerP"><b><a href="/trailer/is-this-thing-on-1140498/" class="filmeListaTrailer">Ver trailer</a></b></p>
+															<!--<div class="clear"></div>-->
+									</div>
+					<div class="clear"></div>
+				</div>
+										<div class="filmeLista gen18 mesestreia202602" id="filmeLista1269644">
+					<div class="filmeListaPoster"><a href="/filme/amrum-1269644/"><img loading="lazy" class="filmePosterShadow" src="https://filmspot.com.pt/images/filmes/posters/thumb/1269644.jpg" alt="Amrum" title="Amrum"/></a></div>
+				<div class="filmeListaInfo">
+									<H3><a href="/filme/amrum-1269644/" name="1269644"><span>Amrum</span></a></H3>					<p class="zsmall">2025 | Drama | 93 min</p>						<p class="zsmall"><b>Com</b> Jasper Billerbeck, Diane Kruger, Kian Köppke</p>
+																<p class="zsmall"><b>Realização</b> Fatih Akin</p>
+																<!--<p class="zsmall"><b>Género</b> Drama</p>-->
+																<!--<p class="zsmall"><b>Duração</b> 93 minutos</p>-->
+																											<p class="zsmall filmeListaDistribuidor"><b>Distribuidor</b> Pris</p>
+																						<!--<div class="clear"></div>-->
+									</div>
+					<div class="clear"></div>
+				</div>
+										<div class="filmeLista gen9648 gen27 mesestreia202602" id="filmeLista1159559">
+					<div class="filmeListaPoster"><a href="/filme/scream-7-1159559/"><img loading="lazy" class="filmePosterShadow" src="https://filmspot.com.pt/images/filmes/posters/thumb/1159559_pt.jpg" alt="Gritos 7" title="Gritos 7"/></a></div>
+				<div class="filmeListaInfo">
+									<H3><a href="/filme/scream-7-1159559/" name="1159559"><span>Gritos 7</span> <span class="tituloOriginal"><span>Scream 7</span></span></a></H3>					<p class="zsmall">2026 | Mistério, Terror</p>						<p class="zsmall"><b>Com</b> Neve Campbell, Isabel May, Celeste O'Connor</p>
+																<p class="zsmall"><b>Realização</b> Kevin Williamson</p>
+																<!--<p class="zsmall"><b>Género</b> Mistério, Terror</p>-->
+																																<p class="zsmall filmeListaDistribuidor"><b>Distribuidor</b> NOS Audiovisuais</p>
+																		<p class="zsmall filmeListaTrailerP"><b><a href="/trailer/scream-7-1159559/" class="filmeListaTrailer">Ver trailer</a></b></p>
+															<!--<div class="clear"></div>-->
+									</div>
+					<div class="clear"></div>
+				</div>
+										<div class="filmeLista gen16 gen28 gen10749 gen14 mesestreia202602" id="filmeLista1406657">
+					<div class="filmeListaPoster"><a href="/filme/hateshinaki-scarlet-1406657/"><img loading="lazy" class="filmePosterShadow" src="https://filmspot.com.pt/images/filmes/posters/thumb/1406657.jpg" alt="Hateshinaki Scarlet" title="Hateshinaki Scarlet"/></a></div>
+				<div class="filmeListaInfo">
+									<H3><a href="/filme/hateshinaki-scarlet-1406657/" name="1406657"><span>Hateshinaki Scarlet</span> <span class="tituloOriginal">Scarlet</span></a></H3>					<p class="zsmall">2025 | Animação, Ação, Romance, Fantasia | 112 min</p>						<p class="zsmall"><b>Vozes</b> Mana Ashida, Masaki Okada, Yutaka Matsushige</p>
+																<p class="zsmall"><b>Realização</b> Mamoru Hosoda</p>
+																<!--<p class="zsmall"><b>Género</b> Animação, Ação, Romance, Fantasia</p>-->
+																<!--<p class="zsmall"><b>Duração</b> 112 minutos</p>-->
+																											<p class="zsmall filmeListaDistribuidor"><b>Distribuidor</b> Big Picture</p>
+																						<!--<div class="clear"></div>-->
+									</div>
+					<div class="clear"></div>
+				</div>
+										<div class="filmeLista gen27 gen14 mesestreia202602" id="filmeLista1286185">
+					<div class="filmeListaPoster"><a href="/filme/the-carpenter-s-son-1286185/"><img loading="lazy" class="filmePosterShadow" src="https://filmspot.com.pt/images/filmes/posters/thumb/1286185.jpg" alt="O Filho do Carpinteiro" title="O Filho do Carpinteiro"/></a></div>
+				<div class="filmeListaInfo">
+									<H3><a href="/filme/the-carpenter-s-son-1286185/" name="1286185"><span>O Filho do Carpinteiro</span> <span class="tituloOriginal"><span>The Carpenter's Son</span></span></a></H3>					<p class="zsmall">2025 | Terror, Fantasia</p>						<p class="zsmall"><b>Com</b> Nicolas Cage, Noah Jupe, FKA twigs</p>
+																<p class="zsmall"><b>Realização</b> Lotfy Nathan</p>
+																<!--<p class="zsmall"><b>Género</b> Terror, Fantasia</p>-->
+																																<p class="zsmall filmeListaDistribuidor"><b>Distribuidor</b> Cinemundo</p>
+																						<!--<div class="clear"></div>-->
+									</div>
+					<div class="clear"></div>
+				</div>
+										<div class="filmeLista gen18 mesestreia202602" id="filmeLista1379520">
+					<div class="filmeListaPoster"><a href="/filme/rule-breakers-1379520/"><img loading="lazy" class="filmePosterShadow" src="https://filmspot.com.pt/images/filmes/posters/thumb/1379520_pt.jpg" alt="O Poder da Mudan&ccedil;a" title="O Poder da Mudan&ccedil;a"/></a></div>
+				<div class="filmeListaInfo">
+									<H3><a href="/filme/rule-breakers-1379520/" name="1379520"><span>O Poder da Mudança</span> <span class="tituloOriginal"><span>Rule Breakers</span></span></a></H3>					<p class="zsmall">2025 | Drama | 122 min</p>						<p class="zsmall"><b>Com</b> Nikohl Boosheri, Noorin Gulamgaus, Amber Afzali</p>
+																<p class="zsmall"><b>Realização</b> Bill Guttentag</p>
+																<!--<p class="zsmall"><b>Género</b> Drama</p>-->
+																<!--<p class="zsmall"><b>Duração</b> 122 minutos</p>-->
+																											<p class="zsmall filmeListaDistribuidor"><b>Distribuidor</b> NOS Audiovisuais</p>
+																		<p class="zsmall filmeListaTrailerP"><b><a href="/trailer/rule-breakers-1379520/" class="filmeListaTrailer">Ver trailer</a></b></p>
+															<!--<div class="clear"></div>-->
+									</div>
+					<div class="clear"></div>
+				</div>
+										<div class="filmeLista gen18 mesestreia202602" id="filmeLista1538046">
+					<div class="filmeListaPoster"><a href="/filme/terra-vil-1538046/"><img loading="lazy" class="filmePosterShadow" src="https://filmspot.com.pt/images/filmes/posters/thumb/1538046.jpg" alt="Terra Vil" title="Terra Vil"/></a></div>
+				<div class="filmeListaInfo">
+									<H3><a href="/filme/terra-vil-1538046/" name="1538046"><span>Terra Vil</span></a></H3>					<p class="zsmall">2026 | Drama | 101 min</p>						<p class="zsmall"><b>Com</b> William Cesnek, Rúben Gomes, Lúcia Moniz</p>
+																<p class="zsmall"><b>Realização</b> Luís Campos</p>
+																<!--<p class="zsmall"><b>Género</b> Drama</p>-->
+																<!--<p class="zsmall"><b>Duração</b> 101 minutos</p>-->
+																											<p class="zsmall filmeListaDistribuidor"><b>Distribuidor</b> Films4You</p>
+																						<!--<div class="clear"></div>-->
+									</div>
+					<div class="clear"></div>
+				</div>
+						<div class="clear"></div><div class="horizBanner hideAdSenseWhenFilter"><script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5910706815683379"
+     crossorigin="anonymous"></script>
+<!-- Desktop 970x90 Na página -->
+<ins class="adsbygoogle"
+     style="display:inline-block;width:970px;height:90px"
+     data-ad-client="ca-pub-5910706815683379"
+     data-ad-slot="1541726112"></ins>
+<script>
+     (adsbygoogle = window.adsbygoogle || []).push({});
+</script></div></div><h2 class="estreiasH2 gen28 gen53 gen10752 gen878 gen80 gen18 gen10749 gen35 gen16 gen27 mesestreia202603" id="estreiasH220260305">5 de março de 2026</h2><div>				<div class="filmeLista gen28 gen53 gen10752 mesestreia202603" id="filmeLista1254135">
+					<div class="filmeListaPoster"><a href="/filme/13-jours-13-nuits-1254135/"><img loading="lazy" class="filmePosterShadow" src="https://filmspot.com.pt/images/filmes/posters/thumb/1254135_pt.jpg" alt="13 Dias, 13 Noites" title="13 Dias, 13 Noites"/></a></div>
+				<div class="filmeListaInfo">
+									<H3><a href="/filme/13-jours-13-nuits-1254135/" name="1254135"><span>13 Dias, 13 Noites</span> <span class="tituloOriginal"><span>13 jours, 13 nuits</span></span></a></H3>					<p class="zsmall">2025 | Ação, Thriller, Guerra | 112 min</p>						<p class="zsmall"><b>Com</b> Roschdy Zem, Lyna Khoudri, Sidse Babett Knudsen</p>
+																<p class="zsmall"><b>Realização</b> Martin Bourboulon</p>
+																<!--<p class="zsmall"><b>Género</b> Ação, Thriller, Guerra</p>-->
+																<!--<p class="zsmall"><b>Duração</b> 112 minutos</p>-->
+																											<p class="zsmall filmeListaDistribuidor"><b>Distribuidor</b> Cinemundo</p>
+																		<p class="zsmall filmeListaTrailerP"><b><a href="/trailer/13-jours-13-nuits-1254135/" class="filmeListaTrailer">Ver trailer</a></b></p>
+															<!--<div class="clear"></div>-->
+									</div>
+					<div class="clear"></div>
+				</div>
+										<div class="filmeLista gen53 gen878 gen80 gen28 mesestreia202603" id="filmeLista1266798">
+					<div class="filmeListaPoster"><a href="/filme/chien-51-1266798/"><img loading="lazy" class="filmePosterShadow" src="https://filmspot.com.pt/images/filmes/posters/thumb/1266798.jpg" alt="Chien 51" title="Chien 51"/></a></div>
+				<div class="filmeListaInfo">
+									<H3><a href="/filme/chien-51-1266798/" name="1266798"><span>Chien 51</span></a></H3>					<p class="zsmall">2025 | Thriller, Ficção Científica, Crime, Ação | 100 min</p>						<p class="zsmall"><b>Com</b> Gilles Lellouche, Adèle Exarchopoulos, Louis Garrel</p>
+																<p class="zsmall"><b>Realização</b> Cédric Jimenez</p>
+																<!--<p class="zsmall"><b>Género</b> Thriller, Ficção Científica, Crime, Ação</p>-->
+																<!--<p class="zsmall"><b>Duração</b> 100 minutos</p>-->
+																											<p class="zsmall filmeListaDistribuidor"><b>Distribuidor</b> NOS Audiovisuais</p>
+																						<!--<div class="clear"></div>-->
+									</div>
+					<div class="clear"></div>
+				</div>
+										<div class="filmeLista gen18 mesestreia202603" id="filmeLista1553884">
+					<div class="filmeListaPoster"><a href="/filme/maria-vitoria-1553884/"><img loading="lazy" class="filmePosterShadow" src="https://filmspot.com.pt/images/filmes/posters/thumb/1553884_pt.jpg" alt="Maria Vit&oacute;ria" title="Maria Vit&oacute;ria"/></a></div>
+				<div class="filmeListaInfo">
+									<H3><a href="/filme/maria-vitoria-1553884/" name="1553884"><span>Maria Vitória</span></a></H3>					<p class="zsmall">2025 | Drama | 114 min</p>						<p class="zsmall"><b>Com</b> Mariana Cardoso, Miguel Borges, Miguel Nunes</p>
+																<p class="zsmall"><b>Realização</b> Mário Patrocínio</p>
+																<!--<p class="zsmall"><b>Género</b> Drama</p>-->
+																<!--<p class="zsmall"><b>Duração</b> 114 minutos</p>-->
+																																			<!--<div class="clear"></div>-->
+									</div>
+					<div class="clear"></div>
+				</div>
+										<div class="filmeLista gen10749 gen18 gen35 mesestreia202603" id="filmeLista1287141">
+					<div class="filmeListaPoster"><a href="/filme/pillion-1287141/"><img loading="lazy" class="filmePosterShadow" src="https://filmspot.com.pt/images/filmes/posters/thumb/1287141.jpg" alt="Pillion" title="Pillion"/></a></div>
+				<div class="filmeListaInfo">
+									<H3><a href="/filme/pillion-1287141/" name="1287141"><span>Pillion</span></a></H3>					<p class="zsmall">2025 | Romance, Drama, Comédia | 106 min</p>						<p class="zsmall"><b>Com</b> Harry Melling, Alexander Skarsgård, Lesley Sharp</p>
+																<p class="zsmall"><b>Realização</b> Harry Lighton</p>
+																<!--<p class="zsmall"><b>Género</b> Romance, Drama, Comédia</p>-->
+																<!--<p class="zsmall"><b>Duração</b> 106 minutos</p>-->
+																											<p class="zsmall filmeListaDistribuidor"><b>Distribuidor</b> NOS Audiovisuais</p>
+																						<!--<div class="clear"></div>-->
+									</div>
+					<div class="clear"></div>
+				</div>
+										<div class="filmeLista gen35 gen16 gen878 mesestreia202603" id="filmeLista1327819">
+					<div class="filmeListaPoster"><a href="/filme/hoppers-1327819/"><img loading="lazy" class="filmePosterShadow" src="https://filmspot.com.pt/images/filmes/posters/thumb/1327819_pt.jpg" alt="Saltit&otilde;es" title="Saltit&otilde;es"/></a></div>
+				<div class="filmeListaInfo">
+									<H3><a href="/filme/hoppers-1327819/" name="1327819"><span>Saltitões</span> <span class="tituloOriginal"><span>Hoppers</span></span></a></H3>					<p class="zsmall">2026 | Comédia, Animação, Ficção Científica</p>						<p class="zsmall"><b>Vozes</b> Piper Curda, Bobby Moynihan, Jon Hamm</p>
+																<p class="zsmall"><b>Realização</b> Daniel Chong</p>
+																<!--<p class="zsmall"><b>Género</b> Comédia, Animação, Ficção Científica</p>-->
+																																<p class="zsmall filmeListaDistribuidor"><b>Distribuidor</b> NOS Audiovisuais</p>
+																		<p class="zsmall filmeListaTrailerP"><b><a href="/trailer/hoppers-1327819/" class="filmeListaTrailer">Ver trailer</a></b></p>
+															<!--<div class="clear"></div>-->
+									</div>
+					<div class="clear"></div>
+				</div>
+										<div class="filmeLista gen53 gen27 mesestreia202603" id="filmeLista1159831">
+					<div class="filmeListaPoster"><a href="/filme/the-bride-1159831/"><img loading="lazy" class="filmePosterShadow" src="https://filmspot.com.pt/images/layout/poster_thumb_default.jpg" alt="The Bride!" title="The Bride!"/></a></div>
+				<div class="filmeListaInfo">
+									<H3><a href="/filme/the-bride-1159831/" name="1159831"><span>The Bride!</span></a></H3>					<p class="zsmall">2025 | Thriller, Terror</p>						<p class="zsmall"><b>Com</b> Jessie Buckley, Christian Bale, Penélope Cruz</p>
+																<p class="zsmall"><b>Realização</b> Maggie Gyllenhaal</p>
+																<!--<p class="zsmall"><b>Género</b> Thriller, Terror</p>-->
+																																<p class="zsmall filmeListaDistribuidor"><b>Distribuidor</b> Cinemundo</p>
+																						<!--<div class="clear"></div>-->
+									</div>
+					<div class="clear"></div>
+				</div>
+						<div class="clear"></div><div class="horizBanner hideAdSenseWhenFilter"><script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5910706815683379"
+     crossorigin="anonymous"></script>
+<!-- Desktop 970x90 Na página -->
+<ins class="adsbygoogle"
+     style="display:inline-block;width:970px;height:90px"
+     data-ad-client="ca-pub-5910706815683379"
+     data-ad-slot="1541726112"></ins>
+<script>
+     (adsbygoogle = window.adsbygoogle || []).push({});
+</script></div></div><h2 class="estreiasH2 gen9648 gen18 gen53 gen35 gen80 gen36 gen16 mesestreia202603" id="estreiasH220260312">12 de março de 2026</h2><div>				<div class="filmeLista gen9648 gen18 mesestreia202603" id="filmeLista1219548">
+					<div class="filmeListaPoster"><a href="/filme/der-medicus-ii-1219548/"><img loading="lazy" class="filmePosterShadow" src="https://filmspot.com.pt/images/layout/poster_thumb_default.jpg" alt="Der Medicus II" title="Der Medicus II"/></a></div>
+				<div class="filmeListaInfo">
+									<H3><a href="/filme/der-medicus-ii-1219548/" name="1219548"><span>Der Medicus II</span> <span class="tituloOriginal">The Physician II</span></a></H3>					<p class="zsmall">2025 | Mistério, Drama</p>						<p class="zsmall"><b>Com</b> Tom Payne, Emily Cox, Aidan Gillen</p>
+																<p class="zsmall"><b>Realização</b> Philipp Stölzl</p>
+																<!--<p class="zsmall"><b>Género</b> Mistério, Drama</p>-->
+																																<p class="zsmall filmeListaDistribuidor"><b>Distribuidor</b> Outsider Films</p>
+																						<!--<div class="clear"></div>-->
+									</div>
+					<div class="clear"></div>
+				</div>
+										<div class="filmeLista gen53 gen35 gen18 mesestreia202603" id="filmeLista467905">
+					<div class="filmeListaPoster"><a href="/filme/how-to-make-a-killing-467905/"><img loading="lazy" class="filmePosterShadow" src="https://filmspot.com.pt/images/filmes/posters/thumb/467905.jpg" alt="How to Make a Killing" title="How to Make a Killing"/></a></div>
+				<div class="filmeListaInfo">
+									<H3><a href="/filme/how-to-make-a-killing-467905/" name="467905"><span>How to Make a Killing</span></a></H3>					<p class="zsmall">2026 | Thriller, Comédia, Drama | 109 min</p>						<p class="zsmall"><b>Com</b> Glen Powell, Margaret Qualley, Jessica Henwick</p>
+																<p class="zsmall"><b>Realização</b> John Patton Ford</p>
+																<!--<p class="zsmall"><b>Género</b> Thriller, Comédia, Drama</p>-->
+																<!--<p class="zsmall"><b>Duração</b> 109 minutos</p>-->
+																											<p class="zsmall filmeListaDistribuidor"><b>Distribuidor</b> Cinemundo</p>
+																						<!--<div class="clear"></div>-->
+									</div>
+					<div class="clear"></div>
+				</div>
+										<div class="filmeLista gen80 gen18 gen36 mesestreia202603" id="filmeLista1148663">
+					<div class="filmeListaPoster"><a href="/filme/iddu-l-ultimo-padrino-1148663/"><img loading="lazy" class="filmePosterShadow" src="https://filmspot.com.pt/images/filmes/posters/thumb/1148663.jpg" alt="Iddu - L&#039;ultimo padrino" title="Iddu - L&#039;ultimo padrino"/></a></div>
+				<div class="filmeListaInfo">
+									<H3><a href="/filme/iddu-l-ultimo-padrino-1148663/" name="1148663"><span>Iddu - L'ultimo padrino</span> <span class="tituloOriginal">Sicilian Letters</span></a></H3>					<p class="zsmall">2024 | Crime, Drama, Histórico | 122 min</p>						<p class="zsmall"><b>Com</b> Toni Servillo, Elio Germano, Daniela Marra</p>
+																<p class="zsmall"><b>Realização</b> Antonio Piazza, Fabio Grassadonia</p>
+																<!--<p class="zsmall"><b>Género</b> Crime, Drama, Histórico</p>-->
+																<!--<p class="zsmall"><b>Duração</b> 122 minutos</p>-->
+																											<p class="zsmall filmeListaDistribuidor"><b>Distribuidor</b> Risi Film</p>
+																						<!--<div class="clear"></div>-->
+									</div>
+					<div class="clear"></div>
+				</div>
+										<div class="filmeLista gen18 gen80 mesestreia202603" id="filmeLista1429348">
+					<div class="filmeListaPoster"><a href="/filme/l-etranger-1429348/"><img loading="lazy" class="filmePosterShadow" src="https://filmspot.com.pt/images/filmes/posters/thumb/1429348.jpg" alt="O Estrangeiro" title="O Estrangeiro"/></a></div>
+				<div class="filmeListaInfo">
+									<H3><a href="/filme/l-etranger-1429348/" name="1429348"><span>O Estrangeiro</span> <span class="tituloOriginal"><span>L'Étranger</span></span></a></H3>					<p class="zsmall">2025 | Drama, Crime | 120 min</p>						<p class="zsmall"><b>Com</b> Benjamin Voisin, Rebecca Marder, Pierre Lottin</p>
+																<p class="zsmall"><b>Realização</b> François Ozon</p>
+																<!--<p class="zsmall"><b>Género</b> Drama, Crime</p>-->
+																<!--<p class="zsmall"><b>Duração</b> 120 minutos</p>-->
+																											<p class="zsmall filmeListaDistribuidor"><b>Distribuidor</b> Alambique</p>
+																						<!--<div class="clear"></div>-->
+									</div>
+					<div class="clear"></div>
+				</div>
+										<div class="filmeLista gen53 mesestreia202603" id="filmeLista1291659">
+					<div class="filmeListaPoster"><a href="/filme/the-wizard-of-the-kremlin-1291659/"><img loading="lazy" class="filmePosterShadow" src="https://filmspot.com.pt/images/layout/poster_thumb_default.jpg" alt="O Mago do Kremlin" title="O Mago do Kremlin"/></a></div>
+				<div class="filmeListaInfo">
+									<H3><a href="/filme/the-wizard-of-the-kremlin-1291659/" name="1291659"><span>O Mago do Kremlin</span> <span class="tituloOriginal"><span>The Wizard of the Kremlin</span></span></a></H3>					<p class="zsmall">2025 | Thriller | 136 min</p>						<p class="zsmall"><b>Com</b> Paul Dano, Jude Law, Alicia Vikander</p>
+																<p class="zsmall"><b>Realização</b> Olivier Assayas</p>
+																<!--<p class="zsmall"><b>Género</b> Thriller</p>-->
+																<!--<p class="zsmall"><b>Duração</b> 136 minutos</p>-->
+																											<p class="zsmall filmeListaDistribuidor"><b>Distribuidor</b> NOS Audiovisuais</p>
+																		<p class="zsmall filmeListaTrailerP"><b><a href="/trailer/the-wizard-of-the-kremlin-1291659/" class="filmeListaTrailer">Ver trailer</a></b></p>
+															<!--<div class="clear"></div>-->
+									</div>
+					<div class="clear"></div>
+				</div>
+										<div class="filmeLista gen16 mesestreia202603" id="filmeLista1437198">
+					<div class="filmeListaPoster"><a href="/filme/tafiti-across-the-desert-1437198/"><img loading="lazy" class="filmePosterShadow" src="https://filmspot.com.pt/images/filmes/posters/thumb/1437198.jpg" alt="Tafiti - Across the Desert" title="Tafiti - Across the Desert"/></a></div>
+				<div class="filmeListaInfo">
+									<H3><a href="/filme/tafiti-across-the-desert-1437198/" name="1437198"><span>Tafiti - Across the Desert</span></a></H3>					<p class="zsmall">2025 | Animação</p>																<!--<p class="zsmall"><b>Género</b> Animação</p>-->
+																																<p class="zsmall filmeListaDistribuidor"><b>Distribuidor</b> Films4You</p>
+																						<!--<div class="clear"></div>-->
+									</div>
+					<div class="clear"></div>
+				</div>
+						<div class="clear"></div><div class="horizBanner hideAdSenseWhenFilter"><script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5910706815683379"
+     crossorigin="anonymous"></script>
+<!-- Desktop 970x90 Na página -->
+<ins class="adsbygoogle"
+     style="display:inline-block;width:970px;height:90px"
+     data-ad-client="ca-pub-5910706815683379"
+     data-ad-slot="1541726112"></ins>
+<script>
+     (adsbygoogle = window.adsbygoogle || []).push({});
+</script></div></div><h2 class="estreiasH2 gen28 gen12 gen878 gen18 gen36 gen10752 mesestreia202603" id="estreiasH220260319">19 de março de 2026</h2><div>				<div class="filmeLista mesestreia202603" id="filmeLista1515899">
+					<div class="filmeListaPoster"><a href="/filme/billie-eilish-hit-me-hard-and-soft-the-tour-live-in-3d-1515899/"><img loading="lazy" class="filmePosterShadow" src="https://filmspot.com.pt/images/layout/poster_thumb_default.jpg" alt="Billie Eilish: Hit Me Hard and Soft: The Tour (Live in 3D)" title="Billie Eilish: Hit Me Hard and Soft: The Tour (Live in 3D)"/></a></div>
+				<div class="filmeListaInfo">
+									<H3><a href="/filme/billie-eilish-hit-me-hard-and-soft-the-tour-live-in-3d-1515899/" name="1515899"><span>Billie Eilish: Hit Me Hard and Soft: The Tour (Live in 3D)</span></a></H3>					<p class="zsmall">2026 | </p>						<p class="zsmall"><b>Com</b> Billie Eilish</p>
+																<p class="zsmall"><b>Realização</b> James Cameron, Billie Eilish</p>
+																<!--<p class="zsmall"><b>Género</b> </p>-->
+																																<p class="zsmall filmeListaDistribuidor"><b>Distribuidor</b> NOS Audiovisuais</p>
+																						<!--<div class="clear"></div>-->
+									</div>
+					<div class="clear"></div>
+				</div>
+										<div class="filmeLista gen28 gen12 gen878 mesestreia202603" id="filmeLista1119449">
+					<div class="filmeListaPoster"><a href="/filme/good-luck-have-fun-don-t-die-1119449/"><img loading="lazy" class="filmePosterShadow" src="https://filmspot.com.pt/images/layout/poster_thumb_default.jpg" alt="Good Luck, Have Fun, Don&#039;t Die" title="Good Luck, Have Fun, Don&#039;t Die"/></a></div>
+				<div class="filmeListaInfo">
+									<H3><a href="/filme/good-luck-have-fun-don-t-die-1119449/" name="1119449"><span>Good Luck, Have Fun, Don't Die</span></a></H3>					<p class="zsmall">2026 | Ação, Aventura, Ficção Científica | 100 min</p>						<p class="zsmall"><b>Com</b> Sam Rockwell, Haley Lu Richardson, Michael Peña</p>
+																<p class="zsmall"><b>Realização</b> Gore Verbinski</p>
+																<!--<p class="zsmall"><b>Género</b> Ação, Aventura, Ficção Científica</p>-->
+																<!--<p class="zsmall"><b>Duração</b> 100 minutos</p>-->
+																											<p class="zsmall filmeListaDistribuidor"><b>Distribuidor</b> NOS Audiovisuais</p>
+																						<!--<div class="clear"></div>-->
+									</div>
+					<div class="clear"></div>
+				</div>
+										<div class="filmeLista gen18 gen36 mesestreia202603" id="filmeLista1401281">
+					<div class="filmeListaPoster"><a href="/filme/the-testament-of-ann-lee-1401281/"><img loading="lazy" class="filmePosterShadow" src="https://filmspot.com.pt/images/filmes/posters/thumb/1401281_pt.jpg" alt="O Testamento de Ann Lee" title="O Testamento de Ann Lee"/></a></div>
+				<div class="filmeListaInfo">
+									<H3><a href="/filme/the-testament-of-ann-lee-1401281/" name="1401281"><span>O Testamento de Ann Lee</span> <span class="tituloOriginal"><span>The Testament of Ann Lee</span></span></a></H3>					<p class="zsmall">2025 | Drama, Histórico | 137 min</p>						<p class="zsmall"><b>Com</b> Amanda Seyfried, Lewis Pullman, Thomasin McKenzie</p>
+																<p class="zsmall"><b>Realização</b> Mona Fastvold</p>
+																<!--<p class="zsmall"><b>Género</b> Drama, Histórico</p>-->
+																<!--<p class="zsmall"><b>Duração</b> 137 minutos</p>-->
+																											<p class="zsmall filmeListaDistribuidor"><b>Distribuidor</b> NOS Audiovisuais</p>
+																		<p class="zsmall filmeListaTrailerP"><b><a href="/trailer/the-testament-of-ann-lee-1401281/" class="filmeListaTrailer">Ver trailer</a></b></p>
+															<!--<div class="clear"></div>-->
+									</div>
+					<div class="clear"></div>
+				</div>
+										<div class="filmeLista gen36 gen18 gen10752 mesestreia202603" id="filmeLista1432596">
+					<div class="filmeListaPoster"><a href="/filme/palestine-36-1432596/"><img loading="lazy" class="filmePosterShadow" src="https://filmspot.com.pt/images/filmes/posters/thumb/1432596.jpg" alt="Palestine 36" title="Palestine 36"/></a></div>
+				<div class="filmeListaInfo">
+									<H3><a href="/filme/palestine-36-1432596/" name="1432596"><span>Palestine 36</span></a></H3>					<p class="zsmall">2025 | Histórico, Drama, Guerra | 118 min</p>						<p class="zsmall"><b>Com</b> Jeremy Irons, Robert Aramayo, Liam Cunningham</p>
+																<p class="zsmall"><b>Realização</b> Annemarie Jacir</p>
+																<!--<p class="zsmall"><b>Género</b> Histórico, Drama, Guerra</p>-->
+																<!--<p class="zsmall"><b>Duração</b> 118 minutos</p>-->
+																											<p class="zsmall filmeListaDistribuidor"><b>Distribuidor</b> Films4You</p>
+																		<p class="zsmall filmeListaTrailerP"><b><a href="/trailer/palestine-36-1432596/" class="filmeListaTrailer">Ver trailer</a></b></p>
+															<!--<div class="clear"></div>-->
+									</div>
+					<div class="clear"></div>
+				</div>
+										<div class="filmeLista gen878 gen12 gen18 mesestreia202603" id="filmeLista687163">
+					<div class="filmeListaPoster"><a href="/filme/project-hail-mary-687163/"><img loading="lazy" class="filmePosterShadow" src="https://filmspot.com.pt/images/filmes/posters/thumb/687163.jpg" alt="Projeto Hail Mary" title="Projeto Hail Mary"/></a></div>
+				<div class="filmeListaInfo">
+									<H3><a href="/filme/project-hail-mary-687163/" name="687163"><span>Projeto Hail Mary</span> <span class="tituloOriginal"><span>Project Hail Mary</span></span></a></H3>					<p class="zsmall">2026 | Ficção Científica, Aventura, Drama | 166 min</p>						<p class="zsmall"><b>Com</b> Ryan Gosling, Sandra Hüller, Milana Vayntrub</p>
+																<p class="zsmall"><b>Realização</b> Phil Lord, Christopher Miller</p>
+																<!--<p class="zsmall"><b>Género</b> Ficção Científica, Aventura, Drama</p>-->
+																<!--<p class="zsmall"><b>Duração</b> 166 minutos</p>-->
+																											<p class="zsmall filmeListaDistribuidor"><b>Distribuidor</b> Big Picture</p>
+																		<p class="zsmall filmeListaTrailerP"><b><a href="/trailer/project-hail-mary-687163/" class="filmeListaTrailer">Ver trailer</a></b></p>
+															<!--<div class="clear"></div>-->
+									</div>
+					<div class="clear"></div>
+				</div>
+						<div class="clear"></div><div class="horizBanner hideAdSenseWhenFilter"><script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5910706815683379"
+     crossorigin="anonymous"></script>
+<!-- Desktop 970x90 Na página -->
+<ins class="adsbygoogle"
+     style="display:inline-block;width:970px;height:90px"
+     data-ad-client="ca-pub-5910706815683379"
+     data-ad-slot="1541726112"></ins>
+<script>
+     (adsbygoogle = window.adsbygoogle || []).push({});
+</script></div></div><h2 class="estreiasH2 gen28 gen53 gen18 gen16 gen12 gen35 gen36 gen10749 gen27 mesestreia202603" id="estreiasH220260326">26 de março de 2026</h2><div>				<div class="filmeLista gen28 gen53 mesestreia202603" id="filmeLista1081012">
+					<div class="filmeListaPoster"><a href="/filme/aftermath-1081012/"><img loading="lazy" class="filmePosterShadow" src="https://filmspot.com.pt/images/filmes/posters/thumb/1081012.jpg" alt="Aftermath" title="Aftermath"/></a></div>
+				<div class="filmeListaInfo">
+									<H3><a href="/filme/aftermath-1081012/" name="1081012"><span>Aftermath</span></a></H3>					<p class="zsmall">2024 | Ação, Thriller | 95 min</p>						<p class="zsmall"><b>Com</b> Dylan Sprouse, Mason Gooding, Dichen Lachman</p>
+																<p class="zsmall"><b>Realização</b> Patrick Lussier</p>
+																<!--<p class="zsmall"><b>Género</b> Ação, Thriller</p>-->
+																<!--<p class="zsmall"><b>Duração</b> 95 minutos</p>-->
+																											<p class="zsmall filmeListaDistribuidor"><b>Distribuidor</b> NOS Audiovisuais</p>
+																						<!--<div class="clear"></div>-->
+									</div>
+					<div class="clear"></div>
+				</div>
+										<div class="filmeLista gen18 mesestreia202603" id="filmeLista1188761">
+					<div class="filmeListaPoster"><a href="/filme/entroncamento-1188761/"><img loading="lazy" class="filmePosterShadow" src="https://filmspot.com.pt/images/filmes/posters/thumb/1188761_pt.jpg" alt="Entroncamento" title="Entroncamento"/></a></div>
+				<div class="filmeListaInfo">
+									<H3><a href="/filme/entroncamento-1188761/" name="1188761"><span>Entroncamento</span></a></H3>					<p class="zsmall">2025 | Drama | 140 min</
