@@ -186,7 +186,7 @@ async function x2Rss(env: CloudflareBindings, userName: string, data: XUserTweet
   return feed;
 }
 
-export function addXToRssEndpoints(app: Hono<{ Bindings: CloudflareBindings }>) {
+export function addXEndpoints(app: Hono<{ Bindings: CloudflareBindings }>) {
   app.get(
     "/rss.x",
     async (c, next) => {

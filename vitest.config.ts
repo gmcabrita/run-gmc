@@ -24,7 +24,7 @@ export default defineWorkersConfig({
     alias: {
       "@email": resolve(__dirname, "src/email/index.ts"),
       "@coverflex": resolve(__dirname, "src/coverflex/index.ts"),
-      "@xToRss": resolve(__dirname, "src/xToRss/index.ts"),
+      "@x": resolve(__dirname, "src/x/index.ts"),
       "@fetchToRss": resolve(__dirname, "src/fetchToRss/index.ts"),
       "@rss/common": resolve(__dirname, "src/rss/common.ts"),
       "@rss/types": resolve(__dirname, "src/rss/types.ts"),
