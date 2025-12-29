@@ -23,6 +23,7 @@ import * as kirShatrovBlog from "./scrapers/kirShatrovBlog";
 import * as kitLangtonBlog from "./scrapers/kitLangtonBlog";
 import * as lbbonlineInternational from "./scrapers/lbbonlineInternational";
 import * as nimas from "./scrapers/nimas";
+import * as primeFreeGames from "./scrapers/primeFreeGames";
 import * as scyllaDbMasterclasses from "./scrapers/scyllaDbMasterclasses";
 import * as waltDisneyPressReleases from "./scrapers/waltDisneyPressReleases";
 import * as walzrBlog from "./scrapers/walzrBlog";
@@ -52,6 +53,7 @@ const scrapers: Record<string, ScraperModule> = {
   kitLangtonBlog,
   lbbonlineInternational,
   nimas,
+  primeFreeGames,
   scyllaDbMasterclasses,
   waltDisneyPressReleases,
   walzrBlog,

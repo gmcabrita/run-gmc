@@ -1,0 +1,44 @@
+{
+  "data": {
+    "games": {
+      "items": [
+        {
+          "assets": {
+            "id": "game-001",
+            "title": "Test Game One",
+            "externalClaimLink": "https://gaming.amazon.com/game/test-game-one"
+          },
+          "offers": [
+            {
+              "startTime": "2025-12-25T00:00:00Z"
+            }
+          ]
+        },
+        {
+          "assets": {
+            "id": "game-002",
+            "title": "Another Free Game",
+            "externalClaimLink": "https://gaming.amazon.com/game/another-free-game"
+          },
+          "offers": [
+            {
+              "startTime": "2025-12-20T12:00:00Z"
+            }
+          ]
+        },
+        {
+          "assets": {
+            "id": "game-003",
+            "title": "Third Game Title",
+            "externalClaimLink": "https://gaming.amazon.com/game/third-game"
+          },
+          "offers": [
+            {
+              "startTime": "2025-12-15T08:30:00Z"
+            }
+          ]
+        }
+      ]
+    }
+  }
+}

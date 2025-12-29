@@ -1,8 +1,6 @@
 import { Hono } from "hono";
 import { Feed } from "feed";
-import XPath from "xpath";
-import { DOMParser } from "@xmldom/xmldom";
-import type { AgendaLxEvent, PrimeGamingResponse } from "@types";
+import type { AgendaLxEvent } from "@types";
 
 export async function cacheAgendaLx(env: CloudflareBindings) {
   const feed = new Feed({
@@ -142,91 +140,5 @@ export function addFetchToRssEndpoints(app: Hono<{ Bindings: CloudflareBindings 
     c.header("Content-Type", "application/rss+xml");
     c.header("Cache-Control", "public, max-age=600");
     return c.text(rss2);
-  });
-
-  app.get("/rss.primeFreeGames", async (c) => {
-    const feed = new Feed({
-      title: `Free games: Prime Gaming`,
-      id: `https://gaming.amazon.com/home`,
-      link: `https://gaming.amazon.com/home`,
-      description: "Free games from Prime Gaming",
-      language: "en",
-      copyright: "",
-      updated: new Date(),
-    });
-
-    const initialResponse = await fetch("https://gaming.amazon.com/home");
-    const cookie = (initialResponse.headers.get("set-cookie") ?? "")
-      .split("Secure, ")
-      .map((item: string) => item.split(";")[0])
-      .join("; ");
-    const html = await initialResponse.text();
-
-    const domParser = new DOMParser({
-      errorHandler: {
-        warning: () => {},
-        error: () => {},
-        fatalError: (err) => {
-          throw new Error(err);
-        },
-      },
-    });
-
-    const document = domParser.parseFromString(html, "text/xml");
-    const csrfToken: string =
-      (
-        XPath.select1("//input[contains(string(@name), 'csrf-key')]/@value", document) as
-          | Attr
-          | undefined
-      )?.value || "";
-
-    const response = await fetch("https://gaming.amazon.com/graphql", {
-      headers: {
-        accept: "*/*",
-        "accept-language": "en-US,en;q=0.9",
-        "cache-control": "no-cache",
-        "client-id": "CarboniteApp",
-        "content-type": "application/json",
-        cookie: cookie,
-        "csrf-token": csrfToken,
-        pragma: "no-cache",
-        "prime-gaming-language": "en-US",
-        "user-agent":
-          "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36",
-        "sec-ch-ua": '"Chromium";v="140", "Not=A?Brand";v="24", "Google Chrome";v="140"',
-        "sec-ch-ua-mobile": "?0",
-        "sec-ch-ua-platform": '"macOS"',
-        "sec-fetch-dest": "empty",
-        "sec-fetch-mode": "cors",
-        "sec-fetch-site": "same-origin",
-      },
-      referrer: "https://gaming.amazon.com/home",
-      body: '{"operationName":"OffersContext_Offers_And_Items","variables":{"pageSize":999},"extensions":{},"query":"query OffersContext_Offers_And_Items($dateOverride: Time, $pageSize: Int) {\\n  inGameLoot: items(collectionType: LOOT, dateOverride: $dateOverride, pageSize: $pageSize) {\\n    items {\\n      ...Item\\n      __typename\\n    }\\n    __typename\\n  }\\n  expiring: items(collectionType: EXPIRING, dateOverride: $dateOverride) {\\n    items {\\n      ...Item\\n      __typename\\n    }\\n    __typename\\n  }\\n  popular: items(collectionType: FEATURED, dateOverride: $dateOverride) {\\n    items {\\n      ...Item\\n      __typename\\n    }\\n    __typename\\n  }\\n  games: items(collectionType: FREE_GAMES, dateOverride: $dateOverride, pageSize: $pageSize) {\\n    items {\\n      ...Item\\n      __typename\\n    }\\n    __typename\\n  }\\n  eventRow1: items(collectionType: EVENT_ROW_1, dateOverride: $dateOverride, pageSize: $pageSize) {\\n    items {\\n      ...Item\\n      __typename\\n    }\\n    __typename\\n  }\\n  eventRow2: items(collectionType: EVENT_ROW_2, dateOverride: $dateOverride, pageSize: $pageSize) {\\n    items {\\n      ...Item\\n      __typename\\n    }\\n    __typename\\n  }\\n  featuredContent: items(collectionType: FEATURED_CONTENT, dateOverride: $dateOverride, pageSize: $pageSize) {\\n    items {\\n      id\\n      __typename\\n    }\\n    __typename\\n  }\\n}\\n\\nfragment Item on Item {\\n  id\\n  isFGWP\\n  isDirectEntitlement\\n  isRetailLinkItem\\n  grantsCode\\n  priority\\n  category\\n  ctaButtonText\\n  isTeaserCard\\n  showCountdownInHours\\n  assets {\\n    id\\n    title\\n    externalClaimLink\\n    shortformDescription\\n    cardMedia {\\n      defaultMedia {\\n        src1x\\n        src2x\\n        type\\n        __typename\\n      }\\n      __typename\\n    }\\n    __typename\\n  }\\n  product {\\n    id\\n    __typename\\n  }\\n  offers {\\n    id\\n    startTime\\n    endTime\\n    offerSelfConnection {\\n      eligibility {\\n        canClaim\\n        isClaimed\\n        conflictingClaimAccount {\\n          obfuscatedEmail\\n          __typename\\n        }\\n        __typename\\n      }\\n      __typename\\n    }\\n    __typename\\n  }\\n  __typename\\n}\\n"}',
-      method: "POST",
-      mode: "cors",
-      credentials: "include",
-    });
-    const json = (await response.json()) as PrimeGamingResponse;
-    json.data.games.items.forEach((game) => {
-      const title = game.assets.title;
-      const link = game.assets.externalClaimLink;
-      const id = game.assets.id;
-      const date = new Date(game.offers[0].startTime);
-
-      if (title == null) throw new Error("no title found");
-      if (link == null) throw new Error("no link found");
-
-      feed.addItem({
-        title,
-        id,
-        link,
-        content: `<a href="${link}">${link}</a>`,
-        date,
-      });
-    });
-
-    c.header("Content-Type", "application/rss+xml");
-    c.header("Cache-Control", "public, max-age=600");
-    return c.text(feed.rss2());
   });
 }
