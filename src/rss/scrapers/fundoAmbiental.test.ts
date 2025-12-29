@@ -4,7 +4,11 @@ import html from "./__fixtures__/fundo-ambiental.html";
 
 describe("fundoAmbiental scraper", () => {
   it("parses news from HTML", async () => {
-    const result = await parse(html);
+    const response = new Response(html, {
+      headers: { "Content-Type": "text/html" },
+    });
+
+    const result = await parse(response);
 
     expect(result.id).toBe("https://www.fundoambiental.pt/listagem-noticias.aspx");
     expect(result.link).toBe("https://www.fundoambiental.pt/listagem-noticias.aspx");
@@ -13,7 +17,11 @@ describe("fundoAmbiental scraper", () => {
   });
 
   it("extracts all required fields from entries", async () => {
-    const result = await parse(html);
+    const response = new Response(html, {
+      headers: { "Content-Type": "text/html" },
+    });
+
+    const result = await parse(response);
 
     for (const entry of result.entries) {
       expect(entry.id).toBeTruthy();

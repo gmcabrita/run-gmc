@@ -4,8 +4,12 @@ import html from "./__fixtures__/filmspot-estreias.html";
 
 describe("filmspotEstreias scraper", () => {
   it("parses movies from HTML", async () => {
+    const response = new Response(html, {
+      headers: { "Content-Type": "text/html" },
+    });
+
     // Use a far future date to include all movies
-    const result = await parse(html, "99991231");
+    const result = await parse(response, "99991231");
 
     expect(result.id).toBe("https://filmspot.pt/estreias");
     expect(result.link).toBe("https://filmspot.pt/estreias");
@@ -14,7 +18,11 @@ describe("filmspotEstreias scraper", () => {
   });
 
   it("extracts all required fields from entries", async () => {
-    const result = await parse(html, "99991231");
+    const response = new Response(html, {
+      headers: { "Content-Type": "text/html" },
+    });
+
+    const result = await parse(response, "99991231");
 
     for (const entry of result.entries) {
       expect(entry.id).toBeTruthy();

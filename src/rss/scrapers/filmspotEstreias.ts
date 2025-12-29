@@ -1,5 +1,4 @@
-import { DOMParser } from "linkedom";
-import { USERAGENT, isValidRSSEntry } from "@rss/common";
+import { USERAGENT, isValidRSSEntry, consume } from "@rss/common";
 import type { RSSData, RSSEntry } from "@rss/types";
 import type { FilmspotMovie } from "@types";
 
@@ -18,40 +17,99 @@ function parseDateFilmspot(dateString: string): Date {
   return new Date(`${dateStr.slice(0, 4)}-${dateStr.slice(4, 6)}-${dateStr.slice(6, 8)}`);
 }
 
-export async function parse(html: string, maxDateStr?: string): Promise<RSSData> {
-  const document = new DOMParser().parseFromString(html, "text/html");
+export async function parse(response: Response, maxDateStr?: string): Promise<RSSData> {
   const maxDate = maxDateStr ?? sevenDaysFromNow();
+  const movies: FilmspotMovie[] = [];
+  let currentDateString = "";
+  let currentDateText = "";
+  let currentDate = new Date();
+  let skipCurrentSection = false;
 
-  const movies: FilmspotMovie[] = Array.from(document.querySelectorAll(".estreiasH2"))
-    .filter((premiereNode) => {
-      const el = premiereNode as Element;
-      return (el.id.match(/\d{8}$/)?.[0] ?? "") <= maxDate;
+  const rewriter = new HTMLRewriter()
+    .on(".estreiasH2", {
+      element(el) {
+        const idAttr = el.getAttribute("id") ?? "";
+        currentDateString = idAttr.match(/\d{8}$/)?.[0] ?? "";
+        currentDate = parseDateFilmspot(currentDateString);
+        skipCurrentSection = currentDateString > maxDate;
+        currentDateText = "";
+      },
+      text(text) {
+        if (text.text) {
+          currentDateText += text.text;
+        }
+      },
     })
-    .flatMap((premiereNode) => {
-      const el = premiereNode as Element & { nextSibling: Element };
-      const dateInText = el.textContent;
-      const dateString = el.id.match(/\d{8}$/)?.[0] ?? "";
-      const date = parseDateFilmspot(dateString);
-
-      return Array.from(el.nextSibling.querySelectorAll(".filmeLista")).map((movieNode) => {
-        const movieEl = movieNode as Element;
-        return {
-          imgUrl: movieEl
-            .querySelector(".filmeListaPoster > a > img")
-            ?.getAttribute("src")
-            ?.replace("/thumb", ""),
-          originalTitle: movieEl.querySelector(".tituloOriginal")?.textContent,
-          title: movieEl.querySelector(".filmeListaInfo > h3 > a > span")?.textContent,
-          url: movieEl.querySelector("* > a")?.getAttribute("href") ?? undefined,
-          metadata: Array.from(movieEl.querySelectorAll(".zsmall"))
-            .map((node) => (node as Element).textContent)
-            .filter((text): text is string => text != null && text !== "Ver trailer")
-            .join("<br>"),
-          date,
-          dateString: dateInText ?? "",
-        };
-      });
+    .on(".filmeLista", {
+      element() {
+        if (skipCurrentSection) return;
+        movies.push({
+          imgUrl: undefined,
+          originalTitle: undefined,
+          title: "",
+          url: undefined,
+          metadata: "",
+          date: currentDate,
+          dateString: currentDateText,
+        });
+      },
+    })
+    .on(".filmeLista .filmeListaPoster > a > img", {
+      element(el) {
+        if (skipCurrentSection) return;
+        const lastMovie = movies[movies.length - 1];
+        const src = el.getAttribute("src");
+        if (lastMovie && src) {
+          lastMovie.imgUrl = src.replace("/thumb", "");
+        }
+      },
+    })
+    .on(".filmeLista .filmeListaInfo > h3 > a", {
+      element(el) {
+        if (skipCurrentSection) return;
+        const lastMovie = movies[movies.length - 1];
+        const href = el.getAttribute("href");
+        if (lastMovie && href) {
+          lastMovie.url = href;
+        }
+      },
+    })
+    .on(".filmeLista .filmeListaInfo > h3 > a > span:first-child", {
+      text(text) {
+        if (skipCurrentSection) return;
+        const lastMovie = movies[movies.length - 1];
+        if (lastMovie && text.text) {
+          lastMovie.title = (lastMovie.title || "") + text.text;
+        }
+      },
+    })
+    .on(".filmeLista .filmeListaInfo .tituloOriginal", {
+      text(text) {
+        if (skipCurrentSection) return;
+        const lastMovie = movies[movies.length - 1];
+        if (lastMovie && text.text) {
+          lastMovie.originalTitle = (lastMovie.originalTitle || "") + text.text;
+        }
+      },
+    })
+    .on(".filmeLista .filmeListaInfo > p.zsmall", {
+      element() {
+        if (skipCurrentSection) return;
+        const lastMovie = movies[movies.length - 1];
+        if (lastMovie && lastMovie.metadata) {
+          lastMovie.metadata += "<br>";
+        }
+      },
+      text(text) {
+        if (skipCurrentSection) return;
+        const lastMovie = movies[movies.length - 1];
+        if (lastMovie && text.text && text.text !== "Ver trailer") {
+          lastMovie.metadata = (lastMovie.metadata || "") + text.text;
+        }
+      },
     });
+
+  await consume(rewriter.transform(response).body!);
 
   const entries: RSSEntry[] = movies.map((m) => {
     const link = `https://filmspot.pt${m.url ?? ""}`;
@@ -85,6 +143,5 @@ export async function get(): Promise<RSSData> {
     },
   });
 
-  const html = await response.text();
-  return parse(html);
+  return parse(response);
 }

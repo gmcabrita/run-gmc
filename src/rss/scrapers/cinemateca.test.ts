@@ -4,7 +4,11 @@ import html from "./__fixtures__/cinemateca.html";
 
 describe("cinemateca scraper", () => {
   it("parses screenings from HTML", async () => {
-    const result = await parse(html);
+    const response = new Response(html, {
+      headers: { "Content-Type": "text/html" },
+    });
+
+    const result = await parse(response);
 
     expect(result.id).toBe("https://www.cinemateca.pt/Programacao.aspx");
     expect(result.link).toBe("https://www.cinemateca.pt/Programacao.aspx");
@@ -13,7 +17,11 @@ describe("cinemateca scraper", () => {
   });
 
   it("extracts all required fields from entries", async () => {
-    const result = await parse(html);
+    const response = new Response(html, {
+      headers: { "Content-Type": "text/html" },
+    });
+
+    const result = await parse(response);
 
     for (const entry of result.entries) {
       expect(entry.id).toBeTruthy();
