@@ -8,7 +8,8 @@
     "deploy": "pnpm build && pnpm sentry:sourcemaps && wrangler deploy dist/index.js --no-bundle --upload-source-maps",
     "cf-typegen": "wrangler types --env-interface CloudflareBindings",
     "coverflex-uat": "pnpm dlx tsx bin/coverflex-uat.ts",
-    "test": "vitest"
+    "test": "vitest",
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "@sentry/cloudflare": "^10.31.0",

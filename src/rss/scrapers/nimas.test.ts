@@ -3,8 +3,8 @@ import { parse } from "./nimas";
 import html from "./__fixtures__/nimas.html";
 
 describe("nimas scraper", () => {
-  it("parses screenings from HTML", async () => {
-    const result = await parse(html);
+  it("parses screenings from HTML", () => {
+    const result = parse(html);
 
     expect(result.id).toBe("https://medeiafilmes.com/cinemas/cinema-medeia-nimas");
     expect(result.link).toBe("https://medeiafilmes.com/cinemas/cinema-medeia-nimas");
@@ -14,8 +14,8 @@ describe("nimas scraper", () => {
     expect(result.entries.length).toBe(4);
   });
 
-  it("extracts all required fields from entries", async () => {
-    const result = await parse(html);
+  it("extracts all required fields from entries", () => {
+    const result = parse(html);
 
     for (const entry of result.entries) {
       expect(entry.id).toBeTruthy();
@@ -25,8 +25,8 @@ describe("nimas scraper", () => {
     }
   });
 
-  it("parses movie details correctly", async () => {
-    const result = await parse(html);
+  it("parses movie details correctly", () => {
+    const result = parse(html);
 
     const firstEntry = result.entries[0];
     expect(firstEntry.id).toBe("https://medeiafilmes.com/filmes/laguna-2025");
