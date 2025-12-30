@@ -8,7 +8,7 @@ const API_URL =
 
 export async function parse(
   json: EpicDesktopFreeGamesResponse,
-  nowDate: Date = new Date()
+  nowDate: Date = new Date(),
 ): Promise<RSSData> {
   const entries: RSSEntry[] = json.data.Catalog.searchStore.elements
     .filter((offer) => {
@@ -32,7 +32,10 @@ export async function parse(
           ?.pageSlug ??
         game.productSlug;
 
-      const link = `https://store.epicgames.com/en-US/p/${pageSlug}`;
+      const isBundle = game.categories?.some((cat) => cat.path === "bundles");
+      const link = isBundle
+        ? `https://store.epicgames.com/en-US/bundles/${pageSlug}`
+        : `https://store.epicgames.com/en-US/p/${pageSlug}`;
 
       const promoOffer = game
         .promotions!.promotionalOffers.map((innerOffers) =>
@@ -41,7 +44,7 @@ export async function parse(
             const endDate = new Date(pOffer.endDate);
             const isFree = pOffer.discountSetting.discountPercentage === 0;
             return startDate <= nowDate && nowDate <= endDate && isFree;
-          })
+          }),
         )
         .filter(Boolean)[0]!;
 

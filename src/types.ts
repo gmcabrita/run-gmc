@@ -113,6 +113,7 @@ export interface EpicMobileGamePurchase {
 export interface EpicMobileGameOffer {
   content: {
     title: string;
+    categories?: Array<{ path: string }>;
     catalogItemId: string;
     mapping: {
       slug: string;
@@ -151,6 +152,7 @@ export interface EpicDesktopGameElement {
   id: string;
   title: string;
   productSlug?: string;
+  categories?: Array<{ path: string }>;
   catalogNs?: {
     mappings?: EpicDesktopCatalogMapping[];
     offerMappings?: EpicDesktopCatalogMapping[];

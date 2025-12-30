@@ -6,20 +6,25 @@ const BASE_URL = "https://store.epicgames.com/en-US/free-games";
 
 export async function parse(
   json: EpicMobileDiscoverResponse,
-  platform: "ios" | "android"
+  platform: "ios" | "android",
 ): Promise<RSSData> {
   const freeGames = json.data.find((item) => item.type === "freeGame");
 
   const entries: RSSEntry[] = (freeGames?.offers ?? [])
     .filter((game) => {
       return game.content.purchase?.find(
-        (purchase) => purchase.purchaseType === "Claim" && purchase.price.decimalPrice === 0
+        (purchase) => purchase.purchaseType === "Claim" && purchase.price.decimalPrice === 0,
       );
     })
     .map((game) => {
       const title = game.content.title;
       const pageSlug = game.content.mapping.slug;
-      const link = `https://store.epicgames.com/en-US/p/${pageSlug}`;
+
+      const isBundle = game.content.categories?.some((cat) => cat.path === "bundles");
+      const link = isBundle
+        ? `https://store.epicgames.com/en-US/bundles/${pageSlug}`
+        : `https://store.epicgames.com/en-US/p/${pageSlug}`;
+
       const id = game.content.catalogItemId;
 
       return {
