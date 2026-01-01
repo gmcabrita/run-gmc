@@ -243,7 +243,7 @@ export default Sentry.withSentry(
             },
           );
           break;
-        case "*/10 * * * *":
+        case "*/2 * * * *":
           await Sentry.withMonitor(
             "coverflex.sendCinecartazEntriesByEmail",
             async () => {
@@ -252,7 +252,7 @@ export default Sentry.withSentry(
             {
               schedule: {
                 type: "crontab",
-                value: "*/10 * * * *",
+                value: "*/2 * * * *",
               },
               checkinMargin: 2,
             },
