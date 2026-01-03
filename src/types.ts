@@ -10,7 +10,6 @@ export interface AgendaLxEvent {
   venue?: Record<string, { name?: string }>;
   categories_name_list?: Record<string, { name: string }>;
   tags_name_list?: Record<string, { name: string }>;
-  occurences?: string[];
   StartDate?: string;
   string_dates?: string;
   string_times?: string;

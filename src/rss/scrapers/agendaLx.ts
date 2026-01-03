@@ -69,8 +69,7 @@ export async function cacheAgendaLx(env: CloudflareBindings) {
               .join(", ")
           : "";
 
-        const startDate =
-          event.occurences && event.occurences.length > 0 ? event.occurences[0] : event.StartDate;
+        const startDate = event.StartDate;
         const dates = event.string_dates || "";
         const times = event.string_times || "";
 
