@@ -28,10 +28,10 @@ export async function cacheAgendaLx(env: CloudflareBindings) {
   const responses = await Promise.all(
     categories.map(async (category: string) => {
       const response = await fetch(
-        `https://www.agendalx.pt/wp-json/agendalx/v1/events?per_page=5000&categories=${category}&_fields=id,title,subtitle,description,venue,categories_name_list,tags_name_list,StartDate,string_dates,string_times,featured_media_large`
+        `https://www.agendalx.pt/wp-json/agendalx/v1/events?per_page=5000&categories=${category}&_fields=id,link,title,subtitle,description,venue,categories_name_list,tags_name_list,StartDate,string_dates,string_times,featured_media_large`,
       );
       return await response.json<AgendaLxEvent[]>();
-    })
+    }),
   );
 
   const seenIds = new Set<string>();
@@ -101,7 +101,7 @@ export async function cacheAgendaLx(env: CloudflareBindings) {
           content += `<div>${description}</div>`;
         }
 
-        const link = event.link || `https://www.agendalx.pt/events/event/${event.id}/`;
+        const link = event.link;
         const pubDate = new Date(startDate || now);
         const guid = `agendalx-event-${event.id}`;
 

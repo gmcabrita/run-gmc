@@ -15,7 +15,7 @@ export interface AgendaLxEvent {
   string_dates?: string;
   string_times?: string;
   featured_media_large?: string;
-  link?: string;
+  link: string;
 }
 
 // =====================================================
