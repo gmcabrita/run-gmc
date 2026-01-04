@@ -358,6 +358,30 @@ export interface FeedItem {
 }
 
 // =====================================================
+// UCI Cinemas Types
+// =====================================================
+
+export interface UciPromotionImage {
+  desktop: string;
+  alt?: string;
+}
+
+export interface UciPromotion {
+  name: string;
+  urlSegment: string;
+  url: string;
+  nodeId: number;
+  alias: string;
+  createDate: string;
+  updateDate: string;
+  promotionImage?: UciPromotionImage;
+  introText?: string;
+  header?: string;
+}
+
+export type UciPromocoesResponse = UciPromotion[];
+
+// =====================================================
 // Ante-Estreias RSS Types (xml2js parsed)
 // =====================================================
 
