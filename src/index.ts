@@ -13,6 +13,36 @@ addCoverflexEndpoints(app);
 addXEndpoints(app);
 addScrapedRssEndpoints(app);
 
+app.get("/debug.omnia", async (c) => {
+  const response = await fetch(
+    "https://www.ucicinemas.pt/api/omnia/v1/pageList?friendly=/promocoes/&properties=promotionImage&properties=header&properties=introText",
+    {
+      headers: {
+        accept: "application/json, text/plain, */*",
+        "user-agent":
+          "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36",
+      },
+      method: "GET",
+    },
+  );
+
+  const json = await response.json();
+
+  const headers: Record<string, string> = {};
+  response.headers.forEach((value, key) => {
+    const lowerKey = key.toLowerCase();
+    if (
+      lowerKey !== "content-encoding" &&
+      lowerKey !== "content-length" &&
+      lowerKey !== "transfer-encoding"
+    ) {
+      headers[key] = value;
+    }
+  });
+
+  return c.json({ data: json, headers });
+});
+
 app.get("/rss.sendCinecartazEntriesByEmail", async (c) => {
   return c.json(await sendCinecartazEntriesByEmail(c.env));
 });
