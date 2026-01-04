@@ -26,7 +26,13 @@ app.get("/debug.omnia", async (c) => {
     },
   );
 
-  const json = await response.json();
+  const text = await response.text();
+  let data: unknown;
+  try {
+    data = JSON.parse(text);
+  } catch {
+    data = text;
+  }
 
   const headers: Record<string, string> = {};
   response.headers.forEach((value, key) => {
@@ -40,7 +46,7 @@ app.get("/debug.omnia", async (c) => {
     }
   });
 
-  return c.json({ data: json, headers });
+  return c.json({ data, headers });
 });
 
 app.get("/rss.sendCinecartazEntriesByEmail", async (c) => {
