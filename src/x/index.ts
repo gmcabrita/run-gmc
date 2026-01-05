@@ -205,14 +205,25 @@ export function addXEndpoints(app: Hono<{ Bindings: CloudflareBindings }>) {
       }
 
       try {
+        const cacheKey = `rss.x:${userName}`;
+        const maxAge = Math.floor(Math.random() * (2400 - 1200 + 1)) + 1200;
+
+        const cachedRss = await c.env.RUN_GMC_X_CACHE_KV.get(cacheKey);
+        if (cachedRss) {
+          c.header("Content-Type", "application/rss+xml");
+          c.header("Cache-Control", `max-age=${maxAge}`);
+          return c.text(cachedRss);
+        }
+
         const userId = await fetchUserId(c.env, userName);
         const data = await fetchPosts(c.env, userId);
         const feed = await x2Rss(c.env, userName, data);
-
         const rss2 = feed.rss2();
 
+        await c.env.RUN_GMC_X_CACHE_KV.put(cacheKey, rss2, { expirationTtl: maxAge });
+
         c.header("Content-Type", "application/rss+xml");
-        c.header("Cache-Control", `${Math.floor(Math.random() * (2400 - 1200 + 1)) + 1200}`);
+        c.header("Cache-Control", `max-age=${maxAge}`);
         return c.text(rss2);
       } catch (e: unknown) {
         if (e instanceof Error && e.message == "Rate Limited") {
