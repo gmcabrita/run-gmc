@@ -206,24 +206,30 @@ export function addXEndpoints(app: Hono<{ Bindings: CloudflareBindings }>) {
 
       try {
         const cacheKey = `rss.x:${userName}`;
-        const maxAge = Math.floor(Math.random() * (2400 - 1200 + 1)) + 1200;
 
-        const cachedRss = await c.env.RUN_GMC_X_CACHE_KV.get(cacheKey);
-        if (cachedRss) {
+        const { value: cachedRss, metadata } = await c.env.RUN_GMC_X_CACHE_KV.getWithMetadata<{
+          expiresAt: number;
+        }>(cacheKey);
+        if (cachedRss && metadata) {
+          const remainingTtl = Math.max(0, Math.floor((metadata.expiresAt - Date.now()) / 1000));
           c.header("Content-Type", "application/rss+xml");
-          c.header("Cache-Control", `max-age=${maxAge}`);
+          c.header("Cache-Control", `max-age=${remainingTtl + 1}`);
           return c.text(cachedRss);
         }
 
+        const maxAge = Math.floor(Math.random() * (2400 - 1200 + 1)) + 1200;
         const userId = await fetchUserId(c.env, userName);
         const data = await fetchPosts(c.env, userId);
         const feed = await x2Rss(c.env, userName, data);
         const rss2 = feed.rss2();
 
-        await c.env.RUN_GMC_X_CACHE_KV.put(cacheKey, rss2, { expirationTtl: maxAge });
+        await c.env.RUN_GMC_X_CACHE_KV.put(cacheKey, rss2, {
+          expirationTtl: maxAge,
+          metadata: { expiresAt: Date.now() + maxAge * 1000 },
+        });
 
         c.header("Content-Type", "application/rss+xml");
-        c.header("Cache-Control", `max-age=${maxAge}`);
+        c.header("Cache-Control", `max-age=${maxAge + 1}`);
         return c.text(rss2);
       } catch (e: unknown) {
         if (e instanceof Error && e.message == "Rate Limited") {
