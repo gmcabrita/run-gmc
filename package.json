@@ -2,7 +2,8 @@
   "name": "run-gmc",
   "type": "module",
   "scripts": {
-    "dev": "localflare  --no-open",
+    "localflare": "localflare attach",
+    "dev": "wrangler dev",
     "build": "wrangler deploy --minify --outdir dist --dry-run",
     "sentry:sourcemaps": "sentry-cli sourcemaps inject dist && sentry-cli sourcemaps upload --org=goncalo-mendes-cabrita --project=run-gmc dist",
     "deploy": "pnpm build && pnpm sentry:sourcemaps && wrangler deploy dist/index.js --no-bundle --upload-source-maps",
