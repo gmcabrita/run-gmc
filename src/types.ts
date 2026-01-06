@@ -290,6 +290,7 @@ export interface XOEmbedResponse {
 
 export interface CoverflexAuthResponse {
   token: string;
+  refresh_token: string;
 }
 
 export interface CoverflexFile {

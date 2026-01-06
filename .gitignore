@@ -34,3 +34,6 @@ lerna-debug.log*
 
 # Sentry Config File
 .sentryclirc
+
+# Localflare generated files
+.localflare/
