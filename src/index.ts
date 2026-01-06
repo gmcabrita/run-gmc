@@ -13,13 +13,13 @@ addCoverflexEndpoints(app);
 addXEndpoints(app);
 addScrapedRssEndpoints(app);
 
-app.get("/rss.sendCinecartazEntriesByEmail", async (c) => {
-  return c.json(await sendCinecartazEntriesByEmail(c.env));
+app.get("/rss.sendCinecartazEntriesByEmail", async (ctx) => {
+  return ctx.json(await sendCinecartazEntriesByEmail(ctx.env));
 });
 
-app.get("/ip.getTrainInformation/:trainId/:date", cors({ origin: "*" }), async (c) => {
-  const trainId = c.req.param("trainId");
-  const date = c.req.param("date");
+app.get("/ip.getTrainInformation/:trainId/:date", cors({ origin: "*" }), async (ctx) => {
+  const trainId = ctx.req.param("trainId");
+  const date = ctx.req.param("date");
   const response = await fetch(
     `https://www.infraestruturasdeportugal.pt/negocios-e-servicos/horarios-ncombio/${trainId}/${date}`,
     {
@@ -33,11 +33,11 @@ app.get("/ip.getTrainInformation/:trainId/:date", cors({ origin: "*" }), async (
     },
   );
   const json = await response.json();
-  return c.json(json);
+  return ctx.json(json);
 });
 
-app.get("/ip.getStations/:name", cors({ origin: "*" }), async (c) => {
-  const name = c.req.param("name");
+app.get("/ip.getStations/:name", cors({ origin: "*" }), async (ctx) => {
+  const name = ctx.req.param("name");
   const response = await fetch(
     `https://www.infraestruturasdeportugal.pt/negocios-e-servicos/estacao-nome/${name}`,
     {
@@ -51,17 +51,17 @@ app.get("/ip.getStations/:name", cors({ origin: "*" }), async (c) => {
     },
   );
   const json = await response.json();
-  return c.json(json);
+  return ctx.json(json);
 });
 
 app.get(
   "/ip.getTimetables/:stationId/:startDate/:endDate/:trainTypes",
   cors({ origin: "*" }),
-  async (c) => {
-    const stationId = c.req.param("stationId");
-    const startDate = c.req.param("startDate");
-    const endDate = c.req.param("endDate");
-    const trainTypes = c.req.param("trainTypes");
+  async (ctx) => {
+    const stationId = ctx.req.param("stationId");
+    const startDate = ctx.req.param("startDate");
+    const endDate = ctx.req.param("endDate");
+    const trainTypes = ctx.req.param("trainTypes");
     const response = await fetch(
       `https://www.infraestruturasdeportugal.pt/negocios-e-servicos/partidas-chegadas/${stationId}/${startDate}/${endDate}/${trainTypes}`,
       {
@@ -75,11 +75,11 @@ app.get(
       },
     );
     const json = await response.json();
-    return c.json(json);
+    return ctx.json(json);
   },
 );
 
-app.get("/fertagus.nextTrainLeavingCorroios", async (c) => {
+app.get("/fertagus.nextTrainLeavingCorroios", async (ctx) => {
   const response = await fetch(
     "https://www.infraestruturasdeportugal.pt/negocios-e-servicos/partidas-chegadas/9417137/%2000:00/%2023:59/URB%7CSUBUR",
     {
@@ -99,8 +99,8 @@ app.get("/fertagus.nextTrainLeavingCorroios", async (c) => {
   );
 
   if (!train) {
-    c.header("Cache-Control", "public, max-age=60");
-    return c.json({});
+    ctx.header("Cache-Control", "public, max-age=60");
+    return ctx.json({});
   }
 
   const dateStr = train.DataHoraPartidaChegada_ToOrderBy;
@@ -130,8 +130,8 @@ app.get("/fertagus.nextTrainLeavingCorroios", async (c) => {
   const expectedTime = originalDateTime.match(/T(\d+:\d+)/)?.[1];
   const expectedTimeWithDelay = `${expectedTime}${delayInMinutes ? ` (${delayInMinutes})` : ""}`;
 
-  c.header("Cache-Control", "public, max-age=60");
-  return c.json({
+  ctx.header("Cache-Control", "public, max-age=60");
+  return ctx.json({
     delayText,
     originalDateTime,
     expectedDateTime,
@@ -143,62 +143,62 @@ app.get("/fertagus.nextTrainLeavingCorroios", async (c) => {
 
 app.get(
   "/sentry.debug.throwError",
-  async (c, next) => {
+  async (ctx, next) => {
     const auth = basicAuth({
-      username: c.env.PRIVATE_BASIC_AUTH_USERNAME,
-      password: c.env.PRIVATE_BASIC_AUTH_PASSWORD,
+      username: ctx.env.PRIVATE_BASIC_AUTH_USERNAME,
+      password: ctx.env.PRIVATE_BASIC_AUTH_PASSWORD,
     });
-    return auth(c, next);
+    return auth(ctx, next);
   },
-  (c) => {
-    throw new Error(`😵‍💫 im an error on ${c.env.ENVIRONMENT}`);
+  (ctx) => {
+    throw new Error(`😵‍💫 im an error on ${ctx.env.ENVIRONMENT}`);
   },
 );
 
 app.get(
   "/sentry.debug.log",
-  async (c, next) => {
+  async (ctx, next) => {
     const auth = basicAuth({
-      username: c.env.PRIVATE_BASIC_AUTH_USERNAME,
-      password: c.env.PRIVATE_BASIC_AUTH_PASSWORD,
+      username: ctx.env.PRIVATE_BASIC_AUTH_USERNAME,
+      password: ctx.env.PRIVATE_BASIC_AUTH_PASSWORD,
     });
-    return auth(c, next);
+    return auth(ctx, next);
   },
-  (c) => {
+  (ctx) => {
     console.debug("Debug log!");
     console.log("Normal log!");
     console.error("Error log!");
-    return c.text("Logged something!");
+    return ctx.text("Logged something!");
   },
 );
 
 app.get(
   "/sentry.debug.tracing",
-  async (c, next) => {
+  async (ctx, next) => {
     const auth = basicAuth({
-      username: c.env.PRIVATE_BASIC_AUTH_USERNAME,
-      password: c.env.PRIVATE_BASIC_AUTH_PASSWORD,
+      username: ctx.env.PRIVATE_BASIC_AUTH_USERNAME,
+      password: ctx.env.PRIVATE_BASIC_AUTH_PASSWORD,
     });
-    return auth(c, next);
+    return auth(ctx, next);
   },
-  async (c) => {
+  async (ctx) => {
     await fetch("https://goncalo.mendescabrita.com");
 
-    return c.text("Fetched something!");
+    return ctx.text("Fetched something!");
   },
 );
 
 app.get(
   "/routes",
-  async (c, next) => {
+  async (ctx, next) => {
     const auth = basicAuth({
-      username: c.env.PRIVATE_BASIC_AUTH_USERNAME,
-      password: c.env.PRIVATE_BASIC_AUTH_PASSWORD,
+      username: ctx.env.PRIVATE_BASIC_AUTH_USERNAME,
+      password: ctx.env.PRIVATE_BASIC_AUTH_PASSWORD,
     });
-    return auth(c, next);
+    return auth(ctx, next);
   },
-  async (c) => {
-    return c.html(`<html>
+  async (ctx) => {
+    return ctx.html(`<html>
     <body>
       ${app.routes
         .map((route) => {

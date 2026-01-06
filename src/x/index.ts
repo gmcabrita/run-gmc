@@ -189,53 +189,53 @@ async function x2Rss(env: CloudflareBindings, userName: string, data: XUserTweet
 export function addXEndpoints(app: Hono<{ Bindings: CloudflareBindings }>) {
   app.get(
     "/rss.x",
-    async (c, next) => {
+    async (ctx, next) => {
       const auth = basicAuth({
-        username: c.env.PRIVATE_BASIC_AUTH_USERNAME,
-        password: c.env.PRIVATE_BASIC_AUTH_PASSWORD,
+        username: ctx.env.PRIVATE_BASIC_AUTH_USERNAME,
+        password: ctx.env.PRIVATE_BASIC_AUTH_PASSWORD,
       });
-      return auth(c, next);
+      return auth(ctx, next);
     },
-    async (c) => {
-      const userName = c.req.query("userName");
+    async (ctx) => {
+      const userName = ctx.req.query("userName");
 
       if (!userName) {
-        c.status(400);
-        return c.text("no userName provided");
+        ctx.status(400);
+        return ctx.text("no userName provided");
       }
 
       try {
         const cacheKey = `rss.x:${userName}`;
 
-        const { value: cachedRss, metadata } = await c.env.RUN_GMC_X_CACHE_KV.getWithMetadata<{
+        const { value: cachedRss, metadata } = await ctx.env.RUN_GMC_X_CACHE_KV.getWithMetadata<{
           expiresAt: number;
         }>(cacheKey);
         if (cachedRss && metadata) {
           const remainingTtl = Math.max(0, Math.floor((metadata.expiresAt - Date.now()) / 1000));
-          c.header("Content-Type", "application/rss+xml");
-          c.header("Cache-Control", `max-age=${remainingTtl + 1}`);
-          return c.text(cachedRss);
+          ctx.header("Content-Type", "application/rss+xml");
+          ctx.header("Cache-Control", `max-age=${remainingTtl + 1}`);
+          return ctx.text(cachedRss);
         }
 
         const maxAge = Math.floor(Math.random() * (2400 - 1200 + 1)) + 1200;
-        const userId = await fetchUserId(c.env, userName);
-        const data = await fetchPosts(c.env, userId);
-        const feed = await x2Rss(c.env, userName, data);
+        const userId = await fetchUserId(ctx.env, userName);
+        const data = await fetchPosts(ctx.env, userId);
+        const feed = await x2Rss(ctx.env, userName, data);
         const rss2 = feed.rss2();
 
-        await c.env.RUN_GMC_X_CACHE_KV.put(cacheKey, rss2, {
+        await ctx.env.RUN_GMC_X_CACHE_KV.put(cacheKey, rss2, {
           expirationTtl: maxAge,
           metadata: { expiresAt: Date.now() + maxAge * 1000 },
         });
 
-        c.header("Content-Type", "application/rss+xml");
-        c.header("Cache-Control", `max-age=${maxAge + 1}`);
-        return c.text(rss2);
+        ctx.header("Content-Type", "application/rss+xml");
+        ctx.header("Cache-Control", `max-age=${maxAge + 1}`);
+        return ctx.text(rss2);
       } catch (e: unknown) {
         if (e instanceof Error && e.message == "Rate Limited") {
-          c.header("Retry-After", `${Math.floor(Math.random() * (240 - 120 + 1)) + 120}`);
-          c.status(429);
-          return c.text("Rate Limited");
+          ctx.header("Retry-After", `${Math.floor(Math.random() * (240 - 120 + 1)) + 120}`);
+          ctx.status(429);
+          return ctx.text("Rate Limited");
         }
 
         throw e;

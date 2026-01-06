@@ -103,45 +103,45 @@ async function getCoverflexBudget(env: CloudflareBindings) {
 export function addCoverflexEndpoints(app: Hono<{ Bindings: CloudflareBindings }>) {
   app.get(
     "/coverflex.getBudget",
-    async (c, next) => {
+    async (ctx, next) => {
       const auth = basicAuth({
-        username: c.env.PRIVATE_BASIC_AUTH_USERNAME,
-        password: c.env.PRIVATE_BASIC_AUTH_PASSWORD,
+        username: ctx.env.PRIVATE_BASIC_AUTH_USERNAME,
+        password: ctx.env.PRIVATE_BASIC_AUTH_PASSWORD,
       });
-      return auth(c, next);
+      return auth(ctx, next);
     },
-    async (c) => {
-      return c.json(await getCoverflexBudget(c.env));
+    async (ctx) => {
+      return ctx.json(await getCoverflexBudget(ctx.env));
     },
   );
 
   app.get(
     "/coverflex.getAppleCatalogue",
-    async (c, next) => {
+    async (ctx, next) => {
       const auth = basicAuth({
-        username: c.env.PRIVATE_BASIC_AUTH_USERNAME,
-        password: c.env.PRIVATE_BASIC_AUTH_PASSWORD,
+        username: ctx.env.PRIVATE_BASIC_AUTH_USERNAME,
+        password: ctx.env.PRIVATE_BASIC_AUTH_PASSWORD,
       });
-      return auth(c, next);
+      return auth(ctx, next);
     },
-    async (c) => {
-      return c.json(await getAppleCatalogueFile(c.env));
+    async (ctx) => {
+      return ctx.json(await getAppleCatalogueFile(ctx.env));
     },
   );
 
   app.get(
     "/coverflex.sendAppleCatalogueByEmail",
-    async (c, next) => {
+    async (ctx, next) => {
       const auth = basicAuth({
-        username: c.env.PRIVATE_BASIC_AUTH_USERNAME,
-        password: c.env.PRIVATE_BASIC_AUTH_PASSWORD,
+        username: ctx.env.PRIVATE_BASIC_AUTH_USERNAME,
+        password: ctx.env.PRIVATE_BASIC_AUTH_PASSWORD,
       });
-      return auth(c, next);
+      return auth(ctx, next);
     },
-    async (c) => {
-      await sendAppleCatalogueByEmail(c.env);
+    async (ctx) => {
+      await sendAppleCatalogueByEmail(ctx.env);
 
-      return c.text("");
+      return ctx.text("");
     },
   );
 }

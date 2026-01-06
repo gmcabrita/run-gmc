@@ -73,7 +73,7 @@ const mobileGameScrapers = {
 };
 
 function createRssHandler(getFn: () => Promise<RSSData>) {
-  return async (c: { header: (k: string, v: string) => void; text: (t: string) => Response }) => {
+  return async (ctx: { header: (k: string, v: string) => void; text: (t: string) => Response }) => {
     const { title, description, id, link, language, entries } = await getFn();
 
     const now = new Date();
@@ -98,9 +98,9 @@ function createRssHandler(getFn: () => Promise<RSSData>) {
       });
     });
 
-    c.header("Content-Type", "application/rss+xml");
-    c.header("Cache-Control", "public, max-age=600");
-    return c.text(feed.rss2());
+    ctx.header("Content-Type", "application/rss+xml");
+    ctx.header("Cache-Control", "public, max-age=600");
+    return ctx.text(feed.rss2());
   };
 }
 
@@ -116,22 +116,22 @@ export function addScrapedRssEndpoints(app: Hono<{ Bindings: CloudflareBindings 
   }
 
   // AgendaLx (served from KV cache)
-  app.get("/rss.agendaLx", async (c) => {
-    const rss2 = (await c.env.RUN_GMC_GENERIC_CACHE_KV.get("agenda-lx-eventos")) || "";
+  app.get("/rss.agendaLx", async (ctx) => {
+    const rss2 = (await ctx.env.RUN_GMC_GENERIC_CACHE_KV.get("agenda-lx-eventos")) || "";
 
     if (rss2) {
-      c.header("Content-Type", "application/rss+xml");
-      c.header("Cache-Control", "public, max-age=600");
+      ctx.header("Content-Type", "application/rss+xml");
+      ctx.header("Cache-Control", "public, max-age=600");
     }
-    return c.text(rss2);
+    return ctx.text(rss2);
   });
 
   // AgendaLx cache refresh endpoint
-  app.get("/rss.cacheAgendaLx", async (c) => {
-    const rss2 = await agendaLx.cacheAgendaLx(c.env);
+  app.get("/rss.cacheAgendaLx", async (ctx) => {
+    const rss2 = await agendaLx.cacheAgendaLx(ctx.env);
 
-    c.header("Content-Type", "application/rss+xml");
-    c.header("Cache-Control", "public, max-age=600");
-    return c.text(rss2);
+    ctx.header("Content-Type", "application/rss+xml");
+    ctx.header("Cache-Control", "public, max-age=600");
+    return ctx.text(rss2);
   });
 }
