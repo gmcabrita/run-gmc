@@ -111,6 +111,7 @@ export function addCoverflexEndpoints(app: Hono<{ Bindings: CloudflareBindings }
       return auth(ctx, next);
     },
     async (ctx) => {
+      ctx.header("Cache-Control", "no-cache, no-store, must-revalidate");
       return ctx.json(await getCoverflexBudget(ctx.env));
     },
   );
