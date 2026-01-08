@@ -1,4 +1,4 @@
-import { USERAGENT, isValidRSSEntry } from "@rss/common";
+import { USERAGENT, isValidRSSEntry, type ScraperContext } from "@rss/common";
 import type { RSSData, RSSEntry } from "@rss/types";
 import type { EpicMobileDiscoverResponse } from "@types";
 
@@ -49,7 +49,7 @@ export async function parse(
   };
 }
 
-async function fetchForPlatform(platform: "ios" | "android"): Promise<RSSData> {
+async function fetchForPlatform(_ctx: ScraperContext, platform: "ios" | "android"): Promise<RSSData> {
   const apiUrl = `https://http-proxy.val.run/?finalUrl=https%3A%2F%2Fegs-platform-service.store.epicgames.com%2Fapi%2Fv2%2Fpublic%2Fdiscover%2Fhome%3Fcount%3D10%26country%3DPT%26locale%3Den%26platform%3D${platform}%26start%3D0%26store%3DEGS`;
 
   const response = await fetch(apiUrl, {
@@ -62,10 +62,10 @@ async function fetchForPlatform(platform: "ios" | "android"): Promise<RSSData> {
   return parse(json, platform);
 }
 
-export async function getiOS(): Promise<RSSData> {
-  return fetchForPlatform("ios");
+export async function getiOS(ctx: ScraperContext): Promise<RSSData> {
+  return fetchForPlatform(ctx, "ios");
 }
 
-export async function getAndroid(): Promise<RSSData> {
-  return fetchForPlatform("android");
+export async function getAndroid(ctx: ScraperContext): Promise<RSSData> {
+  return fetchForPlatform(ctx, "android");
 }

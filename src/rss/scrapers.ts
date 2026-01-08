@@ -1,6 +1,8 @@
+import type { Context } from "hono";
 import { Hono } from "hono";
 import { Feed } from "feed";
 import type { RSSData } from "@rss/types";
+import type { ScraperContext } from "@rss/common";
 
 import * as adsOfTheWorldBlog from "./scrapers/adsOfTheWorldBlog";
 import * as agendaLx from "./scrapers/agendaLx";
@@ -9,6 +11,7 @@ import * as agendaLxPdf from "./scrapers/agendaLxPdf";
 export { cacheAgendaLx } from "./scrapers/agendaLx";
 import * as anteEstreias from "./scrapers/anteEstreias";
 import * as cinecartaz from "./scrapers/cinecartaz";
+import * as discordQuests from "./scrapers/discordQuests";
 import * as cinemateca from "./scrapers/cinemateca";
 import * as epicFreeDesktopGames from "./scrapers/epicFreeDesktopGames";
 import * as epicFreeMobileGames from "./scrapers/epicFreeMobileGames";
@@ -34,7 +37,7 @@ import * as waltDisneyPressReleases from "./scrapers/waltDisneyPressReleases";
 import * as walzrBlog from "./scrapers/walzrBlog";
 
 type ScraperModule = {
-  get: () => Promise<RSSData>;
+  get: (ctx: ScraperContext) => Promise<RSSData>;
 };
 
 const scrapers: Record<string, ScraperModule> = {
@@ -43,6 +46,7 @@ const scrapers: Record<string, ScraperModule> = {
   anteEstreias,
   cinecartaz,
   cinemateca,
+  discordQuests,
   epicFreeDesktopGames,
   ercDeliberacoes,
   ercNoticias,
@@ -72,9 +76,9 @@ const mobileGameScrapers = {
   epicFreeAndroidGames: epicFreeMobileGames.getAndroid,
 };
 
-function createRssHandler(getFn: () => Promise<RSSData>) {
-  return async (ctx: { header: (k: string, v: string) => void; text: (t: string) => Response }) => {
-    const { title, description, id, link, language, entries } = await getFn();
+function createRssHandler(getFn: (ctx: ScraperContext) => Promise<RSSData>) {
+  return async (ctx: ScraperContext) => {
+    const { title, description, id, link, language, entries } = await getFn(ctx);
 
     const now = new Date();
     const feed = new Feed({

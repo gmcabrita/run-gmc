@@ -1,4 +1,7 @@
+import type { Context } from "hono";
 import type { RSSEntry } from "@rss/types";
+
+export type ScraperContext = Context<{ Bindings: CloudflareBindings }>;
 
 export const USERAGENT =
   "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36";

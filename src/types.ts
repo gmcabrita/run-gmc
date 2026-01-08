@@ -399,3 +399,49 @@ export interface AnteEstreiasRssParsed {
     }>;
   };
 }
+
+// =====================================================
+// Discord Quests Types
+// =====================================================
+
+export interface DiscordQuestUserStatus {
+  user_id: string;
+  quest_id: string;
+  enrolled_at: string;
+  completed_at: string | null;
+  claimed_at: string | null;
+}
+
+export interface DiscordQuestConfig {
+  id: string;
+  starts_at: string;
+  expires_at: string;
+  messages: {
+    quest_name: string;
+    game_title: string;
+    game_publisher: string;
+  };
+  application: {
+    link: string;
+    id: string;
+    name: string;
+  };
+  rewards_config: {
+    rewards: Array<{
+      type: number;
+      messages: {
+        name: string;
+      };
+    }>;
+  };
+}
+
+export interface DiscordQuest {
+  id: string;
+  config: DiscordQuestConfig;
+  user_status: DiscordQuestUserStatus | null;
+}
+
+export interface DiscordQuestsResponse {
+  quests: DiscordQuest[];
+}

@@ -1,4 +1,4 @@
-import { USERAGENT, isValidRSSEntry } from "@rss/common";
+import { USERAGENT, isValidRSSEntry, type ScraperContext } from "@rss/common";
 import type { RSSData, RSSEntry } from "@rss/types";
 import type { UciPromocoesResponse } from "@types";
 
@@ -39,7 +39,7 @@ export function parse(json: UciPromocoesResponse): RSSData {
   };
 }
 
-export async function get(): Promise<RSSData> {
+export async function get(_ctx: ScraperContext): Promise<RSSData> {
   const baseHeaders = {
     accept: "application/json, text/plain, */*",
     "user-agent": USERAGENT,

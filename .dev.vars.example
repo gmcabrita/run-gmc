@@ -19,3 +19,6 @@ ICLOUD_PASSWORD=your-app-specific-password
 X_BEARER=
 X_COOKIE=
 X_CSRF_TOKEN=
+
+# Discord Tokens
+DISCORD_AUTHORIZATION_TOKEN=

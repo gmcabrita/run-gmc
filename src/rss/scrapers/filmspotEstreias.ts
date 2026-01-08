@@ -1,4 +1,4 @@
-import { USERAGENT, isValidRSSEntry, consume } from "@rss/common";
+import { USERAGENT, isValidRSSEntry, consume, type ScraperContext } from "@rss/common";
 import type { RSSData, RSSEntry } from "@rss/types";
 import type { FilmspotMovie } from "@types";
 
@@ -136,7 +136,7 @@ export async function parse(response: Response, maxDateStr?: string): Promise<RS
   };
 }
 
-export async function get(): Promise<RSSData> {
+export async function get(_ctx: ScraperContext): Promise<RSSData> {
   const response = await fetch(BASE_URL, {
     headers: {
       "user-agent": USERAGENT,

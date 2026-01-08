@@ -1,4 +1,4 @@
-import { USERAGENT, isValidRSSEntry } from "@rss/common";
+import { USERAGENT, isValidRSSEntry, type ScraperContext } from "@rss/common";
 import type { RSSData, RSSEntry } from "@rss/types";
 import type { ScyllaDbEventsResponse } from "@types";
 
@@ -29,7 +29,7 @@ export async function parse(json: ScyllaDbEventsResponse): Promise<RSSData> {
   };
 }
 
-export async function get(): Promise<RSSData> {
+export async function get(_ctx: ScraperContext): Promise<RSSData> {
   const options = {
     headers: {
       accept: "*/*",

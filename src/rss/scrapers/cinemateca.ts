@@ -1,4 +1,4 @@
-import { USERAGENT, isValidRSSEntry, consume } from "@rss/common";
+import { USERAGENT, isValidRSSEntry, consume, type ScraperContext } from "@rss/common";
 import type { RSSData, RSSEntry } from "@rss/types";
 
 const BASE_URL = "https://www.cinemateca.pt/Programacao.aspx";
@@ -114,7 +114,7 @@ export async function parse(response: Response): Promise<RSSData> {
   };
 }
 
-export async function get(): Promise<RSSData> {
+export async function get(_ctx: ScraperContext): Promise<RSSData> {
   const scrapeUrls = Array.from(generateNextDates()).map((date) => `${BASE_URL}?date=${date}`);
 
   const responses = await Promise.all(

@@ -1,4 +1,4 @@
-import { USERAGENT, isValidRSSEntry, consume } from "@rss/common";
+import { USERAGENT, isValidRSSEntry, consume, type ScraperContext } from "@rss/common";
 import type { RSSData, RSSEntry } from "@rss/types";
 import { idempotentSendEmail } from "@email";
 
@@ -61,7 +61,7 @@ export async function parse(response: Response): Promise<RSSData> {
   };
 }
 
-export async function get(): Promise<RSSData> {
+export async function get(_ctx: ScraperContext): Promise<RSSData> {
   const response = await fetch("https://cinecartaz.publico.pt/passatempos", {
     headers: {
       "user-agent": USERAGENT,

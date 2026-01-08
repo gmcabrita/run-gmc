@@ -1,4 +1,4 @@
-import { USERAGENT, isValidRSSEntry } from "@rss/common";
+import { USERAGENT, isValidRSSEntry, type ScraperContext } from "@rss/common";
 import type { RSSData, RSSEntry } from "@rss/types";
 import type { InformacaoLisboaNoticiasResponse } from "@types";
 
@@ -64,7 +64,7 @@ export async function parse(json: InformacaoLisboaNoticiasResponse): Promise<RSS
   };
 }
 
-export async function get(): Promise<RSSData> {
+export async function get(_ctx: ScraperContext): Promise<RSSData> {
   const response = await fetch(API_URL, {
     headers: {
       "user-agent": USERAGENT,

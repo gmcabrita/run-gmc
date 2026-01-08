@@ -1,4 +1,4 @@
-import { USERAGENT, isValidRSSEntry } from "@rss/common";
+import { USERAGENT, isValidRSSEntry, type ScraperContext } from "@rss/common";
 import type { RSSData, RSSEntry } from "@rss/types";
 
 const BASE_URL = "https://medeiafilmes.com/cinemas/cinema-medeia-nimas";
@@ -107,7 +107,7 @@ export function parse(html: string): RSSData {
   };
 }
 
-export async function get(): Promise<RSSData> {
+export async function get(_ctx: ScraperContext): Promise<RSSData> {
   const response = await fetch(BASE_URL, {
     headers: {
       "user-agent": USERAGENT,
