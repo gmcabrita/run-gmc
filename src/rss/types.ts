@@ -14,4 +14,5 @@ export interface RSSEntry {
   text?: string;
   datetime?: Date;
   imageURL?: string;
+  extra?: Record<string, unknown>;
 }
