@@ -32,7 +32,7 @@ export async function parse(response: Response): Promise<RSSData> {
     const datetime = new Date(year, month - 1, 1);
 
     entries.push({
-      id: title,
+      id: link,
       link,
       title,
       text: title,
