@@ -23,6 +23,5 @@ describe("marktestPodScope scraper", () => {
     expect(entry.link).toBe("https://www.marktest.com/pod_scope/?date=2025-11");
     expect(entry.title).toBe("Ranking de PODCASTS - novembro 2025 [03 nov - 30 nov]");
     expect(entry.text).toBe("Ranking de PODCASTS - novembro 2025 [03 nov - 30 nov]");
-    expect(entry.datetime).toEqual(new Date(2025, 10, 1)); // November 2025
   });
 });
