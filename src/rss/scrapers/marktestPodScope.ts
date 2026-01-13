@@ -29,7 +29,7 @@ export async function parse(response: Response): Promise<RSSData> {
   if (title && currentDate) {
     const link = `https://www.marktest.com/pod_scope/?date=${currentDate}`;
     const [year, month] = currentDate.split("-").map(Number);
-    const datetime = new Date(year, month - 1, 1);
+    const datetime = new Date();
 
     entries.push({
       id: link,
