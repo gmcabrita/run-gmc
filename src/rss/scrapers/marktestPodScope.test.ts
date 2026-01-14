@@ -19,7 +19,7 @@ describe("marktestPodScope scraper", () => {
     expect(result.entries.length).toBe(1);
 
     const entry = result.entries[0];
-    expect(entry.id).toBe("Ranking de PODCASTS - novembro 2025 [03 nov - 30 nov]");
+    expect(entry.id).toBe("https://www.marktest.com/pod_scope/?date=2025-11");
     expect(entry.link).toBe("https://www.marktest.com/pod_scope/?date=2025-11");
     expect(entry.title).toBe("Ranking de PODCASTS - novembro 2025 [03 nov - 30 nov]");
     expect(entry.text).toBe("Ranking de PODCASTS - novembro 2025 [03 nov - 30 nov]");
