@@ -14,7 +14,7 @@ describe("boletimTlim parser", () => {
 
     expect(result.id).toBe("https://tlim.pt/");
     expect(result.link).toBe("https://tlim.pt/");
-    expect(result.title).toBe("Boletim TLIM");
+    expect(result.title).toBe("Boletim tlim");
     expect(result.language).toBe("pt");
 
     expect(result.entries.map((e) => e.link)).toEqual([
@@ -60,13 +60,13 @@ describe("boletimTlim parser", () => {
     const result = parse(json, titlesByPath);
 
     expect(result.entries.map((e) => e.title)).toEqual([
-      "Boletim 1 - Dezembro de 2025",
       "Boletim 2 - Janeiro de 2026",
+      "Boletim 1 - Dezembro de 2025",
     ]);
 
     expect(result.entries.map((e) => e.datetime)).toEqual([
-      new Date(Date.UTC(2025, 11, 1)),
       new Date(Date.UTC(2026, 0, 1)),
+      new Date(Date.UTC(2025, 11, 1)),
     ]);
   });
 

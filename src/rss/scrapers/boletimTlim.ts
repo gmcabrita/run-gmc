@@ -152,8 +152,8 @@ function buildRSSData(
   return {
     id: SITE_URL,
     link: SITE_URL,
-    title: "Boletim TLIM",
-    description: "Boletim TLIM",
+    title: "Boletim tlim",
+    description: "Boletim tlim",
     language: "pt",
     entries,
   };
