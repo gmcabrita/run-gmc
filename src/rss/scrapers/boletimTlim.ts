@@ -142,7 +142,12 @@ function buildRSSData(
 ): RSSData {
   const entries: RSSEntry[] = files
     .map((f) => buildEntry(f, titlesByPath.get(f.path) ?? null))
-    .filter(isValidRSSEntry);
+    .filter(isValidRSSEntry)
+    .sort((a, b) => {
+      const at = a.datetime?.getTime() ?? 0;
+      const bt = b.datetime?.getTime() ?? 0;
+      return bt - at;
+    });
 
   return {
     id: SITE_URL,
@@ -154,7 +159,10 @@ function buildRSSData(
   };
 }
 
-export function parse(json: unknown, titlesByPath: ReadonlyMap<string, string> = new Map()): RSSData {
+export function parse(
+  json: unknown,
+  titlesByPath: ReadonlyMap<string, string> = new Map(),
+): RSSData {
   const files = parseGithubContentsFiles(json).filter((f) => isHighEntropyHtmlName(f.name));
   return buildRSSData(files, titlesByPath);
 }
