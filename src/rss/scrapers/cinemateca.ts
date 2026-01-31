@@ -108,7 +108,8 @@ export async function parse(response: Response): Promise<RSSData> {
     const title = normalizeWS(entry.title);
     const fullTitle = director ? `${title}, ${director}` : title;
     const letterboxd = `https://letterboxd.com/search/${encodeURIComponent(title)}/?adult`;
-    const text = `${dateTimeStr}<br>${extra}<br>${extra2}<br>${room}<br><a href="${letterboxd}">Letterboxd</a>`;
+    const letterboxdDeeplinkApple = `letterboxd://x-callback-url/search?query=encodeURIComponent(title)&type=all`;
+    const text = `${dateTimeStr}<br>${extra}<br>${extra2}<br>${room}<br><a href="${letterboxd}">Letterboxd</a><br><a href="${letterboxdDeeplinkApple}">Letterboxd iOS Deeplink</a>`;
 
     return {
       id: entry.id,
