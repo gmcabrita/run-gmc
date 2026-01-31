@@ -130,19 +130,33 @@ export async function parse(response: Response): Promise<RSSData> {
 
 export async function get(_ctx: ScraperContext): Promise<RSSData> {
   const scrapeUrls = Array.from(generateNextDates()).map((date) => `${BASE_URL}?date=${date}`);
-
-  const responses = await Promise.all(
-    scrapeUrls.map((url) =>
-      fetch(url, {
-        headers: { "user-agent": USERAGENT },
-      }),
-    ),
-  );
-
   const allEntries: RSSEntry[] = [];
-  for (const response of responses) {
-    const result = await parse(response);
-    allEntries.push(...result.entries);
+
+  const MAX_IN_FLIGHT = 10;
+  for (let i = 0; i < scrapeUrls.length; i += MAX_IN_FLIGHT) {
+    const batch = scrapeUrls.slice(i, i + MAX_IN_FLIGHT);
+    const results = await Promise.all(
+      batch.map(async (url) => {
+        const response = await fetch(url, {
+          headers: { "user-agent": USERAGENT },
+        });
+
+        try {
+          return await parse(response);
+        } catch (err) {
+          try {
+            await response.body?.cancel();
+          } catch {
+            // ignore
+          }
+          throw err;
+        }
+      }),
+    );
+
+    for (const result of results) {
+      allEntries.push(...result.entries);
+    }
   }
 
   return {
