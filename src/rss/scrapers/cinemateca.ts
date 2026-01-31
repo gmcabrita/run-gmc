@@ -8,9 +8,14 @@ interface CinematecaEntry extends RSSEntry {
   infoDate: string;
 }
 
+function normalizeWS(input: string): string {
+  return input.replace(/\u00A0/g, " ").replace(/\s+/g, " ").trim();
+}
+
 function parseDateTimeStrCinemateca(dateTimeStr: string): Date {
-  const dateStr = dateTimeStr.split(",")[0].trim().replaceAll("/", "");
-  const timeStr = dateTimeStr.split(",")[1]?.trim().replaceAll("h", "") ?? "";
+  const [datePartRaw, timePartRaw = ""] = dateTimeStr.split(",");
+  const dateStr = datePartRaw.replace(/\D/g, "");
+  const timeStr = timePartRaw.replace(/\D/g, "").padStart(4, "0");
   return new Date(
     `${dateStr.slice(4, 8)}-${dateStr.slice(2, 4)}-${dateStr.slice(0, 2)} ${timeStr.slice(0, 2)}:${timeStr.slice(2, 4)}`,
   );
@@ -26,21 +31,19 @@ function* generateNextDates(count: number = 50): Generator<string> {
 
 export async function parse(response: Response): Promise<RSSData> {
   const entries: CinematecaEntry[] = [];
-  let currentHref = "";
   let infoTitleCount = 0;
 
   const rewriter = new HTMLRewriter()
-    .on("a[href^='?id=']", {
+    .on(".sectionLayoutProgramLeft a[href*='id=']", {
       element(el) {
-        currentHref = el.getAttribute("href") ?? "";
-      },
-    })
-    .on("a[href^='?id='] .w315", {
-      element() {
+        const href = el.getAttribute("href");
+        if (!href) return;
+
         infoTitleCount = 0;
+        const link = new URL(href, BASE_URL).href;
         entries.push({
-          id: `${BASE_URL}${currentHref}`,
-          link: `${BASE_URL}${currentHref}`,
+          id: link,
+          link,
           title: "",
           text: "",
           infoBiblio: [],
@@ -48,19 +51,22 @@ export async function parse(response: Response): Promise<RSSData> {
         });
       },
     })
-    .on("a[href^='?id='] .w315 .infoTitle", {
-      element() {
-        infoTitleCount++;
+    .on(
+      ".sectionLayoutProgramLeft a[href*='id='] .infoTitle, .sectionLayoutProgramLeft a[href*='id='] .infoTitleProg",
+      {
+        element() {
+          infoTitleCount++;
+        },
+        text(text) {
+          const lastEntry = entries[entries.length - 1];
+          // Only capture text from the first .infoTitle (original title)
+          if (lastEntry && text.text && infoTitleCount === 1) {
+            lastEntry.title = (lastEntry.title || "") + text.text;
+          }
+        },
       },
-      text(text) {
-        const lastEntry = entries[entries.length - 1];
-        // Only capture text from the first .infoTitle (original title)
-        if (lastEntry && text.text && infoTitleCount === 1) {
-          lastEntry.title = (lastEntry.title || "") + text.text;
-        }
-      },
-    })
-    .on("a[href^='?id='] .w315 .infoBiblio", {
+    )
+    .on(".sectionLayoutProgramLeft a[href*='id='] .infoBiblio", {
       element() {
         const lastEntry = entries[entries.length - 1];
         if (lastEntry) {
@@ -74,7 +80,7 @@ export async function parse(response: Response): Promise<RSSData> {
         }
       },
     })
-    .on("a[href^='?id='] .w315 .infoDate", {
+    .on(".sectionLayoutProgramLeft a[href*='id='] .infoDate", {
       text(text) {
         const lastEntry = entries[entries.length - 1];
         if (lastEntry && text.text) {
@@ -83,17 +89,25 @@ export async function parse(response: Response): Promise<RSSData> {
       },
     });
 
-  await consume(rewriter.transform(response).body!);
+  const transformed = rewriter.transform(response);
+  if (transformed.body) {
+    await consume(transformed.body);
+  }
 
   const rssEntries: RSSEntry[] = entries.map((entry) => {
-    const director = entry.infoBiblio[1] ?? "";
-    const extra = entry.infoBiblio[0] ?? "";
-    const extra2 = entry.infoBiblio[2] ?? "";
-    const room = entry.infoDate.split("|")[1]?.trim() ?? "";
-    const dateTimeStr = entry.infoDate.split("|")[0]?.trim() ?? "";
+    const infoBiblio = entry.infoBiblio.map(normalizeWS).filter(Boolean);
+    const director = infoBiblio[1] ?? "";
+    const extra = infoBiblio[0] ?? "";
+    const extra2 = infoBiblio[2] ?? "";
+
+    const infoDate = normalizeWS(entry.infoDate);
+    const room = normalizeWS(infoDate.split("|")[1] ?? "");
+    const dateTimeStr = normalizeWS(infoDate.split("|")[0] ?? "");
     const dateTime = parseDateTimeStrCinemateca(dateTimeStr);
-    const fullTitle = `${entry.title}, ${director}`;
-    const text = `${dateTimeStr}<br>${extra}<br>${extra2}<br>${room}<br>Letterboxd: https://letterboxd.com/search/${encodeURIComponent(entry.title)}/?adult`;
+
+    const title = normalizeWS(entry.title);
+    const fullTitle = director ? `${title}, ${director}` : title;
+    const text = `${dateTimeStr}<br>${extra}<br>${extra2}<br>${room}<br>Letterboxd: https://letterboxd.com/search/${encodeURIComponent(title)}/?adult`;
 
     return {
       id: entry.id,
