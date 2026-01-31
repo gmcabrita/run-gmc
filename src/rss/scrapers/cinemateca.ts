@@ -9,7 +9,10 @@ interface CinematecaEntry extends RSSEntry {
 }
 
 function normalizeWS(input: string): string {
-  return input.replace(/\u00A0/g, " ").replace(/\s+/g, " ").trim();
+  return input
+    .replace(/\u00A0/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
 }
 
 function parseDateTimeStrCinemateca(dateTimeStr: string): Date {
@@ -108,7 +111,8 @@ export async function parse(response: Response): Promise<RSSData> {
     const title = normalizeWS(entry.title);
     const fullTitle = director ? `${title}, ${director}` : title;
     const letterboxd = `https://letterboxd.com/search/${encodeURIComponent(title)}/?adult`;
-    const text = `${dateTimeStr}<br>${extra}<br>${extra2}<br>${room}<br><a href="${letterboxd}">Letterboxd</a>`;
+    const letterboxdAppleDeeplink = `letterboxd://x-callback-url/search?query=${encodeURIComponent(title)}&type=film`;
+    const text = `${dateTimeStr}<br>${extra}<br>${extra2}<br>${room}<br><a href="${letterboxd}">Letterboxd</a><br><a href="${letterboxdAppleDeeplink}">Letterboxd iOS Deeplink</a>`;
 
     return {
       id: entry.id,
