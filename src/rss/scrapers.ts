@@ -11,6 +11,7 @@ import * as agendaLxPdf from "./scrapers/agendaLxPdf";
 export { cacheAgendaLx } from "./scrapers/agendaLx";
 import * as anteEstreias from "./scrapers/anteEstreias";
 import * as cinecartaz from "./scrapers/cinecartaz";
+import * as ccpjDestaques from "./scrapers/ccpjDestaques";
 import * as dentsuNewsReleases from "./scrapers/dentsuNewsReleases";
 import * as discordQuests from "./scrapers/discordQuests";
 import * as cinemateca from "./scrapers/cinemateca";
@@ -49,6 +50,7 @@ const scrapers: Record<string, ScraperModule> = {
   anteEstreias,
   cinecartaz,
   cinemateca,
+  ccpjDestaques,
   dentsuNewsReleases,
   discordQuests,
   epicFreeDesktopGames,

@@ -111,8 +111,7 @@ export async function parse(response: Response): Promise<RSSData> {
     const title = normalizeWS(entry.title);
     const fullTitle = director ? `${title}, ${director}` : title;
     const letterboxd = `https://letterboxd.com/search/films${encodeURIComponent(title)}/?adult`;
-
-    const text = `${dateTimeStr}<br>${extra}<br>${extra2}<br>${room}<br><a href="${letterboxd}">Letterboxd Search</a>;
+    const text = `${dateTimeStr}<br>${extra}<br>${extra2}<br>${room}<br><a href="${letterboxd}">Letterboxd Search</a>`;
 
     return {
       id: entry.id,
