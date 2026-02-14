@@ -70,6 +70,34 @@ describe("boletimTlim parser", () => {
     ]);
   });
 
+  it("filters future-dated entries from title parsing", () => {
+    const payload = [
+      {
+        type: "file",
+        name: "A1b2C3d4E5f6G7h8.html",
+        path: "A1b2C3d4E5f6G7h8.html",
+        download_url: "https://example.com/past",
+      },
+      {
+        type: "file",
+        name: "Z9y8X7w6V5u4T3s2.html",
+        path: "Z9y8X7w6V5u4T3s2.html",
+        download_url: "https://example.com/future",
+      },
+    ];
+
+    const titlesByPath = new Map<string, string>([
+      ["A1b2C3d4E5f6G7h8.html", "Boletim 1 - Janeiro de 2000"],
+      ["Z9y8X7w6V5u4T3s2.html", "Boletim 2 - Janeiro de 2099"],
+    ]);
+
+    const result = parse(payload, titlesByPath);
+
+    expect(result.entries).toHaveLength(1);
+    expect(result.entries[0]?.title).toBe("Boletim 1 - Janeiro de 2000");
+    expect(result.entries[0]?.datetime).toEqual(new Date(Date.UTC(2000, 0, 1)));
+  });
+
   it("handles non-array payload", () => {
     const result = parse({});
     expect(result.entries).toEqual([]);
