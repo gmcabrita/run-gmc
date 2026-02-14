@@ -140,9 +140,11 @@ function buildRSSData(
   files: ReadonlyArray<GithubContentsFile>,
   titlesByPath: ReadonlyMap<string, string>,
 ): RSSData {
+  const now = new Date();
   const entries: RSSEntry[] = files
     .map((f) => buildEntry(f, titlesByPath.get(f.path) ?? null))
     .filter(isValidRSSEntry)
+    .filter((entry) => entry.datetime == null || entry.datetime < now)
     .sort((a, b) => {
       const at = a.datetime?.getTime() ?? 0;
       const bt = b.datetime?.getTime() ?? 0;

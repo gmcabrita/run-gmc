@@ -10,8 +10,8 @@ describe("ccpjDestaques scraper", () => {
 
     const result = await parse(response);
 
-    expect(result.id).toBe("https://www.ccpj.pt/");
-    expect(result.link).toBe("https://www.ccpj.pt/");
+    expect(result.id).toBe("https://www.ccpj.pt");
+    expect(result.link).toBe("https://www.ccpj.pt");
     expect(result.title).toBe("CCPJ - Destaques");
     expect(result.description).toBe("CCPJ - Destaques");
     expect(result.language).toBe("pt");
@@ -19,8 +19,12 @@ describe("ccpjDestaques scraper", () => {
     expect(result.entries).toHaveLength(2);
 
     const first = result.entries[0];
-    expect(first.id).toBe("https://www.ccpj.pt/pt/informacao/cooptacao-da-presidente-da-ccpj-para-o-trienio-20252028/");
-    expect(first.link).toBe("https://www.ccpj.pt/pt/informacao/cooptacao-da-presidente-da-ccpj-para-o-trienio-20252028/");
+    expect(first.id).toBe(
+      "https://www.ccpj.pt/pt/informacao/cooptacao-da-presidente-da-ccpj-para-o-trienio-20252028/",
+    );
+    expect(first.link).toBe(
+      "https://www.ccpj.pt/pt/informacao/cooptacao-da-presidente-da-ccpj-para-o-trienio-20252028/",
+    );
     expect(first.title).toBe("Cooptação da Presidente da CCPJ para o triénio 2025/2028");
     expect(first.text).toBe("<strong>Categoria:</strong> Divulgações");
     expect(first.datetime).toBeInstanceOf(Date);
