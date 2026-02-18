@@ -22,3 +22,6 @@ X_CSRF_TOKEN=
 
 # Discord Tokens
 DISCORD_AUTHORIZATION_TOKEN=
+
+# Sentry stuff
+SENTRY_DSN=

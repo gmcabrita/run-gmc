@@ -13,10 +13,10 @@
     "typecheck": "tsgo --noEmit"
   },
   "dependencies": {
-    "@sentry/cloudflare": "^10.38.0",
+    "@sentry/cloudflare": "^10.39.0",
     "@typescript/native-preview": "7.0.0-dev.20260102.1",
     "feed": "^5.2.0",
-    "hono": "^4.11.9",
+    "hono": "^4.11.10",
     "worker-mailer": "^1.2.1",
     "xml2js": "^0.6.2"
   },
@@ -28,6 +28,6 @@
     "localflare": "^0.3.1",
     "vite": "^7.3.1",
     "vitest": "^3.2.4",
-    "wrangler": "^4.64.0"
+    "wrangler": "^4.66.0"
   }
 }
