@@ -83,7 +83,7 @@ export function parse(html: string): RSSData {
         );
         const extra = extraParts.join(" | ");
 
-        const letterboxd = `https://letterboxd.com/search/films${encodeURIComponent(film.film_title)}/?adult`;
+        const letterboxd = `https://letterboxd.com/search/films/${encodeURIComponent(film.film_title)}/?adult`;
         const text = `${displayDate} ${time}<br>${extra}<br>${film.cycle_title || ""}<br><a href="${letterboxd}">Letterboxd Search</a>`;
 
         entries.push({
