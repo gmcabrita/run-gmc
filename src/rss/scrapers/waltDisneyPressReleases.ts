@@ -1,59 +1,86 @@
 import { USERAGENT, isValidRSSEntry, consume, type ScraperContext } from "@rss/common";
 import type { RSSData, RSSEntry } from "@rss/types";
 
+const BASE_URL = "https://thewaltdisneycompany.com/press-releases/";
+
 export async function parse(response: Response): Promise<RSSData> {
   const entries: Array<RSSEntry> = [];
+  let currentEntry: RSSEntry | null = null;
+
   const rewriter = new HTMLRewriter()
-    .on(".press-releases-container > article", {
+    .on(".component-article-filter .article-filter-results article.twdcus-card", {
       element() {
-        entries.push({
+        currentEntry = {
           id: "",
           link: "",
           title: "",
           text: "",
-        });
+        };
+        entries.push(currentEntry);
       },
     })
-    .on(".press-releases-container > article h2 a", {
+    .on(".component-article-filter .article-filter-results article.twdcus-card .twdcus-card__title a", {
       element(el) {
-        const lastEntry = entries[entries.length - 1];
-        const link = el.getAttribute("href")!;
-        if (lastEntry && link) {
-          lastEntry.id = link;
-          lastEntry.link = link;
+        if (!currentEntry) {
+          return;
+        }
+
+        const href = el.getAttribute("href");
+        if (href) {
+          const link = new URL(href, BASE_URL).toString();
+          currentEntry.id = link;
+          currentEntry.link = link;
         }
       },
       text(text) {
-        const lastEntry = entries[entries.length - 1];
-        if (lastEntry && text.text) {
-          lastEntry.title += text.text;
-          lastEntry.text += text.text;
+        if (!currentEntry) {
+          return;
+        }
+
+        currentEntry.title += text.text;
+
+        if (text.lastInTextNode) {
+          const normalizedTitle = currentEntry.title.replace(/\s+/g, " ").trim();
+          currentEntry.title = normalizedTitle;
+          currentEntry.text = normalizedTitle;
         }
       },
     })
-    .on(".press-releases-container > article time", {
+    .on(".component-article-filter .article-filter-results article.twdcus-card time.twdcus-card__date", {
       element(el) {
-        const lastEntry = entries[entries.length - 1];
+        if (!currentEntry) {
+          return;
+        }
+
         const datetime = el.getAttribute("datetime");
-        if (lastEntry && datetime) {
-          lastEntry.datetime = new Date(datetime);
+        if (!datetime) {
+          return;
+        }
+
+        const parsedDate = new Date(datetime);
+        if (!Number.isNaN(parsedDate.getTime())) {
+          currentEntry.datetime = parsedDate;
         }
       },
     });
 
-  await consume(rewriter.transform(response).body!);
+  const body = rewriter.transform(response).body;
+  if (body) {
+    await consume(body);
+  }
+
   return {
-    id: "https://thewaltdisneycompany.com/press-releases/",
-    link: "https://thewaltdisneycompany.com/press-releases/",
-    title: "Press Releases Archives - The Walt Disney Company",
-    description: "Press Releases Archives - The Walt Disney Company",
+    id: BASE_URL,
+    link: BASE_URL,
+    title: "Press Release Archives | The Walt Disney Company",
+    description: "Find announcements and updates from The Walt Disney Company and explore our archive of press releases.",
     language: "en",
-    entries: entries.filter((entry: RSSEntry) => isValidRSSEntry(entry)),
+    entries: entries.filter((entry) => isValidRSSEntry(entry)),
   };
 }
 
 export async function get(_ctx: ScraperContext): Promise<RSSData> {
-  const response = await fetch("https://thewaltdisneycompany.com/press-releases/", {
+  const response = await fetch(BASE_URL, {
     headers: {
       "user-agent": USERAGENT,
       "Content-Type": "text/html",
