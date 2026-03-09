@@ -7,11 +7,14 @@ import type { CoverflexTechnologyResponse, CoverflexPocketsResponse } from "@typ
 export async function sendAppleCatalogueByEmail(env: CloudflareBindings) {
   const { name, url } = await getAppleCatalogueFile(env);
 
+  const idempotencyURL = new URL(url);
+  idempotencyURL.search = "";
+
   await idempotentSendEmail(env, {
     to: "goncalo@mendescabrita.com",
     subject: `New Coverflex Apple catalogue available: ${name}`,
     body: `<a href="${url}" target="_blank">${url}</a>`,
-    idempotencyKey: `coverflex-apple-catalogue-${name}`,
+    idempotencyKey: `coverflex-apple-catalogue-${idempotencyURL}`,
   });
 }
 
