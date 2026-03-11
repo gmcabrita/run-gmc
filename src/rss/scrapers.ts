@@ -36,6 +36,7 @@ import * as museuDoOrienteCinema from "./scrapers/museuDoOrienteCinema";
 import * as nimas from "./scrapers/nimas";
 import * as primeFreeGames from "./scrapers/primeFreeGames";
 import * as scyllaDbMasterclasses from "./scrapers/scyllaDbMasterclasses";
+import * as theDrumLatest from "./scrapers/theDrumLatest";
 import * as boletimTlim from "./scrapers/boletimTlim";
 import * as uciPromocoes from "./scrapers/uciPromocoes";
 import * as waltDisneyPressReleases from "./scrapers/waltDisneyPressReleases";
@@ -74,6 +75,7 @@ const scrapers: Record<string, ScraperModule> = {
   nimas,
   primeFreeGames,
   scyllaDbMasterclasses,
+  theDrumLatest,
   boletimTlim,
   uciPromocoes,
   waltDisneyPressReleases,
