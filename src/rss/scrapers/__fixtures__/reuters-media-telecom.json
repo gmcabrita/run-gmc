@@ -1,0 +1,31 @@
+{
+  "statusCode": 200,
+  "message": "Success",
+  "result": {
+    "articles": [
+      {
+        "id": "abc123",
+        "canonical_url": "/business/media-telecom/test-title-2026-03-09/",
+        "title": "Test Reuters Title\u00a0\u00a0",
+        "description": "Test Reuters description.",
+        "published_time": "2026-03-09T08:06:42.482Z",
+        "updated_time": "2026-03-09T09:06:42.482Z",
+        "thumbnail": {
+          "url": "https://example.com/image.jpg"
+        }
+      },
+      {
+        "id": "def456",
+        "canonical_url": "/business/media-telecom/fallback-title-2026-03-08/",
+        "basic_headline": "Fallback Headline",
+        "updated_time": "2026-03-08T10:00:00Z"
+      },
+      {
+        "id": "ghi789",
+        "title": "Filtered Article",
+        "description": "Missing canonical url",
+        "published_time": "2026-03-07T10:00:00Z"
+      }
+    ]
+  }
+}
