@@ -189,7 +189,7 @@ app.get(
 );
 
 app.get(
-  "/routes",
+  "/",
   async (ctx, next) => {
     const auth = basicAuth({
       username: ctx.env.PRIVATE_BASIC_AUTH_USERNAME,
