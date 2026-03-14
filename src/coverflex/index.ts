@@ -11,7 +11,7 @@ export async function sendAppleCatalogueByEmail(env: CloudflareBindings) {
   idempotencyURL.search = "";
 
   await idempotentSendEmail(env, {
-    to: "goncalo@mendescabrita.com",
+    to: "goncalo.mendes.cabrita@gmail.com",
     subject: `New Coverflex Apple catalogue available: ${name}`,
     body: `<a href="${url}" target="_blank">${url}</a>`,
     idempotencyKey: `coverflex-apple-catalogue-${idempotencyURL}`,
