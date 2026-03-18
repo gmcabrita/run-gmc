@@ -14,6 +14,7 @@ import * as ccbEventos from "./scrapers/ccbEventos";
 import * as cinecartaz from "./scrapers/cinecartaz";
 import * as ccpjDestaques from "./scrapers/ccpjDestaques";
 import * as cmJornalTvMedia from "./scrapers/cmJornalTvMedia";
+import * as culturgestEventos from "./scrapers/culturgestEventos";
 import * as dentsuNewsReleases from "./scrapers/dentsuNewsReleases";
 import * as discordQuests from "./scrapers/discordQuests";
 import * as cinemateca from "./scrapers/cinemateca";
@@ -59,6 +60,7 @@ const scrapers: Record<string, ScraperModule> = {
   cinemateca,
   ccpjDestaques,
   cmJornalTvMedia,
+  culturgestEventos,
   dentsuNewsReleases,
   discordQuests,
   epicFreeDesktopGames,
