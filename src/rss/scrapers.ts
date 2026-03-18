@@ -10,6 +10,7 @@ import * as agendaLxPdf from "./scrapers/agendaLxPdf";
 
 export { cacheAgendaLx } from "./scrapers/agendaLx";
 import * as anteEstreias from "./scrapers/anteEstreias";
+import * as ccbEventos from "./scrapers/ccbEventos";
 import * as cinecartaz from "./scrapers/cinecartaz";
 import * as ccpjDestaques from "./scrapers/ccpjDestaques";
 import * as dentsuNewsReleases from "./scrapers/dentsuNewsReleases";
@@ -52,6 +53,7 @@ const scrapers: Record<string, ScraperModule> = {
   adsOfTheWorldBlog,
   agendaLxPdf,
   anteEstreias,
+  ccbEventos,
   cinecartaz,
   cinemateca,
   ccpjDestaques,
