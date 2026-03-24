@@ -3,6 +3,15 @@ import type { RSSData, RSSEntry } from "@rss/types";
 
 const BASE_URL = "https://medeiafilmes.com/cinemas/cinema-medeia-nimas";
 const UPLOADS_BASE = "https://medeiafilmes.com/uploads/library/";
+const PT_WEEKDAYS = [
+  "domingo",
+  "segunda-feira",
+  "terça-feira",
+  "quarta-feira",
+  "quinta-feira",
+  "sexta-feira",
+  "sábado",
+];
 
 interface NimasFilm {
   film_title: string;
@@ -32,6 +41,10 @@ interface NimasData {
   theater?: {
     programme: Record<string, NimasDay>;
   };
+}
+
+function getPTWeekday(date: Date): string {
+  return PT_WEEKDAYS[date.getDay()] ?? "";
 }
 
 export function parse(html: string): RSSData {
@@ -73,6 +86,7 @@ export function parse(html: string): RSSData {
 
       for (const film of session.films) {
         const datetime = new Date(`${dateStr}T${time}:00`);
+        const weekday = getPTWeekday(datetime);
         const link = `https://medeiafilmes.com/filmes/${film.film_uri_title}`;
         const fullTitle = film.film_director
           ? `${film.film_title}, ${film.film_director}`
@@ -84,7 +98,7 @@ export function parse(html: string): RSSData {
         const extra = extraParts.join(" | ");
 
         const letterboxd = `https://letterboxd.com/search/films/${encodeURIComponent(film.film_title)}/?adult`;
-        const text = `${displayDate} ${time}<br>${extra}<br>${film.cycle_title || ""}<br><a href="${letterboxd}">Letterboxd Search</a>`;
+        const text = `${weekday}, ${displayDate} ${time}<br>${extra}<br>${film.cycle_title || ""}<br><a href="${letterboxd}">Letterboxd Search</a>`;
 
         entries.push({
           id: link,

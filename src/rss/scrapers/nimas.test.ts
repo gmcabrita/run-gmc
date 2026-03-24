@@ -34,6 +34,7 @@ describe("nimas scraper", () => {
     expect(firstEntry.title).toBe("Laguna, Sharunas Bartas");
     expect(firstEntry.imageURL).toBe("https://medeiafilmes.com/uploads/library/laguna_poster.jpg");
     expect(firstEntry.datetime).toEqual(new Date("2025-12-29 13:00"));
+    expect(firstEntry.text).toContain("segunda-feira, 29.12.2025 13:00");
     expect(firstEntry.text).toContain("Letterboxd");
 
     const secondEntry = result.entries[1];
@@ -49,5 +50,6 @@ describe("nimas scraper", () => {
     const fourthEntry = result.entries[3];
     expect(fourthEntry.title).toBe("A Cidade dos Malditos, John Carpenter");
     expect(fourthEntry.datetime).toEqual(new Date("2025-12-30 21:30"));
+    expect(fourthEntry.text).toContain("terça-feira, 30.12.2025 21:30");
   });
 });

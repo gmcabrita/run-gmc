@@ -2,6 +2,15 @@ import { USERAGENT, isValidRSSEntry, consume, type ScraperContext } from "@rss/c
 import type { RSSData, RSSEntry } from "@rss/types";
 
 const BASE_URL = "https://www.cinemateca.pt/Programacao.aspx";
+const PT_WEEKDAYS = [
+  "domingo",
+  "segunda-feira",
+  "terça-feira",
+  "quarta-feira",
+  "quinta-feira",
+  "sexta-feira",
+  "sábado",
+];
 
 interface CinematecaEntry extends RSSEntry {
   infoBiblio: string[];
@@ -13,6 +22,10 @@ function normalizeWS(input: string): string {
     .replace(/\u00A0/g, " ")
     .replace(/\s+/g, " ")
     .trim();
+}
+
+function getPTWeekday(date: Date): string {
+  return PT_WEEKDAYS[date.getDay()] ?? "";
 }
 
 function parseDateTimeStrCinemateca(dateTimeStr: string): Date {
@@ -107,11 +120,12 @@ export async function parse(response: Response): Promise<RSSData> {
     const room = normalizeWS(infoDate.split("|")[1] ?? "");
     const dateTimeStr = normalizeWS(infoDate.split("|")[0] ?? "");
     const dateTime = parseDateTimeStrCinemateca(dateTimeStr);
+    const weekday = getPTWeekday(dateTime);
 
     const title = normalizeWS(entry.title);
     const fullTitle = director ? `${title}, ${director}` : title;
     const letterboxd = `https://letterboxd.com/search/films/${encodeURIComponent(title)}/?adult`;
-    const text = `${dateTimeStr}<br>${extra}<br>${extra2}<br>${room}<br><a href="${letterboxd}">Letterboxd Search</a>`;
+    const text = `${weekday}, ${dateTimeStr}<br>${extra}<br>${extra2}<br>${room}<br><a href="${letterboxd}">Letterboxd Search</a>`;
 
     return {
       id: entry.id,
