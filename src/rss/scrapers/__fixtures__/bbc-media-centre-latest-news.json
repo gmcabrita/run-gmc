@@ -1,0 +1,44 @@
+{
+  "hits": {
+    "hits": [
+      {
+        "_id": "ipages-media-centre:page-standard-asian-network-represents-announces-new-presenters-230326142951",
+        "_source": {
+          "name": "Asian Network Represents announces new presenters ",
+          "description": "BBC Asian Network welcomes 12 brand new presenter to host Asian Network Represents from April 2026 to March 2027",
+          "url": "/mediacentre/2026/asian-network-represents-new-presenters",
+          "fullUrl": "https://www.bbc.co.uk/mediacentre/2026/asian-network-represents-new-presenters",
+          "imageUrl": "ichef.bbci.co.uk/images/ic/$recipe/p0n8b7sf.jpg",
+          "originalDate": "2026-03-24T11:00:00"
+        }
+      },
+      {
+        "_id": "fallback-description",
+        "_source": {
+          "name": "  Fallback title  ",
+          "description": "",
+          "url": "/mediacentre/2026/fallback-title",
+          "imageUrl": "/images/fallback.jpg",
+          "modifiedDate": "2026-03-23T16:16:46.744Z"
+        }
+      },
+      {
+        "_id": "future-entry",
+        "_source": {
+          "name": "Future entry",
+          "description": "Should be filtered",
+          "url": "/mediacentre/2099/future-entry",
+          "originalDate": "2099-01-01T00:00:00"
+        }
+      },
+      {
+        "_id": "missing-link",
+        "_source": {
+          "name": "Missing link entry",
+          "description": "Should be filtered",
+          "originalDate": "2026-03-22T09:00:00"
+        }
+      }
+    ]
+  }
+}

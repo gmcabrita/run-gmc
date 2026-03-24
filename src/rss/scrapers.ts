@@ -43,6 +43,7 @@ import * as reutersMediaTelecom from "./scrapers/reutersMediaTelecom";
 import * as scyllaDbMasterclasses from "./scrapers/scyllaDbMasterclasses";
 import * as theDrumLatest from "./scrapers/theDrumLatest";
 import * as boletimTlim from "./scrapers/boletimTlim";
+import * as bbcMediaCentreLatestNews from "./scrapers/bbcMediaCentreLatestNews";
 import * as uciPromocoes from "./scrapers/uciPromocoes";
 import * as waltDisneyPressReleases from "./scrapers/waltDisneyPressReleases";
 import * as walzrBlog from "./scrapers/walzrBlog";
@@ -55,6 +56,7 @@ const scrapers: Record<string, ScraperModule> = {
   adsOfTheWorldBlog,
   agendaLxPdf,
   anteEstreias,
+  bbcMediaCentreLatestNews,
   ccbEventos,
   cinecartaz,
   cinemateca,
