@@ -1,6 +1,7 @@
 import { Hono } from "hono";
 import { basicAuth } from "hono/basic-auth";
 import { Feed } from "feed";
+import { stripInvalidXmlChars } from "@rss/common";
 import type {
   XUserByScreenNameResponse,
   XUserTweetsResponse,
@@ -214,14 +215,14 @@ export function addXEndpoints(app: Hono<{ Bindings: CloudflareBindings }>) {
           const remainingTtl = Math.max(0, Math.floor((metadata.expiresAt - Date.now()) / 1000));
           ctx.header("Content-Type", "application/rss+xml");
           ctx.header("Cache-Control", `max-age=${remainingTtl + 1}`);
-          return ctx.text(cachedRss);
+          return ctx.text(stripInvalidXmlChars(cachedRss));
         }
 
         const maxAge = Math.floor(Math.random() * (2400 - 1200 + 1)) + 1200;
         const userId = await fetchUserId(ctx.env, userName);
         const data = await fetchPosts(ctx.env, userId);
         const feed = await x2Rss(ctx.env, userName, data);
-        const rss2 = feed.rss2();
+        const rss2 = stripInvalidXmlChars(feed.rss2());
 
         await ctx.env.RUN_GMC_X_CACHE_KV.put(cacheKey, rss2, {
           expirationTtl: maxAge,

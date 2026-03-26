@@ -2,7 +2,7 @@ import type { Context } from "hono";
 import { Hono } from "hono";
 import { Feed } from "feed";
 import type { RSSData } from "@rss/types";
-import type { ScraperContext } from "@rss/common";
+import { stripInvalidXmlChars, type ScraperContext } from "@rss/common";
 
 import * as adsOfTheWorldBlog from "./scrapers/adsOfTheWorldBlog";
 import * as agendaLx from "./scrapers/agendaLx";
@@ -126,9 +126,11 @@ function createRssHandler(getFn: (ctx: ScraperContext) => Promise<RSSData>) {
       });
     });
 
+    const rss2 = stripInvalidXmlChars(feed.rss2());
+
     ctx.header("Content-Type", "application/rss+xml");
     ctx.header("Cache-Control", "public, max-age=600");
-    return ctx.text(feed.rss2());
+    return ctx.text(rss2);
   };
 }
 
@@ -145,7 +147,9 @@ export function addScrapedRssEndpoints(app: Hono<{ Bindings: CloudflareBindings 
 
   // AgendaLx (served from KV cache)
   app.get("/rss.agendaLx", async (ctx) => {
-    const rss2 = (await ctx.env.RUN_GMC_GENERIC_CACHE_KV.get("agenda-lx-eventos")) || "";
+    const rss2 = stripInvalidXmlChars(
+      (await ctx.env.RUN_GMC_GENERIC_CACHE_KV.get("agenda-lx-eventos")) || "",
+    );
 
     if (rss2) {
       ctx.header("Content-Type", "application/rss+xml");

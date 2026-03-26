@@ -1,5 +1,6 @@
 import { Feed } from "feed";
 import type { AgendaLxEvent } from "@types";
+import { stripInvalidXmlChars } from "@rss/common";
 
 export async function cacheAgendaLx(env: CloudflareBindings) {
   const feed = new Feed({
@@ -116,7 +117,7 @@ export async function cacheAgendaLx(env: CloudflareBindings) {
     }
   }
 
-  const rss2 = feed.rss2();
+  const rss2 = stripInvalidXmlChars(feed.rss2());
   await env.RUN_GMC_GENERIC_CACHE_KV.put("agenda-lx-eventos", rss2);
 
   return rss2;

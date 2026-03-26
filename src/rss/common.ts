@@ -10,6 +10,10 @@ export function isValidRSSEntry(entry: RSSEntry) {
   return Boolean(entry.id) && Boolean(entry.link) && Boolean(entry.title);
 }
 
+export function stripInvalidXmlChars(value: string) {
+  return value.replace(/[^\u0009\u000A\u000D\u0020-\uD7FF\uE000-\uFFFD\u{10000}-\u{10FFFF}]/gu, "");
+}
+
 export async function consume(stream: ReadableStream) {
   const reader = stream.getReader();
   while (!(await reader.read()).done) {}
