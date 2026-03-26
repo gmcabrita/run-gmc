@@ -13,16 +13,16 @@ export async function cacheAgendaLx(env: CloudflareBindings) {
   });
 
   const categories = [
-    "artes",
-    "musica",
-    "teatro",
     "cinema",
+    "teatro",
+    "musica",
+    "artes",
     "feiras",
-    "danca",
     "literatura",
     "visitas-guiadas",
     "ciencias",
     "stand-up-comedy",
+    "danca",
   ];
 
   const responses = await Promise.all(
@@ -70,51 +70,48 @@ export async function cacheAgendaLx(env: CloudflareBindings) {
           : "";
 
         const startDate = event.StartDate;
-        const lastDate = event.LastDate;
 
-        if (lastDate && new Date(lastDate) < now) {
-          const dates = event.string_dates || "";
-          const times = event.string_times || "";
+        const dates = event.string_dates || "";
+        const times = event.string_times || "";
 
-          const image = event.featured_media_large || "";
+        const image = event.featured_media_large || "";
 
-          let content = `
-              <p><strong>Datas:</strong> ${dates}</p>
-              <p><strong>Horários:</strong> ${times}</p>
-            `;
+        let content = `
+            <p><strong>Datas:</strong> ${dates}</p>
+            <p><strong>Horários:</strong> ${times}</p>
+          `;
 
-          if (venue) {
-            content += `<p><strong>Local:</strong> ${venue}</p>`;
-          }
-
-          if (categories) {
-            content += `<p><strong>Categorias:</strong> ${categories}</p>`;
-          }
-
-          if (tags) {
-            content += `<p><strong>Tags:</strong> ${tags}</p>`;
-          }
-
-          if (image) {
-            content += `<p><img src="${image}" alt="${title}" /></p>`;
-          }
-
-          if (description) {
-            content += `<div>${description}</div>`;
-          }
-
-          const link = event.link;
-          const pubDate = new Date(startDate || now);
-          const guid = `agendalx-event-${event.id}`;
-
-          feed.addItem({
-            title: fullTitle,
-            id: guid,
-            link,
-            content,
-            date: pubDate,
-          });
+        if (venue) {
+          content += `<p><strong>Local:</strong> ${venue}</p>`;
         }
+
+        if (categories) {
+          content += `<p><strong>Categorias:</strong> ${categories}</p>`;
+        }
+
+        if (tags) {
+          content += `<p><strong>Tags:</strong> ${tags}</p>`;
+        }
+
+        if (image) {
+          content += `<p><img src="${image}" alt="${title}" /></p>`;
+        }
+
+        if (description) {
+          content += `<div>${description}</div>`;
+        }
+
+        const link = event.link;
+        const pubDate = new Date(startDate || now);
+        const guid = `agendalx-event-${event.id}`;
+
+        feed.addItem({
+          title: fullTitle,
+          id: guid,
+          link,
+          content,
+          date: pubDate,
+        });
       }
     }
   }

@@ -11,6 +11,7 @@ export interface AgendaLxEvent {
   categories_name_list?: Record<string, { name: string }>;
   tags_name_list?: Record<string, { name: string }>;
   StartDate?: string;
+  LastDate?: string;
   string_dates?: string;
   string_times?: string;
   featured_media_large?: string;
