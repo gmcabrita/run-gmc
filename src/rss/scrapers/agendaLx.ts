@@ -28,7 +28,7 @@ export async function cacheAgendaLx(env: CloudflareBindings) {
   const responses = await Promise.all(
     categories.map(async (category: string) => {
       const response = await fetch(
-        `https://www.agendalx.pt/wp-json/agendalx/v1/events?per_page=5000&categories=${category}&_fields=id,link,title,subtitle,description,venue,categories_name_list,tags_name_list,StartDate,string_dates,string_times,featured_media_large`,
+        `https://www.agendalx.pt/wp-json/agendalx/v1/events?per_page=5000&categories=${category}&_fields=id,link,title,subtitle,description,venue,categories_name_list,tags_name_list,StartDate,LastDate,string_dates,string_times,featured_media_large`,
       );
       return await response.json<AgendaLxEvent[]>();
     }),
@@ -70,47 +70,51 @@ export async function cacheAgendaLx(env: CloudflareBindings) {
           : "";
 
         const startDate = event.StartDate;
-        const dates = event.string_dates || "";
-        const times = event.string_times || "";
+        const lastDate = event.LastDate;
 
-        const image = event.featured_media_large || "";
+        if (lastDate && new Date(lastDate) < now) {
+          const dates = event.string_dates || "";
+          const times = event.string_times || "";
 
-        let content = `
-            <p><strong>Datas:</strong> ${dates}</p>
-            <p><strong>Horários:</strong> ${times}</p>
-          `;
+          const image = event.featured_media_large || "";
 
-        if (venue) {
-          content += `<p><strong>Local:</strong> ${venue}</p>`;
+          let content = `
+              <p><strong>Datas:</strong> ${dates}</p>
+              <p><strong>Horários:</strong> ${times}</p>
+            `;
+
+          if (venue) {
+            content += `<p><strong>Local:</strong> ${venue}</p>`;
+          }
+
+          if (categories) {
+            content += `<p><strong>Categorias:</strong> ${categories}</p>`;
+          }
+
+          if (tags) {
+            content += `<p><strong>Tags:</strong> ${tags}</p>`;
+          }
+
+          if (image) {
+            content += `<p><img src="${image}" alt="${title}" /></p>`;
+          }
+
+          if (description) {
+            content += `<div>${description}</div>`;
+          }
+
+          const link = event.link;
+          const pubDate = new Date(startDate || now);
+          const guid = `agendalx-event-${event.id}`;
+
+          feed.addItem({
+            title: fullTitle,
+            id: guid,
+            link,
+            content,
+            date: pubDate,
+          });
         }
-
-        if (categories) {
-          content += `<p><strong>Categorias:</strong> ${categories}</p>`;
-        }
-
-        if (tags) {
-          content += `<p><strong>Tags:</strong> ${tags}</p>`;
-        }
-
-        if (image) {
-          content += `<p><img src="${image}" alt="${title}" /></p>`;
-        }
-
-        if (description) {
-          content += `<div>${description}</div>`;
-        }
-
-        const link = event.link;
-        const pubDate = new Date(startDate || now);
-        const guid = `agendalx-event-${event.id}`;
-
-        feed.addItem({
-          title: fullTitle,
-          id: guid,
-          link,
-          content,
-          date: pubDate,
-        });
       }
     }
   }
