@@ -17,6 +17,20 @@ type CCBCard = {
   datetime?: Date;
 };
 
+function ignoreEntries(entry: RSSEntry): boolean {
+  return (
+    !entry.text?.includes("| Programa Vincular -") &&
+    !entry.text?.includes("| Famílias |") &&
+    !entry.text?.includes("Exposição permanente |") &&
+    !entry.text?.includes("Atividades para famílias |") &&
+    !entry.text?.includes("| Encontros para Pessoas com Demência e Famílias |") &&
+    !entry.text?.includes("| Cursos &amp; Formação |") &&
+    !entry.text?.includes("atividades-para-familias") &&
+    !entry.text?.includes("| Artes nas Férias do Verão |") &&
+    !entry.text?.includes("| Famílias")
+  );
+}
+
 function normalizeText(value: string): string {
   return value.replace(/\s+/g, " ").trim();
 }
@@ -188,7 +202,7 @@ export async function parse(response: Response): Promise<RSSData> {
     title: "Eventos | CCB",
     description: "Agenda de eventos do CCB",
     language: "pt",
-    entries: cards.map(buildEntry).filter(isValidRSSEntry),
+    entries: cards.map(buildEntry).filter(ignoreEntries).filter(isValidRSSEntry),
   };
 }
 
