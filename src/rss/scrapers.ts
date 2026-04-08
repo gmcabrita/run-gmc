@@ -4,6 +4,7 @@ import { Feed } from "feed";
 import type { RSSData } from "@rss/types";
 import { stripInvalidXmlChars, type ScraperContext } from "@rss/common";
 
+import * as adAgeNews from "./scrapers/adAgeNews";
 import * as adsOfTheWorldBlog from "./scrapers/adsOfTheWorldBlog";
 import * as agendaLx from "./scrapers/agendaLx";
 import * as agendaLxPdf from "./scrapers/agendaLxPdf";
@@ -54,6 +55,7 @@ type ScraperModule = {
 };
 
 const scrapers: Record<string, ScraperModule> = {
+  adAgeNews,
   adsOfTheWorldBlog,
   agendaLxPdf,
   anteEstreias,
