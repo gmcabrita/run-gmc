@@ -40,6 +40,7 @@ import * as marktestPodScope from "./scrapers/marktestPodScope";
 import * as mfeMediaForEuropeDocuments from "./scrapers/mfeMediaForEuropeDocuments";
 import * as museuDoOrienteCinema from "./scrapers/museuDoOrienteCinema";
 import * as nimas from "./scrapers/nimas";
+import * as observadorMedia from "./scrapers/observadorMedia";
 import * as primeFreeGames from "./scrapers/primeFreeGames";
 import * as reutersMediaTelecom from "./scrapers/reutersMediaTelecom";
 import * as scyllaDbMasterclasses from "./scrapers/scyllaDbMasterclasses";
@@ -88,6 +89,7 @@ const scrapers: Record<string, ScraperModule> = {
   mfeMediaForEuropeDocuments,
   museuDoOrienteCinema,
   nimas,
+  observadorMedia,
   primeFreeGames,
   reutersMediaTelecom,
   scyllaDbMasterclasses,
