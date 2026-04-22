@@ -7,6 +7,11 @@ import { sendCinecartazEntriesByEmail } from "@rss/scrapers/cinecartaz";
 import { addXEndpoints } from "@x";
 import { addScrapedRssEndpoints, cacheAgendaLx } from "@rss/scrapers";
 import type { FertagusResponse } from "@types";
+import {
+  getRssHealthcheckPaths,
+  rssFeedHasAtLeastOneEntry,
+  summarizeRssHealthcheck,
+} from "@rss/healthcheck";
 
 const app = new Hono<{ Bindings: CloudflareBindings }>();
 addCoverflexEndpoints(app);
@@ -152,6 +157,47 @@ app.get(
   },
   (ctx) => {
     throw new Error(`😵‍💫 im an error on ${ctx.env.ENVIRONMENT}`);
+  },
+);
+
+app.get(
+  "/healthcheck",
+  async (ctx, next) => {
+    const auth = basicAuth({
+      username: ctx.env.PRIVATE_BASIC_AUTH_USERNAME,
+      password: ctx.env.PRIVATE_BASIC_AUTH_PASSWORD,
+    });
+    return auth(ctx, next);
+  },
+  async (ctx) => {
+    const origin = new URL(ctx.req.url).origin;
+    const rssPaths = getRssHealthcheckPaths(app.routes);
+    const results = await Promise.all(
+      rssPaths.map(async (path) => {
+        const url = new URL(path, origin).toString();
+
+        try {
+          const response = await app.fetch(new Request(url), ctx.env, ctx.executionCtx);
+          const body = await response.text();
+
+          return {
+            url,
+            statusCode: response.status,
+            passed: response.ok && rssFeedHasAtLeastOneEntry(body),
+          };
+        } catch {
+          return {
+            url,
+            statusCode: 500,
+            passed: false,
+          };
+        }
+      }),
+    );
+
+    const summary = summarizeRssHealthcheck(results);
+    ctx.status(summary.summary.failed === 0 ? 200 : 503);
+    return ctx.json(summary);
   },
 );
 
