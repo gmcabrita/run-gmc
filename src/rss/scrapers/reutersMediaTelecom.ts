@@ -4,10 +4,11 @@ import type { RSSData, RSSEntry } from "@rss/types";
 const SITE_URL = "https://www.reuters.com";
 const SECTION_PATH = "/business/media-telecom/";
 const BASE_URL = new URL(SECTION_PATH, SITE_URL).href;
-const API_URL = "https://www.reuters.com/pf/api/v3/content/fetch/articles-by-section-alias-or-id-v1";
+const API_URL =
+  "https://www.reuters.com/pf/api/v3/content/fetch/articles-by-section-alias-or-id-v1";
 const ACCEPT_LANGUAGE = "en-US,en;q=0.9,pt-PT;q=0.8,pt;q=0.7";
 const REQUEST_USER_AGENT =
-  "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36";
+  "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36";
 const API_QUERY = {
   "arc-site": "reuters",
   fetch_type: "collection",
@@ -41,7 +42,12 @@ function readString(value: unknown): string | undefined {
 }
 
 function normalizeText(value: string | undefined): string | undefined {
-  return value?.replace(/\u00a0/g, " ").replace(/\s+/g, " ").trim() || undefined;
+  return (
+    value
+      ?.replace(/\u00a0/g, " ")
+      .replace(/\s+/g, " ")
+      .trim() || undefined
+  );
 }
 
 function parseReutersArticle(value: unknown): ReutersArticle | undefined {
@@ -88,7 +94,7 @@ function readReutersResponse(value: unknown): ReutersSectionResponse {
 function buildApiUrl() {
   const url = new URL(API_URL);
   url.searchParams.set("query", JSON.stringify(API_QUERY));
-  url.searchParams.set("d", "353");
+  url.searchParams.set("d", "359");
   url.searchParams.set("mxId", "00000000");
   url.searchParams.set("_website", "reuters");
   return url.toString();
@@ -125,6 +131,7 @@ export function parse(json: unknown): RSSData {
 export async function get(_ctx: ScraperContext): Promise<RSSData> {
   const response = await fetch(buildApiUrl(), {
     headers: {
+      referrer: "https://www.reuters.com/business/media-telecom/",
       accept: "application/json, text/plain, */*",
       "accept-language": ACCEPT_LANGUAGE,
       "user-agent": REQUEST_USER_AGENT,
