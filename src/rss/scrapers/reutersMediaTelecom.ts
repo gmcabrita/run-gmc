@@ -94,7 +94,7 @@ function readReutersResponse(value: unknown): ReutersSectionResponse {
 function buildApiUrl() {
   const url = new URL(API_URL);
   url.searchParams.set("query", JSON.stringify(API_QUERY));
-  url.searchParams.set("d", "359");
+  // url.searchParams.set("d", "359");
   url.searchParams.set("mxId", "00000000");
   url.searchParams.set("_website", "reuters");
   return url.toString();
