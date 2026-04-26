@@ -33,10 +33,12 @@ export async function parse(json: InformacaoLisboaAgendaItem[]): Promise<RSSData
 }
 
 export async function get(_ctx: ScraperContext): Promise<RSSData> {
-  const response = await fetch(API_URL, {
+  const response = await fetch("https://dry-lobster-81.gmcabrita.deno.net/proxy", {
     headers: {
       "user-agent": USERAGENT,
       accept: "application/json",
+      authorization: `Bearer ${_ctx.env.DENO_PROXY_AUTH_TOKEN}`,
+      "x-target-url": API_URL,
     },
   });
 

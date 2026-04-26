@@ -65,25 +65,15 @@ export async function parse(json: InformacaoLisboaNoticiasResponse): Promise<RSS
 }
 
 export async function get(_ctx: ScraperContext): Promise<RSSData> {
-  try {
-    const response = await fetch(API_URL, {
-      headers: {
-        "user-agent": USERAGENT,
-        accept: "application/json",
-      },
-    });
+  const response = await fetch("https://dry-lobster-81.gmcabrita.deno.net/proxy", {
+    headers: {
+      "user-agent": USERAGENT,
+      accept: "application/json",
+      authorization: `Bearer ${_ctx.env.DENO_PROXY_AUTH_TOKEN}`,
+      "x-target-url": API_URL,
+    },
+  });
 
-    const json = (await response.json()) as InformacaoLisboaNoticiasResponse;
-    return parse(json);
-  } catch (error) {
-    const response = await fetch(API_URL, {
-      headers: {
-        "user-agent": USERAGENT,
-        accept: "application/json",
-      },
-    });
-
-    console.error({ response: await response.text() });
-    throw error;
-  }
+  const json = (await response.json()) as InformacaoLisboaNoticiasResponse;
+  return parse(json);
 }
