@@ -65,13 +65,25 @@ export async function parse(json: InformacaoLisboaNoticiasResponse): Promise<RSS
 }
 
 export async function get(_ctx: ScraperContext): Promise<RSSData> {
-  const response = await fetch(API_URL, {
-    headers: {
-      "user-agent": USERAGENT,
-      accept: "application/json",
-    },
-  });
+  try {
+    const response = await fetch(API_URL, {
+      headers: {
+        "user-agent": USERAGENT,
+        accept: "application/json",
+      },
+    });
 
-  const json = (await response.json()) as InformacaoLisboaNoticiasResponse;
-  return parse(json);
+    const json = (await response.json()) as InformacaoLisboaNoticiasResponse;
+    return parse(json);
+  } catch (error) {
+    const response = await fetch(API_URL, {
+      headers: {
+        "user-agent": USERAGENT,
+        accept: "application/json",
+      },
+    });
+
+    console.error({ response: await response.text() });
+    throw error;
+  }
 }
