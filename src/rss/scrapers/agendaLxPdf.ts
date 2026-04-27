@@ -1,28 +1,25 @@
-import { USERAGENT, isValidRSSEntry, consume, type ScraperContext } from "@rss/common";
+import { USERAGENT, isValidRSSEntry, type ScraperContext } from "@rss/common";
 import type { RSSData, RSSEntry } from "@rss/types";
 
 const BASE_URL = "https://www.agendalx.pt";
+const PDF_URL_PATTERN = /https:\/\/[^\s"'<>]+\.pdf/g;
 
 export async function parse(response: Response): Promise<RSSData> {
   const now = new Date();
   const entries: RSSEntry[] = [];
+  const html = await response.text();
 
-  const rewriter = new HTMLRewriter().on("a[href*='.pdf']", {
-    element(el) {
-      const href = el.getAttribute("href");
-      if (href && href.includes(".pdf")) {
-        entries.push({
-          id: href,
-          link: href,
-          title: href,
-          text: href,
-          datetime: now,
-        });
-      }
-    },
-  });
+  for (const match of html.matchAll(PDF_URL_PATTERN)) {
+    const url = match[0];
 
-  await consume(rewriter.transform(response).body!);
+    entries.push({
+      id: url,
+      link: url,
+      title: url,
+      text: url,
+      datetime: now,
+    });
+  }
 
   return {
     id: BASE_URL,
