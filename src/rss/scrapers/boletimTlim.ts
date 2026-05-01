@@ -37,7 +37,7 @@ export function isHighEntropyHtmlName(name: string): boolean {
   if (!name.endsWith(".html")) return false;
 
   const base = name.slice(0, -".html".length);
-  if (base.length < 16 || base.length > 64) return false;
+  if (base.length < 12 || base.length > 64) return false;
   if (!/^[A-Za-z0-9]+$/.test(base)) return false;
 
   const hasLower = /[a-z]/.test(base);
