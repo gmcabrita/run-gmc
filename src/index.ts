@@ -5,6 +5,7 @@ import { cors } from "hono/cors";
 import { addCoverflexEndpoints, sendAppleCatalogueByEmail } from "@coverflex";
 import { sendCinecartazEntriesByEmail } from "@rss/scrapers/cinecartaz";
 import { addXEndpoints } from "@x";
+import { addIcs2GcalEndpoint } from "./ics2gcal";
 import { addScrapedRssEndpoints, cacheAgendaLx } from "@rss/scrapers";
 import type { FertagusResponse } from "@types";
 import {
@@ -16,6 +17,7 @@ import {
 const app = new Hono<{ Bindings: CloudflareBindings }>();
 addCoverflexEndpoints(app);
 addXEndpoints(app);
+addIcs2GcalEndpoint(app);
 addScrapedRssEndpoints(app);
 
 app.get("/rss.sendCinecartazEntriesByEmail", async (ctx) => {
