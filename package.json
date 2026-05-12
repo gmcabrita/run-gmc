@@ -13,21 +13,21 @@
     "typecheck": "tsgo --noEmit"
   },
   "dependencies": {
-    "@sentry/cloudflare": "^10.50.0",
+    "@sentry/cloudflare": "^10.52.0",
     "@typescript/native-preview": "7.0.0-dev.20260102.1",
     "feed": "^5.2.1",
-    "hono": "^4.12.15",
+    "hono": "^4.12.18",
     "worker-mailer": "^1.2.1",
     "xml2js": "^0.6.2"
   },
   "devDependencies": {
     "@cloudflare/vitest-pool-workers": "^0.11.1",
     "@sentry/cli": "^2.58.5",
-    "@types/node": "^25.6.0",
+    "@types/node": "^25.6.2",
     "@types/xml2js": "^0.4.14",
     "localflare": "^0.3.1",
-    "vite": "^7.3.2",
+    "vite": "^7.3.3",
     "vitest": "^3.2.4",
-    "wrangler": "^4.85.0"
+    "wrangler": "^4.90.0"
   }
 }
