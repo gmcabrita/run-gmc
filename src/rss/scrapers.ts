@@ -47,7 +47,6 @@ import * as reutersMediaTelecom from "./scrapers/reutersMediaTelecom";
 import * as rtpInformacaoAnual from "./scrapers/rtpInformacaoAnual";
 import * as rtpPlanoAtividadeOrcamento from "./scrapers/rtpPlanoAtividadeOrcamento";
 import * as rtpRelatorioServicoPublico from "./scrapers/rtpRelatorioServicoPublico";
-import * as scyllaDbMasterclasses from "./scrapers/scyllaDbMasterclasses";
 import * as theDrumLatest from "./scrapers/theDrumLatest";
 import * as boletimTlim from "./scrapers/boletimTlim";
 import * as bbcMediaCentreLatestNews from "./scrapers/bbcMediaCentreLatestNews";
@@ -99,7 +98,6 @@ const scrapers: Record<string, ScraperModule> = {
   rtpInformacaoAnual,
   rtpPlanoAtividadeOrcamento,
   rtpRelatorioServicoPublico,
-  scyllaDbMasterclasses,
   theDrumLatest,
   boletimTlim,
   uciPromocoes,

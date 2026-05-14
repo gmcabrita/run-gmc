@@ -173,15 +173,6 @@ export interface EpicDesktopFreeGamesResponse {
 }
 
 // =====================================================
-// ScyllaDB Types
-// =====================================================
-
-export interface ScyllaDbEventsResponse {
-  past: string;
-  upcoming: string;
-}
-
-// =====================================================
 // Imagens de Marca Types
 // =====================================================
 
