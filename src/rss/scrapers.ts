@@ -9,6 +9,7 @@ import * as adsOfTheWorldBlog from "./scrapers/adsOfTheWorldBlog";
 import * as agendaLx from "./scrapers/agendaLx";
 import * as agendaLxPdf from "./scrapers/agendaLxPdf";
 import * as autoRegulacaoPublicitariaDeliberacoes from "./scrapers/autoRegulacaoPublicitariaDeliberacoes";
+import * as azerpasBlog from "./scrapers/azerpasBlog";
 
 export { cacheAgendaLx } from "./scrapers/agendaLx";
 import * as anteEstreias from "./scrapers/anteEstreias";
@@ -64,6 +65,7 @@ const scrapers: Record<string, ScraperModule> = {
   agendaLxPdf,
   autoRegulacaoPublicitariaDeliberacoes,
   anteEstreias,
+  azerpasBlog,
   bbcMediaCentreLatestNews,
   ccbEventos,
   cinecartaz,
