@@ -50,6 +50,7 @@ import * as rtpRelatorioServicoPublico from "./scrapers/rtpRelatorioServicoPubli
 import * as theDrumLatest from "./scrapers/theDrumLatest";
 import * as boletimTlim from "./scrapers/boletimTlim";
 import * as bbcMediaCentreLatestNews from "./scrapers/bbcMediaCentreLatestNews";
+import * as brokenBrowserBlog from "./scrapers/brokenBrowserBlog";
 import * as uciPromocoes from "./scrapers/uciPromocoes";
 import * as waltDisneyPressReleases from "./scrapers/waltDisneyPressReleases";
 
@@ -100,6 +101,7 @@ const scrapers: Record<string, ScraperModule> = {
   rtpRelatorioServicoPublico,
   theDrumLatest,
   boletimTlim,
+  brokenBrowserBlog,
   uciPromocoes,
   waltDisneyPressReleases,
 };
