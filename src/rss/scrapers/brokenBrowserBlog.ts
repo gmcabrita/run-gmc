@@ -1,88 +1,69 @@
 import { USERAGENT, consume, isValidRSSEntry, type ScraperContext } from "@rss/common";
 import type { RSSData, RSSEntry } from "@rss/types";
 
-const BASE_URL = "https://brokenbrowser.com/blog/";
-const SITE_ORIGIN = "https://brokenbrowser.com";
+const BASE_URL = "https://brokenbrowser.com/";
 
-const ACRONYMS = new Set([
-  "api",
-  "boa",
-  "cdp",
-  "csp",
-  "cpu",
-  "dos",
-  "dtd",
-  "html",
-  "http",
-  "ie",
-  "lmz",
-  "mht",
-  "mhtml",
-  "msrc",
-  "pdf",
-  "pidl",
-  "rce",
-  "sop",
-  "swf",
-  "ua",
-  "url",
-  "uxss",
-  "wasm",
-  "wmp",
-  "xhr",
-  "xml",
-  "xss",
-]);
-
-function parseSlug(pathname: string): { date: Date | undefined; title: string } | undefined {
-  const slug = pathname.match(/^\/blog\/(\d{4}-\d{2}-\d{2})-(.+)\/$/);
-  if (!slug) {
-    return undefined;
-  }
-
-  const date = new Date(`${slug[1]}T00:00:00.000Z`);
-  const title = slug[2]
-    .split("-")
-    .map((word) => {
-      if (ACRONYMS.has(word)) {
-        return word.toUpperCase();
-      }
-
-      return `${word.slice(0, 1).toUpperCase()}${word.slice(1)}`;
-    })
-    .join(" ");
-
-  return {
-    date: Number.isNaN(date.getTime()) ? undefined : date,
-    title,
-  };
+function normalizeWhitespace(text: string): string {
+  return text.replace(/\s+/g, " ").trim();
 }
 
 export async function parse(response: Response): Promise<RSSData> {
   const entries: RSSEntry[] = [];
+  let currentEntry: RSSEntry | null = null;
 
-  const rewriter = new HTMLRewriter().on("#table-content a[href^='/blog/']", {
-    element(el) {
-      const href = el.getAttribute("href");
-      if (!href) {
-        return;
-      }
+  const rewriter = new HTMLRewriter()
+    .on("article.post.on-list", {
+      element() {
+        currentEntry = {
+          id: "",
+          link: "",
+          title: "",
+          text: "",
+        };
+        entries.push(currentEntry);
+      },
+    })
+    .on(".post-title a[href^='/blog/']", {
+      element(el) {
+        if (!currentEntry) {
+          return;
+        }
 
-      const link = new URL(href, SITE_ORIGIN).toString();
-      const parsed = parseSlug(new URL(link).pathname);
-      if (!parsed) {
-        return;
-      }
+        const href = el.getAttribute("href");
+        if (!href) {
+          return;
+        }
 
-      entries.push({
-        id: link,
-        link,
-        title: parsed.title,
-        text: parsed.title,
-        datetime: parsed.date,
-      });
-    },
-  });
+        const link = new URL(href, BASE_URL).toString();
+        currentEntry.id = link;
+        currentEntry.link = link;
+      },
+      text(text) {
+        if (!currentEntry) {
+          return;
+        }
+
+        currentEntry.title += text.text;
+        currentEntry.text += text.text;
+      },
+    })
+    .on(".post-date time[datetime]", {
+      element(el) {
+        if (!currentEntry) {
+          return;
+        }
+
+        const datetime = el.getAttribute("datetime");
+        if (!datetime) {
+          return;
+        }
+
+        const date = new Date(datetime);
+        if (!Number.isNaN(date.getTime())) {
+          currentEntry.datetime = date;
+        }
+      },
+    });
 
   const body = rewriter.transform(response).body;
   if (!body) {
@@ -96,11 +77,21 @@ export async function parse(response: Response): Promise<RSSData> {
     title: "Broken Browser Blog",
     description: "Broken Browser blog posts",
     language: "en",
-    entries: entries.filter(isValidRSSEntry).sort((a, b) => {
-      const aTime = a.datetime?.getTime() ?? 0;
-      const bTime = b.datetime?.getTime() ?? 0;
-      return bTime - aTime;
-    }),
+    entries: entries
+      .map((entry) => {
+        const title = normalizeWhitespace(entry.title);
+        return {
+          ...entry,
+          title,
+          text: title,
+        };
+      })
+      .filter(isValidRSSEntry)
+      .sort((a, b) => {
+        const aTime = a.datetime?.getTime() ?? 0;
+        const bTime = b.datetime?.getTime() ?? 0;
+        return bTime - aTime;
+      }),
   };
 }
 

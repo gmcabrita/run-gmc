@@ -12,8 +12,8 @@ describe("brokenBrowserBlog scraper", () => {
   it("parses directory entries", async () => {
     const result = await parse(createResponse());
 
-    expect(result.id).toBe("https://brokenbrowser.com/blog/");
-    expect(result.link).toBe("https://brokenbrowser.com/blog/");
+    expect(result.id).toBe("https://brokenbrowser.com/");
+    expect(result.link).toBe("https://brokenbrowser.com/");
     expect(result.title).toBe("Broken Browser Blog");
     expect(result.description).toBe("Broken Browser blog posts");
     expect(result.language).toBe("en");
@@ -26,8 +26,8 @@ describe("brokenBrowserBlog scraper", () => {
     expect(result.entries[0]).toEqual({
       id: "https://brokenbrowser.com/blog/2026-05-09-prerender-stealth-csp-bypass/",
       link: "https://brokenbrowser.com/blog/2026-05-09-prerender-stealth-csp-bypass/",
-      title: "Prerender Stealth CSP Bypass",
-      text: "Prerender Stealth CSP Bypass",
+      title: "Stealth Request That Bypasses CSP, Hides from DevTools, and Leaks the Real User-Agent",
+      text: "Stealth Request That Bypasses CSP, Hides from DevTools, and Leaks the Real User-Agent",
       datetime: new Date("2026-05-09T00:00:00.000Z"),
     });
 
@@ -42,16 +42,16 @@ describe("brokenBrowserBlog scraper", () => {
     expect(result.entries[2]).toEqual({
       id: "https://brokenbrowser.com/blog/2024-06-10-wasm-shared-memory-timer/",
       link: "https://brokenbrowser.com/blog/2024-06-10-wasm-shared-memory-timer/",
-      title: "WASM Shared Memory Timer",
-      text: "WASM Shared Memory Timer",
+      title: "Building a High-Resolution Timer from WebAssembly.Memory",
+      text: "Building a High-Resolution Timer from WebAssembly.Memory",
       datetime: new Date("2024-06-10T00:00:00.000Z"),
     });
 
     expect(result.entries[3]).toEqual({
       id: "https://brokenbrowser.com/blog/2006-02-17-uxss-object-createpopup-iframe/",
       link: "https://brokenbrowser.com/blog/2006-02-17-uxss-object-createpopup-iframe/",
-      title: "UXSS Object Createpopup Iframe",
-      text: "UXSS Object Createpopup Iframe",
+      title: "UXSS via object.createPopup and an iFrame",
+      text: "UXSS via object.createPopup and an iFrame",
       datetime: new Date("2006-02-17T00:00:00.000Z"),
     });
   });
