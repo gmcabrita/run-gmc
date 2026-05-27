@@ -393,6 +393,44 @@ export interface AnteEstreiasRssParsed {
 }
 
 // =====================================================
+// SAPO RSS Types (xml2js parsed)
+// =====================================================
+
+export interface SapoRssEnclosure {
+  $: {
+    url: string;
+    type?: string;
+  };
+}
+
+export interface SapoRssMediaContent {
+  $: {
+    url: string;
+  };
+}
+
+export interface SapoRssItem {
+  title: string[];
+  link: string[];
+  description?: string[];
+  guid: string[];
+  pubDate?: string[];
+  enclosure?: SapoRssEnclosure[];
+  "media:content"?: SapoRssMediaContent[];
+}
+
+export interface SapoRssParsed {
+  rss: {
+    channel: Array<{
+      title?: string[];
+      link?: string[];
+      description?: string[];
+      item: SapoRssItem[];
+    }>;
+  };
+}
+
+// =====================================================
 // Discord Quests Types
 // =====================================================
 

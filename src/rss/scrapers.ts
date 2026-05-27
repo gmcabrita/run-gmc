@@ -45,6 +45,7 @@ import * as nimas from "./scrapers/nimas";
 import * as observadorMedia from "./scrapers/observadorMedia";
 import * as primeFreeGames from "./scrapers/primeFreeGames";
 import * as reutersMediaTelecom from "./scrapers/reutersMediaTelecom";
+import * as sapo from "./scrapers/sapo";
 import * as rtpInformacaoAnual from "./scrapers/rtpInformacaoAnual";
 import * as rtpPlanoAtividadeOrcamento from "./scrapers/rtpPlanoAtividadeOrcamento";
 import * as rtpRelatorioServicoPublico from "./scrapers/rtpRelatorioServicoPublico";
@@ -97,6 +98,7 @@ const scrapers: Record<string, ScraperModule> = {
   observadorMedia,
   primeFreeGames,
   reutersMediaTelecom,
+  sapo,
   rtpInformacaoAnual,
   rtpPlanoAtividadeOrcamento,
   rtpRelatorioServicoPublico,
