@@ -45,6 +45,7 @@ import * as museuDoOrienteCinema from "./scrapers/museuDoOrienteCinema";
 import * as nimas from "./scrapers/nimas";
 import * as observadorMedia from "./scrapers/observadorMedia";
 import * as primeFreeGames from "./scrapers/primeFreeGames";
+import * as publicoMedia from "./scrapers/publicoMedia";
 import * as reutersMediaTelecom from "./scrapers/reutersMediaTelecom";
 import * as rtpInformacaoAnual from "./scrapers/rtpInformacaoAnual";
 import * as rtpPlanoAtividadeOrcamento from "./scrapers/rtpPlanoAtividadeOrcamento";
@@ -98,6 +99,7 @@ const scrapers: Record<string, ScraperModule> = {
   nimas,
   observadorMedia,
   primeFreeGames,
+  publicoMedia,
   reutersMediaTelecom,
   rtpInformacaoAnual,
   rtpPlanoAtividadeOrcamento,
