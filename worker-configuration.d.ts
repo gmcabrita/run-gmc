@@ -16,16 +16,9 @@ interface __BaseEnv_CloudflareBindings {
 	ICLOUD_PASSWORD: string;
 	X_BEARER: string;
 	X_COOKIE: string;
-	X_CSRF_TOKEN: string;
-	X1_BEARER: string;
 	X1_COOKIE: string;
-	X1_CSRF_TOKEN: string;
-	X2_BEARER: string;
 	X2_COOKIE: string;
-	X2_CSRF_TOKEN: string;
-	X3_BEARER: string;
 	X3_COOKIE: string;
-	X3_CSRF_TOKEN: string;
 	DISCORD_AUTHORIZATION_TOKEN: string;
 	SENTRY_DSN: string;
 	DENO_PROXY_AUTH_TOKEN: string;
@@ -41,7 +34,7 @@ type StringifyValues<EnvType extends Record<string, unknown>> = {
 	[Binding in keyof EnvType]: EnvType[Binding] extends string ? EnvType[Binding] : string;
 };
 declare namespace NodeJS {
-	interface ProcessEnv extends StringifyValues<Pick<Cloudflare.Env, "ENVIRONMENT" | "COVERFLEX_EMAIL" | "COVERFLEX_PASSWORD" | "COVERFLEX_USER_AGENT_TOKEN" | "PRIVATE_BASIC_AUTH_USERNAME" | "PRIVATE_BASIC_AUTH_PASSWORD" | "ICLOUD_USER" | "ICLOUD_PASSWORD" | "X_BEARER" | "X_COOKIE" | "X_CSRF_TOKEN" | "X1_BEARER" | "X1_COOKIE" | "X1_CSRF_TOKEN" | "X2_BEARER" | "X2_COOKIE" | "X2_CSRF_TOKEN" | "X3_BEARER" | "X3_COOKIE" | "X3_CSRF_TOKEN" | "DISCORD_AUTHORIZATION_TOKEN" | "SENTRY_DSN" | "DENO_PROXY_AUTH_TOKEN">> {}
+	interface ProcessEnv extends StringifyValues<Pick<Cloudflare.Env, "ENVIRONMENT" | "COVERFLEX_EMAIL" | "COVERFLEX_PASSWORD" | "COVERFLEX_USER_AGENT_TOKEN" | "PRIVATE_BASIC_AUTH_USERNAME" | "PRIVATE_BASIC_AUTH_PASSWORD" | "ICLOUD_USER" | "ICLOUD_PASSWORD" | "X_BEARER" | "X_COOKIE" | "X1_COOKIE" | "X2_COOKIE" | "X3_COOKIE" | "DISCORD_AUTHORIZATION_TOKEN" | "SENTRY_DSN" | "DENO_PROXY_AUTH_TOKEN">> {}
 }
 
 // Begin runtime types

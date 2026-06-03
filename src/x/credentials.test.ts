@@ -1,27 +1,24 @@
 import { describe, expect, it, vi } from "vitest";
 import {
+  buildXApiHeaders,
   getDefaultCredentials,
+  getCsrfTokenFromCookie,
   getPublicAccountCredentials,
   getRandomPublicAccountIndex,
   resolveCredentials,
 } from "./credentials";
 
-function createEnv(overrides: Partial<CloudflareBindings> = {}): CloudflareBindings {
+type TestEnv = Parameters<typeof resolveCredentials>[0];
+
+function createEnv(overrides: Partial<TestEnv> = {}): TestEnv {
   return {
-    X_BEARER: "default-bearer",
-    X_COOKIE: "default-cookie",
-    X_CSRF_TOKEN: "default-csrf",
-    X1_BEARER: "x1-bearer",
-    X1_COOKIE: "x1-cookie",
-    X1_CSRF_TOKEN: "x1-csrf",
-    X2_BEARER: "x2-bearer",
-    X2_COOKIE: "x2-cookie",
-    X2_CSRF_TOKEN: "x2-csrf",
-    X3_BEARER: "x3-bearer",
-    X3_COOKIE: "x3-cookie",
-    X3_CSRF_TOKEN: "x3-csrf",
+    X_BEARER: "bearer",
+    X_COOKIE: "guest_id=default; ct0=default-csrf; auth_token=default",
+    X1_COOKIE: "guest_id=x1; ct0=x1-csrf; auth_token=x1",
+    X2_COOKIE: "guest_id=x2; ct0=x2-csrf; auth_token=x2",
+    X3_COOKIE: "guest_id=x3; ct0=x3-csrf; auth_token=x3",
     ...overrides,
-  } as CloudflareBindings;
+  };
 }
 
 describe("x credentials", () => {
@@ -29,9 +26,8 @@ describe("x credentials", () => {
     const env = createEnv();
 
     expect(resolveCredentials(env, false)).toEqual({
-      bearer: "default-bearer",
-      cookie: "default-cookie",
-      csrfToken: "default-csrf",
+      bearer: "bearer",
+      cookie: "guest_id=default; ct0=default-csrf; auth_token=default",
     });
   });
 
@@ -39,9 +35,8 @@ describe("x credentials", () => {
     const env = createEnv();
 
     expect(getPublicAccountCredentials(env, 2)).toEqual({
-      bearer: "x2-bearer",
-      cookie: "x2-cookie",
-      csrfToken: "x2-csrf",
+      bearer: "bearer",
+      cookie: "guest_id=x2; ct0=x2-csrf; auth_token=x2",
     });
   });
 
@@ -56,9 +51,8 @@ describe("x credentials", () => {
     vi.spyOn(Math, "random").mockReturnValue(0.4);
 
     expect(resolveCredentials(env, true)).toEqual({
-      bearer: "x2-bearer",
-      cookie: "x2-cookie",
-      csrfToken: "x2-csrf",
+      bearer: "bearer",
+      cookie: "guest_id=x2; ct0=x2-csrf; auth_token=x2",
     });
   });
 
@@ -66,9 +60,27 @@ describe("x credentials", () => {
     const env = createEnv();
 
     expect(getDefaultCredentials(env)).toEqual({
-      bearer: "default-bearer",
-      cookie: "default-cookie",
-      csrfToken: "default-csrf",
+      bearer: "bearer",
+      cookie: "guest_id=default; ct0=default-csrf; auth_token=default",
     });
+  });
+
+  it("reads csrf token from cookie", () => {
+    expect(getCsrfTokenFromCookie("guest_id=v; ct0=csrf-token; auth_token=v")).toBe(
+      "csrf-token",
+    );
+  });
+
+  it("sets csrf header from cookie", () => {
+    expect(
+      buildXApiHeaders({
+        bearer: "bearer",
+        cookie: "guest_id=v; ct0=csrf-token; auth_token=v",
+      })["x-csrf-token"],
+    ).toBe("csrf-token");
+  });
+
+  it("requires csrf token in cookie", () => {
+    expect(() => getCsrfTokenFromCookie("guest_id=v; auth_token=v")).toThrow("X cookie missing ct0");
   });
 });
