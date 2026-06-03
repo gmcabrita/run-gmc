@@ -262,7 +262,7 @@ export interface XUserTweetsResponse {
   data: {
     user: {
       result: {
-        timeline_v2: {
+        timeline_v2?: {
           timeline: {
             instructions: XTimelineInstruction[];
           };

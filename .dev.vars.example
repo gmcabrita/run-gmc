@@ -15,10 +15,21 @@ PRIVATE_BASIC_AUTH_PASSWORD=your-password
 ICLOUD_USER=your-email@example.com
 ICLOUD_PASSWORD=your-app-specific-password
 
-# X Bearer Token
+# X credentials (default account, used for private profiles)
 X_BEARER=
 X_COOKIE=
 X_CSRF_TOKEN=
+
+# X credentials for public profiles (random pick when public=true)
+X1_BEARER=
+X1_COOKIE=
+X1_CSRF_TOKEN=
+X2_BEARER=
+X2_COOKIE=
+X2_CSRF_TOKEN=
+X3_BEARER=
+X3_COOKIE=
+X3_CSRF_TOKEN=
 
 # Discord Tokens
 DISCORD_AUTHORIZATION_TOKEN=
