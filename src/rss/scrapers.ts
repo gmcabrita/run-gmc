@@ -44,6 +44,7 @@ import * as mfeMediaForEuropeDocuments from "./scrapers/mfeMediaForEuropeDocumen
 import * as museuDoOrienteCinema from "./scrapers/museuDoOrienteCinema";
 import * as nimas from "./scrapers/nimas";
 import * as observadorMedia from "./scrapers/observadorMedia";
+import * as peetBlog from "./scrapers/peetBlog";
 import * as primeFreeGames from "./scrapers/primeFreeGames";
 import * as publicoMedia from "./scrapers/publicoMedia";
 import * as reutersMediaTelecom from "./scrapers/reutersMediaTelecom";
@@ -98,6 +99,7 @@ const scrapers: Record<string, ScraperModule> = {
   museuDoOrienteCinema,
   nimas,
   observadorMedia,
+  peetBlog,
   primeFreeGames,
   publicoMedia,
   reutersMediaTelecom,
