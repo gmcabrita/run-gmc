@@ -1,73 +1,173 @@
-import xml2js from "xml2js";
 import { USERAGENT, isValidRSSEntry, type ScraperContext } from "@rss/common";
 import type { RSSData, RSSEntry } from "@rss/types";
-import type { AnteEstreiasRssParsed } from "@types";
 
-const BASE_URL = "https://ante-estreias.blogs.sapo.pt";
-const API_URL = "https://ante-estreias.blogs.sapo.pt/data/rss";
+const BASE_URL = "https://anteestreias.blogspot.com";
+const API_URL = `${BASE_URL}/search/label/-%20bilhetes%20cinema?m=0`;
+const EXCLUDED_HOSTS = new Set(["anteestreias.blogspot.com", "www.blogger.com", "blogger.com"]);
 
-export async function parse(xmlText: string): Promise<RSSData> {
-  const result = await xml2js.parseStringPromise(xmlText);
-  const parsedResult = result as AnteEstreiasRssParsed;
+function decodeHtmlEntities(value: string) {
+  return value.replace(/&(#x[0-9a-f]+|#\d+|amp|lt|gt|quot|apos|nbsp);/gi, (_match, entity: string) => {
+    const normalizedEntity = entity.toLowerCase();
 
-  const filteredItems = parsedResult.rss.channel[0].item.filter((item) => {
-    const categories = item.category || [];
-    return categories.length === 1 && categories[0] === "- bilhetes cinema";
+    if (normalizedEntity.startsWith("#x")) {
+      return String.fromCodePoint(Number.parseInt(normalizedEntity.slice(2), 16));
+    }
+
+    if (normalizedEntity.startsWith("#")) {
+      return String.fromCodePoint(Number.parseInt(normalizedEntity.slice(1), 10));
+    }
+
+    switch (normalizedEntity) {
+      case "amp":
+        return "&";
+      case "lt":
+        return "<";
+      case "gt":
+        return ">";
+      case "quot":
+        return '"';
+      case "apos":
+        return "'";
+      case "nbsp":
+        return " ";
+      default:
+        return _match;
+    }
   });
+}
 
-  const entries: RSSEntry[] = [];
-  const trRegex = /<tr[^>]*>([\s\S]*?)<\/tr>/gi;
-  const firstATagRegex = /<a[^>]*title=["']([^"']+)["'][^>]*>/i;
+function stripHtml(value: string) {
+  return decodeHtmlEntities(value.replace(/<[^>]*>/g, " "))
+    .replace(/\s+/g, " ")
+    .trim();
+}
 
-  for (const item of filteredItems) {
-    const description = item.description[0];
-    let trMatch;
+function readHtmlAttribute(tag: string, name: string) {
+  const regex = new RegExp(`\\s${name}=(['"])([\\s\\S]*?)\\1`, "i");
+  const match = tag.match(regex);
+  const value = match?.[2];
 
-    while ((trMatch = trRegex.exec(description)) !== null) {
-      const trContent = trMatch[1];
-      const firstATagMatch = trContent.match(firstATagRegex);
+  return value ? decodeHtmlEntities(value).trim() : undefined;
+}
 
-      let movieTitle = "";
-      if (firstATagMatch && firstATagMatch[1]) {
-        movieTitle = firstATagMatch[1].trim();
-      }
+function normalizeUrl(url: string) {
+  try {
+    return new URL(url, BASE_URL).href;
+  } catch {
+    return undefined;
+  }
+}
 
-      const urlRegex = /<a[^>]*href=["'](https?:\/\/[^"']+)["'][^>]*>/gi;
-      let urlMatch;
+function parseDatetime(value: string) {
+  const datetime = new Date(value);
+  return Number.isNaN(datetime.getTime()) ? undefined : datetime;
+}
 
-      while ((urlMatch = urlRegex.exec(trContent)) !== null) {
-        const url = urlMatch[1];
+function isExternalUrl(url: string) {
+  try {
+    const parsedUrl = new URL(url);
+    return !EXCLUDED_HOSTS.has(parsedUrl.hostname);
+  } catch {
+    return false;
+  }
+}
 
-        if (!url.includes("ante-estreias.blogs.sapo.pt")) {
-          entries.push({
-            id: url,
-            link: url,
-            title: movieTitle || url,
-            text: url,
-            datetime: new Date(item.pubDate[0]),
-          });
-        }
-      }
+function getBlogPostsHtml(htmlText: string) {
+  const blogPostsStart = htmlText.indexOf("<div class='blog-posts hfeed'>");
+  const blogPagerStart = htmlText.indexOf("<div class='blog-pager'", blogPostsStart);
+
+  if (blogPostsStart === -1 || blogPagerStart === -1) {
+    return htmlText;
+  }
+
+  return htmlText.slice(blogPostsStart, blogPagerStart);
+}
+
+function getPostBodies(blogPostsHtml: string) {
+  const posts: Array<{ body: string; datetime?: Date }> = [];
+  const postRegex = /<div class='post hentry[\s\S]*?<div class='post-body[^>]*>([\s\S]*?)<div style='clear: both;'><\/div>\s*<\/div>[\s\S]*?<abbr class='published'[^>]*title='([^']+)'/gi;
+  let postMatch;
+
+  while ((postMatch = postRegex.exec(blogPostsHtml)) !== null) {
+    const body = postMatch[1];
+    const datetimeText = postMatch[2];
+
+    if (body) {
+      posts.push({
+        body,
+        datetime: datetimeText ? parseDatetime(decodeHtmlEntities(datetimeText)) : undefined,
+      });
     }
   }
 
+  if (posts.length > 0) {
+    return posts;
+  }
+
+  return [{ body: blogPostsHtml }];
+}
+
+function parseRows(body: string, datetime?: Date) {
+  const entries: RSSEntry[] = [];
+  const trRegex = /<tr\b[^>]*>([\s\S]*?)<\/tr>/gi;
+  let trMatch;
+
+  while ((trMatch = trRegex.exec(body)) !== null) {
+    const trContent = trMatch[1];
+    const imageTag = trContent?.match(/<img\b[^>]*>/i)?.[0];
+    const movieTitle = imageTag
+      ? readHtmlAttribute(imageTag, "title") || readHtmlAttribute(imageTag, "alt")
+      : undefined;
+    const imageURL = imageTag ? normalizeUrl(readHtmlAttribute(imageTag, "src") || "") : undefined;
+    const linkRegex = /<a\b[^>]*href=(['"])([\s\S]*?)\1[^>]*>([\s\S]*?)<\/a>/gi;
+    let linkMatch;
+
+    while ((linkMatch = linkRegex.exec(trContent || "")) !== null) {
+      const url = normalizeUrl(decodeHtmlEntities(linkMatch[2] || ""));
+
+      if (!url || !isExternalUrl(url)) {
+        continue;
+      }
+
+      const linkText = stripHtml(linkMatch[3] || "");
+
+      entries.push({
+        id: url,
+        link: url,
+        title: movieTitle || linkText || url,
+        text: linkText ? `${linkText}: ${url}` : url,
+        datetime,
+        imageURL,
+      });
+    }
+  }
+
+  return entries;
+}
+
+export function parse(htmlText: string): RSSData {
+  const entries = getPostBodies(getBlogPostsHtml(htmlText))
+    .flatMap((post) => parseRows(post.body, post.datetime))
+    .filter(isValidRSSEntry);
+
   return {
-    id: BASE_URL,
-    link: BASE_URL,
+    id: API_URL,
+    link: API_URL,
     title: "Ante-Estreias Cinema",
     description: "External URLs extracted from Ante-Estreias bilhetes cinema posts",
     language: "pt",
-    entries: entries.filter(isValidRSSEntry),
+    entries,
   };
 }
 
 export async function get(_ctx: ScraperContext): Promise<RSSData> {
   const response = await fetch(API_URL, {
     headers: {
+      accept: "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
       "user-agent": USERAGENT,
     },
   });
 
-  const xmlText = await response.text();
-  return parse(xmlText);
+  const htmlText = await response.text();
+  return parse(htmlText);
 }
