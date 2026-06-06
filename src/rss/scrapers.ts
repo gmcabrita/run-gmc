@@ -36,6 +36,7 @@ import * as informacaoLisboaAgenda from "./scrapers/informacaoLisboaAgenda";
 import * as jeremyEvansBlog from "./scrapers/jeremyEvansBlog";
 import * as jnMedia from "./scrapers/jnMedia";
 import * as jornalDeNegociosMedia from "./scrapers/jornalDeNegociosMedia";
+import * as kernelShBlog from "./scrapers/kernelShBlog";
 import * as kirShatrovBlog from "./scrapers/kirShatrovBlog";
 import * as kitLangtonBlog from "./scrapers/kitLangtonBlog";
 import * as lbbonlineInternational from "./scrapers/lbbonlineInternational";
@@ -91,6 +92,7 @@ const scrapers: Record<string, ScraperModule> = {
   jeremyEvansBlog,
   jnMedia,
   jornalDeNegociosMedia,
+  kernelShBlog,
   kirShatrovBlog,
   kitLangtonBlog,
   lbbonlineInternational,
