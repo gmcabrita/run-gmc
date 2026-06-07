@@ -29,9 +29,10 @@ function decodeCodePoint(value: number, fallback: string) {
 
 function decodeXmlText(value: string) {
   const trimmed = value.trim();
-  const unwrapped = trimmed.startsWith("<![CDATA[") && trimmed.endsWith("]]>")
-    ? trimmed.slice("<![CDATA[".length, -"]]>".length)
-    : trimmed;
+  const unwrapped =
+    trimmed.startsWith("<![CDATA[") && trimmed.endsWith("]]>")
+      ? trimmed.slice("<![CDATA[".length, -"]]>".length)
+      : trimmed;
 
   return unwrapped
     .replace(/&#x([0-9a-fA-F]+);/g, (entity, hex) =>
@@ -147,8 +148,7 @@ export async function sendCinemaxRtpPassatemposEntriesByEmail(env: CloudflareBin
     await idempotentSendEmail(env, {
       to: "goncalo.mendes.cabrita@gmail.com",
       subject: `[Passatempo] ${entry.title}`,
-      body: `<h2><a href="${entry.link}">${entry.title}</a></h2>
-              ${entry.text ? `<p>${entry.text}</p>` : ""}${entry.imageURL ? `<br><img src="${entry.imageURL}"></img>` : ""}`.trim(),
+      body: `<h2><a href="${entry.link}">${entry.title}</a></h2>`.trim(),
       idempotencyKey: `cinemax-rtp-passatempos-${entry.id}`,
     });
   }
