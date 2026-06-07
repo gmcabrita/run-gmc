@@ -23,6 +23,12 @@
     "COVERFLEX_EMAIL": "goncalo@mendescabrita.com",
     "ICLOUD_USER": "goncalo@mendescabrita.com",
   },
+  "send_email": [
+    {
+      "name": "EMAIL",
+      "remote": true,
+    },
+  ],
   "kv_namespaces": [
     {
       "binding": "RUN_GMC_EMAIL_IDEMPOTENCY_KV",

@@ -20,9 +20,6 @@ importers:
       hono:
         specifier: ^4.12.23
         version: 4.12.23
-      worker-mailer:
-        specifier: ^1.2.1
-        version: 1.2.1
       xml2js:
         specifier: ^0.6.2
         version: 0.6.2
@@ -1833,9 +1830,6 @@ packages:
     resolution: {integrity: sha512-U89AsyEeAsyoF0zVJBkG9zBgekjgjK7yk9sje3F4IQpXBJ10TF6ByLlIfjMhcmHMJgHZI4KHt4rdNfktzxIAMA==}
     engines: {node: '>=20'}
 
-  worker-mailer@1.2.1:
-    resolution: {integrity: sha512-gS2ei/mrpRqNs+AHmqxhT6vFPwCLw2qnz5ShmyGD0ULaU0Q9hxnFAcx9jhAip/MnD6+MjgnQu6hQQgA8mlOkVA==}
-
   workerd@1.20251217.0:
     resolution: {integrity: sha512-s3mHDSWwHTduyY8kpHOsl27ZJ4ziDBJlc18PfBvNMqNnhO7yBeemlxH7bo7yQyU1foJrIZ6IENHDDg0Z9N8zQA==}
     engines: {node: '>=16'}
@@ -3360,8 +3354,6 @@ snapshots:
   widest-line@6.0.0:
     dependencies:
       string-width: 8.2.1
-
-  worker-mailer@1.2.1: {}
 
   workerd@1.20251217.0:
     optionalDependencies:
