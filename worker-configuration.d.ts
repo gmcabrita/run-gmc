@@ -13,8 +13,6 @@ interface __BaseEnv_CloudflareBindings {
 	COVERFLEX_USER_AGENT_TOKEN: string;
 	PRIVATE_BASIC_AUTH_USERNAME: string;
 	PRIVATE_BASIC_AUTH_PASSWORD: string;
-	ICLOUD_USER: string;
-	ICLOUD_PASSWORD: string;
 	X_BEARER: string;
 	X_COOKIE: string;
 	X1_COOKIE: string;
@@ -35,7 +33,7 @@ type StringifyValues<EnvType extends Record<string, unknown>> = {
 	[Binding in keyof EnvType]: EnvType[Binding] extends string ? EnvType[Binding] : string;
 };
 declare namespace NodeJS {
-	interface ProcessEnv extends StringifyValues<Pick<Cloudflare.Env, "ENVIRONMENT" | "COVERFLEX_EMAIL" | "COVERFLEX_PASSWORD" | "COVERFLEX_USER_AGENT_TOKEN" | "PRIVATE_BASIC_AUTH_USERNAME" | "PRIVATE_BASIC_AUTH_PASSWORD" | "ICLOUD_USER" | "ICLOUD_PASSWORD" | "X_BEARER" | "X_COOKIE" | "X1_COOKIE" | "X2_COOKIE" | "X3_COOKIE" | "DISCORD_AUTHORIZATION_TOKEN" | "SENTRY_DSN" | "DENO_PROXY_AUTH_TOKEN">> {}
+	interface ProcessEnv extends StringifyValues<Pick<Cloudflare.Env, "ENVIRONMENT" | "COVERFLEX_EMAIL" | "COVERFLEX_PASSWORD" | "COVERFLEX_USER_AGENT_TOKEN" | "PRIVATE_BASIC_AUTH_USERNAME" | "PRIVATE_BASIC_AUTH_PASSWORD" | "X_BEARER" | "X_COOKIE" | "X1_COOKIE" | "X2_COOKIE" | "X3_COOKIE" | "DISCORD_AUTHORIZATION_TOKEN" | "SENTRY_DSN" | "DENO_PROXY_AUTH_TOKEN">> {}
 }
 
 // Begin runtime types

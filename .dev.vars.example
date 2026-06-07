@@ -11,10 +11,6 @@ COVERFLEX_USER_AGENT_TOKEN=your-user-agent-token
 PRIVATE_BASIC_AUTH_USERNAME=your-username
 PRIVATE_BASIC_AUTH_PASSWORD=your-password
 
-# iCloud SMTP credentials (use app-specific password)
-ICLOUD_USER=your-email@example.com
-ICLOUD_PASSWORD=your-app-specific-password
-
 # X bearer, always the same
 X_BEARER=
 

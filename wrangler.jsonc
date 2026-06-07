@@ -21,7 +21,6 @@
   "vars": {
     "ENVIRONMENT": "production",
     "COVERFLEX_EMAIL": "goncalo@mendescabrita.com",
-    "ICLOUD_USER": "goncalo@mendescabrita.com",
   },
   "send_email": [
     {
