@@ -2,6 +2,7 @@ export const rssHealthcheckExcludedPaths = new Set([
   "/rss.x",
   "/rss.cacheAgendaLx",
   "/rss.sendCinecartazEntriesByEmail",
+  "/rss.sendCinemaxRtpPassatemposEntriesByEmail",
   "/rss.discordQuests",
 ]);
 

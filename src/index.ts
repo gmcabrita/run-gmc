@@ -4,6 +4,7 @@ import { basicAuth } from "hono/basic-auth";
 import { cors } from "hono/cors";
 import { addCoverflexEndpoints, sendAppleCatalogueByEmail } from "@coverflex";
 import { sendCinecartazEntriesByEmail } from "@rss/scrapers/cinecartaz";
+import { sendCinemaxRtpPassatemposEntriesByEmail } from "@rss/scrapers/cinemaxRtpPassatempos";
 import { addXEndpoints } from "@x";
 import { addIcs2GcalEndpoint } from "./ics2gcal";
 import { addScrapedRssEndpoints, cacheAgendaLx } from "@rss/scrapers";
@@ -22,6 +23,10 @@ addScrapedRssEndpoints(app);
 
 app.get("/rss.sendCinecartazEntriesByEmail", async (ctx) => {
   return ctx.json(await sendCinecartazEntriesByEmail(ctx.env));
+});
+
+app.get("/rss.sendCinemaxRtpPassatemposEntriesByEmail", async (ctx) => {
+  return ctx.json(await sendCinemaxRtpPassatemposEntriesByEmail(ctx.env));
 });
 
 app.get("/ip.getTrainInformation/:trainId/:date", cors({ origin: "*" }), async (ctx) => {
@@ -276,26 +281,26 @@ export default Sentry.withSentry(
     fetch: app.fetch,
     async scheduled(controller, env, ctx) {
       switch (controller.cron) {
-        case "0 1 * * *":
+        case "* * * * *":
           await Sentry.withMonitor(
-            "rss.cacheAgendaLx",
+            "rss.sendCinecartazEntriesByEmail",
             async () => {
-              await cacheAgendaLx(env);
+              await sendCinecartazEntriesByEmail(env);
             },
             {
               schedule: {
                 type: "crontab",
-                value: "0 1 * * *",
+                value: "* * * * *",
               },
-              checkinMargin: 10,
+              checkinMargin: 2,
             },
           );
           break;
         case "*/2 * * * *":
           await Sentry.withMonitor(
-            "coverflex.sendCinecartazEntriesByEmail",
+            "rss.sendCinemaxRtpPassatemposEntriesByEmail",
             async () => {
-              await sendCinecartazEntriesByEmail(env);
+              await sendCinemaxRtpPassatemposEntriesByEmail(env);
             },
             {
               schedule: {
@@ -318,6 +323,21 @@ export default Sentry.withSentry(
                 value: "*/15 * * * *",
               },
               checkinMargin: 2,
+            },
+          );
+          break;
+        case "0 1 * * *":
+          await Sentry.withMonitor(
+            "rss.cacheAgendaLx",
+            async () => {
+              await cacheAgendaLx(env);
+            },
+            {
+              schedule: {
+                type: "crontab",
+                value: "0 1 * * *",
+              },
+              checkinMargin: 10,
             },
           );
           break;

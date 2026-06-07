@@ -13,6 +13,7 @@ describe("getRssHealthcheckPaths", () => {
         { method: "GET", path: "/rss.x" },
         { method: "GET", path: "/rss.discordQuests" },
         { method: "GET", path: "/rss.sendCinecartazEntriesByEmail" },
+        { method: "GET", path: "/rss.sendCinemaxRtpPassatemposEntriesByEmail" },
         { method: "GET", path: "/rss.cacheAgendaLx" },
         { method: "GET", path: "/rss.agendaLx" },
         { method: "POST", path: "/rss.only-post" },
