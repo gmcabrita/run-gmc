@@ -13,19 +13,14 @@ import { buildXApiHeaders, resolveCredentials, type XCredentials } from "./crede
 import {
   createPrivateProfileNoticeFeed,
   getTimelineEntries,
-  hasAccessibleTimeline,
+  isProtectedProfile,
 } from "./feed";
 
-async function fetchUserId(
+async function fetchUser(
   env: CloudflareBindings,
   credentials: XCredentials,
   userName: string,
-): Promise<string> {
-  const cacheKey = `fetchUserId:${userName}`;
-  const cachedUserId = await env.RUN_GMC_X_CACHE_KV.get(cacheKey);
-
-  if (cachedUserId) return cachedUserId;
-
+): Promise<XUserByScreenNameResponse> {
   const response = await fetch(
     `https://x.com/i/api/graphql/QGIw94L0abhuohrr76cSbw/UserByScreenName?variables=%7B%22screen_name%22%3A%22${userName}%22%7D&features=%7B%22hidden_profile_subscriptions_enabled%22%3Atrue%2C%22profile_label_improvements_pcf_label_in_post_enabled%22%3Afalse%2C%22rweb_tipjar_consumption_enabled%22%3Atrue%2C%22responsive_web_graphql_exclude_directive_enabled%22%3Atrue%2C%22verified_phone_label_enabled%22%3Afalse%2C%22subscriptions_verification_info_is_identity_verified_enabled%22%3Atrue%2C%22subscriptions_verification_info_verified_since_enabled%22%3Atrue%2C%22highlights_tweets_tab_ui_enabled%22%3Atrue%2C%22responsive_web_twitter_article_notes_tab_enabled%22%3Atrue%2C%22subscriptions_feature_can_gift_premium%22%3Atrue%2C%22creator_subscriptions_tweet_preview_api_enabled%22%3Atrue%2C%22responsive_web_graphql_skip_user_profile_image_extensions_enabled%22%3Afalse%2C%22responsive_web_graphql_timeline_navigation_enabled%22%3Atrue%7D&fieldToggles=%7B%22withAuxiliaryUserLabels%22%3Afalse%7D`,
     {
@@ -39,12 +34,7 @@ async function fetchUserId(
 
   if (response.status == 429) throw new Error("Rate Limited");
 
-  const json = (await response.json()) as XUserByScreenNameResponse;
-  const userId = json.data.user.result.rest_id;
-
-  await env.RUN_GMC_X_CACHE_KV.put(cacheKey, userId, { expirationTtl: 1209600 });
-
-  return userId;
+  return (await response.json()) as XUserByScreenNameResponse;
 }
 
 async function fetchPosts(
@@ -197,12 +187,12 @@ export function addXEndpoints(app: Hono<{ Bindings: CloudflareBindings }>) {
 
         const maxAge = Math.floor(Math.random() * (2400 - 1200 + 1)) + 1200;
         const credentials = resolveCredentials(ctx.env, isPublic);
-        const userId = await fetchUserId(ctx.env, credentials, userName);
-        const data = await fetchPosts(ctx.env, credentials, userId);
+        const user = await fetchUser(ctx.env, credentials, userName);
+        const userId = user.data.user.result.rest_id;
         const feed =
-          isPublic && !hasAccessibleTimeline(data)
+          isPublic && isProtectedProfile(user)
             ? createPrivateProfileNoticeFeed(userName)
-            : await x2Rss(ctx.env, userName, data);
+            : await x2Rss(ctx.env, userName, await fetchPosts(ctx.env, credentials, userId));
         const rss2 = stripInvalidXmlChars(feed.rss2());
 
         await ctx.env.RUN_GMC_X_CACHE_KV.put(cacheKey, rss2, {

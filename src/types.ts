@@ -199,6 +199,7 @@ export interface XUserLegacy {
   name: string;
   description?: string;
   profile_image_url_https?: string;
+  protected?: boolean;
 }
 
 export interface XUserResult {

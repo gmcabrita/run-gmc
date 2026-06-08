@@ -1,8 +1,8 @@
 import { Feed } from "feed";
-import type { XUserTweetsResponse } from "@types";
+import type { XUserByScreenNameResponse, XUserTweetsResponse } from "@types";
 
-export function hasAccessibleTimeline(data: XUserTweetsResponse): boolean {
-  return Boolean(data.data?.user?.result?.timeline_v2?.timeline?.instructions);
+export function isProtectedProfile(data: XUserByScreenNameResponse): boolean {
+  return data.data.user.result.legacy.protected === true;
 }
 
 export function createPrivateProfileNoticeFeed(userName: string): Feed {
@@ -22,7 +22,7 @@ export function createPrivateProfileNoticeFeed(userName: string): Feed {
 
   feed.addItem({
     title: "Profile is now private",
-    id: `${profileUrl}/private-profile-notice`,
+    id: `${profileUrl}/private-profile-notice-${new Date().toISOString()}`,
     link: profileUrl,
     content: `<p>This profile is now private and cannot be fetched with public credentials.</p><p>Update your feed URL to remove <code>public=true</code>:</p><p><code>${feedUrl}</code></p>`,
     date: new Date(),

@@ -2,24 +2,39 @@ import { describe, expect, it } from "vitest";
 import {
   createPrivateProfileNoticeFeed,
   getTimelineEntries,
-  hasAccessibleTimeline,
+  isProtectedProfile,
 } from "./feed";
 
 describe("x feed helpers", () => {
-  it("detects missing timelines", () => {
-    expect(hasAccessibleTimeline({ data: { user: { result: {} } } } as never)).toBe(false);
-  });
-
-  it("detects accessible timelines", () => {
+  it("detects public profiles", () => {
     expect(
-      hasAccessibleTimeline({
+      isProtectedProfile({
         data: {
           user: {
             result: {
-              timeline_v2: {
-                timeline: {
-                  instructions: [{ entries: [] }],
-                },
+              rest_id: "1",
+              legacy: {
+                screen_name: "someuser",
+                name: "Some User",
+              },
+            },
+          },
+        },
+      }),
+    ).toBe(false);
+  });
+
+  it("detects protected profiles", () => {
+    expect(
+      isProtectedProfile({
+        data: {
+          user: {
+            result: {
+              rest_id: "1",
+              legacy: {
+                screen_name: "someuser",
+                name: "Some User",
+                protected: true,
               },
             },
           },
