@@ -78,7 +78,7 @@ export async function sendCinecartazEntriesByEmail(env: CloudflareBindings) {
   for (const entry of data.entries) {
     await idempotentSendEmail(env, {
       to: "goncalo.mendes.cabrita@gmail.com",
-      subject: `[Passatempo] ${entry.title}`,
+      subject: `[Passatempo Cinecartaz] ${entry.title}`,
       body: `<h2><a href="${entry.link}">${entry.title}</a></h2>
               <p>${entry.text}</p>${entry.imageURL ? `<br><img src="${entry.imageURL}"></img>` : ""}`.trim(),
       idempotencyKey: `cinecartaz-${entry.id}`,

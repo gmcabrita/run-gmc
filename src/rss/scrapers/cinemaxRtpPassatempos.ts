@@ -147,7 +147,7 @@ export async function sendCinemaxRtpPassatemposEntriesByEmail(env: CloudflareBin
   for (const entry of data.entries) {
     await idempotentSendEmail(env, {
       to: "goncalo.mendes.cabrita@gmail.com",
-      subject: `[Passatempo] ${entry.title}`,
+      subject: `[Passatempo Cinemax] ${entry.title}`,
       body: `<h2><a href="${entry.link}">${entry.title}</a></h2>
               ${entry.text ? `<p>${entry.text}</p>` : ""}${entry.imageURL ? `<br><img src="${entry.imageURL}"></img>` : ""}`.trim(),
       idempotencyKey: `cinemax-rtp-passatempos-${entry.id}`,
