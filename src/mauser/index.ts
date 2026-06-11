@@ -6,6 +6,7 @@ const RASPBERRY_PI_ZERO_2W_URL =
   "https://mauser.pt/096-4559/raspberry-pi-sc1176-microcomputador-raspberry-pi-zero-2w-c-wifi-bluetooth";
 const RASPBERRY_PI_ZERO_2W_EMAIL = "goncalo.mendes.cabrita@gmail.com";
 const RASPBERRY_PI_ZERO_2W_ID = "mauser-096-4559-raspberry-pi-zero-2w";
+const DENO_PROXY_URL = "https://dry-lobster-81.gmcabrita.deno.net/proxy";
 
 type MauserStockStatus =
   | { kind: "in-stock"; label: string }
@@ -50,11 +51,7 @@ export function parseMauserStockStatus(html: string): MauserStockStatus {
 export async function checkMauserRaspberryPiZero2WStock(
   env: CloudflareBindings,
 ): Promise<MauserCheckResult> {
-  const response = await fetch(RASPBERRY_PI_ZERO_2W_URL, {
-    headers: mauserHeaders(),
-    method: "GET",
-    redirect: "follow",
-  });
+  const response = await fetchMauserRaspberryPiZero2W(env);
 
   if (response.status === 403) {
     const emailSent = await idempotentSendEmail(env, {
@@ -104,6 +101,18 @@ export function addMauserEndpoints(app: Hono<{ Bindings: CloudflareBindings }>) 
       return ctx.json(await checkMauserRaspberryPiZero2WStock(ctx.env));
     },
   );
+}
+
+async function fetchMauserRaspberryPiZero2W(env: CloudflareBindings): Promise<Response> {
+  const headers = mauserHeaders();
+  headers.set("authorization", `Bearer ${env.DENO_PROXY_AUTH_TOKEN}`);
+  headers.set("x-target-url", RASPBERRY_PI_ZERO_2W_URL);
+
+  return fetch(DENO_PROXY_URL, {
+    headers,
+    method: "GET",
+    redirect: "follow",
+  });
 }
 
 function mauserHeaders(): Headers {
