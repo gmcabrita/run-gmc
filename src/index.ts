@@ -6,7 +6,6 @@ import { addCoverflexEndpoints, sendAppleCatalogueByEmail } from "@coverflex";
 import { sendCinecartazEntriesByEmail } from "@rss/scrapers/cinecartaz";
 import { sendCinemaxRtpPassatemposEntriesByEmail } from "@rss/scrapers/cinemaxRtpPassatempos";
 import { addXEndpoints } from "@x";
-import { addMauserEndpoints, checkMauserRaspberryPiZero2WStock } from "./mauser";
 import { addIcs2GcalEndpoint } from "./ics2gcal";
 import { addScrapedRssEndpoints, cacheAgendaLx } from "@rss/scrapers";
 import type { FertagusResponse } from "@types";
@@ -19,7 +18,6 @@ import {
 const app = new Hono<{ Bindings: CloudflareBindings }>();
 addCoverflexEndpoints(app);
 addXEndpoints(app);
-addMauserEndpoints(app);
 addIcs2GcalEndpoint(app);
 addScrapedRssEndpoints(app);
 
@@ -318,19 +316,6 @@ export default Sentry.withSentry(
             "coverflex.sendAppleCatalogueByEmail",
             async () => {
               await sendAppleCatalogueByEmail(env);
-            },
-            {
-              schedule: {
-                type: "crontab",
-                value: "*/15 * * * *",
-              },
-              checkinMargin: 2,
-            },
-          );
-          await Sentry.withMonitor(
-            "mauser.checkRaspberryPiZero2WStock",
-            async () => {
-              await checkMauserRaspberryPiZero2WStock(env);
             },
             {
               schedule: {
