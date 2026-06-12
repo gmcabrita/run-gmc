@@ -28,7 +28,8 @@ DISCORD_AUTHORIZATION_TOKEN=
 # Sentry stuff
 SENTRY_DSN=
 
-DENO_PROXY_AUTH_TOKEN=auth-token
+HTTP_RELAY_URL=https://relay.example.com
+HTTP_RELAY_TOKEN=auth-token
 
 # Healthcheck Discord webhooks
 HEALTHCHECK_DISCORD_SUCCEEDED_WEBHOOK_URL=https://discord.com/api/webhooks/...

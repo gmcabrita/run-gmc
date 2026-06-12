@@ -4,6 +4,7 @@ import {
   getDiscordHealthcheckFailurePayload,
   getDiscordHealthcheckPassMessage,
   getDiscordHealthcheckPassPayload,
+  getHttpRelayHealthcheckUrl,
   getRssHealthcheckFailureReason,
   getRssHealthcheckPaths,
   rssFeedHasAtLeastOneEntry,
@@ -98,6 +99,45 @@ describe("runRssHealthcheck", () => {
       },
       failures: [{ url: "https://run.gmcabrita.com/rss.a", statusCode: 500 }],
     });
+  });
+
+  it("checks extra urls by status only", async () => {
+    const response = await runRssHealthcheck(
+      ["/rss.a"],
+      "https://run.gmcabrita.com",
+      async (url) => {
+        if (url === "https://run.gmcabrita.com/rss.a") {
+          return {
+            statusCode: 200,
+            ok: true,
+            body: "<rss><channel><item></item></channel></rss>",
+          };
+        }
+
+        return {
+          statusCode: 200,
+          ok: true,
+          body: "",
+        };
+      },
+      ["https://relay.example.com/healthz"],
+    );
+
+    expect(response).toEqual({
+      summary: {
+        passed: 2,
+        failed: 0,
+      },
+      failures: [],
+    });
+  });
+});
+
+describe("getHttpRelayHealthcheckUrl", () => {
+  it("appends healthz to the relay url", () => {
+    expect(getHttpRelayHealthcheckUrl("https://relay.example.com/")).toBe(
+      "https://relay.example.com/healthz",
+    );
   });
 });
 
@@ -201,7 +241,7 @@ describe("getDiscordHealthcheckPassPayload", () => {
       embeds: [
         {
           title: "run.gmc healthcheck passed",
-          description: "2 feeds passed",
+          description: "2 checks passed",
           color: 0x34c759,
         },
       ],

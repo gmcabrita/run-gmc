@@ -13,6 +13,7 @@ import {
   getDiscordHealthcheckErrorPayload,
   getDiscordHealthcheckFailurePayload,
   getDiscordHealthcheckPassPayload,
+  getHttpRelayHealthcheckUrl,
   getRssHealthcheckPaths,
   runRssHealthcheck,
   type DiscordWebhookPayload,
@@ -20,7 +21,6 @@ import {
   type RssHealthcheckResponse,
 } from "@rss/healthcheck";
 
-const rssHealthcheckCron = "0 6 * * *";
 const rssHealthcheckOrigin = "https://run.gmcabrita.com";
 
 async function sendDiscordHealthcheckPayload(
@@ -68,6 +68,28 @@ async function fetchRssHealthcheckUrl(
   };
 }
 
+async function fetchHttpHealthcheckUrl(url: string): Promise<RssHealthcheckFetchResult> {
+  const response = await fetch(url);
+  const body = await response.text();
+
+  return {
+    statusCode: response.status,
+    ok: response.ok,
+    body,
+  };
+}
+
+function fetchHealthcheckUrl(
+  url: string,
+  externalUrls: ReadonlyArray<string>,
+  env: CloudflareBindings,
+  executionCtx: HonoExecutionContext,
+): Promise<RssHealthcheckFetchResult> {
+  return externalUrls.includes(url)
+    ? fetchHttpHealthcheckUrl(url)
+    : fetchRssHealthcheckUrl(url, env, executionCtx);
+}
+
 function reportRssHealthcheck(
   summary: RssHealthcheckResponse,
   env: CloudflareBindings,
@@ -90,10 +112,12 @@ async function runRssHealthcheckAndReport(
   executionCtx: HonoExecutionContext,
 ): Promise<RssHealthcheckResponse> {
   try {
+    const externalUrls = [getHttpRelayHealthcheckUrl(env.HTTP_RELAY_URL)];
     const summary = await runRssHealthcheck(
       getRssHealthcheckPaths(app.routes),
       origin,
-      (url) => fetchRssHealthcheckUrl(url, env, executionCtx),
+      (url) => fetchHealthcheckUrl(url, externalUrls, env, executionCtx),
+      externalUrls,
     );
 
     reportRssHealthcheck(summary, env, executionCtx);
@@ -416,7 +440,7 @@ export default Sentry.withSentry(
             },
           );
           break;
-        case rssHealthcheckCron:
+        case "0 12 * * *":
           await Sentry.withMonitor(
             "rss.healthcheck",
             async () => {
@@ -425,7 +449,7 @@ export default Sentry.withSentry(
             {
               schedule: {
                 type: "crontab",
-                value: rssHealthcheckCron,
+                value: "0 12 * * *",
               },
               checkinMargin: 10,
             },

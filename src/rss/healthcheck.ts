@@ -118,11 +118,15 @@ export function getDiscordHealthcheckPassPayload(
     embeds: [
       {
         title: "run.gmc healthcheck passed",
-        description: `${response.summary.passed} feeds passed`,
+        description: `${response.summary.passed} checks passed`,
         color: discordPassColor,
       },
     ],
   };
+}
+
+export function getHttpRelayHealthcheckUrl(httpRelayUrl: string): string {
+  return `${httpRelayUrl.replace(/\/+$/, "")}/healthz`;
 }
 
 function formatHealthcheckSummary(response: RssHealthcheckResponse, overflowCount: number): string {
@@ -169,9 +173,10 @@ export async function runRssHealthcheck(
   paths: ReadonlyArray<string>,
   origin: string,
   fetchUrl: FetchRssHealthcheckUrl,
+  extraUrls: ReadonlyArray<string> = [],
 ): Promise<RssHealthcheckResponse> {
-  const results = await Promise.all(
-    paths.map(async (path) => {
+  const checks: Array<Promise<RssHealthcheckResult>> = [
+    ...paths.map(async (path) => {
       const url = new URL(path, origin).toString();
 
       try {
@@ -190,7 +195,26 @@ export async function runRssHealthcheck(
         };
       }
     }),
-  );
+    ...extraUrls.map(async (url) => {
+      try {
+        const response = await fetchUrl(url);
+
+        return {
+          url,
+          statusCode: response.statusCode,
+          passed: response.ok,
+        };
+      } catch {
+        return {
+          url,
+          statusCode: 500,
+          passed: false,
+        };
+      }
+    }),
+  ];
+
+  const results = await Promise.all(checks);
 
   return summarizeRssHealthcheck(results);
 }

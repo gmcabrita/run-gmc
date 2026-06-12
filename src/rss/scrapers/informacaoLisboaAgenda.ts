@@ -1,4 +1,5 @@
-import { USERAGENT, isValidRSSEntry, type ScraperContext } from "@rss/common";
+import { isValidRSSEntry, type ScraperContext } from "@rss/common";
+import { createProxiedFetch } from "../../proxiedFetch";
 import type { RSSData, RSSEntry } from "@rss/types";
 import type { InformacaoLisboaAgendaItem } from "@types";
 
@@ -33,12 +34,9 @@ export async function parse(json: InformacaoLisboaAgendaItem[]): Promise<RSSData
 }
 
 export async function get(_ctx: ScraperContext): Promise<RSSData> {
-  const response = await fetch("https://dry-lobster-81.gmcabrita.deno.net/proxy", {
+  const response = await createProxiedFetch(_ctx.env)(API_URL, {
     headers: {
-      "user-agent": USERAGENT,
       accept: "application/json",
-      authorization: `Bearer ${_ctx.env.DENO_PROXY_AUTH_TOKEN}`,
-      "x-target-url": API_URL,
     },
   });
 
