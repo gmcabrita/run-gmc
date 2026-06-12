@@ -109,7 +109,6 @@ describe("getDiscordHealthcheckFailurePayload", () => {
         ],
       }),
     ).toEqual({
-      content: "run.gmc healthcheck failed",
       embeds: [
         {
           title: "run.gmc healthcheck failed",
@@ -141,7 +140,6 @@ describe("getDiscordHealthcheckPassPayload", () => {
         failures: [],
       }),
     ).toEqual({
-      content: "run.gmc healthcheck passed",
       embeds: [
         {
           title: "run.gmc healthcheck passed",

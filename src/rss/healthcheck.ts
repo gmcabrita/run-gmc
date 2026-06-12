@@ -44,7 +44,6 @@ export interface DiscordEmbed {
 }
 
 export interface DiscordWebhookPayload {
-  content: string;
   embeds: DiscordEmbed[];
 }
 
@@ -88,14 +87,12 @@ export function getDiscordHealthcheckFailurePayload(
   }
 
   return {
-    content: "run.gmc healthcheck failed",
     embeds,
   };
 }
 
 export function getDiscordHealthcheckErrorPayload(reason: string): DiscordWebhookPayload {
   return {
-    content: getDiscordHealthcheckFailureMessage(reason),
     embeds: [
       {
         title: "run.gmc healthcheck failed",
@@ -110,7 +107,6 @@ export function getDiscordHealthcheckPassPayload(
   response: RssHealthcheckResponse,
 ): DiscordWebhookPayload {
   return {
-    content: getDiscordHealthcheckPassMessage(),
     embeds: [
       {
         title: "run.gmc healthcheck passed",
