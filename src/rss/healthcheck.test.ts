@@ -1,5 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
+  getPokeHealthcheckFailureMessage,
+  getRssHealthcheckFailureReason,
   getRssHealthcheckPaths,
   rssFeedHasAtLeastOneEntry,
   summarizeRssHealthcheck,
@@ -56,5 +58,33 @@ describe("summarizeRssHealthcheck", () => {
         { url: "https://run.gmcabrita.com/rss.c", statusCode: 200 },
       ],
     });
+  });
+});
+
+describe("getRssHealthcheckFailureReason", () => {
+  it("returns undefined when healthcheck passed", () => {
+    expect(
+      getRssHealthcheckFailureReason({
+        summary: { passed: 1, failed: 0 },
+        failures: [],
+      }),
+    ).toBeUndefined();
+  });
+
+  it("returns failures array contents when healthcheck failed", () => {
+    expect(
+      getRssHealthcheckFailureReason({
+        summary: { passed: 0, failed: 1 },
+        failures: [{ url: "https://run.gmcabrita.com/rss.a", statusCode: 500 }],
+      }),
+    ).toBe('[{"url":"https://run.gmcabrita.com/rss.a","statusCode":500}]');
+  });
+});
+
+describe("getPokeHealthcheckFailureMessage", () => {
+  it("formats the Poke message", () => {
+    expect(getPokeHealthcheckFailureMessage("Internal Server Error")).toBe(
+      "run.gmc healthcheck failed: Internal Server Error",
+    );
   });
 });

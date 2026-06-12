@@ -30,6 +30,16 @@ export interface RssHealthcheckResponse {
   failures: RssHealthcheckFailure[];
 }
 
+export function getRssHealthcheckFailureReason(
+  response: RssHealthcheckResponse,
+): string | undefined {
+  return response.failures.length === 0 ? undefined : JSON.stringify(response.failures);
+}
+
+export function getPokeHealthcheckFailureMessage(reason: string): string {
+  return `run.gmc healthcheck failed: ${reason}`;
+}
+
 export function getRssHealthcheckPaths(routes: ReadonlyArray<RouteLike>): string[] {
   return [
     ...new Set(

@@ -10,10 +10,37 @@ import { addIcs2GcalEndpoint } from "./ics2gcal";
 import { addScrapedRssEndpoints, cacheAgendaLx } from "@rss/scrapers";
 import type { FertagusResponse } from "@types";
 import {
+  getPokeHealthcheckFailureMessage,
+  getRssHealthcheckFailureReason,
   getRssHealthcheckPaths,
   rssFeedHasAtLeastOneEntry,
   summarizeRssHealthcheck,
 } from "@rss/healthcheck";
+
+async function sendPokeHealthcheckFailure(env: CloudflareBindings, reason: string): Promise<void> {
+  if (env.POKE_API_KEY.length === 0) {
+    throw new Error("POKE_API_KEY is empty");
+  }
+
+  const response = await fetch("https://poke.com/api/v1/inbound/api-message", {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${env.POKE_API_KEY}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ message: getPokeHealthcheckFailureMessage(reason) }),
+  });
+
+  if (!response.ok) {
+    throw new Error(`Poke failed with ${response.status} ${response.statusText}`);
+  }
+}
+
+function reportPokeHealthcheckFailure(env: CloudflareBindings, reason: string): Promise<void> {
+  return sendPokeHealthcheckFailure(env, reason).catch((error) => {
+    console.error("Failed to send Poke healthcheck failure", error);
+  });
+}
 
 const app = new Hono<{ Bindings: CloudflareBindings }>();
 addCoverflexEndpoints(app);
@@ -177,34 +204,46 @@ app.get(
     return auth(ctx, next);
   },
   async (ctx) => {
-    const origin = new URL(ctx.req.url).origin;
-    const rssPaths = getRssHealthcheckPaths(app.routes);
-    const results = await Promise.all(
-      rssPaths.map(async (path) => {
-        const url = new URL(path, origin).toString();
+    try {
+      const origin = new URL(ctx.req.url).origin;
+      const rssPaths = getRssHealthcheckPaths(app.routes);
+      const results = await Promise.all(
+        rssPaths.map(async (path) => {
+          const url = new URL(path, origin).toString();
 
-        try {
-          const response = await app.fetch(new Request(url), ctx.env, ctx.executionCtx);
-          const body = await response.text();
+          try {
+            const response = await app.fetch(new Request(url), ctx.env, ctx.executionCtx);
+            const body = await response.text();
 
-          return {
-            url,
-            statusCode: response.status,
-            passed: response.ok && rssFeedHasAtLeastOneEntry(body),
-          };
-        } catch {
-          return {
-            url,
-            statusCode: 500,
-            passed: false,
-          };
-        }
-      }),
-    );
+            return {
+              url,
+              statusCode: response.status,
+              passed: response.ok && rssFeedHasAtLeastOneEntry(body),
+            };
+          } catch {
+            return {
+              url,
+              statusCode: 500,
+              passed: false,
+            };
+          }
+        }),
+      );
 
-    const summary = summarizeRssHealthcheck(results);
-    ctx.status(summary.summary.failed === 0 ? 200 : 503);
-    return ctx.json(summary);
+      const summary = summarizeRssHealthcheck(results);
+      const failureReason = getRssHealthcheckFailureReason(summary);
+      if (failureReason) {
+        ctx.executionCtx.waitUntil(reportPokeHealthcheckFailure(ctx.env, failureReason));
+      }
+
+      ctx.status(summary.summary.failed === 0 ? 200 : 503);
+      return ctx.json(summary);
+    } catch (error) {
+      ctx.executionCtx.waitUntil(
+        reportPokeHealthcheckFailure(ctx.env, error.message || "Internal Server Error"),
+      );
+      throw error;
+    }
   },
 );
 
