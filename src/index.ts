@@ -20,14 +20,14 @@ import {
 } from "@rss/healthcheck";
 
 async function sendDiscordHealthcheckPayload(
-  env: CloudflareBindings,
+  webhookUrl: string,
   payload: DiscordWebhookPayload,
 ): Promise<void> {
-  if (env.HEALTHCHECK_DISCORD_WEBHOOK_URL.length === 0) {
-    throw new Error("HEALTHCHECK_DISCORD_WEBHOOK_URL is empty");
+  if (webhookUrl.length === 0) {
+    throw new Error("Healthcheck Discord webhook URL is empty");
   }
 
-  const response = await fetch(env.HEALTHCHECK_DISCORD_WEBHOOK_URL, {
+  const response = await fetch(webhookUrl, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -41,10 +41,10 @@ async function sendDiscordHealthcheckPayload(
 }
 
 function reportDiscordHealthcheckPayload(
-  env: CloudflareBindings,
+  webhookUrl: string,
   payload: DiscordWebhookPayload,
 ): Promise<void> {
-  return sendDiscordHealthcheckPayload(env, payload).catch((error) => {
+  return sendDiscordHealthcheckPayload(webhookUrl, payload).catch((error) => {
     console.error("Failed to send Discord healthcheck message", error);
   });
 }
@@ -238,18 +238,21 @@ app.get(
       );
 
       const summary = summarizeRssHealthcheck(results);
-      const payload =
-        summary.failures.length === 0
-          ? getDiscordHealthcheckPassPayload(summary)
-          : getDiscordHealthcheckFailurePayload(summary);
-      ctx.executionCtx.waitUntil(reportDiscordHealthcheckPayload(ctx.env, payload));
+      const passed = summary.failures.length === 0;
+      const payload = passed
+        ? getDiscordHealthcheckPassPayload(summary)
+        : getDiscordHealthcheckFailurePayload(summary);
+      const webhookUrl = passed
+        ? ctx.env.HEALTHCHECK_DISCORD_SUCCEEDED_WEBHOOK_URL
+        : ctx.env.HEALTHCHECK_DISCORD_FAILED_WEBHOOK_URL;
+      ctx.executionCtx.waitUntil(reportDiscordHealthcheckPayload(webhookUrl, payload));
 
       ctx.status(summary.summary.failed === 0 ? 200 : 503);
       return ctx.json(summary);
     } catch (error) {
       ctx.executionCtx.waitUntil(
         reportDiscordHealthcheckPayload(
-          ctx.env,
+          ctx.env.HEALTHCHECK_DISCORD_FAILED_WEBHOOK_URL,
           getDiscordHealthcheckErrorPayload("Internal Server Error"),
         ),
       );
