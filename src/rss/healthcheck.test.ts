@@ -7,6 +7,7 @@ import {
   getRssHealthcheckFailureReason,
   getRssHealthcheckPaths,
   rssFeedHasAtLeastOneEntry,
+  runRssHealthcheck,
   summarizeRssHealthcheck,
 } from "./healthcheck";
 
@@ -40,6 +41,63 @@ describe("rssFeedHasAtLeastOneEntry", () => {
     expect(
       rssFeedHasAtLeastOneEntry(`<?xml version="1.0"?><rss><channel></channel></rss>`),
     ).toBe(false);
+  });
+});
+
+describe("runRssHealthcheck", () => {
+  it("fetches paths, checks items, and summarizes failures", async () => {
+    const response = await runRssHealthcheck(
+      ["/rss.a", "/rss.b", "/rss.c"],
+      "https://run.gmcabrita.com",
+      async (url) => {
+        if (url === "https://run.gmcabrita.com/rss.a") {
+          return {
+            statusCode: 200,
+            ok: true,
+            body: "<rss><channel><item></item></channel></rss>",
+          };
+        }
+
+        if (url === "https://run.gmcabrita.com/rss.b") {
+          return {
+            statusCode: 200,
+            ok: true,
+            body: "<rss><channel></channel></rss>",
+          };
+        }
+
+        return {
+          statusCode: 500,
+          ok: false,
+          body: "",
+        };
+      },
+    );
+
+    expect(response).toEqual({
+      summary: {
+        passed: 1,
+        failed: 2,
+      },
+      failures: [
+        { url: "https://run.gmcabrita.com/rss.b", statusCode: 200 },
+        { url: "https://run.gmcabrita.com/rss.c", statusCode: 500 },
+      ],
+    });
+  });
+
+  it("marks thrown fetches as failed", async () => {
+    await expect(
+      runRssHealthcheck(["/rss.a"], "https://run.gmcabrita.com", async () => {
+        throw new Error("failed");
+      }),
+    ).resolves.toEqual({
+      summary: {
+        passed: 0,
+        failed: 1,
+      },
+      failures: [{ url: "https://run.gmcabrita.com/rss.a", statusCode: 500 }],
+    });
   });
 });
 

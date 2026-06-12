@@ -1,4 +1,4 @@
-import { Hono } from "hono";
+import { Hono, type ExecutionContext as HonoExecutionContext } from "hono";
 import * as Sentry from "@sentry/cloudflare";
 import { basicAuth } from "hono/basic-auth";
 import { cors } from "hono/cors";
@@ -14,10 +14,14 @@ import {
   getDiscordHealthcheckFailurePayload,
   getDiscordHealthcheckPassPayload,
   getRssHealthcheckPaths,
-  rssFeedHasAtLeastOneEntry,
-  summarizeRssHealthcheck,
+  runRssHealthcheck,
   type DiscordWebhookPayload,
+  type RssHealthcheckFetchResult,
+  type RssHealthcheckResponse,
 } from "@rss/healthcheck";
+
+const rssHealthcheckCron = "0 6 * * *";
+const rssHealthcheckOrigin = "https://run.gmcabrita.com";
 
 async function sendDiscordHealthcheckPayload(
   webhookUrl: string,
@@ -47,6 +51,63 @@ function reportDiscordHealthcheckPayload(
   return sendDiscordHealthcheckPayload(webhookUrl, payload).catch((error) => {
     console.error("Failed to send Discord healthcheck message", error);
   });
+}
+
+async function fetchRssHealthcheckUrl(
+  url: string,
+  env: CloudflareBindings,
+  executionCtx: HonoExecutionContext,
+): Promise<RssHealthcheckFetchResult> {
+  const response = await app.fetch(new Request(url), env, executionCtx);
+  const body = await response.text();
+
+  return {
+    statusCode: response.status,
+    ok: response.ok,
+    body,
+  };
+}
+
+function reportRssHealthcheck(
+  summary: RssHealthcheckResponse,
+  env: CloudflareBindings,
+  executionCtx: HonoExecutionContext,
+): void {
+  const passed = summary.failures.length === 0;
+  const payload = passed
+    ? getDiscordHealthcheckPassPayload(summary)
+    : getDiscordHealthcheckFailurePayload(summary);
+  const webhookUrl = passed
+    ? env.HEALTHCHECK_DISCORD_SUCCEEDED_WEBHOOK_URL
+    : env.HEALTHCHECK_DISCORD_FAILED_WEBHOOK_URL;
+
+  executionCtx.waitUntil(reportDiscordHealthcheckPayload(webhookUrl, payload));
+}
+
+async function runRssHealthcheckAndReport(
+  origin: string,
+  env: CloudflareBindings,
+  executionCtx: HonoExecutionContext,
+): Promise<RssHealthcheckResponse> {
+  try {
+    const summary = await runRssHealthcheck(
+      getRssHealthcheckPaths(app.routes),
+      origin,
+      (url) => fetchRssHealthcheckUrl(url, env, executionCtx),
+    );
+
+    reportRssHealthcheck(summary, env, executionCtx);
+
+    return summary;
+  } catch (error) {
+    executionCtx.waitUntil(
+      reportDiscordHealthcheckPayload(
+        env.HEALTHCHECK_DISCORD_FAILED_WEBHOOK_URL,
+        getDiscordHealthcheckErrorPayload("Internal Server Error"),
+      ),
+    );
+    throw error;
+  }
 }
 
 const app = new Hono<{ Bindings: CloudflareBindings }>();
@@ -211,53 +272,14 @@ app.get(
     return auth(ctx, next);
   },
   async (ctx) => {
-    try {
-      const origin = new URL(ctx.req.url).origin;
-      const rssPaths = getRssHealthcheckPaths(app.routes);
-      const results = await Promise.all(
-        rssPaths.map(async (path) => {
-          const url = new URL(path, origin).toString();
+    const summary = await runRssHealthcheckAndReport(
+      new URL(ctx.req.url).origin,
+      ctx.env,
+      ctx.executionCtx,
+    );
 
-          try {
-            const response = await app.fetch(new Request(url), ctx.env, ctx.executionCtx);
-            const body = await response.text();
-
-            return {
-              url,
-              statusCode: response.status,
-              passed: response.ok && rssFeedHasAtLeastOneEntry(body),
-            };
-          } catch {
-            return {
-              url,
-              statusCode: 500,
-              passed: false,
-            };
-          }
-        }),
-      );
-
-      const summary = summarizeRssHealthcheck(results);
-      const passed = summary.failures.length === 0;
-      const payload = passed
-        ? getDiscordHealthcheckPassPayload(summary)
-        : getDiscordHealthcheckFailurePayload(summary);
-      const webhookUrl = passed
-        ? ctx.env.HEALTHCHECK_DISCORD_SUCCEEDED_WEBHOOK_URL
-        : ctx.env.HEALTHCHECK_DISCORD_FAILED_WEBHOOK_URL;
-      ctx.executionCtx.waitUntil(reportDiscordHealthcheckPayload(webhookUrl, payload));
-
-      ctx.status(summary.summary.failed === 0 ? 200 : 503);
-      return ctx.json(summary);
-    } catch (error) {
-      ctx.executionCtx.waitUntil(
-        reportDiscordHealthcheckPayload(
-          ctx.env.HEALTHCHECK_DISCORD_FAILED_WEBHOOK_URL,
-          getDiscordHealthcheckErrorPayload("Internal Server Error"),
-        ),
-      );
-      throw error;
-    }
+    ctx.status(summary.summary.failed === 0 ? 200 : 503);
+    return ctx.json(summary);
   },
 );
 
@@ -389,6 +411,21 @@ export default Sentry.withSentry(
               schedule: {
                 type: "crontab",
                 value: "0 1 * * *",
+              },
+              checkinMargin: 10,
+            },
+          );
+          break;
+        case rssHealthcheckCron:
+          await Sentry.withMonitor(
+            "rss.healthcheck",
+            async () => {
+              await runRssHealthcheckAndReport(rssHealthcheckOrigin, env, ctx);
+            },
+            {
+              schedule: {
+                type: "crontab",
+                value: rssHealthcheckCron,
               },
               checkinMargin: 10,
             },

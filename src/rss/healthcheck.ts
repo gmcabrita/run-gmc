@@ -17,6 +17,14 @@ export interface RssHealthcheckResult {
   passed: boolean;
 }
 
+export interface RssHealthcheckFetchResult {
+  statusCode: number;
+  ok: boolean;
+  body: string;
+}
+
+export type FetchRssHealthcheckUrl = (url: string) => Promise<RssHealthcheckFetchResult>;
+
 export interface RssHealthcheckFailure {
   url: string;
   statusCode: number;
@@ -155,6 +163,36 @@ export function getRssHealthcheckPaths(routes: ReadonlyArray<RouteLike>): string
 
 export function rssFeedHasAtLeastOneEntry(body: string): boolean {
   return /<item(?:\s|>)/.test(body);
+}
+
+export async function runRssHealthcheck(
+  paths: ReadonlyArray<string>,
+  origin: string,
+  fetchUrl: FetchRssHealthcheckUrl,
+): Promise<RssHealthcheckResponse> {
+  const results = await Promise.all(
+    paths.map(async (path) => {
+      const url = new URL(path, origin).toString();
+
+      try {
+        const response = await fetchUrl(url);
+
+        return {
+          url,
+          statusCode: response.statusCode,
+          passed: response.ok && rssFeedHasAtLeastOneEntry(response.body),
+        };
+      } catch {
+        return {
+          url,
+          statusCode: 500,
+          passed: false,
+        };
+      }
+    }),
+  );
+
+  return summarizeRssHealthcheck(results);
 }
 
 export function summarizeRssHealthcheck(
