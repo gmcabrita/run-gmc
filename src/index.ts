@@ -10,17 +10,18 @@ import { addIcs2GcalEndpoint } from "./ics2gcal";
 import { addScrapedRssEndpoints, cacheAgendaLx } from "@rss/scrapers";
 import type { FertagusResponse } from "@types";
 import {
-  getDiscordHealthcheckFailureMessage,
-  getDiscordHealthcheckPassMessage,
-  getRssHealthcheckFailureReason,
+  getDiscordHealthcheckErrorPayload,
+  getDiscordHealthcheckFailurePayload,
+  getDiscordHealthcheckPassPayload,
   getRssHealthcheckPaths,
   rssFeedHasAtLeastOneEntry,
   summarizeRssHealthcheck,
+  type DiscordWebhookPayload,
 } from "@rss/healthcheck";
 
-async function sendDiscordHealthcheckMessage(
+async function sendDiscordHealthcheckPayload(
   env: CloudflareBindings,
-  message: string,
+  payload: DiscordWebhookPayload,
 ): Promise<void> {
   if (env.HEALTHCHECK_DISCORD_WEBHOOK_URL.length === 0) {
     throw new Error("HEALTHCHECK_DISCORD_WEBHOOK_URL is empty");
@@ -31,7 +32,7 @@ async function sendDiscordHealthcheckMessage(
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({ content: message }),
+    body: JSON.stringify(payload),
   });
 
   if (!response.ok) {
@@ -39,8 +40,11 @@ async function sendDiscordHealthcheckMessage(
   }
 }
 
-function reportDiscordHealthcheckMessage(env: CloudflareBindings, message: string): Promise<void> {
-  return sendDiscordHealthcheckMessage(env, message).catch((error) => {
+function reportDiscordHealthcheckPayload(
+  env: CloudflareBindings,
+  payload: DiscordWebhookPayload,
+): Promise<void> {
+  return sendDiscordHealthcheckPayload(env, payload).catch((error) => {
     console.error("Failed to send Discord healthcheck message", error);
   });
 }
@@ -234,19 +238,19 @@ app.get(
       );
 
       const summary = summarizeRssHealthcheck(results);
-      const failureReason = getRssHealthcheckFailureReason(summary);
-      const message = failureReason
-        ? getDiscordHealthcheckFailureMessage(failureReason)
-        : getDiscordHealthcheckPassMessage();
-      ctx.executionCtx.waitUntil(reportDiscordHealthcheckMessage(ctx.env, message));
+      const payload =
+        summary.failures.length === 0
+          ? getDiscordHealthcheckPassPayload(summary)
+          : getDiscordHealthcheckFailurePayload(summary);
+      ctx.executionCtx.waitUntil(reportDiscordHealthcheckPayload(ctx.env, payload));
 
       ctx.status(summary.summary.failed === 0 ? 200 : 503);
       return ctx.json(summary);
     } catch (error) {
       ctx.executionCtx.waitUntil(
-        reportDiscordHealthcheckMessage(
+        reportDiscordHealthcheckPayload(
           ctx.env,
-          getDiscordHealthcheckFailureMessage("Internal Server Error"),
+          getDiscordHealthcheckErrorPayload("Internal Server Error"),
         ),
       );
       throw error;

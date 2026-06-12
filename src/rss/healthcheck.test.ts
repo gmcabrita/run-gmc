@@ -1,7 +1,9 @@
 import { describe, expect, it } from "vitest";
 import {
   getDiscordHealthcheckFailureMessage,
+  getDiscordHealthcheckFailurePayload,
   getDiscordHealthcheckPassMessage,
+  getDiscordHealthcheckPassPayload,
   getRssHealthcheckFailureReason,
   getRssHealthcheckPaths,
   rssFeedHasAtLeastOneEntry,
@@ -93,5 +95,60 @@ describe("getDiscordHealthcheckFailureMessage", () => {
 describe("getDiscordHealthcheckPassMessage", () => {
   it("formats the Discord pass message", () => {
     expect(getDiscordHealthcheckPassMessage()).toBe("run.gmc healthcheck passed");
+  });
+});
+
+describe("getDiscordHealthcheckFailurePayload", () => {
+  it("formats failures as Discord embeds", () => {
+    expect(
+      getDiscordHealthcheckFailurePayload({
+        summary: { passed: 2, failed: 2 },
+        failures: [
+          { url: "https://run.gmcabrita.com/rss.informacaoLisboa", statusCode: 500 },
+          { url: "https://run.gmcabrita.com/rss.reutersMediaTelecom", statusCode: 502 },
+        ],
+      }),
+    ).toEqual({
+      content: "run.gmc healthcheck failed",
+      embeds: [
+        {
+          title: "run.gmc healthcheck failed",
+          description: "2 failed, 2 passed",
+          color: 0xff3b30,
+          fields: [
+            {
+              name: "500 /rss.informacaoLisboa",
+              value: "<https://run.gmcabrita.com/rss.informacaoLisboa>",
+              inline: false,
+            },
+            {
+              name: "502 /rss.reutersMediaTelecom",
+              value: "<https://run.gmcabrita.com/rss.reutersMediaTelecom>",
+              inline: false,
+            },
+          ],
+        },
+      ],
+    });
+  });
+});
+
+describe("getDiscordHealthcheckPassPayload", () => {
+  it("formats passes as Discord embeds", () => {
+    expect(
+      getDiscordHealthcheckPassPayload({
+        summary: { passed: 2, failed: 0 },
+        failures: [],
+      }),
+    ).toEqual({
+      content: "run.gmc healthcheck passed",
+      embeds: [
+        {
+          title: "run.gmc healthcheck passed",
+          description: "2 feeds passed",
+          color: 0x34c759,
+        },
+      ],
+    });
   });
 });

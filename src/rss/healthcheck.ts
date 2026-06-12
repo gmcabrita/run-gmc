@@ -30,6 +30,29 @@ export interface RssHealthcheckResponse {
   failures: RssHealthcheckFailure[];
 }
 
+export interface DiscordEmbedField {
+  name: string;
+  value: string;
+  inline?: boolean;
+}
+
+export interface DiscordEmbed {
+  title: string;
+  description?: string;
+  color: number;
+  fields?: DiscordEmbedField[];
+}
+
+export interface DiscordWebhookPayload {
+  content: string;
+  embeds: DiscordEmbed[];
+}
+
+const discordFailureColor = 0xff3b30;
+const discordPassColor = 0x34c759;
+const discordEmbedFieldLimit = 25;
+const discordEmbedLimit = 10;
+
 export function getRssHealthcheckFailureReason(
   response: RssHealthcheckResponse,
 ): string | undefined {
@@ -42,6 +65,83 @@ export function getDiscordHealthcheckFailureMessage(reason: string): string {
 
 export function getDiscordHealthcheckPassMessage(): string {
   return "run.gmc healthcheck passed";
+}
+
+export function getDiscordHealthcheckFailurePayload(
+  response: RssHealthcheckResponse,
+): DiscordWebhookPayload {
+  const visibleFailures = response.failures.slice(0, discordEmbedFieldLimit * discordEmbedLimit);
+  const overflowCount = response.failures.length - visibleFailures.length;
+  const fields = visibleFailures.map(formatRssHealthcheckFailureField);
+  const embeds: DiscordEmbed[] = [];
+
+  for (let index = 0; index < fields.length; index += discordEmbedFieldLimit) {
+    const isFirstEmbed = index === 0;
+    embeds.push({
+      title: isFirstEmbed ? "run.gmc healthcheck failed" : "More healthcheck failures",
+      description: isFirstEmbed
+        ? formatHealthcheckSummary(response, overflowCount)
+        : undefined,
+      color: discordFailureColor,
+      fields: fields.slice(index, index + discordEmbedFieldLimit),
+    });
+  }
+
+  return {
+    content: "run.gmc healthcheck failed",
+    embeds,
+  };
+}
+
+export function getDiscordHealthcheckErrorPayload(reason: string): DiscordWebhookPayload {
+  return {
+    content: getDiscordHealthcheckFailureMessage(reason),
+    embeds: [
+      {
+        title: "run.gmc healthcheck failed",
+        description: reason,
+        color: discordFailureColor,
+      },
+    ],
+  };
+}
+
+export function getDiscordHealthcheckPassPayload(
+  response: RssHealthcheckResponse,
+): DiscordWebhookPayload {
+  return {
+    content: getDiscordHealthcheckPassMessage(),
+    embeds: [
+      {
+        title: "run.gmc healthcheck passed",
+        description: `${response.summary.passed} feeds passed`,
+        color: discordPassColor,
+      },
+    ],
+  };
+}
+
+function formatHealthcheckSummary(response: RssHealthcheckResponse, overflowCount: number): string {
+  const summary = `${response.summary.failed} failed, ${response.summary.passed} passed`;
+  return overflowCount === 0
+    ? summary
+    : `${summary}. Showing first ${response.failures.length - overflowCount}.`;
+}
+
+function formatRssHealthcheckFailureField(failure: RssHealthcheckFailure): DiscordEmbedField {
+  return {
+    name: `${failure.statusCode} ${getUrlPathname(failure.url)}`,
+    value: `<${failure.url}>`,
+    inline: false,
+  };
+}
+
+function getUrlPathname(url: string): string {
+  try {
+    return new URL(url).pathname;
+  } catch {
+    return url;
+  }
 }
 
 export function getRssHealthcheckPaths(routes: ReadonlyArray<RouteLike>): string[] {
