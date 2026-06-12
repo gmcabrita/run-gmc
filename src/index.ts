@@ -10,35 +10,38 @@ import { addIcs2GcalEndpoint } from "./ics2gcal";
 import { addScrapedRssEndpoints, cacheAgendaLx } from "@rss/scrapers";
 import type { FertagusResponse } from "@types";
 import {
-  getPokeHealthcheckFailureMessage,
+  getDiscordHealthcheckFailureMessage,
+  getDiscordHealthcheckPassMessage,
   getRssHealthcheckFailureReason,
   getRssHealthcheckPaths,
   rssFeedHasAtLeastOneEntry,
   summarizeRssHealthcheck,
 } from "@rss/healthcheck";
 
-async function sendPokeHealthcheckFailure(env: CloudflareBindings, reason: string): Promise<void> {
-  if (env.POKE_API_KEY.length === 0) {
-    throw new Error("POKE_API_KEY is empty");
+async function sendDiscordHealthcheckMessage(
+  env: CloudflareBindings,
+  message: string,
+): Promise<void> {
+  if (env.HEALTHCHECK_DISCORD_WEBHOOK_URL.length === 0) {
+    throw new Error("HEALTHCHECK_DISCORD_WEBHOOK_URL is empty");
   }
 
-  const response = await fetch("https://poke.com/api/v1/inbound/api-message", {
+  const response = await fetch(env.HEALTHCHECK_DISCORD_WEBHOOK_URL, {
     method: "POST",
     headers: {
-      Authorization: `Bearer ${env.POKE_API_KEY}`,
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({ message: getPokeHealthcheckFailureMessage(reason) }),
+    body: JSON.stringify({ content: message }),
   });
 
   if (!response.ok) {
-    throw new Error(`Poke failed with ${response.status} ${response.statusText}`);
+    throw new Error(`Discord webhook failed with ${response.status} ${response.statusText}`);
   }
 }
 
-function reportPokeHealthcheckFailure(env: CloudflareBindings, reason: string): Promise<void> {
-  return sendPokeHealthcheckFailure(env, reason).catch((error) => {
-    console.error("Failed to send Poke healthcheck failure", error);
+function reportDiscordHealthcheckMessage(env: CloudflareBindings, message: string): Promise<void> {
+  return sendDiscordHealthcheckMessage(env, message).catch((error) => {
+    console.error("Failed to send Discord healthcheck message", error);
   });
 }
 
@@ -232,15 +235,19 @@ app.get(
 
       const summary = summarizeRssHealthcheck(results);
       const failureReason = getRssHealthcheckFailureReason(summary);
-      if (failureReason) {
-        ctx.executionCtx.waitUntil(reportPokeHealthcheckFailure(ctx.env, failureReason));
-      }
+      const message = failureReason
+        ? getDiscordHealthcheckFailureMessage(failureReason)
+        : getDiscordHealthcheckPassMessage();
+      ctx.executionCtx.waitUntil(reportDiscordHealthcheckMessage(ctx.env, message));
 
       ctx.status(summary.summary.failed === 0 ? 200 : 503);
       return ctx.json(summary);
     } catch (error) {
       ctx.executionCtx.waitUntil(
-        reportPokeHealthcheckFailure(ctx.env, error.message || "Internal Server Error"),
+        reportDiscordHealthcheckMessage(
+          ctx.env,
+          getDiscordHealthcheckFailureMessage("Internal Server Error"),
+        ),
       );
       throw error;
     }

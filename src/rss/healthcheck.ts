@@ -36,8 +36,12 @@ export function getRssHealthcheckFailureReason(
   return response.failures.length === 0 ? undefined : JSON.stringify(response.failures);
 }
 
-export function getPokeHealthcheckFailureMessage(reason: string): string {
+export function getDiscordHealthcheckFailureMessage(reason: string): string {
   return `run.gmc healthcheck failed: ${reason}`;
+}
+
+export function getDiscordHealthcheckPassMessage(): string {
+  return "run.gmc healthcheck passed";
 }
 
 export function getRssHealthcheckPaths(routes: ReadonlyArray<RouteLike>): string[] {

@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
-  getPokeHealthcheckFailureMessage,
+  getDiscordHealthcheckFailureMessage,
+  getDiscordHealthcheckPassMessage,
   getRssHealthcheckFailureReason,
   getRssHealthcheckPaths,
   rssFeedHasAtLeastOneEntry,
@@ -81,10 +82,16 @@ describe("getRssHealthcheckFailureReason", () => {
   });
 });
 
-describe("getPokeHealthcheckFailureMessage", () => {
-  it("formats the Poke message", () => {
-    expect(getPokeHealthcheckFailureMessage("Internal Server Error")).toBe(
+describe("getDiscordHealthcheckFailureMessage", () => {
+  it("formats the Discord failure message", () => {
+    expect(getDiscordHealthcheckFailureMessage("Internal Server Error")).toBe(
       "run.gmc healthcheck failed: Internal Server Error",
     );
+  });
+});
+
+describe("getDiscordHealthcheckPassMessage", () => {
+  it("formats the Discord pass message", () => {
+    expect(getDiscordHealthcheckPassMessage()).toBe("run.gmc healthcheck passed");
   });
 });

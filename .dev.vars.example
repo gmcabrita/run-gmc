@@ -30,5 +30,5 @@ SENTRY_DSN=
 
 DENO_PROXY_AUTH_TOKEN=auth-token
 
-# Poke API
-POKE_API_KEY=your-poke-api-key
+# Healthcheck Discord webhook
+HEALTHCHECK_DISCORD_WEBHOOK_URL=https://discord.com/api/webhooks/...
