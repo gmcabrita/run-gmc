@@ -38,11 +38,10 @@ describe("createProxiedFetch", () => {
     const request = requireRelayRequest(relayInput, relayInit);
     const headers = request.headers;
 
-    expect(request.url).toBe(relayEnv.HTTP_RELAY_URL);
+    expect(request.url).toBe("https://relay.example.com/fetch/https://target.example.com/api");
     expect(request.method).toBe("POST");
     expect(await request.text()).toBe("payload");
     expect(headers.get("Authorization")).toBe(`Bearer ${relayEnv.HTTP_RELAY_TOKEN}`);
-    expect(headers.get("x-target-url")).toBe("https://target.example.com/api");
     expect(headers.get("Accept")).toBe("application/json");
     expect(headers.get("Accept-Language")).toBe("pt-PT");
     expect(headers.get("Referer")).toBe("https://target.example.com/");
@@ -68,5 +67,28 @@ describe("createProxiedFetch", () => {
     const request = requireRelayRequest(relayInput, relayInit);
 
     expect(request.headers.get("x-api-key")).toBeNull();
+  });
+
+  it("does not add a duplicate slash when the relay URL already ends with one", async () => {
+    let relayInput: RequestInfo | URL | undefined;
+    let relayInit: RequestInit | undefined;
+
+    const fetcher: typeof fetch = async (input, init) => {
+      relayInput = input;
+      relayInit = init;
+      return new Response("ok");
+    };
+
+    await createProxiedFetch(
+      {
+        ...relayEnv,
+        HTTP_RELAY_URL: "https://relay.example.com/fetch/",
+      },
+      fetcher,
+    )("https://target.example.com/api");
+
+    const request = requireRelayRequest(relayInput, relayInit);
+
+    expect(request.url).toBe("https://relay.example.com/fetch/https://target.example.com/api");
   });
 });

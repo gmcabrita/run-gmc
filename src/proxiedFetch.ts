@@ -14,12 +14,17 @@ const RELAY_FORWARDED_HEADERS: RelayForwardedHeader[] = [
   "Referer",
 ];
 
+function getRelayRequestUrl(relayUrl: string, targetUrl: string): string {
+  const separator = relayUrl.endsWith("/") ? "" : "/";
+
+  return `${relayUrl}${separator}${targetUrl}`;
+}
+
 export function createProxiedFetch(env: ProxiedFetchEnv, fetcher: ProxiedFetch = fetch): ProxiedFetch {
   return (input, init) => {
     const targetRequest = new Request(input, init);
     const headers = new Headers({
       Authorization: `Bearer ${env.HTTP_RELAY_TOKEN}`,
-      "x-target-url": targetRequest.url,
     });
 
     for (const header of RELAY_FORWARDED_HEADERS) {
@@ -30,7 +35,7 @@ export function createProxiedFetch(env: ProxiedFetchEnv, fetcher: ProxiedFetch =
       }
     }
 
-    return fetcher(env.HTTP_RELAY_URL, {
+    return fetcher(getRelayRequestUrl(env.HTTP_RELAY_URL, targetRequest.url), {
       method: targetRequest.method,
       headers,
       body: targetRequest.body,
