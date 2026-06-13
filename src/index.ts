@@ -7,6 +7,7 @@ import { sendCinecartazEntriesByEmail } from "@rss/scrapers/cinecartaz";
 import { sendCinemaxRtpPassatemposEntriesByEmail } from "@rss/scrapers/cinemaxRtpPassatempos";
 import { addXEndpoints } from "@x";
 import { addIcs2GcalEndpoint } from "./ics2gcal";
+import { checkMauserSc1176StockAndNotify } from "./mauser";
 import { addScrapedRssEndpoints, cacheAgendaLx } from "@rss/scrapers";
 import type { FertagusResponse } from "@types";
 import {
@@ -381,34 +382,47 @@ export default Sentry.withSentry(
     async scheduled(controller, env, ctx) {
       switch (controller.cron) {
         case "* * * * *":
-          await Sentry.withMonitor(
-            "rss.sendCinecartazEntriesByEmail",
-            async () => {
-              await sendCinecartazEntriesByEmail(env);
-            },
-            {
-              schedule: {
-                type: "crontab",
-                value: "* * * * *",
+          await Promise.all([
+            Sentry.withMonitor(
+              "rss.sendCinecartazEntriesByEmail",
+              async () => {
+                await sendCinecartazEntriesByEmail(env);
               },
-              checkinMargin: 2,
-            },
-          );
-          break;
-        case "*/2 * * * *":
-          await Sentry.withMonitor(
-            "rss.sendCinemaxRtpPassatemposEntriesByEmail",
-            async () => {
-              await sendCinemaxRtpPassatemposEntriesByEmail(env);
-            },
-            {
-              schedule: {
-                type: "crontab",
-                value: "*/2 * * * *",
+              {
+                schedule: {
+                  type: "crontab",
+                  value: "* * * * *",
+                },
+                checkinMargin: 2,
               },
-              checkinMargin: 2,
-            },
-          );
+            ),
+            Sentry.withMonitor(
+              "rss.sendCinemaxRtpPassatemposEntriesByEmail",
+              async () => {
+                await sendCinemaxRtpPassatemposEntriesByEmail(env);
+              },
+              {
+                schedule: {
+                  type: "crontab",
+                  value: "* * * * *",
+                },
+                checkinMargin: 2,
+              },
+            ),
+            Sentry.withMonitor(
+              "mauser.checkSc1176StockAndNotify",
+              async () => {
+                await checkMauserSc1176StockAndNotify(env, new Date(controller.scheduledTime));
+              },
+              {
+                schedule: {
+                  type: "crontab",
+                  value: "* * * * *",
+                },
+                checkinMargin: 2,
+              },
+            ),
+          ]);
           break;
         case "*/15 * * * *":
           await Sentry.withMonitor(
