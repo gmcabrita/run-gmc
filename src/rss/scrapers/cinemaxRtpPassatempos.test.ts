@@ -26,7 +26,7 @@ const xml = `<?xml version="1.0" encoding="UTF-8"?>
 </rss>`;
 
 describe("cinemax RTP passatempos scraper", () => {
-  it("parses unfinished passatempos from feed", async () => {
+  it("parses passatempos from feed", async () => {
     const response = new Response(xml, {
       headers: { "Content-Type": "application/rss+xml" },
     });
@@ -37,12 +37,31 @@ describe("cinemax RTP passatempos scraper", () => {
     expect(result.link).toBe("https://cinemax.rtp.pt/passatempos/");
     expect(result.title).toBe("Passatempos Archive - RTP Cinemax");
     expect(result.language).toBe("pt-PT");
-    expect(result.entries).toHaveLength(1);
+    expect(result.entries).toHaveLength(2);
     expect(result.entries[0]).toMatchObject({
       id: "https://cinemax.rtp.pt/?post_type=passatempos&p=11778",
       link: "https://cinemax.rtp.pt/passatempos/antestreia-o-dia-da-revelacao/",
       title: "Antestreia: “O Dia da Revelação”",
       text: "SINOPSE Como participar.",
     });
+    expect(result.entries[1]?.title).toBe("[Terminado] Antestreia: “Mais Forte Que Eu”");
+  });
+
+  it("keeps finished passatempos when all entries are finished", async () => {
+    const response = new Response(
+      xml.replace(
+        "<title>Antestreia: &#8220;O Dia da Revelação&#8221;</title>",
+        "<title>[Terminado] Antestreia: &#8220;O Dia da Revelação&#8221;</title>",
+      ),
+      {
+        headers: { "Content-Type": "application/rss+xml" },
+      },
+    );
+
+    const result = await parse(response);
+
+    expect(result.entries).toHaveLength(2);
+    expect(result.entries[0]?.title).toBe("[Terminado] Antestreia: “O Dia da Revelação”");
+    expect(result.entries[1]?.title).toBe("[Terminado] Antestreia: “Mais Forte Que Eu”");
   });
 });

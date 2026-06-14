@@ -80,7 +80,7 @@ function firstImageURL(value: string) {
 
 function entryFromItem(itemXml: string): RSSEntry | undefined {
   const title = normalizeText(tagText(itemXml, "title") ?? "");
-  if (!title || title.includes(FINISHED_TITLE_MARKER)) {
+  if (!title) {
     return undefined;
   }
 
@@ -143,8 +143,11 @@ export async function get(_ctx?: ScraperContext): Promise<RSSData> {
 
 export async function sendCinemaxRtpPassatemposEntriesByEmail(env: CloudflareBindings) {
   const data = await get();
+  const unfinishedEntries = data.entries.filter(
+    (entry) => !entry.title.includes(FINISHED_TITLE_MARKER),
+  );
 
-  for (const entry of data.entries) {
+  for (const entry of unfinishedEntries) {
     await idempotentSendEmail(env, {
       to: "goncalo.mendes.cabrita@gmail.com",
       subject: `[Passatempo Cinemax] ${entry.title}`,
