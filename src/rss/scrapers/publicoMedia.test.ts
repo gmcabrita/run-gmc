@@ -1,14 +1,42 @@
 import { describe, expect, it } from "vitest";
-import pageOneHtml from "./__fixtures__/publico-media-page-1.html";
-import pageTwoHtml from "./__fixtures__/publico-media-page-2.html";
-import { parsePage, scrapeFirstTwoPages } from "./publicoMedia";
+import { parseApiResponse, scrapeMediaApi } from "./publicoMedia";
 
-const FIRST_PAGE_URL = "https://www.publico.pt/media";
-const SECOND_PAGE_URL = "https://www.publico.pt/media?page=2";
+const API_URL = "https://www.publico.pt/api/list/media?page=1&size=20";
 
-function createResponse(html: string) {
-  return new Response(html, {
-    headers: { "Content-Type": "text/html" },
+const apiResponse = [
+  {
+    id: 2179050,
+    titulo: "Chega vai ter de pagar 30 mil euros por falsa sondagem nas legislativas de 2025",
+    tituloNoticia: "Chega vai ter de pagar 30 mil euros por falsa sondagem nas legislativas de 2025",
+    descricao:
+      "A decisão ainda pode ser impugnada judicialmente, mas após o carácter definitivo ou trânsito em julgado da decisão o Chega terá dez dias para pagar a coima.\r\n",
+    url: "https://www.publico.pt/2026/06/22/politica/noticia/chega-vai-pagar-30-mil-euros-falsa-sondagem-legislativas-2025-2179050",
+    multimediaPrincipal: "https://imagens.publico.pt/imagens.aspx/2097343?tp=UH&db=&type=",
+    rubrica: "ERC",
+    data: "2026-06-22T18:00:53+01:00",
+    itemId: "NOTICIA_2179050",
+    escondeImagem: false,
+    tags: [
+      { nome: "Política", isPrincipal: true },
+      { nome: "Media", isPrincipal: false },
+    ],
+  },
+  {
+    id: 2178601,
+    titulo: "Story &quot;sem descrição&quot;",
+    tituloNoticia: null,
+    descricao: "   ",
+    url: "/2026/06/18/media/noticia/story-sem-descricao-2178601",
+    multimediaPrincipal: "https://imagens.publico.pt/imagens.aspx/2097000?tp=UH&db=&type=",
+    rubrica: "Media",
+    data: "2026-06-18T10:15:00+01:00",
+    escondeImagem: true,
+  },
+];
+
+function createJsonResponse(json: unknown) {
+  return new Response(JSON.stringify(json), {
+    headers: { "Content-Type": "application/json" },
   });
 }
 
@@ -25,69 +53,52 @@ function readFetchUrl(input: RequestInfo | URL): string {
 }
 
 describe("publicoMedia scraper", () => {
-  it("parses featured and list entries with next page", async () => {
-    const result = await parsePage(createResponse(pageOneHtml));
+  it("parses API entries", () => {
+    const result = parseApiResponse(apiResponse);
 
-    expect(result.entries).toHaveLength(3);
-    expect(result.nextPageURL).toBe(SECOND_PAGE_URL);
+    expect(result.entries).toHaveLength(2);
     expect(result.entries[0]).toEqual({
-      id: "https://www.publico.pt/2026/05/27/media/noticia/featured-story-2176000",
-      link: "https://www.publico.pt/2026/05/27/media/noticia/featured-story-2176000",
-      title: "Featured Story com espaços",
-      text: "Media",
-      datetime: new Date("Wed, 27 May 2026 21:06:10 GMT"),
-      imageURL: "https://imagens.publico.pt/imagens.aspx/100?tp=UH&w=320&h=180",
+      id: "https://www.publico.pt/2026/06/22/politica/noticia/chega-vai-pagar-30-mil-euros-falsa-sondagem-legislativas-2025-2179050",
+      link: "https://www.publico.pt/2026/06/22/politica/noticia/chega-vai-pagar-30-mil-euros-falsa-sondagem-legislativas-2025-2179050",
+      title: "Chega vai ter de pagar 30 mil euros por falsa sondagem nas legislativas de 2025",
+      text: "A decisão ainda pode ser impugnada judicialmente, mas após o carácter definitivo ou trânsito em julgado da decisão o Chega terá dez dias para pagar a coima.",
+      datetime: new Date("2026-06-22T18:00:53+01:00"),
+      imageURL: "https://imagens.publico.pt/imagens.aspx/2097343?tp=UH&db=&type=",
     });
     expect(result.entries[1]).toEqual({
-      id: "https://www.publico.pt/2026/05/21/impar/noticia/list-story-one-2175510",
-      link: "https://www.publico.pt/2026/05/21/impar/noticia/list-story-one-2175510",
-      title: "List Story One",
-      text: "Lead text for story one.",
-      datetime: new Date("Thu, 21 May 2026 12:55:44 GMT"),
-      imageURL: "https://imagens.publico.pt/imagens.aspx/200?tp=UH&w=480&h=270",
-    });
-    expect(result.entries[2]).toEqual({
-      id: "https://www.publico.pt/2026/05/20/politica/noticia/list-story-two-2175461",
-      link: "https://www.publico.pt/2026/05/20/politica/noticia/list-story-two-2175461",
-      title: 'List Story Two "Premium"',
-      text: "Política",
-      datetime: new Date("Wed, 20 May 2026 10:00:00 GMT"),
+      id: "https://www.publico.pt/2026/06/18/media/noticia/story-sem-descricao-2178601",
+      link: "https://www.publico.pt/2026/06/18/media/noticia/story-sem-descricao-2178601",
+      title: 'Story "sem descrição"',
+      text: "Media",
+      datetime: new Date("2026-06-18T10:15:00+01:00"),
       imageURL: undefined,
     });
   });
 
-  it("fetches only the first two pages", async () => {
+  it("fetches the Público media API", async () => {
     const fetchCalls: string[] = [];
     const fetchFn: typeof fetch = async (input) => {
       const url = readFetchUrl(input);
       fetchCalls.push(url);
 
-      if (url === FIRST_PAGE_URL) {
-        return createResponse(pageOneHtml);
-      }
-
-      if (url === SECOND_PAGE_URL) {
-        return createResponse(pageTwoHtml);
+      if (url === API_URL) {
+        return createJsonResponse(apiResponse);
       }
 
       throw new Error(`Unexpected fetch: ${url}`);
     };
 
-    const result = await scrapeFirstTwoPages(fetchFn);
+    const result = await scrapeMediaApi(fetchFn);
 
-    expect(fetchCalls).toEqual([FIRST_PAGE_URL, SECOND_PAGE_URL]);
-    expect(result.id).toBe(FIRST_PAGE_URL);
-    expect(result.link).toBe(FIRST_PAGE_URL);
+    expect(fetchCalls).toEqual([API_URL]);
+    expect(result.id).toBe("https://www.publico.pt/media");
+    expect(result.link).toBe("https://www.publico.pt/media");
     expect(result.title).toBe("Público - Media");
     expect(result.description).toBe("Público Media");
     expect(result.language).toBe("pt");
     expect(result.entries.map((entry) => entry.title)).toEqual([
-      "Featured Story com espaços",
-      "List Story One",
-      'List Story Two "Premium"',
-      "Page Two Featured",
-      "Page Two List Story",
+      "Chega vai ter de pagar 30 mil euros por falsa sondagem nas legislativas de 2025",
+      'Story "sem descrição"',
     ]);
-    expect(result.entries[4]?.text).toBe("Older article from page two.");
   });
 });

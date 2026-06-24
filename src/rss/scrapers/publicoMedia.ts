@@ -1,20 +1,20 @@
-import { USERAGENT, consume, isValidRSSEntry, type ScraperContext } from "@rss/common";
+import { USERAGENT, isValidRSSEntry, type ScraperContext } from "@rss/common";
 import type { RSSData, RSSEntry } from "@rss/types";
 
 const SITE_ORIGIN = "https://www.publico.pt";
 const SECTION_PATH = "/media";
 const BASE_URL = new URL(SECTION_PATH, SITE_ORIGIN).href;
+const API_URL = "https://www.publico.pt/api/list/media?page=1&size=20";
 
 type FetchFn = typeof fetch;
 
-interface DraftEntry extends RSSEntry {
-  kicker: string;
-  publishedAt: string;
-}
-
-interface ParsedPage {
-  entries: RSSEntry[];
-  nextPageURL?: string;
+interface PublicoArticle {
+  id: string;
+  link: string;
+  title: string;
+  text?: string;
+  datetime?: Date;
+  imageURL?: string;
 }
 
 const HTML_ENTITY_BY_NAME: Record<string, string> = {
@@ -25,6 +25,18 @@ const HTML_ENTITY_BY_NAME: Record<string, string> = {
   nbsp: " ",
   quot: '"',
 };
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null;
+}
+
+function readString(value: unknown): string | undefined {
+  return typeof value === "string" && value !== "" ? value : undefined;
+}
+
+function readBoolean(value: unknown): boolean | undefined {
+  return typeof value === "boolean" ? value : undefined;
+}
 
 function decodeHtmlEntities(text: string): string {
   return text.replace(/&(#x[0-9a-f]+|#\d+|[a-z]+);/gi, (match, entity) => {
@@ -43,19 +55,27 @@ function decodeHtmlEntities(text: string): string {
   });
 }
 
-function normalizeWhitespace(text: string): string {
-  return decodeHtmlEntities(text).replace(/\u00a0/g, " ").replace(/\s+/g, " ").trim();
+function stripTags(text: string): string {
+  return text.replace(/<[^>]*>/g, " ");
 }
 
-function getLastEntry(entries: DraftEntry[]): DraftEntry | undefined {
-  return entries[entries.length - 1];
+function normalizeWhitespace(text: string | undefined): string | undefined {
+  if (!text) {
+    return undefined;
+  }
+
+  return decodeHtmlEntities(stripTags(text)).replace(/\u00a0/g, " ").replace(/\s+/g, " ").trim() || undefined;
 }
 
-function normalizePageUrl(href: string): string {
-  return new URL(href, SITE_ORIGIN).href;
+function normalizeUrl(href: string | undefined): string | undefined {
+  if (!href) {
+    return undefined;
+  }
+
+  return new URL(decodeHtmlEntities(href), SITE_ORIGIN).href;
 }
 
-function parsePublishedAt(value: string): Date | undefined {
+function parseDate(value: string | undefined): Date | undefined {
   if (!value) {
     return undefined;
   }
@@ -64,41 +84,72 @@ function parsePublishedAt(value: string): Date | undefined {
   return Number.isNaN(parsed.getTime()) ? undefined : parsed;
 }
 
-function getImageURLFromInterchange(interchange: string | null): string | undefined {
-  if (!interchange) {
+function readPrimaryTagName(value: unknown): string | undefined {
+  if (!Array.isArray(value)) {
     return undefined;
   }
 
-  const match = interchange.match(/\[\s*(https?:\/\/[^,\]]+)/);
-  if (!match) {
+  for (const tag of value) {
+    if (!isRecord(tag) || readBoolean(tag.isPrincipal) !== true) {
+      continue;
+    }
+
+    const name = normalizeWhitespace(readString(tag.nome));
+    if (name) {
+      return name;
+    }
+  }
+
+  return undefined;
+}
+
+function parseArticle(value: unknown): PublicoArticle | undefined {
+  if (!isRecord(value)) {
     return undefined;
   }
 
-  return decodeHtmlEntities(match[1]);
-}
-
-function getImageURL(el: Element): string | undefined {
-  const src = el.getAttribute("src");
-  if (src && !src.startsWith("data:")) {
-    return new URL(decodeHtmlEntities(src), SITE_ORIGIN).href;
+  const link = normalizeUrl(readString(value.fullUrl) ?? readString(value.url) ?? readString(value.shareUrl));
+  if (!link) {
+    return undefined;
   }
 
-  return getImageURLFromInterchange(el.getAttribute("data-interchange"));
-}
-
-async function fetchPage(url: string, fetchFn: FetchFn): Promise<Response> {
-  const response = await fetchFn(url, {
-    headers: {
-      accept: "text/html,application/xhtml+xml",
-      "user-agent": USERAGENT,
-    },
-  });
-
-  if (!response.ok) {
-    throw new Error(`Público media request failed: ${response.status}`);
+  const title = normalizeWhitespace(readString(value.tituloNoticia) ?? readString(value.titulo) ?? readString(value.cleanTitle));
+  if (!title) {
+    return undefined;
   }
 
-  return response;
+  const text =
+    normalizeWhitespace(readString(value.descricao)) ??
+    normalizeWhitespace(readString(value.lead)) ??
+    normalizeWhitespace(readString(value.subtitulo)) ??
+    normalizeWhitespace(readString(value.rubrica)) ??
+    readPrimaryTagName(value.tags) ??
+    title;
+
+  return {
+    id: link,
+    link,
+    title,
+    text,
+    datetime: parseDate(readString(value.data) ?? readString(value.dataActualizacao)),
+    imageURL: readBoolean(value.escondeImagem) === true ? undefined : normalizeUrl(readString(value.multimediaPrincipal)),
+  };
+}
+
+function readArticles(value: unknown): PublicoArticle[] {
+  if (Array.isArray(value)) {
+    return value.flatMap((article) => {
+      const parsedArticle = parseArticle(article);
+      return parsedArticle ? [parsedArticle] : [];
+    });
+  }
+
+  if (!isRecord(value)) {
+    return [];
+  }
+
+  const articles = value.items ?? value.results ?? value.data;
+  return readArticles(articles);
 }
 
 function buildFeed(entries: RSSEntry[]): RSSData {
@@ -112,201 +163,36 @@ function buildFeed(entries: RSSEntry[]): RSSData {
   };
 }
 
-export async function parsePage(response: Response): Promise<ParsedPage> {
-  const draftEntries: DraftEntry[] = [];
-  let nextPageURL: string | undefined;
-  const featuredSelector = ".headline-featured article.card";
-  const listItemSelector = "#ul-listing > li.headline-list__item";
-
-  const rewriter = new HTMLRewriter()
-    .on(featuredSelector, {
-      element() {
-        draftEntries.push({
-          id: "",
-          link: "",
-          title: "",
-          text: "",
-          kicker: "",
-          publishedAt: "",
-        });
-      },
-    })
-    .on(`${featuredSelector} h3.card__title a.card__faux-block-link`, {
-      element(el) {
-        const entry = getLastEntry(draftEntries);
-        const href = el.getAttribute("href");
-        if (!entry || !href) {
-          return;
-        }
-
-        const link = normalizePageUrl(href);
-        entry.id = link;
-        entry.link = link;
-      },
-      text(text) {
-        const entry = getLastEntry(draftEntries);
-        if (entry) {
-          entry.title += text.text;
-        }
-      },
-    })
-    .on(`${featuredSelector} .card__header h4.kicker`, {
-      text(text) {
-        const entry = getLastEntry(draftEntries);
-        if (entry) {
-          entry.kicker += text.text;
-        }
-      },
-    })
-    .on(`${featuredSelector} figure.card__media img`, {
-      element(el) {
-        const entry = getLastEntry(draftEntries);
-        const imageURL = getImageURL(el);
-        if (entry && imageURL && !entry.imageURL) {
-          entry.imageURL = imageURL;
-        }
-      },
-    })
-    .on(`${featuredSelector} footer.card__meta time.dateline`, {
-      element(el) {
-        const entry = getLastEntry(draftEntries);
-        const datetime = el.getAttribute("datetime");
-        if (entry && datetime) {
-          entry.publishedAt = datetime;
-        }
-      },
-    })
-    .on(listItemSelector, {
-      element() {
-        draftEntries.push({
-          id: "",
-          link: "",
-          title: "",
-          text: "",
-          kicker: "",
-          publishedAt: "",
-        });
-      },
-    })
-    .on(`${listItemSelector} div.media-object-section > a`, {
-      element(el) {
-        const entry = getLastEntry(draftEntries);
-        const href = el.getAttribute("href");
-        if (!entry || !href || entry.link) {
-          return;
-        }
-
-        const link = normalizePageUrl(href);
-        entry.id = link;
-        entry.link = link;
-      },
-    })
-    .on(`${listItemSelector} h4.headline`, {
-      text(text) {
-        const entry = getLastEntry(draftEntries);
-        if (entry) {
-          entry.title += text.text;
-        }
-      },
-    })
-    .on(`${listItemSelector} h5.kicker`, {
-      text(text) {
-        const entry = getLastEntry(draftEntries);
-        if (entry) {
-          entry.kicker += text.text;
-        }
-      },
-    })
-    .on(`${listItemSelector} p.lead.headline-list__blurb`, {
-      text(text) {
-        const entry = getLastEntry(draftEntries);
-        if (entry) {
-          entry.text = (entry.text ?? "") + text.text;
-        }
-      },
-    })
-    .on(`${listItemSelector} a.headline-list__thumb img`, {
-      element(el) {
-        const entry = getLastEntry(draftEntries);
-        const imageURL = getImageURL(el);
-        if (entry && imageURL && !entry.imageURL) {
-          entry.imageURL = imageURL;
-        }
-      },
-    })
-    .on(`${listItemSelector} footer.headline-list__footer time.dateline`, {
-      element(el) {
-        const entry = getLastEntry(draftEntries);
-        const datetime = el.getAttribute("datetime");
-        if (entry && datetime) {
-          entry.publishedAt = datetime;
-        }
-      },
-    })
-    .on('a.module__button--more[href*="page="]', {
-      element(el) {
-        if (nextPageURL) {
-          return;
-        }
-
-        const href = el.getAttribute("href");
-        if (href) {
-          nextPageURL = normalizePageUrl(href);
-        }
-      },
-    });
-
-  const body = rewriter.transform(response).body;
-  if (!body) {
-    throw new Error("Missing response body");
-  }
-
-  await consume(body);
-
-  return {
-    entries: draftEntries
-      .map((entry) => {
-        const title = normalizeWhitespace(entry.title);
-        const kicker = normalizeWhitespace(entry.kicker);
-        const lead = normalizeWhitespace(entry.text ?? "");
-
-        return {
-          id: entry.id,
-          link: entry.link,
-          title,
-          text: lead || kicker || title,
-          datetime: parsePublishedAt(entry.publishedAt),
-          imageURL: entry.imageURL,
-        };
-      })
-      .filter(isValidRSSEntry),
-    nextPageURL,
-  };
-}
-
-export async function scrapeFirstTwoPages(fetchFn: FetchFn): Promise<RSSData> {
-  const entries: RSSEntry[] = [];
-  const seenIds = new Set<string>();
-  let currentPageURL: string | undefined = BASE_URL;
-
-  for (let pageNumber = 0; pageNumber < 2 && currentPageURL; pageNumber += 1) {
-    const page = await parsePage(await fetchPage(currentPageURL, fetchFn));
-
-    for (const entry of page.entries) {
-      if (seenIds.has(entry.id)) {
-        continue;
-      }
-
-      seenIds.add(entry.id);
-      entries.push(entry);
-    }
-
-    currentPageURL = page.nextPageURL;
-  }
+export function parseApiResponse(json: unknown): RSSData {
+  const entries: RSSEntry[] = readArticles(json)
+    .map((article) => ({
+      id: article.id,
+      link: article.link,
+      title: article.title,
+      text: article.text,
+      datetime: article.datetime,
+      imageURL: article.imageURL,
+    }))
+    .filter(isValidRSSEntry);
 
   return buildFeed(entries);
 }
 
+export async function scrapeMediaApi(fetchFn: FetchFn): Promise<RSSData> {
+  const response = await fetchFn(API_URL, {
+    headers: {
+      accept: "application/json, text/plain, */*",
+      "user-agent": USERAGENT,
+    },
+  });
+
+  if (!response.ok) {
+    throw new Error(`Público media request failed: ${response.status}`);
+  }
+
+  return parseApiResponse(await response.json());
+}
+
 export async function get(_ctx: ScraperContext, fetchFn: FetchFn = fetch): Promise<RSSData> {
-  return scrapeFirstTwoPages(fetchFn);
+  return scrapeMediaApi(fetchFn);
 }
