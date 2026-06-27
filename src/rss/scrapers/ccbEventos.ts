@@ -20,6 +20,7 @@ type CCBCard = {
 const IGNORED_TAGS = new Set(["Atividades", "Exposições"]);
 
 const IGNORED_TEXT_PATTERNS = [
+  "programa vincular",
   "| programa vincular -",
   "| famílias |",
   "exposição permanente |",

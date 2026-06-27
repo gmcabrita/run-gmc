@@ -112,6 +112,22 @@ const htmlWithIgnoredCards = `
       </div>
     </div>
   </div>
+  <div class="col-md-4 col-sm-6 col-xs-12">
+    <div id="post-268004" class="cards cards_">
+      <a href="/evento/programa-de-educacao-e-mediacao-do-mac-ccb/2026-06-30/" aria-label="Programa Vincular – Serviço de Educação e Mediação" class="card_click"></a>
+      <div class="card_imgs cards_outro">
+        <div class="card_tag">
+          <p class="tag">Escolas</p>
+        </div>
+      </div>
+      <div class="card_body">
+        <span class="card_date">Até setembro de 2026</span>
+        <p class="card_title">Programa Vincular – Serviço de Educação e Mediação</p>
+        <p class="card_desc">2025-26 Escolas</p>
+        <span><span class="card_info">MAC/CCB</span></span>
+      </div>
+    </div>
+  </div>
 `;
 
 function createResponse() {
@@ -169,7 +185,7 @@ describe("ccbEventos scraper", () => {
     });
   });
 
-  it("ignores recurring activities and exhibitions by tag", async () => {
+  it("ignores recurring activities, exhibitions and Programa Vincular", async () => {
     const result = await parse(createIgnoredCardsResponse());
 
     expect(result.entries).toHaveLength(3);
