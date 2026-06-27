@@ -51,8 +51,77 @@ const html = `
   </div>
 `;
 
+const htmlWithIgnoredCards = `
+  <div class="col-md-4 col-sm-6 col-xs-12">
+    <div id="post-268000" class="cards cards_">
+      <a href="/evento/atividades-para-familias-museu-mac-ccb/2026-06-21/" aria-label="Atividades para Famílias" class="card_click"></a>
+      <div class="card_imgs cards_outro">
+        <div class="card_tag">
+          <p class="tag">Atividades</p>
+        </div>
+      </div>
+      <div class="card_body">
+        <span class="card_date">Sábados e domingos</span>
+        <p class="card_title">Atividades para Famílias</p>
+        <span><span class="card_info">MAC/CCB</span></span>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-4 col-sm-6 col-xs-12">
+    <div id="post-268001" class="cards cards_">
+      <a href="/evento/visitas-guiadas-2/2026-06-28/" aria-label="Visitas Guiadas" class="card_click"></a>
+      <div class="card_imgs cards_outro">
+        <div class="card_tag">
+          <p class="tag">Atividades</p>
+        </div>
+      </div>
+      <div class="card_body">
+        <span class="card_date">Até dezembro 2026</span>
+        <p class="card_title">Visitas Guiadas</p>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-4 col-sm-6 col-xs-12">
+    <div id="post-268002" class="cards cards_">
+      <a href="/evento/exposicao-jose-pedro-croft/2026-06-28/" aria-label="José Pedro Croft" class="card_click"></a>
+      <div class="card_imgs cards_outro">
+        <div class="card_tag">
+          <p class="tag">Exposições</p>
+        </div>
+      </div>
+      <div class="card_body">
+        <span class="card_date">Exposição temporária até 13 setembro de 2026</span>
+        <p class="card_title">José Pedro Croft</p>
+        <p class="card_desc">Reflexos, Enclaves, Desvios</p>
+        <span><span class="card_info">MAC/CCB</span></span>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-4 col-sm-6 col-xs-12">
+    <div id="post-268003" class="cards cards_">
+      <a href="/evento/visitas-guiadas-a-exposicao-2-museu-mac-ccb/2026-06-28/" aria-label="Visitas às Exposições" class="card_click"></a>
+      <div class="card_imgs cards_outro">
+        <div class="card_tag">
+          <p class="tag">Atividades</p>
+        </div>
+      </div>
+      <div class="card_body">
+        <span class="card_date">Até julho de 2026</span>
+        <p class="card_title">Visitas às Exposições</p>
+        <span><span class="card_info">MAC/CCB</span></span>
+      </div>
+    </div>
+  </div>
+`;
+
 function createResponse() {
   return new Response(html, {
+    headers: { "Content-Type": "text/html" },
+  });
+}
+
+function createIgnoredCardsResponse() {
+  return new Response(`${html}${htmlWithIgnoredCards}`, {
     headers: { "Content-Type": "text/html" },
   });
 }
@@ -98,5 +167,16 @@ describe("ccbEventos scraper", () => {
       imageURL: undefined,
       datetime: undefined,
     });
+  });
+
+  it("ignores recurring activities and exhibitions by tag", async () => {
+    const result = await parse(createIgnoredCardsResponse());
+
+    expect(result.entries).toHaveLength(3);
+    expect(result.entries.map((entry) => entry.title)).toEqual([
+      "A Valentina e a Valeria não estão mortas",
+      "James Webb There’s No Place Called Home (Belém, Lisbon)",
+      "Dia Mundial da Poesia",
+    ]);
   });
 });

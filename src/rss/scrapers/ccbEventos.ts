@@ -17,22 +17,27 @@ type CCBCard = {
   datetime?: Date;
 };
 
-function ignoreEntries(entry: RSSEntry): boolean {
-  return (
-    !entry.text?.includes("| Programa Vincular -") &&
-    !entry.text?.includes("| Famílias |") &&
-    !entry.text?.includes("Exposição permanente |") &&
-    !entry.text?.includes("Atividades para famílias |") &&
-    !entry.text?.includes("| Encontros para Pessoas com Demência e Famílias |") &&
-    !entry.text?.includes("| Cursos &amp; Formação |") &&
-    !entry.text?.includes("atividades-para-familias") &&
-    !entry.text?.includes("| Artes nas Férias do Verão |") &&
-    !entry.text?.includes("| Famílias")
-  );
-}
+const IGNORED_TAGS = new Set(["Atividades", "Exposições"]);
+
+const IGNORED_TEXT_PATTERNS = [
+  "| programa vincular -",
+  "| famílias |",
+  "exposição permanente |",
+  "atividades para famílias |",
+  "| encontros para pessoas com demência e famílias |",
+  "| cursos & formação |",
+  "| cursos &amp; formação |",
+  "atividades-para-familias",
+  "| artes nas férias do verão |",
+  "| famílias",
+];
 
 function normalizeText(value: string): string {
   return value.replace(/\s+/g, " ").trim();
+}
+
+function normalizeSearchText(value: string): string {
+  return normalizeText(value).toLocaleLowerCase("pt-PT");
 }
 
 function getLastCard(cards: CCBCard[]): CCBCard | undefined {
@@ -81,8 +86,22 @@ function buildEntryText(card: CCBCard): string | undefined {
   return parts.length > 0 ? parts.join(" | ") : undefined;
 }
 
+function getCardTitle(card: CCBCard): string {
+  return normalizeText(card.title) || normalizeText(card.fallbackTitle);
+}
+
+function shouldIgnoreCard(card: CCBCard): boolean {
+  if (card.tags.some((tag) => IGNORED_TAGS.has(tag))) return true;
+
+  const haystack = normalizeSearchText(
+    [getCardTitle(card), card.link, buildEntryText(card) ?? ""].join(" | "),
+  );
+
+  return IGNORED_TEXT_PATTERNS.some((pattern) => haystack.includes(pattern));
+}
+
 function buildEntry(card: CCBCard): RSSEntry {
-  const title = normalizeText(card.title) || normalizeText(card.fallbackTitle);
+  const title = getCardTitle(card);
 
   return {
     id: card.id,
@@ -202,7 +221,7 @@ export async function parse(response: Response): Promise<RSSData> {
     title: "Eventos | CCB",
     description: "Agenda de eventos do CCB",
     language: "pt",
-    entries: cards.map(buildEntry).filter(ignoreEntries).filter(isValidRSSEntry),
+    entries: cards.filter((card) => !shouldIgnoreCard(card)).map(buildEntry).filter(isValidRSSEntry),
   };
 }
 
