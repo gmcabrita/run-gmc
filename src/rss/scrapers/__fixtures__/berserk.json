@@ -1,0 +1,65 @@
+{
+  "result": "ok",
+  "response": "collection",
+  "data": [
+    {
+      "id": "a8a25d77-245f-4b35-9a24-b831e27e090e",
+      "type": "chapter",
+      "attributes": {
+        "volume": null,
+        "chapter": "386",
+        "title": "Can You Catch Hold of a Migrating Bird in the Clouds?",
+        "translatedLanguage": "en",
+        "publishAt": "2026-07-09T22:35:41+00:00"
+      },
+      "relationships": [
+        {
+          "id": "277df5c9-a486-40f6-8dfa-c086c6b60935",
+          "type": "scanlation_group",
+          "attributes": {
+            "name": "Evil Genius"
+          }
+        },
+        {
+          "id": "801513ba-a712-498c-8f57-cae55b38cc92",
+          "type": "manga",
+          "attributes": {
+            "title": {
+              "ja-ro": "Berserk"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "81141fcf-a0bc-49a5-9512-090390e4a331",
+      "type": "chapter",
+      "attributes": {
+        "volume": "43",
+        "chapter": "382",
+        "title": "Tomb",
+        "translatedLanguage": "en",
+        "publishAt": "2025-06-29T11:22:07+00:00"
+      },
+      "relationships": [
+        {
+          "id": "277df5c9-a486-40f6-8dfa-c086c6b60935",
+          "type": "scanlation_group",
+          "attributes": {
+            "name": "Evil Genius"
+          }
+        }
+      ]
+    },
+    {
+      "type": "chapter",
+      "attributes": {
+        "chapter": "invalid"
+      },
+      "relationships": []
+    }
+  ],
+  "limit": 10,
+  "offset": 0,
+  "total": 3
+}

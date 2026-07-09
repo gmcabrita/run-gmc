@@ -55,6 +55,7 @@ import * as rtpPlanoAtividadeOrcamento from "./scrapers/rtpPlanoAtividadeOrcamen
 import * as rtpRelatorioServicoPublico from "./scrapers/rtpRelatorioServicoPublico";
 import * as theDrumLatest from "./scrapers/theDrumLatest";
 import * as bbcMediaCentreLatestNews from "./scrapers/bbcMediaCentreLatestNews";
+import * as berserk from "./scrapers/berserk";
 import * as brokenBrowserBlog from "./scrapers/brokenBrowserBlog";
 import * as uciPromocoes from "./scrapers/uciPromocoes";
 import * as waltDisneyPressReleases from "./scrapers/waltDisneyPressReleases";
@@ -71,6 +72,7 @@ const scrapers: Record<string, ScraperModule> = {
   anteEstreias,
   azerpasBlog,
   bbcMediaCentreLatestNews,
+  berserk,
   ccbEventos,
   cinecartaz,
   cinemateca,
