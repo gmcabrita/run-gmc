@@ -27,6 +27,7 @@ export default defineWorkersConfig({
       "@x": resolve(__dirname, "src/x/index.ts"),
       "@rss/common": resolve(__dirname, "src/rss/common.ts"),
       "@rss/healthcheck": resolve(__dirname, "src/rss/healthcheck.ts"),
+      "@rss/mangaDex": resolve(__dirname, "src/rss/mangaDex.ts"),
       "@rss/types": resolve(__dirname, "src/rss/types.ts"),
       "@rss": resolve(__dirname, "src/rss/index.ts"),
       "@types": resolve(__dirname, "src/types.ts"),
