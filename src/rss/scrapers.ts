@@ -50,6 +50,7 @@ import * as peetBlog from "./scrapers/peetBlog";
 import * as primeFreeGames from "./scrapers/primeFreeGames";
 import * as publicoMedia from "./scrapers/publicoMedia";
 import * as reutersMediaTelecom from "./scrapers/reutersMediaTelecom";
+import * as rtpConselhoGeralIndependente from "./scrapers/rtpConselhoGeralIndependente";
 import * as rtpInformacaoAnual from "./scrapers/rtpInformacaoAnual";
 import * as rtpPlanoAtividadeOrcamento from "./scrapers/rtpPlanoAtividadeOrcamento";
 import * as rtpRelatorioServicoPublico from "./scrapers/rtpRelatorioServicoPublico";
@@ -109,6 +110,7 @@ const scrapers: Record<string, ScraperModule> = {
   primeFreeGames,
   publicoMedia,
   reutersMediaTelecom,
+  rtpConselhoGeralIndependente,
   rtpInformacaoAnual,
   rtpPlanoAtividadeOrcamento,
   rtpRelatorioServicoPublico,
