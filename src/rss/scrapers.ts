@@ -54,6 +54,7 @@ import * as rtpConselhoGeralIndependente from "./scrapers/rtpConselhoGeralIndepe
 import * as rtpInformacaoAnual from "./scrapers/rtpInformacaoAnual";
 import * as rtpPlanoAtividadeOrcamento from "./scrapers/rtpPlanoAtividadeOrcamento";
 import * as rtpRelatorioServicoPublico from "./scrapers/rtpRelatorioServicoPublico";
+import * as sqliteNews from "./scrapers/sqliteNews";
 import * as theDrumLatest from "./scrapers/theDrumLatest";
 import * as bbcMediaCentreLatestNews from "./scrapers/bbcMediaCentreLatestNews";
 import * as berserk from "./scrapers/berserk";
@@ -114,6 +115,7 @@ const scrapers: Record<string, ScraperModule> = {
   rtpInformacaoAnual,
   rtpPlanoAtividadeOrcamento,
   rtpRelatorioServicoPublico,
+  sqliteNews,
   theDrumLatest,
   brokenBrowserBlog,
   uciPromocoes,
