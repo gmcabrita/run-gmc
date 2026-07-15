@@ -52,15 +52,20 @@ function getLastEntry(entries: DraftEntry[]): DraftEntry | undefined {
 
 function getImageURL(el: Element): string | undefined {
   const src = el.getAttribute("src");
-  if (!src || src.startsWith("data:")) {
+  if (!src) {
     return undefined;
   }
 
-  return new URL(src, SITE_ORIGIN).href;
+  const decodedSrc = decodeHtmlEntities(src);
+  if (decodedSrc.startsWith("data:")) {
+    return undefined;
+  }
+
+  return new URL(decodedSrc, SITE_ORIGIN).href;
 }
 
 function normalizePageUrl(href: string): string {
-  return new URL(href, SITE_ORIGIN).href;
+  return new URL(decodeHtmlEntities(href), SITE_ORIGIN).href;
 }
 
 async function fetchPage(url: string, fetchFn: FetchFn): Promise<Response> {
@@ -90,6 +95,15 @@ function buildFeed(entries: RSSEntry[]): RSSData {
 }
 
 export async function parsePage(response: Response): Promise<ParsedPage> {
+  // JN wraps server-rendered articles in <noscript>; unwrap them before the
+  // parsing pass because HTMLRewriter otherwise treats their markup as text.
+  const unwrappedResponse = new HTMLRewriter()
+    .on("main#main-content noscript", {
+      element(el) {
+        el.removeAndKeepContent();
+      },
+    })
+    .transform(response);
   const draftEntries: DraftEntry[] = [];
   let nextPageURL: string | undefined;
   const articleSelector = 'main#main-content article[class*="ArticleWrap"]';
@@ -155,7 +169,7 @@ export async function parsePage(response: Response): Promise<ParsedPage> {
       },
     });
 
-  const body = rewriter.transform(response).body;
+  const body = rewriter.transform(unwrappedResponse).body;
   if (!body) {
     throw new Error("Missing response body");
   }

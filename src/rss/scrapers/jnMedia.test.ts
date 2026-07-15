@@ -25,7 +25,7 @@ function readFetchUrl(input: RequestInfo | URL): string {
 }
 
 describe("jnMedia scraper", () => {
-  it("parses section entries and next page", async () => {
+  it("parses noscript-wrapped section entries and next page", async () => {
     const result = await parsePage(createResponse(pageOneHtml));
 
     expect(result.entries).toHaveLength(2);
@@ -35,7 +35,7 @@ describe("jnMedia scraper", () => {
       link: "https://www.jn.pt/media/artigo/story-one/18000001",
       title: "Story One com espaços",
       text: "Conferência",
-      imageURL: "https://staticx.noticiasilimitadas.pt/jn/story-one.jpg",
+      imageURL: "https://staticx.noticiasilimitadas.pt/jn/story-one.jpg?brand=jn&w=3840",
     });
     expect(result.entries[1]).toEqual({
       id: "https://www.jn.pt/media/artigo/story-two/18000002",
