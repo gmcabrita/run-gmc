@@ -25,10 +25,11 @@ function readFetchUrl(input: RequestInfo | URL): string {
 }
 
 describe("jnMedia scraper", () => {
-  it("parses noscript-wrapped section entries and next page", async () => {
+  it("parses noscript-wrapped section entries, excluding Mais Vistas", async () => {
     const result = await parsePage(createResponse(pageOneHtml));
 
     expect(result.entries).toHaveLength(2);
+    expect(result.entries.map((entry) => entry.title)).not.toContain("Most Viewed Story");
     expect(result.nextPageURL).toBe(SECOND_PAGE_URL);
     expect(result.entries[0]).toEqual({
       id: "https://www.jn.pt/media/artigo/story-one/18000001",

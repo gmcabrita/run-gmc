@@ -106,7 +106,8 @@ export async function parsePage(response: Response): Promise<ParsedPage> {
     .transform(response);
   const draftEntries: DraftEntry[] = [];
   let nextPageURL: string | undefined;
-  const articleSelector = 'main#main-content article[class*="ArticleWrap"]';
+  const articleSelector =
+    'main#main-content [class*="section-regular"][class*="ArticlesList"] article[class*="ArticleWrap"]';
 
   const rewriter = new HTMLRewriter()
     .on(articleSelector, {
