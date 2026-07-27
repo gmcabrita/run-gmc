@@ -50,17 +50,44 @@ END:VCALENDAR`);
     expect(url.searchParams.get("text")).toBe("Very long title");
   });
 
-  it("derives timed end from duration", () => {
+  it("prefers DTSTART and derives timed end from duration", () => {
     const url = googleUrlFrom(`BEGIN:VCALENDAR
 BEGIN:VEVENT
 SUMMARY:Workout
 DTSTART:20260512T093000Z
+DTSTAMP:20260829T180000
 DURATION:PT45M
 END:VEVENT
 END:VCALENDAR`);
 
     expect(url.searchParams.get("dates")).toBe("20260512T093000Z/20260512T101500Z");
   });
+
+  it("uses DTSTAMP with a valid duration when DTSTART is absent", () => {
+    const url = googleUrlFrom(`BEGIN:VCALENDAR
+BEGIN:VEVENT
+SUMMARY:BOL - Evento: "Rebeldes sem Causas | West Side Story"
+DTSTAMP:20260829T180000
+DURATION:PT2H31M
+END:VEVENT
+END:VCALENDAR`);
+
+    expect(url.searchParams.get("dates")).toBe("20260829T180000/20260829T203100");
+  });
+
+  it.each(["", "DURATION:P", "DURATION:not-a-duration"])(
+    "does not use DTSTAMP without a valid duration (%s)",
+    (durationLine) => {
+      const url = googleUrlFrom(`BEGIN:VCALENDAR
+BEGIN:VEVENT
+DTSTAMP:20260829T180000
+${durationLine}
+END:VEVENT
+END:VCALENDAR`);
+
+      expect(url.searchParams.get("dates")).toBeNull();
+    },
+  );
 
   it("derives all-day end from duration", () => {
     const url = googleUrlFrom(`BEGIN:VCALENDAR

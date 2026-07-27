@@ -76,7 +76,7 @@ function parseDuration(duration: string): number | undefined {
   const match = /^P(?:(\d+)W)?(?:(\d+)D)?(?:T(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?)?$/.exec(
     duration,
   );
-  if (!match) return;
+  if (!match || match.slice(1).every((part) => part === undefined)) return;
 
   const weeks = Number(match[1] || 0);
   const days = Number(match[2] || 0);
@@ -164,16 +164,19 @@ function eventToGoogleCalendarUrl(event: IcsEvent): GoogleCalendarEvent {
   const summary = firstProperty(event, "SUMMARY");
   const description = firstProperty(event, "DESCRIPTION");
   const location = firstProperty(event, "LOCATION");
-  const start = firstProperty(event, "DTSTART");
+  const declaredStart = firstProperty(event, "DTSTART");
   const end = firstProperty(event, "DTEND");
   const duration = firstProperty(event, "DURATION");
+  const durationSeconds = duration ? parseDuration(duration.value) : undefined;
+  const start =
+    declaredStart ??
+    (durationSeconds !== undefined ? firstProperty(event, "DTSTAMP") : undefined);
   const rrule = firstProperty(event, "RRULE");
 
   const startValue = normalizeDateValue(start);
   let endValue = normalizeDateValue(end);
 
   if (!endValue && startValue) {
-    const durationSeconds = duration ? parseDuration(duration.value) : undefined;
     if (durationSeconds !== undefined && !isAllDay(start)) {
       endValue = addSecondsToIcsDate(startValue, durationSeconds);
     }
