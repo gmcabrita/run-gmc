@@ -8,6 +8,7 @@ import * as adAgeNews from "./scrapers/adAgeNews";
 import * as adsOfTheWorldBlog from "./scrapers/adsOfTheWorldBlog";
 import * as agendaLx from "./scrapers/agendaLx";
 import * as agendaLxPdf from "./scrapers/agendaLxPdf";
+import * as antibotBlog from "./scrapers/antibotBlog";
 import * as autoRegulacaoPublicitariaDeliberacoes from "./scrapers/autoRegulacaoPublicitariaDeliberacoes";
 import * as azerpasBlog from "./scrapers/azerpasBlog";
 
@@ -71,6 +72,7 @@ const scrapers: Record<string, ScraperModule> = {
   adAgeNews,
   adsOfTheWorldBlog,
   agendaLxPdf,
+  antibotBlog,
   autoRegulacaoPublicitariaDeliberacoes,
   anteEstreias,
   azerpasBlog,
