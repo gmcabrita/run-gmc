@@ -1,5 +1,17 @@
 import { describe, expect, it } from "vitest";
-import { stripInvalidXmlChars } from "@rss/common";
+import { decodeHtmlEntities, stripInvalidXmlChars } from "@rss/common";
+
+describe("decodeHtmlEntities", () => {
+  it("decodes named and numeric HTML entities", () => {
+    expect(decodeHtmlEntities("&quot;Almada &amp; Sul&#39; &#x1f3ad;&quot;")).toBe(
+      '"Almada & Sul\' 🎭"',
+    );
+  });
+
+  it("leaves unsupported and invalid entities unchanged", () => {
+    expect(decodeHtmlEntities("&copy; &#99999999;")).toBe("&copy; &#99999999;");
+  });
+});
 
 describe("stripInvalidXmlChars", () => {
   it("removes xml-invalid control characters", () => {

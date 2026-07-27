@@ -1,40 +1,14 @@
-import { USERAGENT, isValidRSSEntry, type ScraperContext } from "@rss/common";
+import {
+  USERAGENT,
+  decodeHtmlEntities,
+  isValidRSSEntry,
+  type ScraperContext,
+} from "@rss/common";
 import type { RSSData, RSSEntry } from "@rss/types";
 
 const BASE_URL = "https://anteestreias.blogspot.com";
 const API_URL = `${BASE_URL}/search/label/-%20bilhetes%20cinema?m=0`;
 const EXCLUDED_HOSTS = new Set(["anteestreias.blogspot.com", "www.blogger.com", "blogger.com"]);
-
-function decodeHtmlEntities(value: string) {
-  return value.replace(/&(#x[0-9a-f]+|#\d+|amp|lt|gt|quot|apos|nbsp);/gi, (_match, entity: string) => {
-    const normalizedEntity = entity.toLowerCase();
-
-    if (normalizedEntity.startsWith("#x")) {
-      return String.fromCodePoint(Number.parseInt(normalizedEntity.slice(2), 16));
-    }
-
-    if (normalizedEntity.startsWith("#")) {
-      return String.fromCodePoint(Number.parseInt(normalizedEntity.slice(1), 10));
-    }
-
-    switch (normalizedEntity) {
-      case "amp":
-        return "&";
-      case "lt":
-        return "<";
-      case "gt":
-        return ">";
-      case "quot":
-        return '"';
-      case "apos":
-        return "'";
-      case "nbsp":
-        return " ";
-      default:
-        return _match;
-    }
-  });
-}
 
 function stripHtml(value: string) {
   return decodeHtmlEntities(value.replace(/<[^>]*>/g, " "))

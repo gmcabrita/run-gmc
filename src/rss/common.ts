@@ -10,6 +10,35 @@ export function isValidRSSEntry(entry: RSSEntry) {
   return Boolean(entry.id) && Boolean(entry.link) && Boolean(entry.title);
 }
 
+const namedHtmlEntities: Record<string, string> = {
+  amp: "&",
+  apos: "'",
+  gt: ">",
+  lt: "<",
+  nbsp: " ",
+  quot: '"',
+};
+
+export function decodeHtmlEntities(value: string) {
+  return value.replace(/&(#x[0-9a-f]+|#\d+|amp|lt|gt|quot|apos|nbsp);/gi, (match, entity: string) => {
+    const normalizedEntity = entity.toLowerCase();
+
+    if (normalizedEntity.startsWith("#")) {
+      const radix = normalizedEntity.startsWith("#x") ? 16 : 10;
+      const digits = normalizedEntity.slice(radix === 16 ? 2 : 1);
+      const codePoint = Number.parseInt(digits, radix);
+      const isValidCodePoint =
+        codePoint > 0 &&
+        codePoint <= 0x10ffff &&
+        (codePoint < 0xd800 || codePoint > 0xdfff);
+
+      return isValidCodePoint ? String.fromCodePoint(codePoint) : match;
+    }
+
+    return namedHtmlEntities[normalizedEntity] ?? match;
+  });
+}
+
 export function stripInvalidXmlChars(value: string) {
   return value.replace(/[^\u0009\u000A\u000D\u0020-\uD7FF\uE000-\uFFFD\u{10000}-\u{10FFFF}]/gu, "");
 }

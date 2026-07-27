@@ -60,6 +60,7 @@ import * as bbcMediaCentreLatestNews from "./scrapers/bbcMediaCentreLatestNews";
 import * as berserk from "./scrapers/berserk";
 import * as brokenBrowserBlog from "./scrapers/brokenBrowserBlog";
 import * as uciPromocoes from "./scrapers/uciPromocoes";
+import * as viralAgendaAlmada from "./scrapers/viralAgendaAlmada";
 import * as waltDisneyPressReleases from "./scrapers/waltDisneyPressReleases";
 
 type ScraperModule = {
@@ -119,6 +120,7 @@ const scrapers: Record<string, ScraperModule> = {
   theDrumLatest,
   brokenBrowserBlog,
   uciPromocoes,
+  viralAgendaAlmada,
   waltDisneyPressReleases,
 };
 
