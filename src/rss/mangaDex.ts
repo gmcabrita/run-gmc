@@ -1,4 +1,4 @@
-import { USERAGENT, isValidRSSEntry, type ScraperContext } from "@rss/common";
+import { isValidRSSEntry, type ScraperContext } from "@rss/common";
 import type { RSSData, RSSEntry } from "@rss/types";
 import { createProxiedFetch } from "../proxiedFetch";
 
@@ -160,8 +160,7 @@ export function parseMangaDexFeed(json: unknown, config: MangaDexFeedConfig): RS
     id: mangaUrl,
     link: mangaUrl,
     title: config.feedTitle ?? `${config.mangaTitle} chapters`,
-    description:
-      config.description ?? `${config.mangaTitle} chapter releases from MangaDex`,
+    description: config.description ?? `${config.mangaTitle} chapter releases from MangaDex`,
     language: config.language,
     entries,
   };
@@ -175,7 +174,6 @@ export async function getMangaDexFeed(
     headers: {
       Accept: "application/json",
       "Accept-Language": config.language,
-      "User-Agent": USERAGENT,
     },
   });
 
