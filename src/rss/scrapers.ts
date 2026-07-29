@@ -63,6 +63,7 @@ import * as brokenBrowserBlog from "./scrapers/brokenBrowserBlog";
 import * as uciPromocoes from "./scrapers/uciPromocoes";
 import * as viralAgendaAlmada from "./scrapers/viralAgendaAlmada";
 import * as waltDisneyPressReleases from "./scrapers/waltDisneyPressReleases";
+import * as wsjBusinessMedia from "./scrapers/wsjBusinessMedia";
 
 type ScraperModule = {
   get: (ctx: ScraperContext) => Promise<RSSData>;
@@ -124,6 +125,7 @@ const scrapers: Record<string, ScraperModule> = {
   uciPromocoes,
   viralAgendaAlmada,
   waltDisneyPressReleases,
+  wsjBusinessMedia,
 };
 
 // Special handlers for mobile games (different function names)

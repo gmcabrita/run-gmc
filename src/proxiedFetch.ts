@@ -21,7 +21,21 @@ interface RelayRetryPolicy {
   sleep: (milliseconds: number, signal: AbortSignal) => Promise<void>;
 }
 
-type RelayForwardedHeader = "User-Agent" | "Accept" | "Accept-Language" | "Referer";
+type RelayForwardedHeader =
+  | "User-Agent"
+  | "Accept"
+  | "Accept-Language"
+  | "Referer"
+  | "Cookie"
+  | "Sec-CH-UA"
+  | "Sec-CH-UA-Mobile"
+  | "Sec-CH-UA-Platform"
+  | "Upgrade-Insecure-Requests"
+  | "Sec-Fetch-Site"
+  | "Sec-Fetch-Mode"
+  | "Sec-Fetch-User"
+  | "Sec-Fetch-Dest"
+  | "Priority";
 
 const RELAY_RETRY_COUNT = 3;
 const RELAY_RETRY_BASE_DELAY_MS = 250;
@@ -32,6 +46,16 @@ const RELAY_FORWARDED_HEADERS: RelayForwardedHeader[] = [
   "Accept",
   "Accept-Language",
   "Referer",
+  "Cookie",
+  "Sec-CH-UA",
+  "Sec-CH-UA-Mobile",
+  "Sec-CH-UA-Platform",
+  "Upgrade-Insecure-Requests",
+  "Sec-Fetch-Site",
+  "Sec-Fetch-Mode",
+  "Sec-Fetch-User",
+  "Sec-Fetch-Dest",
+  "Priority",
 ];
 
 function getRelayRequestUrl(relayUrl: string, targetUrl: string): string {
