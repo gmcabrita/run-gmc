@@ -10,6 +10,7 @@ import { addIcs2GcalEndpoint } from "./ics2gcal";
 import { checkMauserSc1176StockAndNotify } from "./mauser";
 import { addScrapedRssEndpoints, cacheAgendaLx } from "@rss/scrapers";
 import type { FertagusResponse } from "@types";
+import { createTrackingPixelResponse } from "./trackingPixel";
 import {
   getDiscordHealthcheckErrorPayload,
   getDiscordHealthcheckFailurePayload,
@@ -140,6 +141,8 @@ addCoverflexEndpoints(app);
 addXEndpoints(app);
 addIcs2GcalEndpoint(app);
 addScrapedRssEndpoints(app);
+
+app.get("/tracking-pixel.gif", () => createTrackingPixelResponse());
 
 app.get("/rss.sendCinecartazEntriesByEmail", async (ctx) => {
   return ctx.json(await sendCinecartazEntriesByEmail(ctx.env));
