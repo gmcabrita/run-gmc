@@ -29,6 +29,7 @@ import * as epicFreeMobileGames from "./scrapers/epicFreeMobileGames";
 import * as ercDeliberacoes from "./scrapers/ercDeliberacoes";
 import * as ercNoticias from "./scrapers/ercNoticias";
 import * as filmspotEstreias from "./scrapers/filmspotEstreias";
+import * as ftMedia from "./scrapers/ftMedia";
 import * as fundoAmbiental from "./scrapers/fundoAmbiental";
 import * as imagensDeMarca from "./scrapers/imagensDeMarca";
 import * as impresaComunicados from "./scrapers/impresaComunicados";
@@ -93,6 +94,7 @@ const scrapers: Record<string, ScraperModule> = {
   ercDeliberacoes,
   ercNoticias,
   filmspotEstreias,
+  ftMedia,
   fundoAmbiental,
   imagensDeMarca,
   impresaComunicados,
