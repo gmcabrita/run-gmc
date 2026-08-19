@@ -1,4 +1,5 @@
-import { defineWorkersConfig } from "@cloudflare/vitest-pool-workers/config";
+import { cloudflareTest } from "@cloudflare/vitest-pool-workers";
+import { defineConfig } from "vitest/config";
 import { resolve } from "node:path";
 import { readFileSync } from "node:fs";
 import type { Plugin } from "vite";
@@ -18,8 +19,14 @@ function rawTextPlugin(): Plugin {
   };
 }
 
-export default defineWorkersConfig({
-  plugins: [rawTextPlugin()],
+export default defineConfig({
+  plugins: [
+    rawTextPlugin(),
+    cloudflareTest({
+      remoteBindings: false,
+      wrangler: { configPath: "./wrangler.jsonc" },
+    }),
+  ],
   resolve: {
     alias: {
       "@email": resolve(__dirname, "src/email/index.ts"),
@@ -31,13 +38,6 @@ export default defineWorkersConfig({
       "@rss/types": resolve(__dirname, "src/rss/types.ts"),
       "@rss": resolve(__dirname, "src/rss/index.ts"),
       "@types": resolve(__dirname, "src/types.ts"),
-    },
-  },
-  test: {
-    poolOptions: {
-      workers: {
-        wrangler: { configPath: "./wrangler.jsonc" },
-      },
     },
   },
 });
