@@ -32,6 +32,23 @@ describe("lbbonlineInternational json parser", () => {
     expect(entryWithoutImage?.imageURL).toBeUndefined();
   });
 
+  it("normalizes the numeric IDs returned by the LBB API", async () => {
+    const result = await parse({
+      hits: [
+        {
+          id: 152_622,
+          title: "Current API response",
+          slug: "current-api-response",
+          description: "The live API returns numeric IDs.",
+          image: null,
+          date: "2025-12-28T10:00:00Z",
+        },
+      ],
+    });
+
+    expect(result.entries[0]?.id).toBe("152622");
+  });
+
   it("filters out future posts", async () => {
     const result = await parse(json);
 

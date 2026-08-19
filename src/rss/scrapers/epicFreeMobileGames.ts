@@ -4,45 +4,44 @@ import * as v from "valibot";
 
 const BASE_URL = "https://store.epicgames.com/en-US/free-games";
 
+const EpicMobileOfferSchema = v.looseObject({
+  content: v.looseObject({
+    title: v.string(),
+    categories: v.nullish(v.array(v.string())),
+    catalogItemId: v.string(),
+    mapping: v.looseObject({ slug: v.string() }),
+    purchase: v.nullish(
+      v.array(
+        v.looseObject({
+          purchaseType: v.string(),
+          price: v.looseObject({ decimalPrice: v.number() }),
+        }),
+      ),
+    ),
+  }),
+});
 const EpicMobileDiscoverPayloadSchema = v.looseObject({
   data: v.array(
     v.looseObject({
       type: v.string(),
-      offers: v.array(
-        v.looseObject({
-          content: v.looseObject({
-            title: v.string(),
-            categories: v.nullish(
-              v.array(v.looseObject({ path: v.string() })),
-            ),
-            catalogItemId: v.string(),
-            mapping: v.looseObject({ slug: v.string() }),
-            purchase: v.nullish(
-              v.array(
-                v.looseObject({
-                  purchaseType: v.string(),
-                  price: v.looseObject({ decimalPrice: v.number() }),
-                }),
-              ),
-            ),
-          }),
-        }),
-      ),
+      offers: v.array(v.unknown()),
     }),
   ),
 });
 
-type EpicMobileDiscoverPayload = v.InferOutput<
+type EpicMobileDiscoverPayload = v.InferInput<
   typeof EpicMobileDiscoverPayloadSchema
 >;
 
 export async function parse(
-  json: EpicMobileDiscoverPayload,
+  payload: EpicMobileDiscoverPayload,
   platform: "ios" | "android",
 ): Promise<RSSData> {
+  const json = v.parse(EpicMobileDiscoverPayloadSchema, payload);
   const freeGames = json.data.find((item) => item.type === "freeGame");
+  const offers = v.parse(v.array(EpicMobileOfferSchema), freeGames?.offers ?? []);
 
-  const entries: RSSEntry[] = (freeGames?.offers ?? [])
+  const entries: RSSEntry[] = offers
     .filter((game) => {
       return game.content.purchase?.find(
         (purchase) => purchase.purchaseType === "Claim" && purchase.price.decimalPrice === 0,
@@ -52,7 +51,7 @@ export async function parse(
       const title = game.content.title;
       const pageSlug = game.content.mapping.slug;
 
-      const isBundle = game.content.categories?.some((cat) => cat.path === "bundles");
+      const isBundle = game.content.categories?.includes("bundles");
       const link = isBundle
         ? `https://store.epicgames.com/en-US/bundles/${pageSlug}`
         : `https://store.epicgames.com/en-US/p/${pageSlug}`;
@@ -90,8 +89,7 @@ async function fetchForPlatform(_ctx: ScraperContext, platform: "ios" | "android
     },
   });
 
-  const json = v.parse(EpicMobileDiscoverPayloadSchema, await response.json());
-  return parse(json, platform);
+  return parse(await response.json(), platform);
 }
 
 export async function getiOS(ctx: ScraperContext): Promise<RSSData> {

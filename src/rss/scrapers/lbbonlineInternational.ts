@@ -9,7 +9,10 @@ const IMAGE_BASE_URL = "https://d3q27bh1u24u2o.cloudfront.net";
 const LbbOnlinePayloadSchema = v.looseObject({
   hits: v.array(
     v.looseObject({
-      id: v.string(),
+      id: v.pipe(
+        v.union([v.string(), v.number()]),
+        v.transform((value) => String(value)),
+      ),
       title: v.string(),
       slug: v.string(),
       description: v.string(),
@@ -19,9 +22,10 @@ const LbbOnlinePayloadSchema = v.looseObject({
   ),
 });
 
-type LbbOnlinePayload = v.InferOutput<typeof LbbOnlinePayloadSchema>;
+type LbbOnlinePayload = v.InferInput<typeof LbbOnlinePayloadSchema>;
 
-export async function parse(json: LbbOnlinePayload): Promise<RSSData> {
+export async function parse(payload: LbbOnlinePayload): Promise<RSSData> {
+  const json = v.parse(LbbOnlinePayloadSchema, payload);
   const now = new Date();
   const entries: RSSEntry[] = json.hits
     .filter((post) => new Date(post.date) < now)
@@ -68,6 +72,5 @@ export async function get(_ctx: ScraperContext): Promise<RSSData> {
     }),
   });
 
-  const json = v.parse(LbbOnlinePayloadSchema, await response.json());
-  return parse(json);
+  return parse(await response.json());
 }
