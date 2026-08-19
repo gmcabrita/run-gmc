@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss xmlns:media="http://search.yahoo.com/mrss/" version="2.0">
+  <channel>
+    <title>WSJ.com: US Business</title>
+    <description>US Business</description>
+    <link>https://www.wsj.com/business</link>
+    <language>en-us</language>
+    <item>
+      <guid isPermaLink="false">WP-WSJ-0000000001</guid>
+      <title>Casey Wasserman&#x2019;s Talent Agency to Buy Out His Stake Using Private-Equity Financing</title>
+      <description>Casey Wasserman&#x2019;s talent and marketing agency will buy his remaining stake using a new investment from Providence Equity Partners.</description>
+      <link>https://www.wsj.com/business/media/casey-wassermans-talent-agency-to-buy-out-his-stake-using-private-equity-financing-6ca51131?mod=pls_whats_news_us_business_f</link>
+      <pubDate>Wed, 29 Jul 2026 00:12:00 GMT</pubDate>
+      <media:content url="https://images.wsj.net/im-24657121?size=1.16" medium="image" type="image/jpeg">
+        <media:credit>Fixture Photographer/Reuters</media:credit>
+      </media:content>
+    </item>
+    <item>
+      <guid isPermaLink="false">WP-WSJ-0000000002</guid>
+      <title>Canada to Cease Compelling U.S. Streamers to Help Finance Domestic Broadcasting</title>
+      <description>Canada will abandon efforts to compel foreign streamers to make mandatory financial contributions.</description>
+      <link>https://www.wsj.com/business/media/canada-to-cease-compelling-u-s-streamers-to-help-finance-domestic-broadcasting-3f969061?mod=pls_whats_news_us_business_f</link>
+      <pubDate>Tue, 28 Jul 2026 23:55:00 GMT</pubDate>
+      <media:content url="https://images.wsj.net/im-40241267?size=1.47" medium="image" type="image/jpeg" />
+    </item>
+    <item>
+      <guid isPermaLink="false">WP-WSJ-0000000003</guid>
+      <title>CBS News Adds Ross Douthat and Sebastian Junger to &#x2018;60 Minutes&#x2019;</title>
+      <description>The hires mark executive producer Nick Bilton&#x2019;s first major staffing decisions since taking over the show in May.</description>
+      <link>https://www.wsj.com/business/media/cbs-news-adds-ross-douthat-and-sebastian-junger-to-60-minutes-edf9d6f7?mod=pls_whats_news_us_business_f#comments_sector</link>
+      <pubDate>Tue, 28 Jul 2026 21:42:00 GMT</pubDate>
+      <media:content url="https://images.wsj.net/im-30219294?size=1.5" medium="image" type="image/jpeg" />
+    </item>
+    <item>
+      <guid isPermaLink="false">WP-WSJ-0000000004</guid>
+      <title>CMO Today Article Included in Media</title>
+      <description>A media article published under the CMO Today path.</description>
+      <link>https://www.wsj.com/cmo-today/cmo-article-included-in-media-1234abcd?mod=pls_whats_news_us_business_f</link>
+      <pubDate>Tue, 28 Jul 2026 20:00:00 GMT</pubDate>
+      <media:content url="https://images.wsj.net/im-00000004" medium="image" type="image/jpeg" />
+    </item>
+    <item>
+      <guid isPermaLink="false">WP-WSJ-duplicate</guid>
+      <title>Duplicate</title>
+      <link>https://www.wsj.com/business/media/casey-wassermans-talent-agency-to-buy-out-his-stake-using-private-equity-financing-6ca51131?mod=duplicate</link>
+    </item>
+    <item>
+      <guid isPermaLink="false">WP-WSJ-other-business</guid>
+      <title>Other Business Article</title>
+      <link>https://www.wsj.com/business/not-a-media-article-87654321?mod=pls_whats_news_us_business_f</link>
+    </item>
+    <item>
+      <guid isPermaLink="false">WP-WSJ-invalid-host</guid>
+      <title>Invalid Host</title>
+      <link>https://example.com/business/media/not-wsj-87654321</link>
+    </item>
+    <item>
+      <guid isPermaLink="false">WP-WSJ-missing-title</guid>
+      <title></title>
+      <link>https://www.wsj.com/business/media/missing-title-87654321</link>
+    </item>
+  </channel>
+</rss>

@@ -1,31 +1,41 @@
-import { isValidRSSEntry, type ScraperContext } from "@rss/common";
+import {
+  USERAGENT,
+  decodeHtmlEntities,
+  isValidRSSEntry,
+  type ScraperContext,
+} from "@rss/common";
 import type { RSSData, RSSEntry } from "@rss/types";
-import { createProxiedFetch, type ProxiedFetchEnv } from "../../proxiedFetch";
 
 const BASE_URL = "https://www.wsj.com/business/media";
-const USER_AGENT =
-  "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36";
-const NEXT_DATA_PATTERN = /<script[^>]*\bid=["']__NEXT_DATA__["'][^>]*>([\s\S]*?)<\/script>/i;
+const FEED_URL = "https://feeds.content.dowjones.io/public/rss/WSJcomUSBusiness";
+const MEDIA_ARTICLE_PATH_PREFIXES = ["/business/media/", "/cmo-today/"] as const;
 
-type JsonRecord = Record<string, unknown>;
+function decodeXmlText(value: string): string {
+  const trimmed = value.trim();
+  const unwrapped =
+    trimmed.startsWith("<![CDATA[") && trimmed.endsWith("]]>")
+      ? trimmed.slice("<![CDATA[".length, -"]]>".length)
+      : trimmed;
 
-function isRecord(value: unknown): value is JsonRecord {
-  return typeof value === "object" && value !== null;
+  return decodeHtmlEntities(unwrapped);
 }
 
-function getRecord(record: JsonRecord | undefined, key: string): JsonRecord | undefined {
-  const value = record?.[key];
-  return isRecord(value) ? value : undefined;
+function tagText(xml: string, tagName: string): string | undefined {
+  const match = new RegExp(`<${tagName}(?:\\s[^>]*)?>([\\s\\S]*?)<\\/${tagName}>`, "i").exec(
+    xml,
+  );
+  const value = match?.[1];
+  return value === undefined ? undefined : decodeXmlText(value);
 }
 
-function getArray(record: JsonRecord | undefined, key: string): unknown[] {
-  const value = record?.[key];
-  return Array.isArray(value) ? value : [];
-}
+function tagAttribute(xml: string, tagName: string, attributeName: string): string | undefined {
+  const tag = new RegExp(`<${tagName}\\b([^>]*)>`, "i").exec(xml)?.[1];
+  if (!tag) {
+    return undefined;
+  }
 
-function getString(record: JsonRecord, key: string): string | undefined {
-  const value = record[key];
-  return typeof value === "string" && value.trim() !== "" ? value.trim() : undefined;
+  const value = new RegExp(`(?:^|\\s)${attributeName}=(['"])(.*?)\\1`, "i").exec(tag)?.[2];
+  return value === undefined ? undefined : decodeXmlText(value);
 }
 
 function normalizeText(value: string): string {
@@ -34,8 +44,11 @@ function normalizeText(value: string): string {
 
 function getCanonicalArticleUrl(value: string): string | undefined {
   try {
-    const url = new URL(value);
-    if (url.protocol !== "https:" || url.hostname !== "www.wsj.com") {
+    const url = new URL(normalizeText(value));
+    const isMediaArticle = MEDIA_ARTICLE_PATH_PREFIXES.some((prefix) =>
+      url.pathname.startsWith(prefix),
+    );
+    if (url.protocol !== "https:" || url.hostname !== "www.wsj.com" || !isMediaArticle) {
       return undefined;
     }
 
@@ -56,69 +69,51 @@ function parseDatetime(value: string | undefined): Date | undefined {
   return Number.isNaN(datetime.getTime()) ? undefined : datetime;
 }
 
-function parseArticle(value: unknown): RSSEntry | undefined {
-  if (!isRecord(value)) {
+function parseItem(itemXml: string): RSSEntry | undefined {
+  const link = getCanonicalArticleUrl(tagText(itemXml, "link") ?? "");
+  const title = normalizeText(tagText(itemXml, "title") ?? "");
+  if (!link || !title) {
     return undefined;
   }
 
-  const articleUrl = getString(value, "articleUrl");
-  const headline = getString(value, "headline");
-  if (!articleUrl || !headline) {
-    return undefined;
-  }
-
-  const link = getCanonicalArticleUrl(articleUrl);
-  if (!link) {
-    return undefined;
-  }
-
-  const title = normalizeText(headline);
-  const summary = getString(value, "summary");
-  const imageURL = getString(value, "imageUrl");
-
-  return {
+  const description = normalizeText(tagText(itemXml, "description") ?? "");
+  const entry: RSSEntry = {
     id: link,
     link,
     title,
-    text: summary ? normalizeText(summary) : title,
-    datetime: parseDatetime(getString(value, "timestamp")),
-    imageURL,
+    text: description || title,
   };
-}
+  const datetime = parseDatetime(tagText(itemXml, "pubDate"));
+  const imageURL = tagAttribute(itemXml, "media:content", "url");
 
-function readPageProps(html: string): JsonRecord {
-  const payload = html.match(NEXT_DATA_PATTERN)?.[1];
-  if (!payload) {
-    throw new Error("Missing WSJ __NEXT_DATA__ payload");
+  if (datetime) {
+    entry.datetime = datetime;
+  }
+  if (imageURL) {
+    entry.imageURL = imageURL;
   }
 
-  const parsed: unknown = JSON.parse(payload);
-  const props = getRecord(isRecord(parsed) ? parsed : undefined, "props");
-  const result = getRecord(props, "pageProps");
-  if (!result) {
-    throw new Error("Invalid WSJ __NEXT_DATA__ payload");
-  }
-
-  return result;
+  return isValidRSSEntry(entry) ? entry : undefined;
 }
 
-export function parse(html: string): RSSData {
-  const pageProps = readPageProps(html);
+export function parse(xml: string): RSSData {
+  if (!/<rss\b/i.test(xml) || !/<channel\b/i.test(xml)) {
+    throw new Error("Invalid WSJ Business RSS feed");
+  }
+
   const seenLinks = new Set<string>();
-  const entries = [
-    ...getArray(pageProps, "latestArticles"),
-    ...getArray(pageProps, "moreInArticlesInitial"),
-  ]
-    .flatMap((value) => {
-      const entry = parseArticle(value);
+  const entries = Array.from(xml.matchAll(/<item(?:\s[^>]*)?>([\s\S]*?)<\/item>/gi)).flatMap(
+    (match) => {
+      const itemXml = match[1];
+      const entry = itemXml === undefined ? undefined : parseItem(itemXml);
       if (!entry || seenLinks.has(entry.link)) {
         return [];
       }
 
       seenLinks.add(entry.link);
       return [entry];
-    })
-    .filter(isValidRSSEntry);
+    },
+  );
 
   return {
     id: BASE_URL,
@@ -130,40 +125,21 @@ export function parse(html: string): RSSData {
   };
 }
 
-function getRequestHeaders(): HeadersInit {
-  return {
-    Cookie: 'bcookie=""',
-    "Sec-CH-UA": '"Chromium";v="146", "Not-A.Brand";v="24", "Google Chrome";v="146"',
-    "Sec-CH-UA-Mobile": "?0",
-    "Sec-CH-UA-Platform": '"macOS"',
-    "Upgrade-Insecure-Requests": "1",
-    "User-Agent": USER_AGENT,
-    Accept:
-      "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",
-    "Sec-Fetch-Site": "none",
-    "Sec-Fetch-Mode": "navigate",
-    "Sec-Fetch-User": "?1",
-    "Sec-Fetch-Dest": "document",
-    "Accept-Language": "en-US,en;q=0.9",
-    Priority: "u=0, i",
-  };
-}
-
-export async function scrape(
-  env: ProxiedFetchEnv,
-  fetcher: typeof fetch = fetch,
-): Promise<RSSData> {
-  const response = await createProxiedFetch(env, fetcher)(BASE_URL, {
-    headers: getRequestHeaders(),
+export async function scrape(fetcher: typeof fetch = fetch): Promise<RSSData> {
+  const response = await fetcher(FEED_URL, {
+    headers: {
+      Accept: "application/rss+xml, application/xml;q=0.9",
+      "User-Agent": USERAGENT,
+    },
   });
 
   if (!response.ok) {
-    throw new Error(`WSJ request failed: ${response.status}`);
+    throw new Error(`WSJ Business RSS request failed: ${response.status}`);
   }
 
   return parse(await response.text());
 }
 
-export async function get(ctx: ScraperContext): Promise<RSSData> {
-  return scrape(ctx.env);
+export async function get(_ctx: ScraperContext): Promise<RSSData> {
+  return scrape();
 }
