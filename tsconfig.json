@@ -21,4 +21,5 @@
       "@types": ["./src/types.ts"]
     }
   },
+  "exclude": ["tools/oxlint/anti-slop"],
 }
