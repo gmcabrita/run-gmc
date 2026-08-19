@@ -28,7 +28,6 @@ export async function parse(response: Response): Promise<RSSData> {
   const title = currentTitle.trim().replace(/\s+/g, " ");
   if (title && currentDate) {
     const link = `https://www.marktest.com/pod_scope/?date=${currentDate}`;
-    const [year, month] = currentDate.split("-").map(Number);
     const datetime = new Date();
 
     entries.push({

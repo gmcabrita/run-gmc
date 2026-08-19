@@ -14,9 +14,9 @@ describe("icsTextToGoogleCalendarUrl", () => {
     const url = googleUrlFrom(`BEGIN:VCALENDAR
 VERSION:2.0
 BEGIN:VEVENT
-SUMMARY:Coffee\, sync
+SUMMARY:Coffee\\, sync
 DESCRIPTION:Line one\\nLine two
-LOCATION:Lisbon\; PT
+LOCATION:Lisbon\\; PT
 DTSTART;TZID=Europe/Lisbon:20260512T093000
 DTEND;TZID=Europe/Lisbon:20260512T100000
 ATTENDEE:mailto:one@example.com

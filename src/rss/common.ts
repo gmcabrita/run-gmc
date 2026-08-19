@@ -40,7 +40,19 @@ export function decodeHtmlEntities(value: string) {
 }
 
 export function stripInvalidXmlChars(value: string) {
-  return value.replace(/[^\u0009\u000A\u000D\u0020-\uD7FF\uE000-\uFFFD\u{10000}-\u{10FFFF}]/gu, "");
+  return Array.from(value)
+    .filter((character) => {
+      const codePoint = character.codePointAt(0)!;
+      return (
+        codePoint === 0x09 ||
+        codePoint === 0x0a ||
+        codePoint === 0x0d ||
+        (codePoint >= 0x20 && codePoint <= 0xd7ff) ||
+        (codePoint >= 0xe000 && codePoint <= 0xfffd) ||
+        (codePoint >= 0x10000 && codePoint <= 0x10ffff)
+      );
+    })
+    .join("");
 }
 
 export async function consume(stream: ReadableStream) {

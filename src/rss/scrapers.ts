@@ -1,4 +1,3 @@
-import type { Context } from "hono";
 import { Hono } from "hono";
 import { Feed } from "feed";
 import type { RSSData } from "@rss/types";

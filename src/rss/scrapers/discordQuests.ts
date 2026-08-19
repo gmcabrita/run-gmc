@@ -5,7 +5,6 @@ import type { DiscordQuestsResponse } from "@types";
 const BASE_URL = "https://discord.com/quest-home";
 
 export function parse(json: DiscordQuestsResponse, nowDate: Date = new Date()): RSSData {
-  const needToEnroll = [];
   const entries: RSSEntry[] = json.quests
     .filter((quest) => {
       const expiresAt = quest.config.expires_at;
