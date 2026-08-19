@@ -5,32 +5,32 @@ const SITE_ORIGIN = "https://www.culturgest.pt";
 const BASE_URL = new URL("/pt/programacao/por-evento/", SITE_ORIGIN).href;
 const AJAX_URL = new URL("/pt/programacao/schedule/events/", SITE_ORIGIN).href;
 
-const PT_MONTH_INDEX: Record<string, number> = {
-  jan: 0,
-  janeiro: 0,
-  fev: 1,
-  fevereiro: 1,
-  mar: 2,
-  marco: 2,
-  abr: 3,
-  abril: 3,
-  mai: 4,
-  maio: 4,
-  jun: 5,
-  junho: 5,
-  jul: 6,
-  julho: 6,
-  ago: 7,
-  agosto: 7,
-  set: 8,
-  setembro: 8,
-  out: 9,
-  outubro: 9,
-  nov: 10,
-  novembro: 10,
-  dez: 11,
-  dezembro: 11,
-};
+const PT_MONTH_INDEX = new Map([
+  ["jan", 0],
+  ["janeiro", 0],
+  ["fev", 1],
+  ["fevereiro", 1],
+  ["mar", 2],
+  ["marco", 2],
+  ["abr", 3],
+  ["abril", 3],
+  ["mai", 4],
+  ["maio", 4],
+  ["jun", 5],
+  ["junho", 5],
+  ["jul", 6],
+  ["julho", 6],
+  ["ago", 7],
+  ["agosto", 7],
+  ["set", 8],
+  ["setembro", 8],
+  ["out", 9],
+  ["outubro", 9],
+  ["nov", 10],
+  ["novembro", 10],
+  ["dez", 11],
+  ["dezembro", 11],
+]);
 
 type FetchFn = typeof fetch;
 
@@ -111,7 +111,7 @@ function parsePtDate(value: string): Date | undefined {
   const crossMonthMatch = normalized.match(/^(\d{1,2})\s+([a-z]+)\s*-\s*\d{1,2}\s+([a-z]+)\s+(\d{4})$/);
   if (crossMonthMatch) {
     const day = Number(crossMonthMatch[1]);
-    const monthIndex = PT_MONTH_INDEX[crossMonthMatch[2] ?? ""];
+    const monthIndex = PT_MONTH_INDEX.get(crossMonthMatch[2] ?? "");
     const year = Number(crossMonthMatch[4]);
     return monthIndex == null ? undefined : parseUtcDate(year, monthIndex, day);
   }
@@ -119,7 +119,7 @@ function parsePtDate(value: string): Date | undefined {
   const rangeMatch = normalized.match(/^(\d{1,2})\s*-\s*\d{1,2}\s+([a-z]+)\s+(\d{4})$/);
   if (rangeMatch) {
     const day = Number(rangeMatch[1]);
-    const monthIndex = PT_MONTH_INDEX[rangeMatch[2] ?? ""];
+    const monthIndex = PT_MONTH_INDEX.get(rangeMatch[2] ?? "");
     const year = Number(rangeMatch[3]);
     return monthIndex == null ? undefined : parseUtcDate(year, monthIndex, day);
   }
@@ -130,7 +130,7 @@ function parsePtDate(value: string): Date | undefined {
   }
 
   const day = Number(singleMatch[1]);
-  const monthIndex = PT_MONTH_INDEX[singleMatch[2] ?? ""];
+  const monthIndex = PT_MONTH_INDEX.get(singleMatch[2] ?? "");
   const year = Number(singleMatch[3]);
   return monthIndex == null ? undefined : parseUtcDate(year, monthIndex, day);
 }

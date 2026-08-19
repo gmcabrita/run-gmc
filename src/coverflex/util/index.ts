@@ -1,20 +1,25 @@
-import type { CoverflexAuthResponse } from "@types";
+import * as v from "valibot";
+import {
+  CoverflexAuthResponseSchema,
+  type CoverflexAuthResponse,
+} from "../schemas";
+
+const JwtPayloadSchema = v.object({
+  exp: v.number(),
+});
 
 const KV_TOKEN_KEY = "coverflex:token";
 const KV_REFRESH_TOKEN_KEY = "coverflex:refresh_token";
 const EXPIRY_BUFFER_SECONDS = 600; // 10 minutes
 
-interface JwtPayload {
-  exp: number;
-}
-
 function parseJwtExpiration(token: string): number {
   const parts = token.split(".");
-  if (parts.length !== 3) {
+  const encodedPayload = parts[1];
+  if (parts.length !== 3 || !encodedPayload) {
     throw new Error("Invalid JWT format");
   }
-  const payload = JSON.parse(atob(parts[1])) as JwtPayload;
-  return payload.exp;
+
+  return v.parse(JwtPayloadSchema, JSON.parse(atob(encodedPayload))).exp;
 }
 
 function getExpirationTtl(token: string): number {
@@ -63,7 +68,7 @@ async function refreshSession(refreshToken: string): Promise<CoverflexAuthRespon
     throw new Error(`Refresh failed: ${response.status}`);
   }
 
-  return response.json() as Promise<CoverflexAuthResponse>;
+  return v.parse(CoverflexAuthResponseSchema, await response.json());
 }
 
 async function loginWithCredentials(env: CloudflareBindings): Promise<CoverflexAuthResponse> {
@@ -92,7 +97,7 @@ async function loginWithCredentials(env: CloudflareBindings): Promise<CoverflexA
     throw new Error(`Login failed: ${response.status}`);
   }
 
-  return response.json() as Promise<CoverflexAuthResponse>;
+  return v.parse(CoverflexAuthResponseSchema, await response.json());
 }
 
 export async function getAuthenticationToken(env: CloudflareBindings): Promise<string> {

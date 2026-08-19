@@ -68,6 +68,19 @@ describe("viralAgendaAlmada scraper", () => {
     ]);
   });
 
+  it("keeps events with malformed optional calendar fields", () => {
+    const html = createCard(42).replace(
+      "&quot;startTime&quot;:&quot;21:00&quot;",
+      "&quot;startTime&quot;:42",
+    );
+    const result = parse(html);
+
+    expect(result.entries).toHaveLength(1);
+    expect(result.entries[0]?.text).toBe(
+      "2026-09-15 | Auditório Fernando Lopes Graça (Almada)",
+    );
+  });
+
   it("follows pagination into ongoing events until Viral Agenda returns a partial page", async () => {
     const requests: Array<{ url: string; headers: Headers }> = [];
     const responses = [

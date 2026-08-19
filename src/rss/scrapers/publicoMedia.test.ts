@@ -34,22 +34,16 @@ const apiResponse = [
   },
 ];
 
-function createJsonResponse(json: unknown) {
+type PublicoApiFixturePayload = typeof apiResponse;
+
+function createJsonResponse(json: PublicoApiFixturePayload) {
   return new Response(JSON.stringify(json), {
     headers: { "Content-Type": "application/json" },
   });
 }
 
 function readFetchUrl(input: RequestInfo | URL): string {
-  if (typeof input === "string") {
-    return input;
-  }
-
-  if (input instanceof URL) {
-    return input.href;
-  }
-
-  return input.url;
+  return new Request(input).url;
 }
 
 describe("publicoMedia scraper", () => {
@@ -73,6 +67,60 @@ describe("publicoMedia scraper", () => {
       datetime: new Date("2026-06-18T10:15:00+01:00"),
       imageURL: undefined,
     });
+  });
+
+  it("uses fallback fields when preferred strings are empty", () => {
+    const result = parseApiResponse([
+      {
+        fullUrl: "",
+        url: "/2026/06/18/media/noticia/fallback",
+        tituloNoticia: "",
+        titulo: "Fallback title",
+        data: "",
+        dataActualizacao: "2026-06-18T10:15:00+01:00",
+      },
+    ]);
+
+    expect(result.entries[0]).toMatchObject({
+      link: "https://www.publico.pt/2026/06/18/media/noticia/fallback",
+      title: "Fallback title",
+      datetime: new Date("2026-06-18T10:15:00+01:00"),
+    });
+  });
+
+  it("recursively unwraps containers and ignores malformed optional fields", () => {
+    const result = parseApiResponse({
+      items: {
+        results: {
+          data: [
+            {
+              fullUrl: "&nbsp;",
+              url: "/2026/06/18/media/noticia/nested",
+              tituloNoticia: "<br>",
+              titulo: "Nested title",
+              descricao: 42,
+              lead: "Nested lead",
+              data: false,
+              dataActualizacao: "2026-06-18T10:15:00+01:00",
+              multimediaPrincipal: { invalid: true },
+              escondeImagem: "invalid",
+              tags: "invalid",
+            },
+          ],
+        },
+      },
+    });
+
+    expect(result.entries).toEqual([
+      {
+        id: "https://www.publico.pt/2026/06/18/media/noticia/nested",
+        link: "https://www.publico.pt/2026/06/18/media/noticia/nested",
+        title: "Nested title",
+        text: "Nested lead",
+        datetime: new Date("2026-06-18T10:15:00+01:00"),
+        imageURL: undefined,
+      },
+    ]);
   });
 
   it("fetches the Público media API", async () => {

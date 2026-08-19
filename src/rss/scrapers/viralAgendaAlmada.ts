@@ -5,6 +5,7 @@ import {
   type ScraperContext,
 } from "@rss/common";
 import type { RSSData, RSSEntry } from "@rss/types";
+import * as v from "valibot";
 
 const BASE_URL = "https://www.viralagenda.com/pt/setubal/almada";
 const PAGE_SIZE = 30;
@@ -12,14 +13,22 @@ const MAX_PAGES = 30;
 
 type FetchFn = typeof fetch;
 
-type CalendarData = {
-  name: string;
-  startDate?: string;
-  endDate?: string;
-  startTime?: string;
-  endTime?: string;
-  location?: string;
-};
+const OptionalTextSchema = v.fallback(v.nullish(v.string()), undefined);
+const CalendarDataSchema = v.looseObject({
+  name: v.string(),
+  startDate: OptionalTextSchema,
+  endDate: OptionalTextSchema,
+  startTime: OptionalTextSchema,
+  endTime: OptionalTextSchema,
+  location: OptionalTextSchema,
+});
+const ViralAgendaAjaxPayloadSchema = v.looseObject({
+  html: v.string(),
+  pageTotal: v.number(),
+});
+
+type CalendarData = v.InferOutput<typeof CalendarDataSchema>;
+type ViralAgendaAjaxPayload = v.InferOutput<typeof ViralAgendaAjaxPayloadSchema>;
 
 type ParsedPage = {
   eventCount: number;
@@ -27,10 +36,6 @@ type ParsedPage = {
   hasOngoingMarker: boolean;
   hasPastMarker: boolean;
 };
-
-function isRecord(value: unknown): value is Record<string, unknown> {
-  return typeof value === "object" && value != null && !Array.isArray(value);
-}
 
 function readHtmlAttribute(html: string, name: string): string | undefined {
   const match = new RegExp(`\\s${name}=(['"])([\\s\\S]*?)\\1`, "i").exec(html);
@@ -40,29 +45,16 @@ function readHtmlAttribute(html: string, name: string): string | undefined {
 }
 
 function parseCalendarData(value: string): CalendarData | undefined {
-  let parsed: unknown;
-
   try {
-    parsed = JSON.parse(value);
+    const result = v.safeParse(CalendarDataSchema, JSON.parse(value));
+    if (!result.success || result.output.name.trim().length === 0) {
+      return undefined;
+    }
+
+    return { ...result.output, name: result.output.name.trim() };
   } catch {
     return undefined;
   }
-
-  if (!isRecord(parsed)) return undefined;
-
-  const data = parsed;
-  if (typeof data.name !== "string" || data.name.trim().length === 0) {
-    return undefined;
-  }
-
-  return {
-    name: data.name.trim(),
-    startDate: typeof data.startDate === "string" ? data.startDate : undefined,
-    endDate: typeof data.endDate === "string" ? data.endDate : undefined,
-    startTime: typeof data.startTime === "string" ? data.startTime : undefined,
-    endTime: typeof data.endTime === "string" ? data.endTime : undefined,
-    location: typeof data.location === "string" ? data.location : undefined,
-  };
 }
 
 function parseDatetime(value: string | undefined): Date | undefined {
@@ -70,6 +62,10 @@ function parseDatetime(value: string | undefined): Date | undefined {
 
   const datetime = new Date(value);
   return Number.isNaN(datetime.getTime()) ? undefined : datetime;
+}
+
+function isNonEmptyText(value: string | null | undefined): value is string {
+  return value !== null && value !== undefined && value.length > 0;
 }
 
 function buildText(data: CalendarData): string | undefined {
@@ -81,9 +77,7 @@ function buildText(data: CalendarData): string | undefined {
     data.startTime && data.endTime && data.endTime !== data.startTime
       ? `${data.startTime}–${data.endTime}`
       : data.startTime;
-  const parts = [date, time, data.location].filter(
-    (value): value is string => typeof value === "string" && value.length > 0,
-  );
+  const parts = [date, time, data.location].filter(isNonEmptyText);
 
   return parts.length > 0 ? parts.join(" | ") : undefined;
 }
@@ -165,22 +159,6 @@ async function fetchResponse(fetchFn: FetchFn, url: string, ajax: boolean): Prom
   return response;
 }
 
-function parseAjaxPayload(value: unknown): { html: string; pageTotal: number } {
-  if (!isRecord(value)) {
-    throw new Error("Invalid Viral Agenda pagination response");
-  }
-
-  const payload = value;
-  if (typeof payload.html !== "string" || typeof payload.pageTotal !== "number") {
-    throw new Error("Invalid Viral Agenda pagination response");
-  }
-
-  return {
-    html: payload.html,
-    pageTotal: payload.pageTotal,
-  };
-}
-
 export async function scrape(fetchFn: FetchFn): Promise<RSSData> {
   const firstResponse = await fetchResponse(
     fetchFn,
@@ -203,8 +181,15 @@ export async function scrape(fetchFn: FetchFn): Promise<RSSData> {
       getAjaxUrl(offset, hasPastMarker, hasOngoingMarker),
       true,
     );
-    const rawPayload: unknown = await response.json();
-    const payload = parseAjaxPayload(rawPayload);
+    const payloadResult = v.safeParse(
+      ViralAgendaAjaxPayloadSchema,
+      await response.json(),
+    );
+    if (!payloadResult.success) {
+      throw new Error("Invalid Viral Agenda pagination response");
+    }
+
+    const payload: ViralAgendaAjaxPayload = payloadResult.output;
     const page = parsePage(payload.html);
     const previousEntryCount = entriesById.size;
     hasOngoingMarker ||= page.hasOngoingMarker;

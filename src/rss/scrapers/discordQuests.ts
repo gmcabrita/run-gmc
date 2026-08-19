@@ -1,10 +1,40 @@
 import { isValidRSSEntry, type ScraperContext } from "@rss/common";
 import type { RSSData, RSSEntry } from "@rss/types";
-import type { DiscordQuestsResponse } from "@types";
+import * as v from "valibot";
 
 const BASE_URL = "https://discord.com/quest-home";
 
-export function parse(json: DiscordQuestsResponse, nowDate: Date = new Date()): RSSData {
+const DiscordQuestsPayloadSchema = v.looseObject({
+  quests: v.array(
+    v.looseObject({
+      id: v.string(),
+      config: v.looseObject({
+        starts_at: v.string(),
+        expires_at: v.nullish(v.string()),
+        messages: v.looseObject({
+          quest_name: v.string(),
+          game_title: v.string(),
+          game_publisher: v.string(),
+        }),
+        application: v.looseObject({ link: v.string() }),
+        rewards_config: v.looseObject({
+          rewards: v.array(
+            v.looseObject({
+              messages: v.looseObject({ name: v.string() }),
+            }),
+          ),
+        }),
+      }),
+      user_status: v.nullish(
+        v.looseObject({ claimed_at: v.nullish(v.string()) }),
+      ),
+    }),
+  ),
+});
+
+type DiscordQuestsPayload = v.InferOutput<typeof DiscordQuestsPayloadSchema>;
+
+export function parse(json: DiscordQuestsPayload, nowDate: Date = new Date()): RSSData {
   const entries: RSSEntry[] = json.quests
     .filter((quest) => {
       const expiresAt = quest.config.expires_at;
@@ -65,6 +95,6 @@ export async function get(ctx: ScraperContext): Promise<RSSData> {
     method: "GET",
   });
 
-  const json = (await response.json()) as DiscordQuestsResponse;
+  const json = v.parse(DiscordQuestsPayloadSchema, await response.json());
   return parse(json);
 }

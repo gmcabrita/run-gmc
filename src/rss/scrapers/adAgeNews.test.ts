@@ -52,4 +52,41 @@ describe("adAgeNews scraper", () => {
     expect(links).not.toContain("https://adage.com/future-story/");
     expect(links).not.toContain("https://adage.com/missing-headline/");
   });
+
+  it("keeps stories with malformed optional fields", async () => {
+    const contentCache = {
+      "story-feed-sections": {
+        main: {
+          data: {
+            content_elements: [
+              {
+                website_url: "/tolerant-story/",
+                websites: 42,
+                headlines: { basic: "Tolerant story" },
+                description: { basic: false },
+                display_date: { invalid: true },
+                publish_date: "2025-01-01T12:00:00Z",
+                promo_items: ["invalid"],
+              },
+            ],
+          },
+        },
+      },
+    };
+    const response = new Response(
+      `<script>Fusion.contentCache=${JSON.stringify(contentCache)};Fusion.lastModified=0;</script>`,
+    );
+    const result = await parse(response, new Date("2026-01-01T00:00:00Z"));
+
+    expect(result.entries).toEqual([
+      {
+        id: "https://adage.com/tolerant-story/",
+        link: "https://adage.com/tolerant-story/",
+        title: "Tolerant story",
+        text: "Tolerant story",
+        datetime: new Date("2025-01-01T12:00:00Z"),
+        imageURL: undefined,
+      },
+    ]);
+  });
 });

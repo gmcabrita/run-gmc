@@ -1,6 +1,60 @@
 import { Feed } from "feed";
-import type { AgendaLxEvent } from "@types";
 import { stripInvalidXmlChars } from "@rss/common";
+import * as v from "valibot";
+
+const NamedValueSchema = v.looseObject({
+  name: v.string(),
+});
+const OptionalTextSchema = v.fallback(v.nullish(v.string()), undefined);
+const TextListSchema = v.pipe(
+  v.union([v.array(v.string()), v.string()]),
+  v.transform((value) =>
+    Array.isArray(value) ? value : value.length > 0 ? [value] : [],
+  ),
+);
+const AgendaLxEventSchema = v.looseObject({
+  id: v.pipe(
+    v.union([v.string(), v.number()]),
+    v.transform((value) => String(value)),
+  ),
+  title: v.fallback(
+    v.nullish(v.looseObject({ rendered: OptionalTextSchema })),
+    undefined,
+  ),
+  subtitle: v.fallback(v.nullish(TextListSchema), undefined),
+  description: v.fallback(v.nullish(v.array(v.string())), undefined),
+  venue: v.fallback(
+    v.nullish(
+      v.record(v.string(), v.looseObject({ name: OptionalTextSchema })),
+    ),
+    undefined,
+  ),
+  categories_name_list: v.fallback(
+    v.nullish(v.record(v.string(), NamedValueSchema)),
+    undefined,
+  ),
+  tags_name_list: v.fallback(
+    v.nullish(v.record(v.string(), NamedValueSchema)),
+    undefined,
+  ),
+  StartDate: OptionalTextSchema,
+  LastDate: OptionalTextSchema,
+  string_dates: OptionalTextSchema,
+  string_times: OptionalTextSchema,
+  featured_media_large: OptionalTextSchema,
+  link: v.string(),
+});
+const AgendaLxEventsPayloadSchema = v.array(v.unknown());
+
+type AgendaLxEvent = v.InferOutput<typeof AgendaLxEventSchema>;
+type AgendaLxEventsPayload = v.InferOutput<typeof AgendaLxEventsPayloadSchema>;
+
+function parseAgendaLxEvents(payload: AgendaLxEventsPayload): AgendaLxEvent[] {
+  return payload.flatMap((event) => {
+    const result = v.safeParse(AgendaLxEventSchema, event);
+    return result.success ? [result.output] : [];
+  });
+}
 
 export async function cacheAgendaLx(env: CloudflareBindings) {
   const feed = new Feed({
@@ -31,7 +85,8 @@ export async function cacheAgendaLx(env: CloudflareBindings) {
       const response = await fetch(
         `https://www.agendalx.pt/wp-json/agendalx/v1/events?per_page=5000&categories=${category}&_fields=id,link,title,subtitle,description,venue,categories_name_list,tags_name_list,StartDate,LastDate,string_dates,string_times,featured_media_large`,
       );
-      return await response.json<AgendaLxEvent[]>();
+      const payload = v.parse(AgendaLxEventsPayloadSchema, await response.json());
+      return parseAgendaLxEvents(payload);
     }),
   );
 
@@ -53,7 +108,7 @@ export async function cacheAgendaLx(env: CloudflareBindings) {
 
         let venue = "";
         if (event.venue) {
-          const venueObj = Object.values(event.venue)[0] as { name?: string } | undefined;
+          const venueObj = Object.values(event.venue)[0];
           if (venueObj && venueObj.name) {
             venue = venueObj.name;
           }

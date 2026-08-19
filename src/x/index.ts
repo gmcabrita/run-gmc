@@ -2,13 +2,16 @@ import { Hono } from "hono";
 import { basicAuth } from "hono/basic-auth";
 import { Feed } from "feed";
 import { stripInvalidXmlChars } from "@rss/common";
-import type {
-  XUserByScreenNameResponse,
-  XUserTweetsResponse,
-  XPost,
-  XOEmbedResponse,
-  FeedItem,
-} from "@types";
+import type { FeedItem } from "@types";
+import * as v from "valibot";
+import {
+  XOEmbedResponseSchema,
+  XUserByScreenNameResponseSchema,
+  XUserTweetsResponseSchema,
+  type XPost,
+  type XUserByScreenNameResponse,
+  type XUserTweetsResponse,
+} from "./schemas";
 import { buildXApiHeaders, resolveCredentials, type XCredentials } from "./credentials";
 import {
   createPrivateProfileNoticeFeed,
@@ -34,7 +37,7 @@ async function fetchUser(
 
   if (response.status == 429) throw new Error("Rate Limited");
 
-  return (await response.json()) as XUserByScreenNameResponse;
+  return v.parse(XUserByScreenNameResponseSchema, await response.json());
 }
 
 async function fetchPosts(
@@ -51,7 +54,7 @@ async function fetchPosts(
   );
 
   if (response.status == 429) throw new Error("Rate Limited");
-  return (await response.json()) as XUserTweetsResponse;
+  return v.parse(XUserTweetsResponseSchema, await response.json());
 }
 
 async function transformPost(
@@ -103,7 +106,7 @@ async function getEmbed(env: CloudflareBindings, postUrl: string): Promise<strin
   const response = await fetch(
     `https://publish.twitter.com/oembed?url=${encodeURIComponent(postUrl)}`,
   );
-  const json = (await response.json()) as XOEmbedResponse;
+  const json = v.parse(XOEmbedResponseSchema, await response.json());
 
   await env.RUN_GMC_X_CACHE_KV.put(postUrl, json.html, { expirationTtl: 1209600 });
 
@@ -121,7 +124,7 @@ async function x2Rss(env: CloudflareBindings, userName: string, data: XUserTweet
     id: `https://x.com/${firstUser?.screen_name || userName}`,
     link: `https://x.com/${firstUser?.screen_name || userName}`,
     language: "en",
-    image: firstUser?.profile_image_url_https,
+    image: firstUser?.profile_image_url_https ?? undefined,
     favicon: "https://x.com/favicon.ico",
     copyright: `All rights reserved ${new Date().getFullYear()}, ${firstUser?.name}`,
     updated: new Date(),
@@ -135,7 +138,10 @@ async function x2Rss(env: CloudflareBindings, userName: string, data: XUserTweet
   for (const entry of entries) {
     if (entry.content?.itemContent?.promotedMetadata) continue;
 
-    const post = await transformPost(env, entry.content?.itemContent?.tweet_results?.result);
+    const post = await transformPost(
+      env,
+      entry.content?.itemContent?.tweet_results?.result ?? undefined,
+    );
     if (post) {
       feed.addItem(post);
     }
@@ -143,7 +149,7 @@ async function x2Rss(env: CloudflareBindings, userName: string, data: XUserTweet
     if (entry.content?.items?.[0]?.item?.itemContent?.promotedMetadata) continue;
     const threadedPost = await transformPost(
       env,
-      entry.content?.items?.[0]?.item?.itemContent?.tweet_results?.result,
+      entry.content?.items?.[0]?.item?.itemContent?.tweet_results?.result ?? undefined,
     );
     if (threadedPost) {
       feed.addItem(threadedPost);

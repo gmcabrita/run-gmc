@@ -55,4 +55,31 @@ describe("parseMangaDexFeed", () => {
     expect(result.entries[0].title).toContain("Another Manga — Chapter 386");
     expect(result.entries[0].title).toContain("Evil Genius");
   });
+
+  it("keeps chapters with malformed optional fields", () => {
+    const result = parseMangaDexFeed(
+      {
+        data: [
+          {
+            id: "chapter-id",
+            attributes: {
+              volume: 42,
+              chapter: "7",
+              title: { invalid: true },
+              publishAt: false,
+            },
+            relationships: [],
+          },
+        ],
+      },
+      config,
+    );
+
+    expect(result.entries).toHaveLength(1);
+    expect(result.entries[0]).toMatchObject({
+      id: "chapter-id",
+      title: "Berserk — Chapter 7 — Unknown scanlation group",
+      datetime: undefined,
+    });
+  });
 });

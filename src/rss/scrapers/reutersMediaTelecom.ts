@@ -1,6 +1,7 @@
 import { isValidRSSEntry, type ScraperContext } from "@rss/common";
 import { createProxiedFetch } from "../../proxiedFetch";
 import type { RSSData, RSSEntry } from "@rss/types";
+import * as v from "valibot";
 
 const SITE_URL = "https://www.reuters.com";
 const SECTION_PATH = "/business/media-telecom/";
@@ -19,6 +20,31 @@ const API_QUERY = {
   website: "reuters",
 };
 
+const OptionalTextSchema = v.fallback(v.nullish(v.string()), undefined);
+const ReutersThumbnailSchema = v.looseObject({
+  url: v.string(),
+});
+const ReutersArticlePayloadSchema = v.looseObject({
+  id: v.string(),
+  canonical_url: OptionalTextSchema,
+  title: OptionalTextSchema,
+  basic_headline: OptionalTextSchema,
+  web: OptionalTextSchema,
+  native: OptionalTextSchema,
+  description: OptionalTextSchema,
+  published_time: OptionalTextSchema,
+  updated_time: OptionalTextSchema,
+  thumbnail: v.optional(v.unknown()),
+});
+const ReutersApiPayloadSchema = v.looseObject({
+  result: v.looseObject({
+    articles: v.array(v.unknown()),
+  }),
+});
+
+export type ReutersApiPayload = v.InferOutput<typeof ReutersApiPayloadSchema>;
+type ReutersArticlePayload = v.InferOutput<typeof ReutersArticlePayloadSchema>;
+
 interface ReutersArticle {
   id: string;
   canonicalUrl?: string;
@@ -32,12 +58,10 @@ interface ReutersSectionResponse {
   articles: ReutersArticle[];
 }
 
-function isRecord(value: unknown): value is Record<string, unknown> {
-  return typeof value === "object" && value !== null;
-}
+const EMPTY_REUTERS_PAYLOAD = { result: { articles: [] } } satisfies ReutersApiPayload;
 
-function readString(value: unknown): string | undefined {
-  return typeof value === "string" && value !== "" ? value : undefined;
+function normalizeOptionalText(value: string | null | undefined): string | undefined {
+  return value && value.length > 0 ? value : undefined;
 }
 
 function normalizeText(value: string | undefined): string | undefined {
@@ -49,42 +73,48 @@ function normalizeText(value: string | undefined): string | undefined {
   );
 }
 
-function parseReutersArticle(value: unknown): ReutersArticle | undefined {
-  if (!isRecord(value)) {
-    return undefined;
-  }
-
-  const id = readString(value.id);
+function parseReutersArticle(payload: ReutersArticlePayload): ReutersArticle | undefined {
+  const id = normalizeOptionalText(payload.id);
   if (!id) {
     return undefined;
   }
 
-  const thumbnail = isRecord(value.thumbnail) ? readString(value.thumbnail.url) : undefined;
+  const thumbnailResult = v.safeParse(ReutersThumbnailSchema, payload.thumbnail);
   const title = normalizeText(
-    readString(value.title) ??
-      readString(value.basic_headline) ??
-      readString(value.web) ??
-      readString(value.native),
+    normalizeOptionalText(payload.title) ??
+      normalizeOptionalText(payload.basic_headline) ??
+      normalizeOptionalText(payload.web) ??
+      normalizeOptionalText(payload.native),
   );
 
   return {
     id,
-    canonicalUrl: readString(value.canonical_url),
+    canonicalUrl: normalizeOptionalText(payload.canonical_url),
     title,
-    description: normalizeText(readString(value.description)),
-    publishedAt: readString(value.published_time) ?? readString(value.updated_time),
-    imageUrl: thumbnail,
+    description: normalizeText(normalizeOptionalText(payload.description)),
+    publishedAt:
+      normalizeOptionalText(payload.published_time) ??
+      normalizeOptionalText(payload.updated_time),
+    imageUrl: thumbnailResult.success
+      ? normalizeOptionalText(thumbnailResult.output.url)
+      : undefined,
   };
 }
 
-function readReutersResponse(value: unknown): ReutersSectionResponse {
-  if (!isRecord(value) || !isRecord(value.result) || !Array.isArray(value.result.articles)) {
+function readReutersResponse(payload: ReutersApiPayload): ReutersSectionResponse {
+  const payloadResult = v.safeParse(ReutersApiPayloadSchema, payload);
+  if (!payloadResult.success) {
     return { articles: [] };
   }
 
   return {
-    articles: value.result.articles.flatMap((article) => {
-      const parsedArticle = parseReutersArticle(article);
+    articles: payloadResult.output.result.articles.flatMap((article) => {
+      const articleResult = v.safeParse(ReutersArticlePayloadSchema, article);
+      if (!articleResult.success) {
+        return [];
+      }
+
+      const parsedArticle = parseReutersArticle(articleResult.output);
       return parsedArticle ? [parsedArticle] : [];
     }),
   };
@@ -98,8 +128,8 @@ function buildApiUrl() {
   return url.toString();
 }
 
-export function parse(json: unknown): RSSData {
-  const response = readReutersResponse(json);
+export function parse(payload: ReutersApiPayload): RSSData {
+  const response = readReutersResponse(payload);
   const entries: RSSEntry[] = response.articles
     .map((article) => {
       const link = article.canonicalUrl ? new URL(article.canonicalUrl, SITE_URL).href : "";
@@ -139,5 +169,6 @@ export async function get(_ctx: ScraperContext): Promise<RSSData> {
     throw new Error(`Reuters request failed: ${response.status}`);
   }
 
-  return parse(await response.json());
+  const payloadResult = v.safeParse(ReutersApiPayloadSchema, await response.json());
+  return parse(payloadResult.success ? payloadResult.output : EMPTY_REUTERS_PAYLOAD);
 }

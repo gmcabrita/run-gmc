@@ -1,5 +1,6 @@
 import { USERAGENT, isValidRSSEntry, type ScraperContext } from "@rss/common";
 import type { RSSData, RSSEntry } from "@rss/types";
+import * as v from "valibot";
 
 const BASE_URL = "https://www.kernel.sh/";
 const BLOG_URL = "https://www.kernel.sh/blog";
@@ -8,30 +9,27 @@ const DESCRIPTION = "Engineering Blog for Fast Browser Agents";
 const NEXT_DATA_PREFIX = "self.__next_f.push([1,\"";
 const POSTS_MARKER = '"posts":';
 
+const KernelPostImageSchema = v.looseObject({
+  asset: v.looseObject({
+    url: v.string(),
+  }),
+});
+const KernelPostSchema = v.looseObject({
+  title: v.string(),
+  publishedAt: v.string(),
+  slug: v.looseObject({
+    current: v.string(),
+  }),
+  excerpt: v.fallback(v.nullish(v.string()), undefined),
+  previewImage: v.optional(v.unknown()),
+  mainImage: v.optional(v.unknown()),
+});
+const KernelPostListSchema = v.array(v.unknown());
+
+type KernelPost = v.InferOutput<typeof KernelPostSchema>;
+
 function normalizeWhitespace(text: string): string {
   return text.replace(/\s+/g, " ").trim();
-}
-
-function isRecord(value: unknown): value is Record<string, unknown> {
-  return typeof value === "object" && value !== null;
-}
-
-function getStringProperty(record: Record<string, unknown>, key: string): string | undefined {
-  const value = record[key];
-  if (typeof value !== "string") {
-    return undefined;
-  }
-
-  return value;
-}
-
-function getRecordProperty(record: Record<string, unknown>, key: string): Record<string, unknown> | undefined {
-  const value = record[key];
-  if (!isRecord(value)) {
-    return undefined;
-  }
-
-  return value;
 }
 
 function parseDate(value: string): Date | undefined {
@@ -44,12 +42,8 @@ function parseDate(value: string): Date | undefined {
 }
 
 function parseJsonStringLiteral(content: string): string | undefined {
-  const value: unknown = JSON.parse(`"${content}"`);
-  if (typeof value !== "string") {
-    return undefined;
-  }
-
-  return value;
+  const result = v.safeParse(v.string(), JSON.parse(`"${content}"`));
+  return result.success ? result.output : undefined;
 }
 
 function decodeNextDataScripts(html: string): string[] {
@@ -146,45 +140,25 @@ function extractPostsJson(source: string): string | undefined {
   return extractBalancedArray(source, arrayStart);
 }
 
-function getSanityImageUrl(value: unknown): string | undefined {
-  if (!isRecord(value)) {
+function parsePost(payload: KernelPost): RSSEntry | undefined {
+  if (!payload.title || !payload.publishedAt || !payload.slug.current) {
     return undefined;
   }
 
-  const asset = getRecordProperty(value, "asset");
-  if (!asset) {
-    return undefined;
-  }
-
-  return getStringProperty(asset, "url");
-}
-
-function parsePost(value: unknown): RSSEntry | undefined {
-  if (!isRecord(value)) {
-    return undefined;
-  }
-
-  const title = getStringProperty(value, "title");
-  const publishedAt = getStringProperty(value, "publishedAt");
-  const slug = getRecordProperty(value, "slug");
-  if (!title || !publishedAt || !slug) {
-    return undefined;
-  }
-
-  const currentSlug = getStringProperty(slug, "current");
-  if (!currentSlug) {
-    return undefined;
-  }
-
-  const link = new URL(`/blog/${currentSlug}`, BASE_URL).toString();
-  const excerpt = getStringProperty(value, "excerpt") ?? "";
-  const imageURL = getSanityImageUrl(value["previewImage"]) ?? getSanityImageUrl(value["mainImage"]);
-  const datetime = parseDate(publishedAt);
+  const previewImageResult = v.safeParse(KernelPostImageSchema, payload.previewImage);
+  const mainImageResult = v.safeParse(KernelPostImageSchema, payload.mainImage);
+  const link = new URL(`/blog/${payload.slug.current}`, BASE_URL).toString();
+  const imageURL = previewImageResult.success
+    ? previewImageResult.output.asset.url
+    : mainImageResult.success
+      ? mainImageResult.output.asset.url
+      : undefined;
+  const datetime = parseDate(payload.publishedAt);
   const entry: RSSEntry = {
     id: link,
     link,
-    title: normalizeWhitespace(title),
-    text: normalizeWhitespace(excerpt),
+    title: normalizeWhitespace(payload.title),
+    text: normalizeWhitespace(payload.excerpt ?? ""),
   };
 
   if (datetime) {
@@ -199,18 +173,19 @@ function parsePost(value: unknown): RSSEntry | undefined {
 }
 
 function parsePostsJson(json: string): RSSEntry[] {
-  const parsed: unknown = JSON.parse(json);
-  if (!Array.isArray(parsed)) {
+  const listResult = v.safeParse(KernelPostListSchema, JSON.parse(json));
+  if (!listResult.success) {
     return [];
   }
 
-  return parsed.flatMap((post) => {
-    const entry = parsePost(post);
-    if (!entry) {
+  return listResult.output.flatMap((post) => {
+    const postResult = v.safeParse(KernelPostSchema, post);
+    if (!postResult.success) {
       return [];
     }
 
-    return [entry];
+    const entry = parsePost(postResult.output);
+    return entry ? [entry] : [];
   });
 }
 

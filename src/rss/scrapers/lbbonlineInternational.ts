@@ -1,12 +1,27 @@
 import { USERAGENT, isValidRSSEntry, type ScraperContext } from "@rss/common";
 import type { RSSData, RSSEntry } from "@rss/types";
-import type { LbbOnlineResponse } from "@types";
+import * as v from "valibot";
 
 const BASE_URL = "https://lbbonline.com/news?edition=international";
 const API_URL = "https://search.lbbonline.com/indexes/lbb_news/search";
 const IMAGE_BASE_URL = "https://d3q27bh1u24u2o.cloudfront.net";
 
-export async function parse(json: LbbOnlineResponse): Promise<RSSData> {
+const LbbOnlinePayloadSchema = v.looseObject({
+  hits: v.array(
+    v.looseObject({
+      id: v.string(),
+      title: v.string(),
+      slug: v.string(),
+      description: v.string(),
+      image: v.nullish(v.string()),
+      date: v.string(),
+    }),
+  ),
+});
+
+type LbbOnlinePayload = v.InferOutput<typeof LbbOnlinePayloadSchema>;
+
+export async function parse(json: LbbOnlinePayload): Promise<RSSData> {
   const now = new Date();
   const entries: RSSEntry[] = json.hits
     .filter((post) => new Date(post.date) < now)
@@ -53,6 +68,6 @@ export async function get(_ctx: ScraperContext): Promise<RSSData> {
     }),
   });
 
-  const json = (await response.json()) as LbbOnlineResponse;
+  const json = v.parse(LbbOnlinePayloadSchema, await response.json());
   return parse(json);
 }

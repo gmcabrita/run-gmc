@@ -1,11 +1,43 @@
 import { USERAGENT, isValidRSSEntry, type ScraperContext } from "@rss/common";
 import type { RSSData, RSSEntry } from "@rss/types";
-import type { EpicMobileDiscoverResponse } from "@types";
+import * as v from "valibot";
 
 const BASE_URL = "https://store.epicgames.com/en-US/free-games";
 
+const EpicMobileDiscoverPayloadSchema = v.looseObject({
+  data: v.array(
+    v.looseObject({
+      type: v.string(),
+      offers: v.array(
+        v.looseObject({
+          content: v.looseObject({
+            title: v.string(),
+            categories: v.nullish(
+              v.array(v.looseObject({ path: v.string() })),
+            ),
+            catalogItemId: v.string(),
+            mapping: v.looseObject({ slug: v.string() }),
+            purchase: v.nullish(
+              v.array(
+                v.looseObject({
+                  purchaseType: v.string(),
+                  price: v.looseObject({ decimalPrice: v.number() }),
+                }),
+              ),
+            ),
+          }),
+        }),
+      ),
+    }),
+  ),
+});
+
+type EpicMobileDiscoverPayload = v.InferOutput<
+  typeof EpicMobileDiscoverPayloadSchema
+>;
+
 export async function parse(
-  json: EpicMobileDiscoverResponse,
+  json: EpicMobileDiscoverPayload,
   platform: "ios" | "android",
 ): Promise<RSSData> {
   const freeGames = json.data.find((item) => item.type === "freeGame");
@@ -58,7 +90,7 @@ async function fetchForPlatform(_ctx: ScraperContext, platform: "ios" | "android
     },
   });
 
-  const json = (await response.json()) as EpicMobileDiscoverResponse;
+  const json = v.parse(EpicMobileDiscoverPayloadSchema, await response.json());
   return parse(json, platform);
 }
 

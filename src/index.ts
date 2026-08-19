@@ -9,7 +9,7 @@ import { addXEndpoints } from "@x";
 import { addIcs2GcalEndpoint } from "./ics2gcal";
 import { checkMauserSc1176StockAndNotify } from "./mauser";
 import { addScrapedRssEndpoints, cacheAgendaLx } from "@rss/scrapers";
-import type { FertagusResponse } from "@types";
+import * as v from "valibot";
 import {
   getDiscordHealthcheckErrorPayload,
   getDiscordHealthcheckFailurePayload,
@@ -23,6 +23,20 @@ import {
 } from "@rss/healthcheck";
 
 const rssHealthcheckOrigin = "https://run.gmcabrita.com";
+const FertagusResponseSchema = v.looseObject({
+  response: v.array(
+    v.looseObject({
+      NodesComboioTabelsPartidasChegadas: v.array(
+        v.looseObject({
+          ComboioPassou: v.boolean(),
+          NomeEstacaoDestino: v.string(),
+          DataHoraPartidaChegada_ToOrderBy: v.string(),
+          Observacoes: v.nullish(v.string()),
+        }),
+      ),
+    }),
+  ),
+});
 
 async function sendDiscordHealthcheckPayload(
   webhookUrl: string,
@@ -225,7 +239,7 @@ app.get("/fertagus.nextTrainLeavingCorroios", async (ctx) => {
       method: "GET",
     },
   );
-  const json = (await response.json()) as FertagusResponse;
+  const json = v.parse(FertagusResponseSchema, await response.json());
   const train = json.response[1].NodesComboioTabelsPartidasChegadas.find(
     (train) => !train.ComboioPassou && train.NomeEstacaoDestino === "ROMA-AREEIRO",
   );

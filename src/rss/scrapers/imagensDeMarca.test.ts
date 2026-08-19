@@ -24,4 +24,22 @@ describe("imagensDeMarca parser", () => {
       expect(entry.link).toContain("https://www.imagensdemarca.pt/artigo/");
     }
   });
+
+  it("excludes posts with invalid publication dates", async () => {
+    const result = await parse({
+      items: [
+        {
+          id: "invalid-date",
+          _title: { all: "Invalid date" },
+          _slug: { all: "invalid-date" },
+          image_cHyPyUtO1f: null,
+          image_cSyfYQnEab: null,
+          image_crJeRfSWfz: null,
+          datetime_cB1vB7YcXz: "not-a-date",
+        },
+      ],
+    });
+
+    expect(result.entries).toEqual([]);
+  });
 });

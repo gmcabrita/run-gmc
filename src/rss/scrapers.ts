@@ -69,7 +69,7 @@ type ScraperModule = {
   get: (ctx: ScraperContext) => Promise<RSSData>;
 };
 
-const scrapers: Record<string, ScraperModule> = {
+const scrapers = {
   adAgeNews,
   adsOfTheWorldBlog,
   agendaLxPdf,
@@ -127,7 +127,7 @@ const scrapers: Record<string, ScraperModule> = {
   viralAgendaAlmada,
   waltDisneyPressReleases,
   wsjBusinessMedia,
-};
+} satisfies Record<string, ScraperModule>;
 
 // Special handlers for mobile games (different function names)
 const mobileGameScrapers = {

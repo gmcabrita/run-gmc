@@ -49,7 +49,7 @@ describe("primeFreeGames json parser", () => {
             {
               assets: {
                 id: "missing-title",
-                title: null as unknown as string,
+                title: null,
                 externalClaimLink: "https://example.com/game2",
               },
               offers: [{ startTime: "2025-12-25T00:00:00Z" }],
@@ -58,7 +58,7 @@ describe("primeFreeGames json parser", () => {
               assets: {
                 id: "missing-link",
                 title: "No Link Game",
-                externalClaimLink: null as unknown as string,
+                externalClaimLink: null,
               },
               offers: [{ startTime: "2025-12-25T00:00:00Z" }],
             },

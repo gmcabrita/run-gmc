@@ -11,15 +11,7 @@ function createResponse(body: string) {
 }
 
 function readFetchUrl(input: RequestInfo | URL): string {
-  if (typeof input === "string") {
-    return input;
-  }
-
-  if (input instanceof URL) {
-    return input.href;
-  }
-
-  return input.url;
+  return new Request(input).url;
 }
 
 describe("observadorMedia scraper", () => {

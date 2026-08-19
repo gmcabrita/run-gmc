@@ -15,15 +15,7 @@ function createResponse(html: string) {
 }
 
 function readFetchUrl(input: RequestInfo | URL): string {
-  if (typeof input === "string") {
-    return input;
-  }
-
-  if (input instanceof URL) {
-    return input.href;
-  }
-
-  return input.url;
+  return new Request(input).url;
 }
 
 describe("jornalDeNegociosMedia scraper", () => {
@@ -96,9 +88,11 @@ describe("jornalDeNegociosMedia scraper", () => {
         firstPageAttempts += 1;
 
         if (firstPageAttempts === 1) {
-          const error = new Error("Network connection lost.");
-          Object.defineProperty(error, "retryable", { value: true });
-          throw error;
+          throw { message: "Network connection lost." };
+        }
+
+        if (firstPageAttempts === 2) {
+          throw new Error("Network connection lost.");
         }
 
         return createResponse(pageOneHtml);
@@ -113,7 +107,12 @@ describe("jornalDeNegociosMedia scraper", () => {
 
     const result = await scrapeFirstTwoPages(fetchFn);
 
-    expect(fetchCalls).toEqual([FIRST_PAGE_URL, FIRST_PAGE_URL, SECOND_PAGE_URL]);
+    expect(fetchCalls).toEqual([
+      FIRST_PAGE_URL,
+      FIRST_PAGE_URL,
+      FIRST_PAGE_URL,
+      SECOND_PAGE_URL,
+    ]);
     expect(result.entries).toHaveLength(4);
   });
 });

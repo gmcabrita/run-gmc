@@ -18,6 +18,7 @@
     "@typescript/native-preview": "7.0.0-dev.20260523.1",
     "feed": "^5.2.1",
     "hono": "^4.12.25",
+    "valibot": "^1.4.2",
     "xml2js": "^0.6.2"
   },
   "devDependencies": {

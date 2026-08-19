@@ -16,14 +16,14 @@ interface ParsedPage {
   nextPageURL?: string;
 }
 
-const HTML_ENTITY_BY_NAME: Record<string, string> = {
-  amp: "&",
-  apos: "'",
-  gt: ">",
-  lt: "<",
-  nbsp: " ",
-  quot: '"',
-};
+const HTML_ENTITY_BY_NAME = new Map([
+  ["amp", "&"],
+  ["apos", "'"],
+  ["gt", ">"],
+  ["lt", "<"],
+  ["nbsp", " "],
+  ["quot", '"'],
+]);
 
 function decodeHtmlEntities(text: string): string {
   return text.replace(/&(#x[0-9a-f]+|#\d+|[a-z]+);/gi, (match, entity) => {
@@ -38,7 +38,7 @@ function decodeHtmlEntities(text: string): string {
       return Number.isFinite(codePoint) ? String.fromCodePoint(codePoint) : match;
     }
 
-    return HTML_ENTITY_BY_NAME[normalizedEntity] ?? match;
+    return HTML_ENTITY_BY_NAME.get(normalizedEntity) ?? match;
   });
 }
 

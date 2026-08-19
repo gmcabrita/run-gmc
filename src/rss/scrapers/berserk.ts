@@ -3,6 +3,7 @@ import {
   getMangaDexFeed,
   parseMangaDexFeed,
   type MangaDexFeedConfig,
+  type MangaDexFeedPayload,
 } from "@rss/mangaDex";
 import type { RSSData } from "@rss/types";
 
@@ -16,8 +17,8 @@ const config = {
   description: "English Berserk chapter releases from MangaDex",
 } satisfies MangaDexFeedConfig;
 
-export function parse(json: unknown): RSSData {
-  return parseMangaDexFeed(json, config);
+export function parse(payload: MangaDexFeedPayload): RSSData {
+  return parseMangaDexFeed(payload, config);
 }
 
 export function get(ctx: ScraperContext): Promise<RSSData> {

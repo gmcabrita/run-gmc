@@ -1,6 +1,6 @@
 import { USERAGENT, isValidRSSEntry, consume, type ScraperContext } from "@rss/common";
 import type { RSSData, RSSEntry } from "@rss/types";
-import type { PrimeGamingResponse } from "@types";
+import * as v from "valibot";
 
 const BASE_URL = "https://gaming.amazon.com/home";
 const GRAPHQL_URL = "https://gaming.amazon.com/graphql";
@@ -106,16 +106,44 @@ fragment Item on Item {
   __typename
 }`;
 
-export function parse(json: PrimeGamingResponse): RSSData {
+const PrimeGamingPayloadSchema = v.looseObject({
+  data: v.looseObject({
+    games: v.looseObject({
+      items: v.array(
+        v.looseObject({
+          assets: v.looseObject({
+            id: v.string(),
+            title: v.nullish(v.string()),
+            externalClaimLink: v.nullish(v.string()),
+          }),
+          offers: v.array(v.looseObject({ startTime: v.string() })),
+        }),
+      ),
+    }),
+  }),
+});
+
+type PrimeGamingPayload = v.InferOutput<typeof PrimeGamingPayloadSchema>;
+
+export function parse(json: PrimeGamingPayload): RSSData {
   const entries: RSSEntry[] = json.data.games.items
-    .filter((game) => game.assets.title != null && game.assets.externalClaimLink != null)
-    .map((game) => ({
-      id: game.assets.id,
-      link: game.assets.externalClaimLink,
-      title: game.assets.title,
-      text: game.assets.title,
-      datetime: new Date(game.offers[0].startTime),
-    }))
+    .flatMap((game) => {
+      const { externalClaimLink, id, title } = game.assets;
+      const offer = game.offers[0];
+      if (title == null || externalClaimLink == null || !offer) {
+        return [];
+      }
+
+      return [
+        {
+          id,
+          link: externalClaimLink,
+          title,
+          text: title,
+          datetime: new Date(offer.startTime),
+        },
+      ];
+    })
     .filter(isValidRSSEntry);
 
   return {
@@ -181,6 +209,6 @@ export async function get(_ctx: ScraperContext): Promise<RSSData> {
     method: "POST",
   });
 
-  const json = (await response.json()) as PrimeGamingResponse;
+  const json = v.parse(PrimeGamingPayloadSchema, await response.json());
   return parse(json);
 }

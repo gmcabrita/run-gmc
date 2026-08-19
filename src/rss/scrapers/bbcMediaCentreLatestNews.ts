@@ -1,10 +1,33 @@
 import { USERAGENT, isValidRSSEntry, type ScraperContext } from "@rss/common";
 import type { RSSData, RSSEntry } from "@rss/types";
+import * as v from "valibot";
 
 const SITE_URL = "https://www.bbc.co.uk";
 const BASE_URL = "https://www.bbc.co.uk/mediacentre/latestnews";
 const API_URL =
   "https://corporate.api.bbci.co.uk/api/search/ipages-live/_search?sort=originalDate:desc&q=projectId.keyword:ipages-media-centre%20AND%20(tags.id.keyword:Latest_News%20OR%20tags.fileId.keyword:Latest_News)&size=25&from=0";
+
+const OptionalTextSchema = v.fallback(v.nullish(v.string()), undefined);
+const BbcArticlePayloadSchema = v.looseObject({
+  _id: OptionalTextSchema,
+  _source: v.looseObject({
+    fullUrl: OptionalTextSchema,
+    url: OptionalTextSchema,
+    name: OptionalTextSchema,
+    description: OptionalTextSchema,
+    imageUrl: OptionalTextSchema,
+    originalDate: OptionalTextSchema,
+    modifiedDate: OptionalTextSchema,
+  }),
+});
+const BbcApiPayloadSchema = v.looseObject({
+  hits: v.looseObject({
+    hits: v.array(v.unknown()),
+  }),
+});
+
+export type BbcApiPayload = v.InferOutput<typeof BbcApiPayloadSchema>;
+type BbcArticlePayload = v.InferOutput<typeof BbcArticlePayloadSchema>;
 
 interface BbcMediaCentreArticle {
   id: string;
@@ -15,12 +38,10 @@ interface BbcMediaCentreArticle {
   publishedAt?: Date;
 }
 
-function isRecord(value: unknown): value is Record<string, unknown> {
-  return typeof value === "object" && value !== null;
-}
+const EMPTY_BBC_PAYLOAD = { hits: { hits: [] } } satisfies BbcApiPayload;
 
-function readString(value: unknown): string | undefined {
-  return typeof value === "string" && value !== "" ? value : undefined;
+function normalizeOptionalText(value: string | null | undefined): string | undefined {
+  return value && value.length > 0 ? value : undefined;
 }
 
 function normalizeText(value: string | undefined): string | undefined {
@@ -65,14 +86,12 @@ function resolveImageUrl(value: string | undefined): string | undefined {
   return `https://${value}`;
 }
 
-function parseArticle(value: unknown): BbcMediaCentreArticle | undefined {
-  if (!isRecord(value) || !isRecord(value._source)) {
-    return undefined;
-  }
-
-  const source = value._source;
-  const link = resolveUrl(readString(source.fullUrl) ?? readString(source.url));
-  const id = readString(value._id) ?? link;
+function parseArticle(payload: BbcArticlePayload): BbcMediaCentreArticle | undefined {
+  const source = payload._source;
+  const link = resolveUrl(
+    normalizeOptionalText(source.fullUrl) ?? normalizeOptionalText(source.url),
+  );
+  const id = normalizeOptionalText(payload._id) ?? link;
 
   if (!id) {
     return undefined;
@@ -80,28 +99,36 @@ function parseArticle(value: unknown): BbcMediaCentreArticle | undefined {
 
   return {
     id,
-    title: normalizeText(readString(source.name)),
-    description: normalizeText(readString(source.description)),
+    title: normalizeText(normalizeOptionalText(source.name)),
+    description: normalizeText(normalizeOptionalText(source.description)),
     link,
-    imageUrl: resolveImageUrl(readString(source.imageUrl)),
-    publishedAt: parseDate(readString(source.originalDate) ?? readString(source.modifiedDate)),
+    imageUrl: resolveImageUrl(normalizeOptionalText(source.imageUrl)),
+    publishedAt: parseDate(
+      normalizeOptionalText(source.originalDate) ?? normalizeOptionalText(source.modifiedDate),
+    ),
   };
 }
 
-function readArticles(value: unknown): BbcMediaCentreArticle[] {
-  if (!isRecord(value) || !isRecord(value.hits) || !Array.isArray(value.hits.hits)) {
+function readArticles(payload: BbcApiPayload): BbcMediaCentreArticle[] {
+  const payloadResult = v.safeParse(BbcApiPayloadSchema, payload);
+  if (!payloadResult.success) {
     return [];
   }
 
-  return value.hits.hits.flatMap((article) => {
-    const parsedArticle = parseArticle(article);
+  return payloadResult.output.hits.hits.flatMap((article) => {
+    const articleResult = v.safeParse(BbcArticlePayloadSchema, article);
+    if (!articleResult.success) {
+      return [];
+    }
+
+    const parsedArticle = parseArticle(articleResult.output);
     return parsedArticle ? [parsedArticle] : [];
   });
 }
 
-export function parse(json: unknown): RSSData {
+export function parse(payload: BbcApiPayload): RSSData {
   const now = new Date();
-  const entries: RSSEntry[] = readArticles(json)
+  const entries: RSSEntry[] = readArticles(payload)
     .filter((article) => !article.publishedAt || article.publishedAt <= now)
     .map((article) => {
       const title = article.title ?? "";
@@ -139,5 +166,6 @@ export async function get(_ctx: ScraperContext): Promise<RSSData> {
     throw new Error(`BBC Media Centre request failed: ${response.status}`);
   }
 
-  return parse(await response.json());
+  const payloadResult = v.safeParse(BbcApiPayloadSchema, await response.json());
+  return parse(payloadResult.success ? payloadResult.output : EMPTY_BBC_PAYLOAD);
 }

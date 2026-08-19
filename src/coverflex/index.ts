@@ -2,7 +2,11 @@ import { Hono } from "hono";
 import { getAuthenticationToken } from "./util";
 import { basicAuth } from "hono/basic-auth";
 import { idempotentSendEmail } from "@email";
-import type { CoverflexTechnologyResponse, CoverflexPocketsResponse } from "@types";
+import * as v from "valibot";
+import {
+  CoverflexPocketsResponseSchema,
+  CoverflexTechnologyResponseSchema,
+} from "./schemas";
 
 export async function sendAppleCatalogueByEmail(env: CloudflareBindings) {
   const { name, url } = await getAppleCatalogueFile(env);
@@ -47,7 +51,7 @@ async function getAppleCatalogueFile(env: CloudflareBindings) {
     throw new Error(`Error:  ${response.status}`);
   }
 
-  const json = (await response.json()) as CoverflexTechnologyResponse;
+  const json = v.parse(CoverflexTechnologyResponseSchema, await response.json());
   if (json.benefit.slug != "technology") {
     throw new Error(`Response: ${JSON.stringify(json)}`);
   }
@@ -91,7 +95,7 @@ async function getCoverflexBudget(env: CloudflareBindings) {
     throw new Error(`Error:  ${response.status}`);
   }
 
-  const json = (await response.json()) as CoverflexPocketsResponse;
+  const json = v.parse(CoverflexPocketsResponseSchema, await response.json());
   const pocket = json.pockets.find((pocket) => pocket.type == "meals");
 
   if (!pocket) {

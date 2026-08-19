@@ -1,13 +1,29 @@
 import { isValidRSSEntry, type ScraperContext } from "@rss/common";
 import { createProxiedFetch } from "../../proxiedFetch";
 import type { RSSData, RSSEntry } from "@rss/types";
-import type { InformacaoLisboaAgendaItem } from "@types";
+import * as v from "valibot";
 
 const BASE_URL = "https://informacao.lisboa.pt";
 const API_URL =
   "https://informacao.lisboa.pt/agenda?extensao=sfeventmgt&ambito=filter_sem_paginacao&pid=25&lang=0&cat_pai=19&offset=0";
 
-export async function parse(json: InformacaoLisboaAgendaItem[]): Promise<RSSData> {
+const DateValueSchema = v.object({ date: v.string() });
+const InformacaoLisboaAgendaPayloadSchema = v.array(
+  v.looseObject({
+    uid: v.number(),
+    slug: v.string(),
+    title: v.string(),
+    categories: v.array(v.looseObject({ title: v.string() })),
+    startdate: v.nullish(DateValueSchema),
+    enddate: v.nullish(DateValueSchema),
+  }),
+);
+
+type InformacaoLisboaAgendaPayload = v.InferOutput<
+  typeof InformacaoLisboaAgendaPayloadSchema
+>;
+
+export async function parse(json: InformacaoLisboaAgendaPayload): Promise<RSSData> {
   const entries: RSSEntry[] = json
     .map((item) => {
       const link = `${BASE_URL}/agenda/o-que-fazer/${item.slug}/`;
@@ -40,6 +56,6 @@ export async function get(_ctx: ScraperContext): Promise<RSSData> {
     },
   });
 
-  const json = (await response.json()) as InformacaoLisboaAgendaItem[];
+  const json = v.parse(InformacaoLisboaAgendaPayloadSchema, await response.json());
   return parse(json);
 }

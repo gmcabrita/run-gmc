@@ -1,15 +1,24 @@
 import * as fs from "fs";
 import * as path from "path";
 import * as readline from "readline";
+import * as v from "valibot";
+
+const CoverflexAuthResponseSchema = v.object({
+  token: v.string(),
+  refresh_token: v.string(),
+});
+const TrustedUserAgentResponseSchema = v.object({
+  user_agent_token: v.string(),
+});
 
 const API_BASE = "https://menhir-api.coverflex.com/api";
 
-function loadDevVars(): Record<string, string> {
+function loadDevVars() {
+  const vars: Record<string, string> = {};
   const devVarsPath = path.join(process.cwd(), ".dev.vars");
-  if (!fs.existsSync(devVarsPath)) return {};
+  if (!fs.existsSync(devVarsPath)) return vars;
 
   const content = fs.readFileSync(devVarsPath, "utf-8");
-  const vars: Record<string, string> = {};
 
   for (const line of content.split("\n")) {
     const trimmed = line.trim();
@@ -54,13 +63,7 @@ async function authenticate(
   password: string,
   otp?: string,
 ): Promise<{ token: string; refresh_token: string }> {
-  const payload: { email: string; password: string; otp?: string } = {
-    email,
-    password,
-  };
-  if (otp) {
-    payload.otp = `${otp}`;
-  }
+  const payload = otp ? { email, password, otp } : { email, password };
 
   const response = await fetch(`${API_BASE}/employee/sessions`, {
     method: "POST",
@@ -73,7 +76,7 @@ async function authenticate(
     throw new Error(`Authentication failed: ${response.status} - ${text}`);
   }
 
-  return response.json();
+  return v.parse(CoverflexAuthResponseSchema, await response.json());
 }
 
 async function trustUserAgent(token: string): Promise<string> {
@@ -91,7 +94,7 @@ async function trustUserAgent(token: string): Promise<string> {
     throw new Error(`Trust user agent failed: ${response.status} - ${text}`);
   }
 
-  const json: { user_agent_token: string } = await response.json();
+  const json = v.parse(TrustedUserAgentResponseSchema, await response.json());
   return json.user_agent_token;
 }
 
@@ -126,7 +129,7 @@ async function main() {
   );
 }
 
-main().catch((err) => {
-  console.error("Error:", err.message);
+main().catch((error) => {
+  console.error("Error:", error instanceof Error ? error.message : String(error));
   process.exit(1);
 });

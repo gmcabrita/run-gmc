@@ -6,14 +6,14 @@ const FEED_URL = "https://cinemax.rtp.pt/passatempos/feed/";
 const SITE_URL = "https://cinemax.rtp.pt/passatempos/";
 const FINISHED_TITLE_MARKER = "[Terminado]";
 
-const XML_ENTITIES: Record<string, string> = {
-  amp: "&",
-  apos: "'",
-  gt: ">",
-  lt: "<",
-  nbsp: " ",
-  quot: '"',
-};
+const XML_ENTITIES = new Map([
+  ["amp", "&"],
+  ["apos", "'"],
+  ["gt", ">"],
+  ["lt", "<"],
+  ["nbsp", " "],
+  ["quot", '"'],
+]);
 
 function decodeCodePoint(value: number, fallback: string) {
   if (!Number.isInteger(value) || value < 0 || value > 0x10ffff) {
@@ -41,7 +41,7 @@ function decodeXmlText(value: string) {
     .replace(/&#([0-9]+);/g, (entity, decimal) =>
       decodeCodePoint(Number.parseInt(decimal, 10), entity),
     )
-    .replace(/&([a-zA-Z]+);/g, (entity, name) => XML_ENTITIES[name] ?? entity);
+    .replace(/&([a-zA-Z]+);/g, (entity, name) => XML_ENTITIES.get(name) ?? entity);
 }
 
 function tagText(xml: string, tagName: string) {

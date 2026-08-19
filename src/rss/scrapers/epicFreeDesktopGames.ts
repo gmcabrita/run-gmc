@@ -1,60 +1,109 @@
 import { USERAGENT, isValidRSSEntry, type ScraperContext } from "@rss/common";
 import type { RSSData, RSSEntry } from "@rss/types";
-import type { EpicDesktopFreeGamesResponse } from "@types";
+import * as v from "valibot";
 
 const BASE_URL = "https://store.epicgames.com/en-US/free-games";
 const API_URL =
   "https://store-site-backend-static-ipv4.ak.epicgames.com/freeGamesPromotions?locale=en-US&country=PT&allowCountries=PT";
 
+const CatalogMappingSchema = v.looseObject({
+  pageType: v.string(),
+  pageSlug: v.string(),
+});
+const PromotionalOfferSchema = v.looseObject({
+  startDate: v.string(),
+  endDate: v.string(),
+  discountSetting: v.looseObject({ discountPercentage: v.number() }),
+});
+const EpicDesktopFreeGamesPayloadSchema = v.looseObject({
+  data: v.looseObject({
+    Catalog: v.looseObject({
+      searchStore: v.looseObject({
+        elements: v.array(
+          v.looseObject({
+            id: v.string(),
+            title: v.string(),
+            productSlug: v.nullish(v.string()),
+            categories: v.nullish(
+              v.array(v.looseObject({ path: v.string() })),
+            ),
+            catalogNs: v.nullish(
+              v.looseObject({
+                mappings: v.nullish(v.array(CatalogMappingSchema)),
+                offerMappings: v.nullish(v.array(CatalogMappingSchema)),
+              }),
+            ),
+            promotions: v.nullish(
+              v.looseObject({
+                promotionalOffers: v.array(
+                  v.looseObject({
+                    promotionalOffers: v.array(PromotionalOfferSchema),
+                  }),
+                ),
+              }),
+            ),
+          }),
+        ),
+      }),
+    }),
+  }),
+});
+
+type EpicDesktopFreeGamesPayload = v.InferOutput<
+  typeof EpicDesktopFreeGamesPayloadSchema
+>;
+type EpicDesktopGame =
+  EpicDesktopFreeGamesPayload["data"]["Catalog"]["searchStore"]["elements"][number];
+type PromotionalOffer = v.InferOutput<typeof PromotionalOfferSchema>;
+
+function getActivePromotionalOffer(
+  game: EpicDesktopGame,
+  nowDate: Date,
+): PromotionalOffer | undefined {
+  return game.promotions?.promotionalOffers
+    .flatMap((offers) => offers.promotionalOffers)
+    .find((offer) => {
+      const startDate = new Date(offer.startDate);
+      const endDate = new Date(offer.endDate);
+      return (
+        startDate <= nowDate &&
+        nowDate <= endDate &&
+        offer.discountSetting.discountPercentage === 0
+      );
+    });
+}
+
 export async function parse(
-  json: EpicDesktopFreeGamesResponse,
+  json: EpicDesktopFreeGamesPayload,
   nowDate: Date = new Date(),
 ): Promise<RSSData> {
   const entries: RSSEntry[] = json.data.Catalog.searchStore.elements
-    .filter((offer) => {
-      if (offer.promotions) {
-        return offer.promotions.promotionalOffers.some((innerOffers) => {
-          return innerOffers.promotionalOffers.some((pOffer) => {
-            const startDate = new Date(pOffer.startDate);
-            const endDate = new Date(pOffer.endDate);
-            const isFree = pOffer.discountSetting.discountPercentage === 0;
-            return startDate <= nowDate && nowDate <= endDate && isFree;
-          });
-        });
+    .flatMap((game) => {
+      const promotionalOffer = getActivePromotionalOffer(game, nowDate);
+      if (!promotionalOffer) {
+        return [];
       }
-      return false;
-    })
-    .map((game) => {
+
       const pageSlug =
-        game?.catalogNs?.mappings?.find((mapping) => mapping.pageType === "productHome")
+        game.catalogNs?.mappings?.find((mapping) => mapping.pageType === "productHome")
           ?.pageSlug ??
-        game?.catalogNs?.offerMappings?.find((mapping) => mapping.pageType === "productHome")
+        game.catalogNs?.offerMappings?.find((mapping) => mapping.pageType === "productHome")
           ?.pageSlug ??
         game.productSlug;
-
-      const isBundle = game.categories?.some((cat) => cat.path === "bundles");
+      const isBundle = game.categories?.some((category) => category.path === "bundles");
       const link = isBundle
         ? `https://store.epicgames.com/en-US/bundles/${pageSlug}`
         : `https://store.epicgames.com/en-US/p/${pageSlug}`;
 
-      const promoOffer = game
-        .promotions!.promotionalOffers.map((innerOffers) =>
-          innerOffers.promotionalOffers.find((pOffer) => {
-            const startDate = new Date(pOffer.startDate);
-            const endDate = new Date(pOffer.endDate);
-            const isFree = pOffer.discountSetting.discountPercentage === 0;
-            return startDate <= nowDate && nowDate <= endDate && isFree;
-          }),
-        )
-        .filter(Boolean)[0]!;
-
-      return {
-        id: game.id,
-        link,
-        title: game.title,
-        text: game.title,
-        datetime: new Date(promoOffer.startDate),
-      };
+      return [
+        {
+          id: game.id,
+          link,
+          title: game.title,
+          text: game.title,
+          datetime: new Date(promotionalOffer.startDate),
+        },
+      ];
     })
     .filter(isValidRSSEntry);
 
@@ -75,6 +124,6 @@ export async function get(_ctx: ScraperContext): Promise<RSSData> {
     },
   });
 
-  const json = (await response.json()) as EpicDesktopFreeGamesResponse;
+  const json = v.parse(EpicDesktopFreeGamesPayloadSchema, await response.json());
   return parse(json);
 }

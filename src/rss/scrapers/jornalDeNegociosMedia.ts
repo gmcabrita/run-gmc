@@ -1,5 +1,6 @@
 import { USERAGENT, consume, isValidRSSEntry, type ScraperContext } from "@rss/common";
 import type { RSSData, RSSEntry } from "@rss/types";
+import * as v from "valibot";
 
 const SITE_ORIGIN = "https://www.jornaldenegocios.pt";
 const SECTION_PATH = "/empresas/media";
@@ -10,6 +11,10 @@ const FIRST_PAGE_URL = new URL(
   SITE_ORIGIN,
 ).href;
 const REQUEST_RETRY_COUNT = 3;
+const RetryableFailureSchema = v.looseObject({
+  retryable: v.fallback(v.boolean(), false),
+  message: v.fallback(v.string(), ""),
+});
 
 type FetchFn = typeof fetch;
 
@@ -26,10 +31,6 @@ interface LoadMorePage {
 interface ParsedPageResult {
   page: LoadMorePage;
   isPartial: boolean;
-}
-
-function isRecord(value: unknown): value is Record<string, unknown> {
-  return typeof value === "object" && value !== null;
 }
 
 function normalizeWhitespace(text: string): string {
@@ -76,18 +77,6 @@ function buildFallbackNextPageURL(currentPageURL: string): string {
   const nextIndex = Number.isFinite(currentIndex) ? currentIndex + PAGE_SIZE : PAGE_SIZE;
   url.searchParams.set("contentStartIndex", String(nextIndex));
   return url.toString();
-}
-
-function isRetryableRequestError(error: unknown): boolean {
-  if (!isRecord(error)) {
-    return false;
-  }
-
-  if (error.retryable === true) {
-    return true;
-  }
-
-  return typeof error.message === "string" && error.message.includes("Network connection lost");
 }
 
 async function fetchPage(url: string, fetchFn: FetchFn): Promise<Response> {
@@ -206,7 +195,12 @@ async function parsePageWithFallback(
   try {
     await consume(body);
   } catch (error) {
-    if (!isRetryableRequestError(error) || draftEntries.length === 0) {
+    const failureResult = v.safeParse(RetryableFailureSchema, error);
+    const isRetryable =
+      failureResult.success &&
+      (failureResult.output.retryable ||
+        failureResult.output.message.includes("Network connection lost"));
+    if (!isRetryable || draftEntries.length === 0) {
       throw error;
     }
 
@@ -242,7 +236,7 @@ async function parsePageWithFallback(
 
 async function loadPage(url: string, fetchFn: FetchFn): Promise<LoadMorePage> {
   let bestPage: LoadMorePage | undefined;
-  let lastError: unknown;
+  let lastError: Error | undefined;
 
   for (let attempt = 0; attempt < REQUEST_RETRY_COUNT; attempt += 1) {
     try {
@@ -256,8 +250,16 @@ async function loadPage(url: string, fetchFn: FetchFn): Promise<LoadMorePage> {
         return result.page;
       }
     } catch (error) {
-      lastError = error;
-      if (!isRetryableRequestError(error) || attempt === REQUEST_RETRY_COUNT - 1) {
+      const failureResult = v.safeParse(RetryableFailureSchema, error);
+      const isRetryable =
+        failureResult.success &&
+        (failureResult.output.retryable ||
+          failureResult.output.message.includes("Network connection lost"));
+      if (error instanceof Error) {
+        lastError = error;
+      }
+
+      if (!isRetryable || attempt === REQUEST_RETRY_COUNT - 1) {
         if (bestPage) {
           return bestPage;
         }
@@ -271,7 +273,7 @@ async function loadPage(url: string, fetchFn: FetchFn): Promise<LoadMorePage> {
     return bestPage;
   }
 
-  throw lastError instanceof Error ? lastError : new Error("Failed to load Jornal de Negocios page");
+  throw lastError ?? new Error("Failed to load Jornal de Negocios page");
 }
 
 export async function scrapeFirstTwoPages(fetchFn: FetchFn): Promise<RSSData> {

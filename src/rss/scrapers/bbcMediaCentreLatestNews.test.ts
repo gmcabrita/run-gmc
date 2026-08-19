@@ -39,4 +39,36 @@ describe("bbcMediaCentreLatestNews parser", () => {
     expect(fallbackEntry?.text).toBe("Fallback title");
     expect(fallbackEntry?.imageURL).toBe("https://www.bbc.co.uk/images/fallback.jpg");
   });
+
+  it("keeps articles with malformed optional fields", () => {
+    const result = parse({
+      hits: {
+        hits: [
+          {
+            _id: "tolerant-entry",
+            _source: {
+              fullUrl: 42,
+              url: "/mediacentre/tolerant-entry",
+              name: "Tolerant entry",
+              description: { invalid: true },
+              imageUrl: false,
+              originalDate: ["invalid"],
+              modifiedDate: "2025-01-01T12:00:00Z",
+            },
+          },
+        ],
+      },
+    });
+
+    expect(result.entries).toEqual([
+      {
+        id: "tolerant-entry",
+        link: "https://www.bbc.co.uk/mediacentre/tolerant-entry",
+        title: "Tolerant entry",
+        text: "Tolerant entry",
+        datetime: new Date("2025-01-01T12:00:00Z"),
+        imageURL: undefined,
+      },
+    ]);
+  });
 });

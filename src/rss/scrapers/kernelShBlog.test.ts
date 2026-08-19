@@ -54,4 +54,34 @@ describe("kernelShBlog scraper", () => {
       imageURL: "https://cdn.sanity.io/images/7o5bsuld/production/wrapped.png",
     });
   });
+
+  it("keeps posts with malformed optional fields", async () => {
+    const nextData = JSON.stringify({
+      posts: [
+        {
+          title: "Tolerant post",
+          publishedAt: "2025-01-01T12:00:00Z",
+          slug: { current: "tolerant-post" },
+          excerpt: 42,
+          previewImage: { asset: { url: false } },
+          mainImage: { invalid: true },
+        },
+      ],
+    });
+    const encodedNextData = JSON.stringify(nextData).slice(1, -1);
+    const response = new Response(
+      `<script>self.__next_f.push([1,"${encodedNextData}"])</script>`,
+    );
+    const result = await parse(response);
+
+    expect(result.entries).toEqual([
+      {
+        id: "https://www.kernel.sh/blog/tolerant-post",
+        link: "https://www.kernel.sh/blog/tolerant-post",
+        title: "Tolerant post",
+        text: "",
+        datetime: new Date("2025-01-01T12:00:00Z"),
+      },
+    ]);
+  });
 });

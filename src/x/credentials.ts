@@ -78,7 +78,7 @@ export function resolveCredentials(env: XCredentialsBindings, isPublic: boolean)
 export function buildXApiHeaders(
   credentials: XCredentials,
   extraHeaders: Record<string, string> = {},
-): Record<string, string> {
+) {
   return {
     accept: "*/*",
     "accept-language": "en-US,en;q=0.9,pt-PT;q=0.8,pt;q=0.7",

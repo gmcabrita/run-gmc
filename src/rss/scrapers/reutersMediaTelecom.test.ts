@@ -40,4 +40,34 @@ describe("reutersMediaTelecom parser", () => {
 
     expect(result.entries.find((entry) => entry.id === "ghi789")).toBeUndefined();
   });
+
+  it("keeps articles with malformed optional fields", () => {
+    const result = parse({
+      result: {
+        articles: [
+          {
+            id: "tolerant-entry",
+            canonical_url: "/business/media-telecom/tolerant-entry/",
+            title: 42,
+            basic_headline: "Tolerant headline",
+            description: { invalid: true },
+            published_time: false,
+            updated_time: "2025-01-01T12:00:00Z",
+            thumbnail: { url: 99 },
+          },
+        ],
+      },
+    });
+
+    expect(result.entries).toEqual([
+      {
+        id: "tolerant-entry",
+        link: "https://www.reuters.com/business/media-telecom/tolerant-entry/",
+        title: "Tolerant headline",
+        text: "Tolerant headline",
+        datetime: new Date("2025-01-01T12:00:00Z"),
+        imageURL: undefined,
+      },
+    ]);
+  });
 });

@@ -1,13 +1,29 @@
 import { USERAGENT, isValidRSSEntry, type ScraperContext } from "@rss/common";
 import type { RSSData, RSSEntry } from "@rss/types";
-import type { UciPromocoesResponse } from "@types";
+import * as v from "valibot";
 
 const BASE_URL = "https://www.ucicinemas.pt/promocoes/";
 const API_URL =
   "https://www.ucicinemas.pt/api/omnia/v1/pageList?friendly=/promocoes/&properties=promotionImage&properties=header&properties=introText";
 const IMAGE_BASE_URL = "https://www.ucicinemas.pt";
 
-export function parse(json: UciPromocoesResponse): RSSData {
+const UciPromocoesPayloadSchema = v.array(
+  v.looseObject({
+    name: v.string(),
+    url: v.string(),
+    nodeId: v.number(),
+    createDate: v.string(),
+    promotionImage: v.nullish(
+      v.looseObject({ desktop: v.string() }),
+    ),
+    introText: v.nullish(v.string()),
+    header: v.nullish(v.string()),
+  }),
+);
+
+type UciPromocoesPayload = v.InferOutput<typeof UciPromocoesPayloadSchema>;
+
+export function parse(json: UciPromocoesPayload): RSSData {
   const entries: RSSEntry[] = json
     .map((promo) => {
       const link = new URL(promo.url, BASE_URL).href;
@@ -46,18 +62,16 @@ export async function get(_ctx: ScraperContext): Promise<RSSData> {
   };
 
   let currentUrl = API_URL;
-  let cookies: string[] = [];
-  let response: Response;
-  let redirectCount = 0;
+  const cookies: string[] = [];
   const maxRedirects = 10;
 
-  while (redirectCount < maxRedirects) {
-    const requestHeaders: Record<string, string> = { ...baseHeaders };
+  for (let redirectCount = 0; redirectCount <= maxRedirects; redirectCount += 1) {
+    const requestHeaders = new Headers(baseHeaders);
     if (cookies.length > 0) {
-      requestHeaders["cookie"] = cookies.join("; ");
+      requestHeaders.set("cookie", cookies.join("; "));
     }
 
-    response = await fetch(currentUrl, {
+    const response = await fetch(currentUrl, {
       headers: requestHeaders,
       method: "GET",
       redirect: "manual",
@@ -72,19 +86,19 @@ export async function get(_ctx: ScraperContext): Promise<RSSData> {
       }
     }
 
-    // Check if it's a redirect
-    if (response.status >= 300 && response.status < 400) {
-      const location = response.headers.get("location");
-      if (location) {
-        currentUrl = new URL(location, currentUrl).toString();
-        redirectCount++;
-        continue;
-      }
+    // Follow redirects that include a destination.
+    const isRedirect = response.status >= 300 && response.status < 400;
+    const location = isRedirect ? response.headers.get("location") : undefined;
+    if (!location) {
+      return parse(v.parse(UciPromocoesPayloadSchema, await response.json()));
     }
 
-    break;
+    if (redirectCount === maxRedirects) {
+      throw new Error(`Too many redirects while fetching ${API_URL}`);
+    }
+
+    currentUrl = new URL(location, currentUrl).toString();
   }
 
-  const json = (await response!.json()) as UciPromocoesResponse;
-  return parse(json);
+  throw new Error(`Failed to fetch ${API_URL}`);
 }

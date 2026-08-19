@@ -1,27 +1,55 @@
 import { USERAGENT, isValidRSSEntry, type ScraperContext } from "@rss/common";
 import type { RSSData, RSSEntry } from "@rss/types";
-import type { ImagensDeMarcaResponse } from "@types";
+import * as v from "valibot";
 
 const BASE_URL = "https://www.imagensdemarca.pt/";
 const API_URL = "https://repeater.bondlayer.com/fetch";
 
-export async function parse(json: ImagensDeMarcaResponse): Promise<RSSData> {
+const ImageValueSchema = v.looseObject({ all: v.string() });
+const ImagensDeMarcaPayloadSchema = v.looseObject({
+  items: v.array(
+    v.looseObject({
+      id: v.string(),
+      _title: v.looseObject({ all: v.string() }),
+      _slug: v.looseObject({ all: v.string() }),
+      image_cHyPyUtO1f: v.nullish(ImageValueSchema),
+      image_cSyfYQnEab: v.nullish(ImageValueSchema),
+      image_crJeRfSWfz: v.nullish(ImageValueSchema),
+      datetime_cB1vB7YcXz: v.nullish(v.string()),
+    }),
+  ),
+});
+
+type ImagensDeMarcaPayload = v.InferOutput<typeof ImagensDeMarcaPayloadSchema>;
+
+export async function parse(json: ImagensDeMarcaPayload): Promise<RSSData> {
   const now = new Date();
   const entries: RSSEntry[] = json.items
-    .filter((post) => post.datetime_cB1vB7YcXz && new Date(post.datetime_cB1vB7YcXz) < now)
-    .map((post) => {
+    .flatMap((post) => {
+      const publishedAt = post.datetime_cB1vB7YcXz;
+      if (!publishedAt) {
+        return [];
+      }
+
+      const publishedDate = new Date(publishedAt);
+      if (Number.isNaN(publishedDate.getTime()) || publishedDate >= now) {
+        return [];
+      }
+
       const link = new URL(`artigo/${post._slug.all}`, BASE_URL).href;
       const imageUrl = (post.image_cHyPyUtO1f || post.image_cSyfYQnEab || post.image_crJeRfSWfz)
         ?.all;
 
-      return {
-        id: post.id,
-        link,
-        title: post._title.all,
-        text: post._title.all,
-        datetime: new Date(post.datetime_cB1vB7YcXz!),
-        imageURL: imageUrl && imageUrl !== "" ? imageUrl : undefined,
-      };
+      return [
+        {
+          id: post.id,
+          link,
+          title: post._title.all,
+          text: post._title.all,
+          datetime: publishedDate,
+          imageURL: imageUrl && imageUrl !== "" ? imageUrl : undefined,
+        },
+      ];
     })
     .filter(isValidRSSEntry);
 
@@ -66,6 +94,6 @@ export async function get(_ctx: ScraperContext): Promise<RSSData> {
     }),
   });
 
-  const json = (await response.json()) as ImagensDeMarcaResponse;
+  const json = v.parse(ImagensDeMarcaPayloadSchema, await response.json());
   return parse(json);
 }

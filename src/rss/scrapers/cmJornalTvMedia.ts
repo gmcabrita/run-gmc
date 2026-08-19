@@ -1,5 +1,6 @@
 import { USERAGENT, consume, isValidRSSEntry, type ScraperContext } from "@rss/common";
 import type { RSSData, RSSEntry } from "@rss/types";
+import * as v from "valibot";
 
 const SITE_ORIGIN = "https://www.cmjornal.pt";
 const SECTION_PATH = "/tv-media";
@@ -11,20 +12,20 @@ const FIRST_PAGE_URL = new URL(
 const PAGE_SIZE = 10;
 const REQUEST_RETRY_COUNT = 3;
 
-const PT_MONTH_INDEX: Record<string, number> = {
-  janeiro: 0,
-  fevereiro: 1,
-  marco: 2,
-  abril: 3,
-  maio: 4,
-  junho: 5,
-  julho: 6,
-  agosto: 7,
-  setembro: 8,
-  outubro: 9,
-  novembro: 10,
-  dezembro: 11,
-};
+const PT_MONTH_INDEX = new Map([
+  ["janeiro", 0],
+  ["fevereiro", 1],
+  ["marco", 2],
+  ["abril", 3],
+  ["maio", 4],
+  ["junho", 5],
+  ["julho", 6],
+  ["agosto", 7],
+  ["setembro", 8],
+  ["outubro", 9],
+  ["novembro", 10],
+  ["dezembro", 11],
+]);
 
 type FetchFn = typeof fetch;
 
@@ -42,14 +43,18 @@ interface ParsedPageResult {
   isPartial: boolean;
 }
 
-const HTML_ENTITY_BY_NAME: Record<string, string> = {
-  amp: "&",
-  apos: "'",
-  gt: ">",
-  lt: "<",
-  nbsp: " ",
-  quot: '"',
-};
+const HTML_ENTITY_BY_NAME = new Map([
+  ["amp", "&"],
+  ["apos", "'"],
+  ["gt", ">"],
+  ["lt", "<"],
+  ["nbsp", " "],
+  ["quot", '"'],
+]);
+const RetryableFailureSchema = v.looseObject({
+  retryable: v.fallback(v.boolean(), false),
+  message: v.fallback(v.string(), ""),
+});
 
 function decodeHtmlEntities(text: string): string {
   return text.replace(/&(#x[0-9a-f]+|#\d+|[a-z]+);/gi, (match, entity) => {
@@ -64,7 +69,7 @@ function decodeHtmlEntities(text: string): string {
       return Number.isFinite(codePoint) ? String.fromCodePoint(codePoint) : match;
     }
 
-    return HTML_ENTITY_BY_NAME[normalizedEntity] ?? match;
+    return HTML_ENTITY_BY_NAME.get(normalizedEntity) ?? match;
   });
 }
 
@@ -95,7 +100,7 @@ function parsePtDateTime(value: string): Date | undefined {
 
   const [, dayText, monthText, yearText, hourText, minuteText] = match;
   const day = Number(dayText);
-  const monthIndex = PT_MONTH_INDEX[monthText];
+  const monthIndex = PT_MONTH_INDEX.get(monthText);
   const year = Number(yearText);
   const hour = Number(hourText);
   const minute = Number(minuteText);
@@ -145,22 +150,6 @@ function buildFallbackNextPageURL(currentPageURL: string): string {
   url.searchParams.delete("lastContentId");
   url.searchParams.delete("urlRefParameters");
   return url.toString();
-}
-
-function isRecord(value: unknown): value is Record<string, unknown> {
-  return typeof value === "object" && value !== null;
-}
-
-function isRetryableRequestError(error: unknown): boolean {
-  if (!isRecord(error)) {
-    return false;
-  }
-
-  if (error.retryable === true) {
-    return true;
-  }
-
-  return typeof error.message === "string" && error.message.includes("Network connection lost");
 }
 
 async function fetchPage(url: string, fetchFn: FetchFn): Promise<Response> {
@@ -278,7 +267,12 @@ async function parsePageWithFallback(
   try {
     await consume(body);
   } catch (error) {
-    if (!isRetryableRequestError(error) || draftEntries.length === 0) {
+    const failureResult = v.safeParse(RetryableFailureSchema, error);
+    const isRetryable =
+      failureResult.success &&
+      (failureResult.output.retryable ||
+        failureResult.output.message.includes("Network connection lost"));
+    if (!isRetryable || draftEntries.length === 0) {
       throw error;
     }
 
@@ -314,7 +308,7 @@ async function parsePageWithFallback(
 
 async function loadPage(url: string, fetchFn: FetchFn): Promise<LoadMorePage> {
   let bestPage: LoadMorePage | undefined;
-  let lastError: unknown;
+  let lastError: Error | undefined;
 
   for (let attempt = 0; attempt < REQUEST_RETRY_COUNT; attempt += 1) {
     try {
@@ -328,8 +322,16 @@ async function loadPage(url: string, fetchFn: FetchFn): Promise<LoadMorePage> {
         return result.page;
       }
     } catch (error) {
-      lastError = error;
-      if (!isRetryableRequestError(error) || attempt === REQUEST_RETRY_COUNT - 1) {
+      const failureResult = v.safeParse(RetryableFailureSchema, error);
+      const isRetryable =
+        failureResult.success &&
+        (failureResult.output.retryable ||
+          failureResult.output.message.includes("Network connection lost"));
+      if (error instanceof Error) {
+        lastError = error;
+      }
+
+      if (!isRetryable || attempt === REQUEST_RETRY_COUNT - 1) {
         if (bestPage) {
           return bestPage;
         }
@@ -343,7 +345,7 @@ async function loadPage(url: string, fetchFn: FetchFn): Promise<LoadMorePage> {
     return bestPage;
   }
 
-  throw lastError instanceof Error ? lastError : new Error("Failed to load CM Jornal page");
+  throw lastError ?? new Error("Failed to load CM Jornal page");
 }
 
 export async function scrapeFirstTwoPages(fetchFn: FetchFn): Promise<RSSData> {

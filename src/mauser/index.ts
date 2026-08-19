@@ -1,4 +1,5 @@
 import { idempotentSendEmail } from "@email";
+import * as v from "valibot";
 import { createProxiedFetch } from "../proxiedFetch";
 
 const MAUSER_SC1176_PRODUCT_URL =
@@ -11,18 +12,16 @@ const EMAIL_RECIPIENT = "goncalo.mendes.cabrita@gmail.com";
 
 export type MauserStockStatus = "in_stock" | "out_of_stock";
 
-interface MauserStockState {
-  status: MauserStockStatus;
-  observedAt: string;
-}
+const MauserStockStateSchema = v.object({
+  status: v.picklist(["in_stock", "out_of_stock"]),
+  observedAt: v.string(),
+});
+
+type MauserStockState = v.InferOutput<typeof MauserStockStateSchema>;
 
 export interface MauserStockCheckResult {
   status: MauserStockStatus;
   evidence: string;
-}
-
-function isRecord(value: unknown): value is Record<string, unknown> {
-  return typeof value === "object" && value !== null;
 }
 
 function parseMauserStockState(raw: string | null): MauserStockState | undefined {
@@ -30,24 +29,12 @@ function parseMauserStockState(raw: string | null): MauserStockState | undefined
     return undefined;
   }
 
-  let parsed: unknown;
   try {
-    parsed = JSON.parse(raw);
+    const result = v.safeParse(MauserStockStateSchema, JSON.parse(raw));
+    return result.success ? result.output : undefined;
   } catch {
     return undefined;
   }
-
-  if (!isRecord(parsed)) {
-    return undefined;
-  }
-
-  const status = parsed.status;
-  const observedAt = parsed.observedAt;
-  if ((status === "in_stock" || status === "out_of_stock") && typeof observedAt === "string") {
-    return { status, observedAt };
-  }
-
-  return undefined;
 }
 
 function escapeHtml(value: string): string {
@@ -57,10 +44,6 @@ function escapeHtml(value: string): string {
     .replace(/>/g, "&gt;")
     .replace(/"/g, "&quot;")
     .replace(/'/g, "&#39;");
-}
-
-function errorMessage(error: unknown): string {
-  return error instanceof Error ? error.message : String(error);
 }
 
 function dailyKey(date: Date): string {
@@ -171,7 +154,7 @@ async function reportMauserSc1176Stock(
 
 async function sendMauserSc1176FailureEmail(
   env: CloudflareBindings,
-  error: unknown,
+  failureDetail: string,
   checkedAt: Date,
 ): Promise<void> {
   await idempotentSendEmail(env, {
@@ -179,7 +162,7 @@ async function sendMauserSc1176FailureEmail(
     subject: "Mauser Raspberry Pi SC1176 stock check failed",
     body: `<p>Mauser Raspberry Pi SC1176 stock check failed.</p>
 <p><a href="${MAUSER_SC1176_PRODUCT_URL}">${MAUSER_SC1176_PRODUCT_URL}</a></p>
-<p>${escapeHtml(errorMessage(error))}</p>`,
+<p>${escapeHtml(failureDetail)}</p>`,
     idempotencyKey: `mauser-sc1176-check-failed-${dailyKey(checkedAt)}`,
   });
 }
@@ -193,7 +176,8 @@ export async function checkMauserSc1176StockAndNotify(
     await reportMauserSc1176Stock(env, result, checkedAt);
     return result;
   } catch (error) {
-    await sendMauserSc1176FailureEmail(env, error, checkedAt);
+    const failureDetail = error instanceof Error ? error.message : String(error);
+    await sendMauserSc1176FailureEmail(env, failureDetail, checkedAt);
     throw error;
   }
 }

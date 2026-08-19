@@ -1,5 +1,6 @@
 import { isValidRSSEntry, type ScraperContext } from "@rss/common";
 import type { RSSData, RSSEntry } from "@rss/types";
+import * as v from "valibot";
 import { createProxiedFetch } from "../proxiedFetch";
 
 const MANGADEX_API_URL = "https://api.mangadex.org";
@@ -26,6 +27,33 @@ export interface MangaDexFeedConfig {
   description?: string;
 }
 
+const OptionalTextSchema = v.fallback(v.nullish(v.string()), undefined);
+const MangaDexRelationshipSchema = v.looseObject({
+  type: v.string(),
+  attributes: v.looseObject({
+    name: v.string(),
+  }),
+});
+const MangaDexChapterPayloadSchema = v.looseObject({
+  id: v.string(),
+  attributes: v.looseObject({
+    volume: OptionalTextSchema,
+    chapter: OptionalTextSchema,
+    title: OptionalTextSchema,
+    publishAt: OptionalTextSchema,
+  }),
+  relationships: v.array(v.unknown()),
+});
+const MangaDexFeedPayloadSchema = v.looseObject({
+  data: v.unknown(),
+});
+const MangaDexFeedDataSchema = v.looseObject({
+  data: v.array(v.unknown()),
+});
+
+export type MangaDexFeedPayload = v.InferOutput<typeof MangaDexFeedPayloadSchema>;
+type MangaDexChapterPayload = v.InferOutput<typeof MangaDexChapterPayloadSchema>;
+
 interface MangaDexChapter {
   id: string;
   volume?: string;
@@ -35,16 +63,14 @@ interface MangaDexChapter {
   scanlationGroups: string[];
 }
 
-function isRecord(value: unknown): value is Record<string, unknown> {
-  return typeof value === "object" && value !== null;
+const EMPTY_MANGADEX_PAYLOAD = { data: [] } satisfies MangaDexFeedPayload;
+
+function normalizeOptionalText(value: string | null | undefined): string | undefined {
+  return value && value.length > 0 ? value : undefined;
 }
 
-function readString(value: unknown): string | undefined {
-  return typeof value === "string" && value.length > 0 ? value : undefined;
-}
-
-function readDate(value: unknown): Date | undefined {
-  const rawDate = readString(value);
+function parseOptionalDate(value: string | null | undefined): Date | undefined {
+  const rawDate = normalizeOptionalText(value);
   if (!rawDate) {
     return undefined;
   }
@@ -53,44 +79,43 @@ function readDate(value: unknown): Date | undefined {
   return Number.isNaN(date.getTime()) ? undefined : date;
 }
 
-function readScanlationGroupName(value: unknown): string | undefined {
-  if (!isRecord(value) || value.type !== "scanlation_group" || !isRecord(value.attributes)) {
-    return undefined;
-  }
-
-  return readString(value.attributes.name);
-}
-
-function readChapter(value: unknown): MangaDexChapter | undefined {
-  if (!isRecord(value) || !isRecord(value.attributes) || !Array.isArray(value.relationships)) {
-    return undefined;
-  }
-
-  const id = readString(value.id);
+function readChapter(payload: MangaDexChapterPayload): MangaDexChapter | undefined {
+  const id = normalizeOptionalText(payload.id);
   if (!id) {
     return undefined;
   }
 
   return {
     id,
-    volume: readString(value.attributes.volume),
-    chapter: readString(value.attributes.chapter),
-    title: readString(value.attributes.title),
-    publishedAt: readDate(value.attributes.publishAt),
-    scanlationGroups: value.relationships.flatMap((relationship) => {
-      const name = readScanlationGroupName(relationship);
+    volume: normalizeOptionalText(payload.attributes.volume),
+    chapter: normalizeOptionalText(payload.attributes.chapter),
+    title: normalizeOptionalText(payload.attributes.title),
+    publishedAt: parseOptionalDate(payload.attributes.publishAt),
+    scanlationGroups: payload.relationships.flatMap((relationship) => {
+      const result = v.safeParse(MangaDexRelationshipSchema, relationship);
+      if (!result.success || result.output.type !== "scanlation_group") {
+        return [];
+      }
+
+      const name = normalizeOptionalText(result.output.attributes.name);
       return name ? [name] : [];
     }),
   };
 }
 
-function readChapters(value: unknown): MangaDexChapter[] {
-  if (!isRecord(value) || !Array.isArray(value.data)) {
+function readChapters(payload: MangaDexFeedPayload): MangaDexChapter[] {
+  const feedResult = v.safeParse(MangaDexFeedDataSchema, payload);
+  if (!feedResult.success) {
     return [];
   }
 
-  return value.data.flatMap((chapter) => {
-    const parsedChapter = readChapter(chapter);
+  return feedResult.output.data.flatMap((chapter) => {
+    const chapterResult = v.safeParse(MangaDexChapterPayloadSchema, chapter);
+    if (!chapterResult.success) {
+      return [];
+    }
+
+    const parsedChapter = readChapter(chapterResult.output);
     return parsedChapter ? [parsedChapter] : [];
   });
 }
@@ -132,8 +157,11 @@ export function buildMangaDexFeedUrl(config: MangaDexFeedConfig): string {
   return url.toString();
 }
 
-export function parseMangaDexFeed(json: unknown, config: MangaDexFeedConfig): RSSData {
-  const entries: RSSEntry[] = readChapters(json)
+export function parseMangaDexFeed(
+  payload: MangaDexFeedPayload,
+  config: MangaDexFeedConfig,
+): RSSData {
+  const entries: RSSEntry[] = readChapters(payload)
     .map((chapter) => {
       const groupNames = chapter.scanlationGroups.join(", ") || "Unknown scanlation group";
       const chapterLabel = chapter.chapter ? `Chapter ${chapter.chapter}` : "Chapter";
@@ -181,5 +209,9 @@ export async function getMangaDexFeed(
     throw new Error(`MangaDex request failed: ${response.status}`);
   }
 
-  return parseMangaDexFeed(await response.json(), config);
+  const payloadResult = v.safeParse(MangaDexFeedPayloadSchema, await response.json());
+  return parseMangaDexFeed(
+    payloadResult.success ? payloadResult.output : EMPTY_MANGADEX_PAYLOAD,
+    config,
+  );
 }

@@ -1,5 +1,5 @@
 import { Feed } from "feed";
-import type { XUserByScreenNameResponse, XUserTweetsResponse } from "@types";
+import type { XUserByScreenNameResponse, XUserTweetsResponse } from "./schemas";
 
 export function isProtectedProfile(data: XUserByScreenNameResponse): boolean {
   return data.data.user.result.legacy.protected === true;

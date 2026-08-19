@@ -10,14 +10,14 @@ export function isValidRSSEntry(entry: RSSEntry) {
   return Boolean(entry.id) && Boolean(entry.link) && Boolean(entry.title);
 }
 
-const namedHtmlEntities: Record<string, string> = {
-  amp: "&",
-  apos: "'",
-  gt: ">",
-  lt: "<",
-  nbsp: " ",
-  quot: '"',
-};
+const namedHtmlEntities = new Map([
+  ["amp", "&"],
+  ["apos", "'"],
+  ["gt", ">"],
+  ["lt", "<"],
+  ["nbsp", " "],
+  ["quot", '"'],
+]);
 
 export function decodeHtmlEntities(value: string) {
   return value.replace(/&(#x[0-9a-f]+|#\d+|amp|lt|gt|quot|apos|nbsp);/gi, (match, entity: string) => {
@@ -35,7 +35,7 @@ export function decodeHtmlEntities(value: string) {
       return isValidCodePoint ? String.fromCodePoint(codePoint) : match;
     }
 
-    return namedHtmlEntities[normalizedEntity] ?? match;
+    return namedHtmlEntities.get(normalizedEntity) ?? match;
   });
 }
 

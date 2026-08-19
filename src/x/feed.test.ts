@@ -44,7 +44,7 @@ describe("x feed helpers", () => {
   });
 
   it("returns empty entries when timeline is missing", () => {
-    expect(getTimelineEntries({ data: { user: { result: {} } } } as never)).toEqual([]);
+    expect(getTimelineEntries({ data: { user: { result: {} } } })).toEqual([]);
   });
 
   it("creates a private profile notice feed", () => {
