@@ -27,6 +27,7 @@ import * as epicFreeDesktopGames from "./scrapers/epicFreeDesktopGames";
 import * as epicFreeMobileGames from "./scrapers/epicFreeMobileGames";
 import * as ercDeliberacoes from "./scrapers/ercDeliberacoes";
 import * as ercNoticias from "./scrapers/ercNoticias";
+import * as expressoMedia from "./scrapers/expressoMedia";
 import * as filmspotEstreias from "./scrapers/filmspotEstreias";
 import * as ftMedia from "./scrapers/ftMedia";
 import * as fundoAmbiental from "./scrapers/fundoAmbiental";
@@ -92,6 +93,7 @@ const scrapers = {
   epicFreeDesktopGames,
   ercDeliberacoes,
   ercNoticias,
+  expressoMedia,
   filmspotEstreias,
   ftMedia,
   fundoAmbiental,
