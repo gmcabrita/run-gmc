@@ -1,6 +1,7 @@
 import { USERAGENT, isValidRSSEntry, type ScraperContext } from "@rss/common";
 import type { RSSData, RSSEntry } from "@rss/types";
 import * as v from "valibot";
+import { createProxiedFetch } from "../../proxiedFetch";
 
 const BASE_URL = "https://adage.com/news/";
 const SITE_ORIGIN = "https://adage.com";
@@ -165,8 +166,8 @@ export async function parse(response: Response, now: Date = new Date()): Promise
   };
 }
 
-export async function get(_ctx: ScraperContext): Promise<RSSData> {
-  const response = await fetch(BASE_URL, {
+export async function get(ctx: ScraperContext): Promise<RSSData> {
+  const response = await createProxiedFetch(ctx.env)(BASE_URL, {
     headers: {
       "user-agent": USERAGENT,
       accept: "text/html",
