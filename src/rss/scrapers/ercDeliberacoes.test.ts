@@ -1,8 +1,20 @@
 import { describe, it, expect } from "vitest";
-import { parse } from "./ercDeliberacoes";
+import { buildRequestUrl, parse } from "./ercDeliberacoes";
 import html from "./__fixtures__/erc-deliberacoes.html";
 
 describe("ercDeliberacoes scraper", () => {
+  it("requests deliberacoes from three months ago", () => {
+    expect(buildRequestUrl(new Date("2026-10-27T12:00:00Z"))).toBe(
+      "https://www.erc.pt/pt/deliberacoes/deliberacoes-erc/?s=1&palavrasChave=&date_from=27%2F07%2F2026",
+    );
+  });
+
+  it("clamps the date to the last day of a shorter target month", () => {
+    expect(buildRequestUrl(new Date("2026-05-31T12:00:00Z"))).toContain(
+      "date_from=28%2F02%2F2026",
+    );
+  });
+
   it("parses deliberacoes from HTML", async () => {
     const response = new Response(html, {
       headers: { "Content-Type": "text/html" },

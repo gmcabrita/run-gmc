@@ -1,6 +1,31 @@
 import { USERAGENT, isValidRSSEntry, consume, type ScraperContext } from "@rss/common";
 import type { RSSData, RSSEntry } from "@rss/types";
 
+const BASE_URL = "https://www.erc.pt/pt/deliberacoes/deliberacoes-erc/";
+
+export function buildRequestUrl(now: Date = new Date()): string {
+  const targetMonth = now.getUTCMonth() - 3;
+  const daysInTargetMonth = new Date(
+    Date.UTC(now.getUTCFullYear(), targetMonth + 1, 0),
+  ).getUTCDate();
+  const dateFrom = new Date(
+    Date.UTC(
+      now.getUTCFullYear(),
+      targetMonth,
+      Math.min(now.getUTCDate(), daysInTargetMonth),
+    ),
+  );
+  const day = String(dateFrom.getUTCDate()).padStart(2, "0");
+  const month = String(dateFrom.getUTCMonth() + 1).padStart(2, "0");
+  const url = new URL(BASE_URL);
+
+  url.searchParams.set("s", "1");
+  url.searchParams.set("palavrasChave", "");
+  url.searchParams.set("date_from", `${day}/${month}/${dateFrom.getUTCFullYear()}`);
+
+  return url.href;
+}
+
 export async function parse(response: Response): Promise<RSSData> {
   const entries: Array<RSSEntry> = [];
   const rewriter = new HTMLRewriter()
@@ -44,8 +69,8 @@ export async function parse(response: Response): Promise<RSSData> {
 
   await consume(rewriter.transform(response).body!);
   return {
-    id: "https://www.erc.pt/pt/deliberacoes/deliberacoes-erc/",
-    link: "https://www.erc.pt/pt/deliberacoes/deliberacoes-erc/",
+    id: BASE_URL,
+    link: BASE_URL,
     title: "Deliberações ERC",
     description: "Deliberações ERC",
     language: "pt",
@@ -72,7 +97,7 @@ export async function parse(response: Response): Promise<RSSData> {
 }
 
 export async function get(_ctx: ScraperContext): Promise<RSSData> {
-  const response = await fetch("https://www.erc.pt/pt/deliberacoes/deliberacoes-erc/", {
+  const response = await fetch(buildRequestUrl(), {
     headers: {
       "user-agent": USERAGENT,
       "Content-Type": "text/html",
