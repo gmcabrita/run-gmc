@@ -26,8 +26,28 @@ export function buildRequestUrl(now: Date = new Date()): string {
   return url.href;
 }
 
+function parsePublicationDate(text: string): Date | undefined {
+  const match = text.match(/\b(\d{2})\.(\d{2})\.(\d{4})\b/);
+  if (!match) {
+    return undefined;
+  }
+
+  const [, dayText, monthText, yearText] = match;
+  const day = Number(dayText);
+  const month = Number(monthText);
+  const year = Number(yearText);
+  const date = new Date(Date.UTC(year, month - 1, day));
+
+  return date.getUTCFullYear() === year &&
+    date.getUTCMonth() === month - 1 &&
+    date.getUTCDate() === day
+    ? date
+    : undefined;
+}
+
 export async function parse(response: Response): Promise<RSSData> {
   const entries: Array<RSSEntry> = [];
+  const optionTexts: string[] = [];
   const rewriter = new HTMLRewriter()
     .on(".item article", {
       element() {
@@ -37,6 +57,7 @@ export async function parse(response: Response): Promise<RSSData> {
           title: "",
           text: "",
         });
+        optionTexts.push("");
       },
     })
     .on(".item article h1.item__title", {
@@ -52,6 +73,14 @@ export async function parse(response: Response): Promise<RSSData> {
         const lastEntry = entries[entries.length - 1];
         if (lastEntry && text.text) {
           lastEntry.text = (lastEntry.text || "") + text.text;
+        }
+      },
+    })
+    .on(".item article .item__options", {
+      text(text) {
+        const lastIndex = optionTexts.length - 1;
+        if (lastIndex >= 0) {
+          optionTexts[lastIndex] += text.text;
         }
       },
     })
@@ -75,7 +104,7 @@ export async function parse(response: Response): Promise<RSSData> {
     description: "Deliberações ERC",
     language: "pt",
     entries: entries
-      .map((entry) => {
+      .map((entry, index) => {
         let text = entry.text?.trim().replace(/\s+/g, " ") || "";
         // Handle both decoded "Tópicos:" and HTML entity encoded "T&oacute;picos:"
         const topicsPatterns = ["Tópicos:", "T&oacute;picos:"];
@@ -90,6 +119,7 @@ export async function parse(response: Response): Promise<RSSData> {
           ...entry,
           title: entry.title.trim().replace(/\n/g, " | "),
           text,
+          datetime: parsePublicationDate(optionTexts[index] ?? ""),
         };
       })
       .filter((entry: RSSEntry) => isValidRSSEntry(entry)),

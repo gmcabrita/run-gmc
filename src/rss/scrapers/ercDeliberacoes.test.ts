@@ -33,7 +33,8 @@ describe("ercDeliberacoes scraper", () => {
     const firstEntry = result.entries[0];
     expect(firstEntry.id).toContain("https://www.erc.pt/document.php");
     expect(firstEntry.link).toContain("https://www.erc.pt/document.php");
-    expect(firstEntry.title).toMatch(/ERC\/2025\/\d+/);
+    expect(firstEntry.title).toMatch(/ERC\/2026\/\d+/);
+    expect(firstEntry.datetime).toEqual(new Date("2026-07-30T00:00:00.000Z"));
   });
 
   it("extracts all entries from the page", async () => {
