@@ -3,7 +3,7 @@ import { basicAuth } from "hono/basic-auth";
 import { Feed } from "feed";
 import { stripInvalidXmlChars } from "@rss/common";
 import type { FeedItem } from "@types";
-import * as v from "valibot";
+import { parse } from "valibot";
 import {
   XOEmbedResponseSchema,
   XUserByScreenNameResponseSchema,
@@ -35,9 +35,9 @@ async function fetchUser(
     },
   );
 
-  if (response.status == 429) throw new Error("Rate Limited");
+  if (response.status == 429) {throw new Error("Rate Limited");}
 
-  return v.parse(XUserByScreenNameResponseSchema, await response.json());
+  return parse(XUserByScreenNameResponseSchema, await response.json());
 }
 
 async function fetchPosts(
@@ -53,8 +53,8 @@ async function fetchPosts(
     },
   );
 
-  if (response.status == 429) throw new Error("Rate Limited");
-  return v.parse(XUserTweetsResponseSchema, await response.json());
+  if (response.status == 429) {throw new Error("Rate Limited");}
+  return parse(XUserTweetsResponseSchema, await response.json());
 }
 
 async function transformPost(
@@ -65,18 +65,18 @@ async function transformPost(
     const postUrl = `https://x.com/${post.core.user_results.result.legacy.screen_name}/status/${post.legacy.id_str}`;
 
     return {
-      title:
-        post.legacy.full_text.substring(0, 50) + (post.legacy.full_text.length > 50 ? "..." : ""),
-      id: post.legacy.id_str,
-      link: postUrl,
-      content: (await getEmbedWithRetries(env, postUrl, 2)) ?? "",
       author: [
         {
-          name: post.core.user_results.result.legacy.name,
           link: `https://x.com/${post.core.user_results.result.legacy.screen_name}`,
+          name: post.core.user_results.result.legacy.name,
         },
       ],
+      content: (await getEmbedWithRetries(env, postUrl, 2)) ?? "",
       date: new Date(post.legacy.created_at),
+      id: post.legacy.id_str,
+      link: postUrl,
+      title:
+        post.legacy.full_text.slice(0, 50) + (post.legacy.full_text.length > 50 ? "..." : ""),
     };
   }
 }
@@ -86,7 +86,7 @@ async function getEmbedWithRetries(
   postUrl: string,
   retryCount: number,
 ): Promise<string | undefined> {
-  var lastError;
+  let lastError;
   for (let i = 0; i < retryCount; i++) {
     try {
       return await getEmbed(env, postUrl);
@@ -95,20 +95,20 @@ async function getEmbedWithRetries(
     }
   }
 
-  if (lastError) throw lastError;
+  if (lastError) {throw lastError;}
 }
 
 async function getEmbed(env: CloudflareBindings, postUrl: string): Promise<string> {
   const cachedHtml = await env.RUN_GMC_X_CACHE_KV.get(postUrl);
 
-  if (cachedHtml) return cachedHtml;
+  if (cachedHtml) {return cachedHtml;}
 
   const response = await fetch(
     `https://publish.twitter.com/oembed?url=${encodeURIComponent(postUrl)}`,
   );
-  const json = v.parse(XOEmbedResponseSchema, await response.json());
+  const json = parse(XOEmbedResponseSchema, await response.json());
 
-  await env.RUN_GMC_X_CACHE_KV.put(postUrl, json.html, { expirationTtl: 1209600 });
+  await env.RUN_GMC_X_CACHE_KV.put(postUrl, json.html, { expirationTtl: 1_209_600 });
 
   return json.html;
 }
@@ -119,24 +119,24 @@ async function x2Rss(env: CloudflareBindings, userName: string, data: XUserTweet
     entries?.[0]?.content?.itemContent?.tweet_results?.result?.core?.user_results?.result?.legacy;
 
   const feed = new Feed({
-    title: `X // ${firstUser?.name || userName}`,
-    description: firstUser?.description || userName,
-    id: `https://x.com/${firstUser?.screen_name || userName}`,
-    link: `https://x.com/${firstUser?.screen_name || userName}`,
-    language: "en",
-    image: firstUser?.profile_image_url_https ?? undefined,
-    favicon: "https://x.com/favicon.ico",
-    copyright: `All rights reserved ${new Date().getFullYear()}, ${firstUser?.name}`,
-    updated: new Date(),
-    generator: "X2RSS",
     author: {
-      name: firstUser?.name || "",
       link: `https://x.com/${firstUser?.screen_name}`,
+      name: firstUser?.name || "",
     },
+    copyright: `All rights reserved ${new Date().getFullYear()}, ${firstUser?.name}`,
+    description: firstUser?.description || userName,
+    favicon: "https://x.com/favicon.ico",
+    generator: "X2RSS",
+    id: `https://x.com/${firstUser?.screen_name || userName}`,
+    image: firstUser?.profile_image_url_https ?? undefined,
+    language: "en",
+    link: `https://x.com/${firstUser?.screen_name || userName}`,
+    title: `X // ${firstUser?.name || userName}`,
+    updated: new Date(),
   });
 
   for (const entry of entries) {
-    if (entry.content?.itemContent?.promotedMetadata) continue;
+    if (entry.content?.itemContent?.promotedMetadata) {continue;}
 
     const post = await transformPost(
       env,
@@ -146,7 +146,7 @@ async function x2Rss(env: CloudflareBindings, userName: string, data: XUserTweet
       feed.addItem(post);
     }
 
-    if (entry.content?.items?.[0]?.item?.itemContent?.promotedMetadata) continue;
+    if (entry.content?.items?.[0]?.item?.itemContent?.promotedMetadata) {continue;}
     const threadedPost = await transformPost(
       env,
       entry.content?.items?.[0]?.item?.itemContent?.tweet_results?.result ?? undefined,
@@ -164,8 +164,8 @@ export function addXEndpoints(app: Hono<{ Bindings: CloudflareBindings }>) {
     "/rss.x",
     async (ctx, next) => {
       const auth = basicAuth({
-        username: ctx.env.PRIVATE_BASIC_AUTH_USERNAME,
         password: ctx.env.PRIVATE_BASIC_AUTH_PASSWORD,
+        username: ctx.env.PRIVATE_BASIC_AUTH_USERNAME,
       });
       return auth(ctx, next);
     },
@@ -181,7 +181,7 @@ export function addXEndpoints(app: Hono<{ Bindings: CloudflareBindings }>) {
       try {
         const cacheKey = `rss.x:${userName}${isPublic ? ":public" : ""}`;
 
-        const { value: cachedRss, metadata } = await ctx.env.RUN_GMC_X_CACHE_KV.getWithMetadata<{
+        const { metadata, value: cachedRss } = await ctx.env.RUN_GMC_X_CACHE_KV.getWithMetadata<{
           expiresAt: number;
         }>(cacheKey);
         if (cachedRss && metadata) {
@@ -209,14 +209,14 @@ export function addXEndpoints(app: Hono<{ Bindings: CloudflareBindings }>) {
         ctx.header("Content-Type", "application/rss+xml");
         ctx.header("Cache-Control", `max-age=${maxAge + 1}`);
         return ctx.text(rss2);
-      } catch (e: unknown) {
-        if (e instanceof Error && e.message == "Rate Limited") {
+      } catch (error: unknown) {
+        if (error instanceof Error && error.message == "Rate Limited") {
           ctx.header("Retry-After", `${Math.floor(Math.random() * (240 - 120 + 1)) + 120}`);
           ctx.status(429);
           return ctx.text("Rate Limited");
         }
 
-        throw e;
+        throw error;
       }
     },
   );

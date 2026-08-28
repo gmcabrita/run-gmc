@@ -7,10 +7,10 @@ import {
 } from "./rtpFinancialDocuments";
 
 const CONFIG: RtpFinancialDocumentPageConfig = {
+  description: "Relatórios de serviço público publicados pela RTP.",
   pageUrl:
     "https://media.rtp.pt/empresa/inf-financeira/relatorio-de-servico-publico-relatorio-e-contas/",
   title: "RTP – Relatório de serviço público",
-  description: "Relatórios de serviço público publicados pela RTP.",
 };
 
 export async function parse(response: Response): Promise<RSSData> {

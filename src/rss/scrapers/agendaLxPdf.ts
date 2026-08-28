@@ -6,28 +6,28 @@ const PDF_URL_PATTERN = /https:\/\/[^\s"'<>]+\.pdf/g;
 
 export async function parse(response: Response): Promise<RSSData> {
   const now = new Date();
-  const entries: RSSEntry[] = [];
+  const entries: Array<RSSEntry> = [];
   const html = await response.text();
 
   for (const match of html.matchAll(PDF_URL_PATTERN)) {
     const url = match[0];
 
     entries.push({
+      datetime: now,
       id: url,
       link: url,
-      title: url,
       text: url,
-      datetime: now,
+      title: url,
     });
   }
 
   return {
+    description: "AgendaLX",
+    entries: entries.filter(isValidRSSEntry),
     id: BASE_URL,
+    language: "pt",
     link: BASE_URL,
     title: "AgendaLX",
-    description: "AgendaLX",
-    language: "pt",
-    entries: entries.filter(isValidRSSEntry),
   };
 }
 

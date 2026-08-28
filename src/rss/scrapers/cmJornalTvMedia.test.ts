@@ -25,25 +25,25 @@ describe("cmJornalTvMedia scraper", () => {
     expect(result.entries).toHaveLength(2);
     expect(result.nextPageURL).toBe(SECOND_PAGE_URL);
     expect(result.entries[0]).toEqual({
-      id: "https://www.cmjornal.pt/tv-media/detalhe/story-one",
-      link: "https://www.cmjornal.pt/tv-media/detalhe/story-one",
-      title: "Story One",
-      text: "Lead one",
       datetime: new Date("2026-03-18T19:59:00.000Z"),
+      id: "https://www.cmjornal.pt/tv-media/detalhe/story-one",
       imageURL: "https://cdn.cmjornal.pt/images/story-one.jpg",
+      link: "https://www.cmjornal.pt/tv-media/detalhe/story-one",
+      text: "Lead one",
+      title: "Story One",
     });
     expect(result.entries[1]).toEqual({
-      id: "https://www.cmjornal.pt/sociedade/detalhe/story-two",
-      link: "https://www.cmjornal.pt/sociedade/detalhe/story-two",
-      title: 'Story Two "Premium"',
-      text: 'Story Two "Premium"',
       datetime: new Date("2026-03-17T13:07:00.000Z"),
+      id: "https://www.cmjornal.pt/sociedade/detalhe/story-two",
       imageURL: undefined,
+      link: "https://www.cmjornal.pt/sociedade/detalhe/story-two",
+      text: 'Story Two "Premium"',
+      title: 'Story Two "Premium"',
     });
   });
 
   it("fetches only the first two loadmore pages", async () => {
-    const fetchCalls: string[] = [];
+    const fetchCalls: Array<string> = [];
     const fetchFn: typeof fetch = async (input) => {
       const url = readFetchUrl(input);
       fetchCalls.push(url);
@@ -78,7 +78,7 @@ describe("cmJornalTvMedia scraper", () => {
   });
 
   it("retries retryable failures while loading a page", async () => {
-    const fetchCalls: string[] = [];
+    const fetchCalls: Array<string> = [];
     let firstPageAttempts = 0;
     const fetchFn: typeof fetch = async (input) => {
       const url = readFetchUrl(input);

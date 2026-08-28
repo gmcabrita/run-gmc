@@ -7,12 +7,12 @@ const DESCRIPTION =
   "I enjoy spending time yak shaving a little too much, and at some point, I realized that my personal notes documenting the architecture, design decisions, and implementation details of popular software might be interesting to others. Thus, this blog was born.";
 
 interface DansvetlovDraftEntry extends RSSEntry {
-  summary: string;
   publishedAt: string;
+  summary: string;
 }
 
 function normalizeWhitespace(text: string): string {
-  return text.replace(/\s+/g, " ").trim();
+  return text.replaceAll(/\s+/g, " ").trim();
 }
 
 function parsePublishedAt(value: string): Date | undefined {
@@ -30,7 +30,7 @@ function parsePublishedAt(value: string): Date | undefined {
 }
 
 export async function parse(response: Response): Promise<RSSData> {
-  const entries: DansvetlovDraftEntry[] = [];
+  const entries: Array<DansvetlovDraftEntry> = [];
   let currentEntry: DansvetlovDraftEntry | null = null;
 
   const rewriter = new HTMLRewriter()
@@ -39,10 +39,10 @@ export async function parse(response: Response): Promise<RSSData> {
         currentEntry = {
           id: "",
           link: "",
-          title: "",
-          text: "",
-          summary: "",
           publishedAt: "",
+          summary: "",
+          text: "",
+          title: "",
         };
         entries.push(currentEntry);
       },
@@ -110,33 +110,33 @@ export async function parse(response: Response): Promise<RSSData> {
   await consume(body);
 
   return {
-    id: BASE_URL,
-    link: BASE_URL,
-    title: "Articles | dansvetlov.me",
     description: DESCRIPTION,
-    language: "en",
     entries: entries
       .map((entry) => {
         const title = normalizeWhitespace(entry.title);
         const summary = normalizeWhitespace(entry.summary);
         return {
-          id: entry.id,
-          link: entry.link,
-          title,
-          text: summary || title,
           datetime: parsePublishedAt(entry.publishedAt),
+          id: entry.id,
           imageURL: entry.imageURL,
+          link: entry.link,
+          text: summary || title,
+          title,
         };
       })
       .filter(isValidRSSEntry),
+    id: BASE_URL,
+    language: "en",
+    link: BASE_URL,
+    title: "Articles | dansvetlov.me",
   };
 }
 
 export async function get(_ctx: ScraperContext): Promise<RSSData> {
   const response = await fetch(BASE_URL, {
     headers: {
-      "user-agent": USERAGENT,
       accept: "text/html",
+      "user-agent": USERAGENT,
     },
   });
 

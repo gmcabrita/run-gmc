@@ -1,11 +1,20 @@
 import { isValidRSSEntry, type ScraperContext } from "@rss/common";
 import type { RSSData, RSSEntry } from "@rss/types";
-import * as v from "valibot";
+import {
+  array,
+  fallback,
+  looseObject,
+  nullish,
+  safeParse,
+  string,
+  unknown,
+  type InferOutput,
+} from "valibot";
 import { createProxiedFetch } from "../proxiedFetch";
 
 const MANGADEX_API_URL = "https://api.mangadex.org";
 const MANGADEX_SITE_URL = "https://mangadex.org";
-const DEFAULT_CONTENT_RATINGS: readonly MangaDexContentRating[] = [
+const DEFAULT_CONTENT_RATINGS: ReadonlyArray<MangaDexContentRating> = [
   "safe",
   "suggestive",
   "erotica",
@@ -15,52 +24,52 @@ const DEFAULT_CONTENT_RATINGS: readonly MangaDexContentRating[] = [
 export type MangaDexContentRating = "safe" | "suggestive" | "erotica" | "pornographic";
 
 export interface MangaDexFeedConfig {
-  mangaId: string;
-  mangaTitle: string;
-  mangaSlug?: string;
-  language: string;
-  excludedGroupIds?: readonly string[];
-  limit?: number;
-  contentRatings?: readonly MangaDexContentRating[];
-  includeUnavailable?: boolean;
-  feedTitle?: string;
+  contentRatings?: ReadonlyArray<MangaDexContentRating>;
   description?: string;
+  excludedGroupIds?: ReadonlyArray<string>;
+  feedTitle?: string;
+  includeUnavailable?: boolean;
+  language: string;
+  limit?: number;
+  mangaId: string;
+  mangaSlug?: string;
+  mangaTitle: string;
 }
 
-const OptionalTextSchema = v.fallback(v.nullish(v.string()), undefined);
-const MangaDexRelationshipSchema = v.looseObject({
-  type: v.string(),
-  attributes: v.looseObject({
-    name: v.string(),
+const OptionalTextSchema = fallback(nullish(string()), undefined);
+const MangaDexRelationshipSchema = looseObject({
+  attributes: looseObject({
+    name: string(),
   }),
+  type: string(),
 });
-const MangaDexChapterPayloadSchema = v.looseObject({
-  id: v.string(),
-  attributes: v.looseObject({
-    volume: OptionalTextSchema,
+const MangaDexChapterPayloadSchema = looseObject({
+  attributes: looseObject({
     chapter: OptionalTextSchema,
-    title: OptionalTextSchema,
     publishAt: OptionalTextSchema,
+    title: OptionalTextSchema,
+    volume: OptionalTextSchema,
   }),
-  relationships: v.array(v.unknown()),
+  id: string(),
+  relationships: array(unknown()),
 });
-const MangaDexFeedPayloadSchema = v.looseObject({
-  data: v.unknown(),
+const MangaDexFeedPayloadSchema = looseObject({
+  data: unknown(),
 });
-const MangaDexFeedDataSchema = v.looseObject({
-  data: v.array(v.unknown()),
+const MangaDexFeedDataSchema = looseObject({
+  data: array(unknown()),
 });
 
-export type MangaDexFeedPayload = v.InferOutput<typeof MangaDexFeedPayloadSchema>;
-type MangaDexChapterPayload = v.InferOutput<typeof MangaDexChapterPayloadSchema>;
+export type MangaDexFeedPayload = InferOutput<typeof MangaDexFeedPayloadSchema>;
+type MangaDexChapterPayload = InferOutput<typeof MangaDexChapterPayloadSchema>;
 
 interface MangaDexChapter {
-  id: string;
-  volume?: string;
   chapter?: string;
-  title?: string;
+  id: string;
   publishedAt?: Date;
-  scanlationGroups: string[];
+  scanlationGroups: Array<string>;
+  title?: string;
+  volume?: string;
 }
 
 const EMPTY_MANGADEX_PAYLOAD = { data: [] } satisfies MangaDexFeedPayload;
@@ -86,13 +95,11 @@ function readChapter(payload: MangaDexChapterPayload): MangaDexChapter | undefin
   }
 
   return {
-    id,
-    volume: normalizeOptionalText(payload.attributes.volume),
     chapter: normalizeOptionalText(payload.attributes.chapter),
-    title: normalizeOptionalText(payload.attributes.title),
+    id,
     publishedAt: parseOptionalDate(payload.attributes.publishAt),
     scanlationGroups: payload.relationships.flatMap((relationship) => {
-      const result = v.safeParse(MangaDexRelationshipSchema, relationship);
+      const result = safeParse(MangaDexRelationshipSchema, relationship);
       if (!result.success || result.output.type !== "scanlation_group") {
         return [];
       }
@@ -100,17 +107,19 @@ function readChapter(payload: MangaDexChapterPayload): MangaDexChapter | undefin
       const name = normalizeOptionalText(result.output.attributes.name);
       return name ? [name] : [];
     }),
+    title: normalizeOptionalText(payload.attributes.title),
+    volume: normalizeOptionalText(payload.attributes.volume),
   };
 }
 
-function readChapters(payload: MangaDexFeedPayload): MangaDexChapter[] {
-  const feedResult = v.safeParse(MangaDexFeedDataSchema, payload);
+function readChapters(payload: MangaDexFeedPayload): Array<MangaDexChapter> {
+  const feedResult = safeParse(MangaDexFeedDataSchema, payload);
   if (!feedResult.success) {
     return [];
   }
 
   return feedResult.output.data.flatMap((chapter) => {
-    const chapterResult = v.safeParse(MangaDexChapterPayloadSchema, chapter);
+    const chapterResult = safeParse(MangaDexChapterPayloadSchema, chapter);
     if (!chapterResult.success) {
       return [];
     }
@@ -161,7 +170,7 @@ export function parseMangaDexFeed(
   payload: MangaDexFeedPayload,
   config: MangaDexFeedConfig,
 ): RSSData {
-  const entries: RSSEntry[] = readChapters(payload)
+  const entries: Array<RSSEntry> = readChapters(payload)
     .map((chapter) => {
       const groupNames = chapter.scanlationGroups.join(", ") || "Unknown scanlation group";
       const chapterLabel = chapter.chapter ? `Chapter ${chapter.chapter}` : "Chapter";
@@ -174,23 +183,23 @@ export function parseMangaDexFeed(
       ].filter((detail): detail is string => detail !== undefined);
 
       return {
+        datetime: chapter.publishedAt,
         id: chapter.id,
         link: `${MANGADEX_SITE_URL}/chapter/${chapter.id}`,
-        title,
         text: details.join("<br>"),
-        datetime: chapter.publishedAt,
+        title,
       };
     })
     .filter(isValidRSSEntry);
   const mangaUrl = getMangaUrl(config);
 
   return {
+    description: config.description ?? `${config.mangaTitle} chapter releases from MangaDex`,
+    entries,
     id: mangaUrl,
+    language: config.language,
     link: mangaUrl,
     title: config.feedTitle ?? `${config.mangaTitle} chapters`,
-    description: config.description ?? `${config.mangaTitle} chapter releases from MangaDex`,
-    language: config.language,
-    entries,
   };
 }
 
@@ -209,7 +218,7 @@ export async function getMangaDexFeed(
     throw new Error(`MangaDex request failed: ${response.status}`);
   }
 
-  const payloadResult = v.safeParse(MangaDexFeedPayloadSchema, await response.json());
+  const payloadResult = safeParse(MangaDexFeedPayloadSchema, await response.json());
   return parseMangaDexFeed(
     payloadResult.success ? payloadResult.output : EMPTY_MANGADEX_PAYLOAD,
     config,

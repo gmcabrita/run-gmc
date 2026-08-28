@@ -5,7 +5,15 @@ import {
   type ScraperContext,
 } from "@rss/common";
 import type { RSSData, RSSEntry } from "@rss/types";
-import * as v from "valibot";
+import {
+  fallback,
+  looseObject,
+  nullish,
+  number,
+  safeParse,
+  string,
+  type InferOutput,
+} from "valibot";
 
 const BASE_URL = "https://www.viralagenda.com/pt/setubal/almada";
 const PAGE_SIZE = 30;
@@ -13,26 +21,26 @@ const MAX_PAGES = 30;
 
 type FetchFn = typeof fetch;
 
-const OptionalTextSchema = v.fallback(v.nullish(v.string()), undefined);
-const CalendarDataSchema = v.looseObject({
-  name: v.string(),
-  startDate: OptionalTextSchema,
+const OptionalTextSchema = fallback(nullish(string()), undefined);
+const CalendarDataSchema = looseObject({
   endDate: OptionalTextSchema,
-  startTime: OptionalTextSchema,
   endTime: OptionalTextSchema,
   location: OptionalTextSchema,
+  name: string(),
+  startDate: OptionalTextSchema,
+  startTime: OptionalTextSchema,
 });
-const ViralAgendaAjaxPayloadSchema = v.looseObject({
-  html: v.string(),
-  pageTotal: v.number(),
+const ViralAgendaAjaxPayloadSchema = looseObject({
+  html: string(),
+  pageTotal: number(),
 });
 
-type CalendarData = v.InferOutput<typeof CalendarDataSchema>;
-type ViralAgendaAjaxPayload = v.InferOutput<typeof ViralAgendaAjaxPayloadSchema>;
+type CalendarData = InferOutput<typeof CalendarDataSchema>;
+type ViralAgendaAjaxPayload = InferOutput<typeof ViralAgendaAjaxPayloadSchema>;
 
 type ParsedPage = {
+  entries: Array<RSSEntry>;
   eventCount: number;
-  entries: RSSEntry[];
   hasOngoingMarker: boolean;
   hasPastMarker: boolean;
 };
@@ -46,7 +54,7 @@ function readHtmlAttribute(html: string, name: string): string | undefined {
 
 function parseCalendarData(value: string): CalendarData | undefined {
   try {
-    const result = v.safeParse(CalendarDataSchema, JSON.parse(value));
+    const result = safeParse(CalendarDataSchema, JSON.parse(value));
     if (!result.success || result.output.name.trim().length === 0) {
       return undefined;
     }
@@ -58,7 +66,7 @@ function parseCalendarData(value: string): CalendarData | undefined {
 }
 
 function parseDatetime(value: string | undefined): Date | undefined {
-  if (!value) return undefined;
+  if (!value) {return undefined;}
 
   const datetime = new Date(value);
   return Number.isNaN(datetime.getTime()) ? undefined : datetime;
@@ -83,7 +91,7 @@ function buildText(data: CalendarData): string | undefined {
 }
 
 function parsePage(html: string): ParsedPage {
-  const entries: RSSEntry[] = [];
+  const entries: Array<RSSEntry> = [];
   const cardRegex = /<li\b[^>]*\bid=(['"])c\d+\1[^>]*>[\s\S]*?<\/li>/gi;
   let eventCount = 0;
   let cardMatch: RegExpExecArray | null;
@@ -93,11 +101,11 @@ function parsePage(html: string): ParsedPage {
     const card = cardMatch[0];
     const openingTag = /^<li\b[^>]*>/i.exec(card)?.[0];
     const encodedCalendarData = readHtmlAttribute(card, "data-atcb");
-    if (!openingTag || !encodedCalendarData) continue;
+    if (!openingTag || !encodedCalendarData) {continue;}
 
     const relativeLink = readHtmlAttribute(openingTag, "data-url");
     const calendarData = parseCalendarData(encodedCalendarData);
-    if (!relativeLink || !calendarData) continue;
+    if (!relativeLink || !calendarData) {continue;}
 
     let link: string;
     try {
@@ -107,31 +115,31 @@ function parsePage(html: string): ParsedPage {
     }
 
     entries.push({
-      id: link,
-      link,
-      title: calendarData.name,
-      text: buildText(calendarData),
       datetime: parseDatetime(readHtmlAttribute(openingTag, "data-date-start")),
+      id: link,
       imageURL: readHtmlAttribute(card, "data-img"),
+      link,
+      text: buildText(calendarData),
+      title: calendarData.name,
     });
   }
 
   return {
-    eventCount,
     entries: entries.filter(isValidRSSEntry),
+    eventCount,
     hasOngoingMarker: html.includes("viral-event-ongoing"),
     hasPastMarker: html.includes("viral-event-past"),
   };
 }
 
-function buildFeed(entries: RSSEntry[]): RSSData {
+function buildFeed(entries: Array<RSSEntry>): RSSData {
   return {
+    description: "Eventos em Almada publicados na Viral Agenda",
+    entries,
     id: BASE_URL,
+    language: "pt",
     link: BASE_URL,
     title: "Agenda Cultural de Almada | Viral Agenda",
-    description: "Eventos em Almada publicados na Viral Agenda",
-    language: "pt",
-    entries,
   };
 }
 
@@ -149,7 +157,7 @@ async function fetchResponse(fetchFn: FetchFn, url: string, ajax: boolean): Prom
   const headers = new Headers({
     "user-agent": USERAGENT,
   });
-  if (ajax) headers.set("X-Requested-With", "XMLHttpRequest");
+  if (ajax) {headers.set("X-Requested-With", "XMLHttpRequest");}
 
   const response = await fetchFn(url, { headers });
   if (!response.ok) {
@@ -181,7 +189,7 @@ export async function scrape(fetchFn: FetchFn): Promise<RSSData> {
       getAjaxUrl(offset, hasPastMarker, hasOngoingMarker),
       true,
     );
-    const payloadResult = v.safeParse(
+    const payloadResult = safeParse(
       ViralAgendaAjaxPayloadSchema,
       await response.json(),
     );

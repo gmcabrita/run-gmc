@@ -2,8 +2,8 @@ import { describe, expect, it } from "vitest";
 import { createProxiedFetch } from "./proxiedFetch";
 
 const relayEnv = {
-  HTTP_RELAY_URL: "https://relay.example.com/fetch",
   HTTP_RELAY_TOKEN: "relay-token",
+  HTTP_RELAY_URL: "https://relay.example.com/fetch",
 };
 
 function requireRelayRequest(input: RequestInfo | URL | undefined, init: RequestInit | undefined) {
@@ -26,13 +26,13 @@ describe("createProxiedFetch", () => {
     };
 
     await createProxiedFetch(relayEnv, fetcher)("https://target.example.com/api", {
-      method: "POST",
+      body: "payload",
       headers: {
         Accept: "application/json",
         "Accept-Language": "pt-PT",
         Referer: "https://target.example.com/",
       },
-      body: "payload",
+      method: "POST",
     });
 
     const request = requireRelayRequest(relayInput, relayInit);
@@ -93,8 +93,8 @@ describe("createProxiedFetch", () => {
   });
 
   it("retries relay 502 responses with exponential backoff and jitter", async () => {
-    const delays: number[] = [];
-    const requestBodies: string[] = [];
+    const delays: Array<number> = [];
+    const requestBodies: Array<string> = [];
     let calls = 0;
 
     const fetcher: typeof fetch = async (input, init) => {
@@ -116,8 +116,8 @@ describe("createProxiedFetch", () => {
         delays.push(milliseconds);
       },
     })("https://target.example.com/api", {
-      method: "POST",
       body: "payload",
+      method: "POST",
     });
 
     expect(response.status).toBe(200);
@@ -128,7 +128,7 @@ describe("createProxiedFetch", () => {
   });
 
   it("retries relay 525 responses up to 3 times", async () => {
-    const delays: number[] = [];
+    const delays: Array<number> = [];
     let calls = 0;
 
     const fetcher: typeof fetch = async () => {

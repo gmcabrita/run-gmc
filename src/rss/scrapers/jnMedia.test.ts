@@ -25,22 +25,22 @@ describe("jnMedia scraper", () => {
     expect(result.nextPageURL).toBe(SECOND_PAGE_URL);
     expect(result.entries[0]).toEqual({
       id: "https://www.jn.pt/media/artigo/story-one/18000001",
-      link: "https://www.jn.pt/media/artigo/story-one/18000001",
-      title: "Story One com espaços",
-      text: "Conferência",
       imageURL: "https://staticx.noticiasilimitadas.pt/jn/story-one.jpg?brand=jn&w=3840",
+      link: "https://www.jn.pt/media/artigo/story-one/18000001",
+      text: "Conferência",
+      title: "Story One com espaços",
     });
     expect(result.entries[1]).toEqual({
       id: "https://www.jn.pt/media/artigo/story-two/18000002",
-      link: "https://www.jn.pt/media/artigo/story-two/18000002",
-      title: 'Story Two "Premium"',
-      text: "Jornalismo",
       imageURL: undefined,
+      link: "https://www.jn.pt/media/artigo/story-two/18000002",
+      text: "Jornalismo",
+      title: 'Story Two "Premium"',
     });
   });
 
   it("fetches only the first two pages", async () => {
-    const fetchCalls: string[] = [];
+    const fetchCalls: Array<string> = [];
     const fetchFn: typeof fetch = async (input) => {
       const url = readFetchUrl(input);
       fetchCalls.push(url);

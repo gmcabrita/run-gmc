@@ -11,8 +11,8 @@ const API_URL = `${BASE_URL}/search/label/-%20bilhetes%20cinema?m=0`;
 const EXCLUDED_HOSTS = new Set(["anteestreias.blogspot.com", "www.blogger.com", "blogger.com"]);
 
 function stripHtml(value: string) {
-  return decodeHtmlEntities(value.replace(/<[^>]*>/g, " "))
-    .replace(/\s+/g, " ")
+  return decodeHtmlEntities(value.replaceAll(/<[^>]*>/g, " "))
+    .replaceAll(/\s+/g, " ")
     .trim();
 }
 
@@ -82,7 +82,7 @@ function getPostBodies(blogPostsHtml: string) {
 }
 
 function parseRows(body: string, datetime?: Date) {
-  const entries: RSSEntry[] = [];
+  const entries: Array<RSSEntry> = [];
   const trRegex = /<tr\b[^>]*>([\s\S]*?)<\/tr>/gi;
   let trMatch;
 
@@ -106,12 +106,12 @@ function parseRows(body: string, datetime?: Date) {
       const linkText = stripHtml(linkMatch[3] || "");
 
       entries.push({
-        id: url,
-        link: url,
-        title: movieTitle || linkText || url,
-        text: linkText ? `${linkText}: ${url}` : url,
         datetime,
+        id: url,
         imageURL,
+        link: url,
+        text: linkText ? `${linkText}: ${url}` : url,
+        title: movieTitle || linkText || url,
       });
     }
   }
@@ -125,12 +125,12 @@ export function parse(htmlText: string): RSSData {
     .filter(isValidRSSEntry);
 
   return {
+    description: "External URLs extracted from Ante-Estreias bilhetes cinema posts",
+    entries,
     id: API_URL,
+    language: "pt",
     link: API_URL,
     title: "Ante-Estreias Cinema",
-    description: "External URLs extracted from Ante-Estreias bilhetes cinema posts",
-    language: "pt",
-    entries,
   };
 }
 

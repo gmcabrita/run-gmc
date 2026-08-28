@@ -21,8 +21,8 @@ const PORTUGUESE_MONTHS = new Map([
 ]);
 
 interface AutoRegulacaoPublicitariaDraftEntry extends RSSEntry {
-  year: string;
   date: string;
+  year: string;
 }
 
 const NAMED_HTML_ENTITIES = new Map([
@@ -36,7 +36,7 @@ const NAMED_HTML_ENTITIES = new Map([
 
 function decodeHtmlEntities(value: string): string {
   return value
-    .replace(/&#(\d+);/g, (entity, decimal) => {
+    .replaceAll(/&#(\d+);/g, (entity, decimal) => {
       const codePoint = Number(decimal);
       if (!Number.isInteger(codePoint) || codePoint < 0) {
         return entity;
@@ -48,7 +48,7 @@ function decodeHtmlEntities(value: string): string {
         return entity;
       }
     })
-    .replace(/&#x([\da-f]+);/gi, (entity, hexadecimal) => {
+    .replaceAll(/&#x([\da-f]+);/gi, (entity, hexadecimal) => {
       const codePoint = Number.parseInt(hexadecimal, 16);
       if (!Number.isInteger(codePoint) || codePoint < 0) {
         return entity;
@@ -60,14 +60,14 @@ function decodeHtmlEntities(value: string): string {
         return entity;
       }
     })
-    .replace(
+    .replaceAll(
       /&([a-z]+);/gi,
       (entity, name) => NAMED_HTML_ENTITIES.get(name.toLocaleLowerCase("en-US")) ?? entity,
     );
 }
 
 function normalizeWhitespace(value: string): string {
-  return decodeHtmlEntities(value).replace(/\s+/g, " ").trim();
+  return decodeHtmlEntities(value).replaceAll(/\s+/g, " ").trim();
 }
 
 function parsePortugueseDate(value: string): Date | undefined {
@@ -90,24 +90,24 @@ function parsePortugueseDate(value: string): Date | undefined {
 }
 
 export async function parse(response: Response): Promise<RSSData> {
-  const entries: AutoRegulacaoPublicitariaDraftEntry[] = [];
+  const entries: Array<AutoRegulacaoPublicitariaDraftEntry> = [];
 
   const rewriter = new HTMLRewriter()
     .on(".post_content .sc_blogger_item", {
       element() {
         entries.push({
+          date: "",
           id: "",
           link: "",
-          title: "",
           text: "",
+          title: "",
           year: "",
-          date: "",
         });
       },
     })
     .on(".post_content .sc_blogger_item .post_categories a", {
       text(text) {
-        const lastEntry = entries[entries.length - 1];
+        const lastEntry = entries.at(-1);
         if (lastEntry && text.text) {
           lastEntry.year += text.text;
         }
@@ -115,7 +115,7 @@ export async function parse(response: Response): Promise<RSSData> {
     })
     .on(".post_content .sc_blogger_item .post_date", {
       text(text) {
-        const lastEntry = entries[entries.length - 1];
+        const lastEntry = entries.at(-1);
         if (lastEntry && text.text) {
           lastEntry.date += text.text;
         }
@@ -123,7 +123,7 @@ export async function parse(response: Response): Promise<RSSData> {
     })
     .on(".post_content .sc_blogger_item .sc_blogger_item_title a", {
       element(el) {
-        const lastEntry = entries[entries.length - 1];
+        const lastEntry = entries.at(-1);
         const href = el.getAttribute("href");
         if (lastEntry && href) {
           const link = new URL(href, BASE_ORIGIN).href;
@@ -132,7 +132,7 @@ export async function parse(response: Response): Promise<RSSData> {
         }
       },
       text(text) {
-        const lastEntry = entries[entries.length - 1];
+        const lastEntry = entries.at(-1);
         if (lastEntry && text.text) {
           lastEntry.title += text.text;
         }
@@ -155,30 +155,30 @@ export async function parse(response: Response): Promise<RSSData> {
         .join(" | ");
 
       return {
+        datetime: parsePortugueseDate(date),
         id: entry.id,
         link: entry.link,
-        title,
         text: text || title,
-        datetime: parsePortugueseDate(date),
+        title,
       };
     })
     .filter((entry: RSSEntry) => isValidRSSEntry(entry));
 
   return {
+    description: "Deliberações da Auto Regulação Publicitária",
+    entries: rssEntries,
     id: BASE_URL,
+    language: "pt",
     link: BASE_URL,
     title: "Deliberações ARP",
-    description: "Deliberações da Auto Regulação Publicitária",
-    language: "pt",
-    entries: rssEntries,
   };
 }
 
 export async function get(_ctx: ScraperContext): Promise<RSSData> {
   const response = await fetch(BASE_URL, {
     headers: {
-      "user-agent": USERAGENT,
       accept: "text/html",
+      "user-agent": USERAGENT,
     },
   });
 

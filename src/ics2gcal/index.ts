@@ -9,36 +9,36 @@ type IcsProperty = {
 };
 
 type IcsEvent = {
-  properties: IcsProperty[];
+  properties: Array<IcsProperty>;
 };
 
 type GoogleCalendarEvent = {
-  title: string;
-  start: string;
+  attendees: Array<string>;
   end: string;
+  start: string;
   timezone: string;
-  attendees: string[];
+  title: string;
   url: string;
 };
 
 export type IcsToGoogleCalendarUrlResult =
   | { status: "ok"; url: string }
-  | { status: "error"; message: string };
+  | { message: string; status: "error"; };
 
 function splitParamValue(part: string): [string, string] {
   const index = part.indexOf("=");
-  if (index === -1) return [part.toUpperCase(), ""];
+  if (index === -1) {return [part.toUpperCase(), ""];}
   return [part.slice(0, index).toUpperCase(), unquoteParam(part.slice(index + 1))];
 }
 
 function unquoteParam(value: string): string {
-  if (value.startsWith('"') && value.endsWith('"')) return value.slice(1, -1);
+  if (value.startsWith('"') && value.endsWith('"')) {return value.slice(1, -1);}
   return value;
 }
 
 function parseLine(line: string): IcsProperty | undefined {
   const colon = line.indexOf(":");
-  if (colon === -1) return;
+  if (colon === -1) {return;}
 
   const left = line.slice(0, colon);
   const value = line.slice(colon + 1);
@@ -51,14 +51,14 @@ function parseLine(line: string): IcsProperty | undefined {
 
 function unescapeIcsText(value: string): string {
   return value
-    .replace(/\\[nN]/g, "\n")
-    .replace(/\\,/g, ",")
-    .replace(/\\;/g, ";")
-    .replace(/\\\\/g, "\\");
+    .replaceAll(/\\[nN]/g, "\n")
+    .replaceAll(String.raw`\,`, ",")
+    .replaceAll(String.raw`\;`, ";")
+    .replaceAll(String.raw`\\`, "\\");
 }
 
 function unfoldIcs(text: string): string {
-  return text.replace(/\r?\n[ \t]/g, "");
+  return text.replaceAll(/\r?\n[ \t]/g, "");
 }
 
 function addDays(yyyymmdd: string, days: number): string {
@@ -76,7 +76,7 @@ function parseDuration(duration: string): number | undefined {
   const match = /^P(?:(\d+)W)?(?:(\d+)D)?(?:T(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?)?$/.exec(
     duration,
   );
-  if (!match || match.slice(1).every((part) => part === undefined)) return;
+  if (!match || match.slice(1).every((part) => part === undefined)) {return;}
 
   const weeks = Number(match[1] || 0);
   const days = Number(match[2] || 0);
@@ -88,7 +88,7 @@ function parseDuration(duration: string): number | undefined {
 
 function addSecondsToIcsDate(value: string, seconds: number): string {
   const match = /^(\d{4})(\d{2})(\d{2})T(\d{2})(\d{2})(\d{2})(Z?)$/.exec(value);
-  if (!match) return value;
+  if (!match) {return value;}
 
   const date = new Date(
     Date.UTC(
@@ -111,12 +111,12 @@ function addSecondsToIcsDate(value: string, seconds: number): string {
 }
 
 function normalizeDateValue(prop: IcsProperty | undefined): string {
-  if (!prop) return "";
-  return prop.value.replace(/[-:]/g, "");
+  if (!prop) {return "";}
+  return prop.value.replaceAll(/[-:]/g, "");
 }
 
 function isAllDay(prop: IcsProperty | undefined): boolean {
-  if (!prop) return false;
+  if (!prop) {return false;}
   return prop.params.get("VALUE") === "DATE" || /^\d{8}$/.test(prop.value);
 }
 
@@ -124,13 +124,13 @@ function firstProperty(event: IcsEvent, name: string): IcsProperty | undefined {
   return event.properties.find((property) => property.name === name);
 }
 
-function allProperties(event: IcsEvent, name: string): IcsProperty[] {
+function allProperties(event: IcsEvent, name: string): Array<IcsProperty> {
   return event.properties.filter((property) => property.name === name);
 }
 
-function parseIcsEvents(text: string): IcsEvent[] {
+function parseIcsEvents(text: string): Array<IcsEvent> {
   const lines = unfoldIcs(text).split(/\r?\n/);
-  const events: IcsEvent[] = [];
+  const events: Array<IcsEvent> = [];
   let active: IcsEvent | undefined;
 
   for (const line of lines) {
@@ -140,15 +140,15 @@ function parseIcsEvents(text: string): IcsEvent[] {
     }
 
     if (line === "END:VEVENT") {
-      if (active) events.push(active);
+      if (active) {events.push(active);}
       active = undefined;
       continue;
     }
 
-    if (!active) continue;
+    if (!active) {continue;}
 
     const property = parseLine(line);
-    if (!property) continue;
+    if (!property) {continue;}
 
     if (textProperties.has(property.name)) {
       active.properties.push({ ...property, value: unescapeIcsText(property.value) });
@@ -181,10 +181,10 @@ function eventToGoogleCalendarUrl(event: IcsEvent): GoogleCalendarEvent {
       endValue = addSecondsToIcsDate(startValue, durationSeconds);
     }
     if (durationSeconds !== undefined && isAllDay(start)) {
-      endValue = addDays(startValue, Math.max(1, Math.round(durationSeconds / 86400)));
+      endValue = addDays(startValue, Math.max(1, Math.round(durationSeconds / 86_400)));
     }
-    if (!endValue && isAllDay(start)) endValue = addDays(startValue, 1);
-    if (!endValue) endValue = addSecondsToIcsDate(startValue, 3600);
+    if (!endValue && isAllDay(start)) {endValue = addDays(startValue, 1);}
+    if (!endValue) {endValue = addSecondsToIcsDate(startValue, 3600);}
   }
 
   const attendees = allProperties(event, "ATTENDEE")
@@ -195,31 +195,31 @@ function eventToGoogleCalendarUrl(event: IcsEvent): GoogleCalendarEvent {
   const params = new URLSearchParams();
   params.set("action", "TEMPLATE");
   params.set("text", summary ? summary.value : "Untitled event");
-  if (startValue && endValue) params.set("dates", `${startValue}/${endValue}`);
-  if (description && description.value) params.set("details", description.value);
-  if (location && location.value) params.set("location", location.value);
-  if (attendees.length > 0) params.set("add", attendees.join(","));
-  if (timezone && startValue && !startValue.endsWith("Z")) params.set("ctz", timezone);
-  if (rrule && rrule.value) params.set("recur", `RRULE:${rrule.value}`);
+  if (startValue && endValue) {params.set("dates", `${startValue}/${endValue}`);}
+  if (description && description.value) {params.set("details", description.value);}
+  if (location && location.value) {params.set("location", location.value);}
+  if (attendees.length > 0) {params.set("add", attendees.join(","));}
+  if (timezone && startValue && !startValue.endsWith("Z")) {params.set("ctz", timezone);}
+  if (rrule && rrule.value) {params.set("recur", `RRULE:${rrule.value}`);}
 
   return {
-    title: summary ? summary.value : "Untitled event",
-    start: startValue,
-    end: endValue,
-    timezone,
     attendees,
+    end: endValue,
+    start: startValue,
+    timezone,
+    title: summary ? summary.value : "Untitled event",
     url: `https://calendar.google.com/calendar/render?${params.toString()}`,
   };
 }
 
 export function icsTextToGoogleCalendarUrl(text: string): IcsToGoogleCalendarUrlResult {
   if (!text.trim()) {
-    return { status: "error", message: "No ICS text provided." };
+    return { message: "No ICS text provided.", status: "error" };
   }
 
   const event = parseIcsEvents(text)[0];
   if (!event) {
-    return { status: "error", message: "No VEVENT found in this ICS file." };
+    return { message: "No VEVENT found in this ICS file.", status: "error" };
   }
 
   return { status: "ok", url: eventToGoogleCalendarUrl(event).url };

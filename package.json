@@ -14,23 +14,24 @@
     "typecheck": "tsgo --noEmit"
   },
   "dependencies": {
-    "@sentry/cloudflare": "^10.57.0",
-    "@typescript/native-preview": "7.0.0-dev.20260523.1",
-    "feed": "^5.2.1",
-    "hono": "^4.12.25",
+    "@sentry/cloudflare": "^10.71.0",
+    "@typescript/native-preview": "7.0.0-dev.20260707.2",
+    "feed": "^6.0.0",
+    "hono": "^4.13.5",
     "valibot": "^1.4.2",
     "xml2js": "^0.6.2"
   },
   "devDependencies": {
     "@cloudflare/vitest-pool-workers": "^0.22.0",
-    "@oxlint/plugins": "^1.78.0",
-    "@sentry/cli": "^2.58.6",
-    "@types/node": "^25.9.3",
+    "@nkzw/oxlint-config": "^1.3.0",
+    "@oxlint/plugins": "^1.80.0",
+    "@sentry/cli": "^3.6.2",
+    "@types/node": "^26.4.0",
     "@types/xml2js": "^0.4.14",
-    "localflare": "^0.3.1",
-    "oxlint": "^1.78.0",
-    "vite": "^7.3.5",
+    "localflare": "^0.5.0",
+    "oxlint": "^1.80.0",
+    "vite": "^8.2.2",
     "vitest": "^4.1.11",
-    "wrangler": "^4.99.0"
+    "wrangler": "^4.127.0"
   }
 }

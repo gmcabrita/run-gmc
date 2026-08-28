@@ -3,88 +3,87 @@ import { Feed } from "feed";
 import type { RSSData } from "@rss/types";
 import { stripInvalidXmlChars, type ScraperContext } from "@rss/common";
 
-import * as adAgeNews from "./scrapers/adAgeNews";
-import * as adsOfTheWorldBlog from "./scrapers/adsOfTheWorldBlog";
-import * as agendaLx from "./scrapers/agendaLx";
-import * as agendaLxPdf from "./scrapers/agendaLxPdf";
-import * as antibotBlog from "./scrapers/antibotBlog";
-import * as autoRegulacaoPublicitariaDeliberacoes from "./scrapers/autoRegulacaoPublicitariaDeliberacoes";
-import * as azerpasBlog from "./scrapers/azerpasBlog";
+import { get as adAgeNews } from "./scrapers/adAgeNews";
+import { get as adsOfTheWorldBlog } from "./scrapers/adsOfTheWorldBlog";
+import { cacheAgendaLx } from "./scrapers/agendaLx";
+import { get as agendaLxPdf } from "./scrapers/agendaLxPdf";
+import { get as antibotBlog } from "./scrapers/antibotBlog";
+import { get as autoRegulacaoPublicitariaDeliberacoes } from "./scrapers/autoRegulacaoPublicitariaDeliberacoes";
+import { get as azerpasBlog } from "./scrapers/azerpasBlog";
 
 export { cacheAgendaLx } from "./scrapers/agendaLx";
-import * as anteEstreias from "./scrapers/anteEstreias";
-import * as ccbEventos from "./scrapers/ccbEventos";
-import * as cinecartaz from "./scrapers/cinecartaz";
-import * as ccpjDestaques from "./scrapers/ccpjDestaques";
-import * as cmJornalTvMedia from "./scrapers/cmJornalTvMedia";
-import * as culturgestEventos from "./scrapers/culturgestEventos";
-import * as dansvetlovArticles from "./scrapers/dansvetlovArticles";
-import * as dentsuNewsReleases from "./scrapers/dentsuNewsReleases";
-import * as discordQuests from "./scrapers/discordQuests";
-import * as cinemateca from "./scrapers/cinemateca";
-import * as cinemaxRtpPassatempos from "./scrapers/cinemaxRtpPassatempos";
-import * as epicFreeDesktopGames from "./scrapers/epicFreeDesktopGames";
-import * as epicFreeMobileGames from "./scrapers/epicFreeMobileGames";
-import * as ercDeliberacoes from "./scrapers/ercDeliberacoes";
-import * as ercNoticias from "./scrapers/ercNoticias";
-import * as expressoMedia from "./scrapers/expressoMedia";
-import * as filmspotEstreias from "./scrapers/filmspotEstreias";
-import * as ftMedia from "./scrapers/ftMedia";
-import * as fundoAmbiental from "./scrapers/fundoAmbiental";
-import * as imagensDeMarca from "./scrapers/imagensDeMarca";
-import * as impresaComunicados from "./scrapers/impresaComunicados";
-import * as impresaInvestidores from "./scrapers/impresaInvestidores";
-import * as informacaoLisboa from "./scrapers/informacaoLisboa";
-import * as informacaoLisboaAgenda from "./scrapers/informacaoLisboaAgenda";
-import * as jeremyEvansBlog from "./scrapers/jeremyEvansBlog";
-import * as jnMedia from "./scrapers/jnMedia";
-import * as jornalDeNegociosMedia from "./scrapers/jornalDeNegociosMedia";
-import * as kernelShBlog from "./scrapers/kernelShBlog";
-import * as kirShatrovBlog from "./scrapers/kirShatrovBlog";
-import * as kitLangtonBlog from "./scrapers/kitLangtonBlog";
-import * as lbbonlineInternational from "./scrapers/lbbonlineInternational";
-import * as marktestPodScope from "./scrapers/marktestPodScope";
-import * as mfeMediaForEuropeDocuments from "./scrapers/mfeMediaForEuropeDocuments";
-import * as museuDoOrienteCinema from "./scrapers/museuDoOrienteCinema";
-import * as nimas from "./scrapers/nimas";
-import * as observadorMedia from "./scrapers/observadorMedia";
-import * as peetBlog from "./scrapers/peetBlog";
-import * as primeFreeGames from "./scrapers/primeFreeGames";
-import * as publicoMedia from "./scrapers/publicoMedia";
-import * as reutersMediaTelecom from "./scrapers/reutersMediaTelecom";
-import * as rtpConselhoGeralIndependente from "./scrapers/rtpConselhoGeralIndependente";
-import * as rtpInformacaoAnual from "./scrapers/rtpInformacaoAnual";
-import * as rtpPlanoAtividadeOrcamento from "./scrapers/rtpPlanoAtividadeOrcamento";
-import * as rtpRelatorioServicoPublico from "./scrapers/rtpRelatorioServicoPublico";
-import * as sqliteNews from "./scrapers/sqliteNews";
-import * as theDrumLatest from "./scrapers/theDrumLatest";
-import * as bbcMediaCentreLatestNews from "./scrapers/bbcMediaCentreLatestNews";
-import * as berserk from "./scrapers/berserk";
-import * as brokenBrowserBlog from "./scrapers/brokenBrowserBlog";
-import * as uciPromocoes from "./scrapers/uciPromocoes";
-import * as viralAgendaAlmada from "./scrapers/viralAgendaAlmada";
-import * as waltDisneyPressReleases from "./scrapers/waltDisneyPressReleases";
-import * as wsjBusinessMedia from "./scrapers/wsjBusinessMedia";
+import { get as anteEstreias } from "./scrapers/anteEstreias";
+import { get as ccbEventos } from "./scrapers/ccbEventos";
+import { get as cinecartaz } from "./scrapers/cinecartaz";
+import { get as ccpjDestaques } from "./scrapers/ccpjDestaques";
+import { get as cmJornalTvMedia } from "./scrapers/cmJornalTvMedia";
+import { get as culturgestEventos } from "./scrapers/culturgestEventos";
+import { get as dansvetlovArticles } from "./scrapers/dansvetlovArticles";
+import { get as dentsuNewsReleases } from "./scrapers/dentsuNewsReleases";
+import { get as discordQuests } from "./scrapers/discordQuests";
+import { get as cinemateca } from "./scrapers/cinemateca";
+import { get as cinemaxRtpPassatempos } from "./scrapers/cinemaxRtpPassatempos";
+import { get as epicFreeDesktopGames } from "./scrapers/epicFreeDesktopGames";
+import { getAndroid as epicFreeAndroidGames, getiOS as epicFreeiOSGames } from "./scrapers/epicFreeMobileGames";
+import { get as ercDeliberacoes } from "./scrapers/ercDeliberacoes";
+import { get as ercNoticias } from "./scrapers/ercNoticias";
+import { get as expressoMedia } from "./scrapers/expressoMedia";
+import { get as filmspotEstreias } from "./scrapers/filmspotEstreias";
+import { get as ftMedia } from "./scrapers/ftMedia";
+import { get as fundoAmbiental } from "./scrapers/fundoAmbiental";
+import { get as imagensDeMarca } from "./scrapers/imagensDeMarca";
+import { get as impresaComunicados } from "./scrapers/impresaComunicados";
+import { get as impresaInvestidores } from "./scrapers/impresaInvestidores";
+import { get as informacaoLisboa } from "./scrapers/informacaoLisboa";
+import { get as informacaoLisboaAgenda } from "./scrapers/informacaoLisboaAgenda";
+import { get as jeremyEvansBlog } from "./scrapers/jeremyEvansBlog";
+import { get as jnMedia } from "./scrapers/jnMedia";
+import { get as jornalDeNegociosMedia } from "./scrapers/jornalDeNegociosMedia";
+import { get as kernelShBlog } from "./scrapers/kernelShBlog";
+import { get as kirShatrovBlog } from "./scrapers/kirShatrovBlog";
+import { get as kitLangtonBlog } from "./scrapers/kitLangtonBlog";
+import { get as lbbonlineInternational } from "./scrapers/lbbonlineInternational";
+import { get as marktestPodScope } from "./scrapers/marktestPodScope";
+import { get as mfeMediaForEuropeDocuments } from "./scrapers/mfeMediaForEuropeDocuments";
+import { get as museuDoOrienteCinema } from "./scrapers/museuDoOrienteCinema";
+import { get as nimas } from "./scrapers/nimas";
+import { get as observadorMedia } from "./scrapers/observadorMedia";
+import { get as peetBlog } from "./scrapers/peetBlog";
+import { get as primeFreeGames } from "./scrapers/primeFreeGames";
+import { get as publicoMedia } from "./scrapers/publicoMedia";
+import { get as reutersMediaTelecom } from "./scrapers/reutersMediaTelecom";
+import { get as rtpConselhoGeralIndependente } from "./scrapers/rtpConselhoGeralIndependente";
+import { get as rtpInformacaoAnual } from "./scrapers/rtpInformacaoAnual";
+import { get as rtpPlanoAtividadeOrcamento } from "./scrapers/rtpPlanoAtividadeOrcamento";
+import { get as rtpRelatorioServicoPublico } from "./scrapers/rtpRelatorioServicoPublico";
+import { get as sqliteNews } from "./scrapers/sqliteNews";
+import { get as theDrumLatest } from "./scrapers/theDrumLatest";
+import { get as bbcMediaCentreLatestNews } from "./scrapers/bbcMediaCentreLatestNews";
+import { get as berserk } from "./scrapers/berserk";
+import { get as brokenBrowserBlog } from "./scrapers/brokenBrowserBlog";
+import { get as uciPromocoes } from "./scrapers/uciPromocoes";
+import { get as viralAgendaAlmada } from "./scrapers/viralAgendaAlmada";
+import { get as waltDisneyPressReleases } from "./scrapers/waltDisneyPressReleases";
+import { get as wsjBusinessMedia } from "./scrapers/wsjBusinessMedia";
 
-type ScraperModule = {
-  get: (ctx: ScraperContext) => Promise<RSSData>;
-};
+type Scraper = (ctx: ScraperContext) => Promise<RSSData>;
 
 const scrapers = {
   adAgeNews,
   adsOfTheWorldBlog,
   agendaLxPdf,
+  anteEstreias,
   antibotBlog,
   autoRegulacaoPublicitariaDeliberacoes,
-  anteEstreias,
   azerpasBlog,
   bbcMediaCentreLatestNews,
   berserk,
+  brokenBrowserBlog,
   ccbEventos,
+  ccpjDestaques,
   cinecartaz,
   cinemateca,
   cinemaxRtpPassatempos,
-  ccpjDestaques,
   cmJornalTvMedia,
   culturgestEventos,
   dansvetlovArticles,
@@ -124,42 +123,41 @@ const scrapers = {
   rtpRelatorioServicoPublico,
   sqliteNews,
   theDrumLatest,
-  brokenBrowserBlog,
   uciPromocoes,
   viralAgendaAlmada,
   waltDisneyPressReleases,
   wsjBusinessMedia,
-} satisfies Record<string, ScraperModule>;
+} satisfies Record<string, Scraper>;
 
 // Special handlers for mobile games (different function names)
 const mobileGameScrapers = {
-  epicFreeiOSGames: epicFreeMobileGames.getiOS,
-  epicFreeAndroidGames: epicFreeMobileGames.getAndroid,
+  epicFreeAndroidGames,
+  epicFreeiOSGames,
 };
 
 function createRssHandler(getFn: (ctx: ScraperContext) => Promise<RSSData>) {
   return async (ctx: ScraperContext) => {
-    const { title, description, id, link, language, entries } = await getFn(ctx);
+    const { description, entries, id, language, link, title } = await getFn(ctx);
 
     const now = new Date();
     const feed = new Feed({
-      title,
+      copyright: "",
       description,
       id,
-      link,
       language,
-      copyright: "",
+      link,
+      title,
       updated: now,
     });
 
     entries.forEach((entry) => {
       feed.addItem({
-        id: entry.id,
-        title: entry.title,
-        link: entry.link,
         content:
           `<p>${entry.text}</p><a href="${entry.link}">${entry.link}</a>${entry.imageURL ? `<p><img src="${entry.imageURL}" alt="${entry.title}" /></p>` : ""}`.trim(),
         date: entry.datetime || now,
+        id: entry.id,
+        link: entry.link,
+        title: entry.title,
       });
     });
 
@@ -174,7 +172,7 @@ function createRssHandler(getFn: (ctx: ScraperContext) => Promise<RSSData>) {
 export function addScrapedRssEndpoints(app: Hono<{ Bindings: CloudflareBindings }>) {
   // Standard scrapers
   for (const [name, scraper] of Object.entries(scrapers)) {
-    app.get(`/rss.${name}`, createRssHandler(scraper.get));
+    app.get(`/rss.${name}`, createRssHandler(scraper));
   }
 
   // Mobile game scrapers (different function names)
@@ -197,7 +195,7 @@ export function addScrapedRssEndpoints(app: Hono<{ Bindings: CloudflareBindings 
 
   // AgendaLx cache refresh endpoint
   app.get("/rss.cacheAgendaLx", async (ctx) => {
-    const rss2 = await agendaLx.cacheAgendaLx(ctx.env);
+    const rss2 = await cacheAgendaLx(ctx.env);
 
     ctx.header("Content-Type", "application/rss+xml");
     ctx.header("Cache-Control", "public, max-age=600");

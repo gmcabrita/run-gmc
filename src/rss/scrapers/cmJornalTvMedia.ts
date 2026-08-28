@@ -1,6 +1,12 @@
 import { USERAGENT, consume, isValidRSSEntry, type ScraperContext } from "@rss/common";
 import type { RSSData, RSSEntry } from "@rss/types";
-import * as v from "valibot";
+import {
+  boolean,
+  fallback,
+  looseObject,
+  safeParse,
+  string,
+} from "valibot";
 
 const SITE_ORIGIN = "https://www.cmjornal.pt";
 const SECTION_PATH = "/tv-media";
@@ -34,13 +40,13 @@ interface DraftEntry extends RSSEntry {
 }
 
 interface LoadMorePage {
-  entries: RSSEntry[];
+  entries: Array<RSSEntry>;
   nextPageURL?: string;
 }
 
 interface ParsedPageResult {
-  page: LoadMorePage;
   isPartial: boolean;
+  page: LoadMorePage;
 }
 
 const HTML_ENTITY_BY_NAME = new Map([
@@ -51,13 +57,13 @@ const HTML_ENTITY_BY_NAME = new Map([
   ["nbsp", " "],
   ["quot", '"'],
 ]);
-const RetryableFailureSchema = v.looseObject({
-  retryable: v.fallback(v.boolean(), false),
-  message: v.fallback(v.string(), ""),
+const RetryableFailureSchema = looseObject({
+  message: fallback(string(), ""),
+  retryable: fallback(boolean(), false),
 });
 
 function decodeHtmlEntities(text: string): string {
-  return text.replace(/&(#x[0-9a-f]+|#\d+|[a-z]+);/gi, (match, entity) => {
+  return text.replaceAll(/&(#x[0-9a-f]+|#\d+|[a-z]+);/gi, (match, entity) => {
     const normalizedEntity = entity.toLowerCase();
     if (normalizedEntity.startsWith("#x")) {
       const codePoint = Number.parseInt(normalizedEntity.slice(2), 16);
@@ -74,18 +80,18 @@ function decodeHtmlEntities(text: string): string {
 }
 
 function normalizeWhitespace(text: string): string {
-  return decodeHtmlEntities(text).replace(/\s+/g, " ").trim();
+  return decodeHtmlEntities(text).replaceAll(/\s+/g, " ").trim();
 }
 
 function normalizeToken(value: string): string {
   return normalizeWhitespace(value)
     .toLowerCase()
     .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "");
+    .replaceAll(/[\u0300-\u036f]/g, "");
 }
 
-function getLastEntry(entries: DraftEntry[]): DraftEntry | undefined {
-  return entries[entries.length - 1];
+function getLastEntry(entries: Array<DraftEntry>): DraftEntry | undefined {
+  return entries.at(-1);
 }
 
 function normalizeAjaxUrl(value: string): string {
@@ -167,14 +173,14 @@ async function fetchPage(url: string, fetchFn: FetchFn): Promise<Response> {
   return response;
 }
 
-function buildFeed(entries: RSSEntry[]): RSSData {
+function buildFeed(entries: Array<RSSEntry>): RSSData {
   return {
+    description: "CM Jornal TV Media",
+    entries,
     id: BASE_URL,
+    language: "pt",
     link: BASE_URL,
     title: "CM Jornal - TV Media",
-    description: "CM Jornal TV Media",
-    language: "pt",
-    entries,
   };
 }
 
@@ -186,7 +192,7 @@ async function parsePageWithFallback(
   response: Response,
   fallbackNextPageURL?: string,
 ): Promise<ParsedPageResult> {
-  const draftEntries: DraftEntry[] = [];
+  const draftEntries: Array<DraftEntry> = [];
   let nextPageURL: string | undefined;
   let isPartial = false;
 
@@ -196,9 +202,9 @@ async function parsePageWithFallback(
         draftEntries.push({
           id: "",
           link: "",
-          title: "",
-          text: "",
           publishedAt: "",
+          text: "",
+          title: "",
         });
       },
     })
@@ -267,7 +273,7 @@ async function parsePageWithFallback(
   try {
     await consume(body);
   } catch (error) {
-    const failureResult = v.safeParse(RetryableFailureSchema, error);
+    const failureResult = safeParse(RetryableFailureSchema, error);
     const isRetryable =
       failureResult.success &&
       (failureResult.output.retryable ||
@@ -292,12 +298,12 @@ async function parsePageWithFallback(
           const text = normalizeWhitespace(entry.text ?? "") || title;
 
           return {
-            id: entry.id,
-            link: entry.link,
-            title,
-            text,
             datetime: parsePtDateTime(entry.publishedAt),
+            id: entry.id,
             imageURL: entry.imageURL,
+            link: entry.link,
+            text,
+            title,
           };
         })
         .filter(isValidRSSEntry),
@@ -322,7 +328,7 @@ async function loadPage(url: string, fetchFn: FetchFn): Promise<LoadMorePage> {
         return result.page;
       }
     } catch (error) {
-      const failureResult = v.safeParse(RetryableFailureSchema, error);
+      const failureResult = safeParse(RetryableFailureSchema, error);
       const isRetryable =
         failureResult.success &&
         (failureResult.output.retryable ||
@@ -349,7 +355,7 @@ async function loadPage(url: string, fetchFn: FetchFn): Promise<LoadMorePage> {
 }
 
 export async function scrapeFirstTwoPages(fetchFn: FetchFn): Promise<RSSData> {
-  const entries: RSSEntry[] = [];
+  const entries: Array<RSSEntry> = [];
   const seenIds = new Set<string>();
   let currentPageURL: string | undefined = FIRST_PAGE_URL;
 

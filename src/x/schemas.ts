@@ -1,64 +1,73 @@
-import * as v from "valibot";
+import {
+  array,
+  boolean,
+  looseObject,
+  nullish,
+  optional,
+  string,
+  unknown,
+  type InferOutput,
+} from "valibot";
 
-const XUserLegacySchema = v.looseObject({
-  screen_name: v.string(),
-  name: v.string(),
-  description: v.nullish(v.string()),
-  profile_image_url_https: v.nullish(v.string()),
-  protected: v.nullish(v.boolean()),
+const XUserLegacySchema = looseObject({
+  description: nullish(string()),
+  name: string(),
+  profile_image_url_https: nullish(string()),
+  protected: nullish(boolean()),
+  screen_name: string(),
 });
 
-const XUserResultSchema = v.looseObject({
-  rest_id: v.string(),
+const XUserResultSchema = looseObject({
   legacy: XUserLegacySchema,
+  rest_id: string(),
 });
 
-export const XUserByScreenNameResponseSchema = v.looseObject({
-  data: v.looseObject({
-    user: v.looseObject({
+export const XUserByScreenNameResponseSchema = looseObject({
+  data: looseObject({
+    user: looseObject({
       result: XUserResultSchema,
     }),
   }),
 });
 
-const XPostLegacySchema = v.looseObject({
-  id_str: v.string(),
-  full_text: v.string(),
-  created_at: v.string(),
+const XPostLegacySchema = looseObject({
+  created_at: string(),
+  full_text: string(),
+  id_str: string(),
 });
 
-const XPostCoreSchema = v.looseObject({
-  user_results: v.looseObject({
-    result: v.looseObject({
+const XPostCoreSchema = looseObject({
+  user_results: looseObject({
+    result: looseObject({
       legacy: XUserLegacySchema,
     }),
   }),
 });
 
-const XPostSchema = v.looseObject({
-  legacy: v.nullish(XPostLegacySchema),
-  core: v.nullish(XPostCoreSchema),
+const XPostSchema = looseObject({
+  core: nullish(XPostCoreSchema),
+  legacy: nullish(XPostLegacySchema),
 });
 
-const XTweetResultSchema = v.looseObject({
-  result: v.nullish(XPostSchema),
+const XTweetResultSchema = looseObject({
+  result: nullish(XPostSchema),
 });
 
-const XItemContentSchema = v.looseObject({
-  tweet_results: v.nullish(XTweetResultSchema),
-  promotedMetadata: v.optional(v.unknown()),
+const XItemContentSchema = looseObject({
+  promotedMetadata: optional(unknown()),
+  tweet_results: nullish(XTweetResultSchema),
 });
 
-const XTimelineEntrySchema = v.looseObject({
-  content: v.nullish(
-    v.looseObject({
-      itemContent: v.nullish(XItemContentSchema),
-      items: v.nullish(
-        v.array(
-          v.looseObject({
-            item: v.nullish(
-              v.looseObject({
-                itemContent: v.nullish(XItemContentSchema),
+const XTimelineEntrySchema = looseObject({
+  content: nullish(
+    looseObject({
+      itemContent: nullish(XItemContentSchema),
+      items: nullish(
+        array(
+          looseObject({
+            item: nullish(
+              looseObject({
+                itemContent: nullish(XItemContentSchema),
               }),
             ),
           }),
@@ -68,16 +77,16 @@ const XTimelineEntrySchema = v.looseObject({
   ),
 });
 
-export const XUserTweetsResponseSchema = v.looseObject({
-  data: v.looseObject({
-    user: v.looseObject({
-      result: v.looseObject({
-        timeline_v2: v.nullish(
-          v.looseObject({
-            timeline: v.looseObject({
-              instructions: v.array(
-                v.looseObject({
-                  entries: v.nullish(v.array(XTimelineEntrySchema)),
+export const XUserTweetsResponseSchema = looseObject({
+  data: looseObject({
+    user: looseObject({
+      result: looseObject({
+        timeline_v2: nullish(
+          looseObject({
+            timeline: looseObject({
+              instructions: array(
+                looseObject({
+                  entries: nullish(array(XTimelineEntrySchema)),
                 }),
               ),
             }),
@@ -88,12 +97,12 @@ export const XUserTweetsResponseSchema = v.looseObject({
   }),
 });
 
-export const XOEmbedResponseSchema = v.looseObject({
-  html: v.string(),
+export const XOEmbedResponseSchema = looseObject({
+  html: string(),
 });
 
-export type XPost = v.InferOutput<typeof XPostSchema>;
-export type XUserByScreenNameResponse = v.InferOutput<
+export type XPost = InferOutput<typeof XPostSchema>;
+export type XUserByScreenNameResponse = InferOutput<
   typeof XUserByScreenNameResponseSchema
 >;
-export type XUserTweetsResponse = v.InferOutput<typeof XUserTweetsResponseSchema>;
+export type XUserTweetsResponse = InferOutput<typeof XUserTweetsResponseSchema>;

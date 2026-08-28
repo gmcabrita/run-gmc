@@ -12,51 +12,51 @@ export interface RouteLike {
 }
 
 export interface RssHealthcheckResult {
-  url: string;
-  statusCode: number;
   passed: boolean;
+  statusCode: number;
+  url: string;
 }
 
 export interface RssHealthcheckFetchResult {
-  statusCode: number;
-  ok: boolean;
   body: string;
+  ok: boolean;
+  statusCode: number;
 }
 
 export type FetchRssHealthcheckUrl = (url: string) => Promise<RssHealthcheckFetchResult>;
 
 export interface RssHealthcheckFailure {
-  url: string;
   statusCode: number;
+  url: string;
 }
 
 export interface RssHealthcheckResponse {
+  failures: Array<RssHealthcheckFailure>;
   summary: {
-    passed: number;
     failed: number;
+    passed: number;
   };
-  failures: RssHealthcheckFailure[];
 }
 
 export interface DiscordEmbedField {
+  inline?: boolean;
   name: string;
   value: string;
-  inline?: boolean;
 }
 
 export interface DiscordEmbed {
-  title: string;
-  description?: string;
   color: number;
-  fields?: DiscordEmbedField[];
+  description?: string;
+  fields?: Array<DiscordEmbedField>;
+  title: string;
 }
 
 export interface DiscordWebhookPayload {
-  embeds: DiscordEmbed[];
+  embeds: Array<DiscordEmbed>;
 }
 
-const discordFailureColor = 0xff3b30;
-const discordPassColor = 0x34c759;
+const discordFailureColor = 0xff_3b_30;
+const discordPassColor = 0x34_c7_59;
 const discordEmbedFieldLimit = 25;
 const discordEmbedLimit = 10;
 
@@ -80,17 +80,17 @@ export function getDiscordHealthcheckFailurePayload(
   const visibleFailures = response.failures.slice(0, discordEmbedFieldLimit * discordEmbedLimit);
   const overflowCount = response.failures.length - visibleFailures.length;
   const fields = visibleFailures.map(formatRssHealthcheckFailureField);
-  const embeds: DiscordEmbed[] = [];
+  const embeds: Array<DiscordEmbed> = [];
 
   for (let index = 0; index < fields.length; index += discordEmbedFieldLimit) {
     const isFirstEmbed = index === 0;
     embeds.push({
-      title: isFirstEmbed ? "run.gmc healthcheck failed" : "More healthcheck failures",
+      color: discordFailureColor,
       description: isFirstEmbed
         ? formatHealthcheckSummary(response, overflowCount)
         : undefined,
-      color: discordFailureColor,
       fields: fields.slice(index, index + discordEmbedFieldLimit),
+      title: isFirstEmbed ? "run.gmc healthcheck failed" : "More healthcheck failures",
     });
   }
 
@@ -103,9 +103,9 @@ export function getDiscordHealthcheckErrorPayload(reason: string): DiscordWebhoo
   return {
     embeds: [
       {
-        title: "run.gmc healthcheck failed",
-        description: reason,
         color: discordFailureColor,
+        description: reason,
+        title: "run.gmc healthcheck failed",
       },
     ],
   };
@@ -117,9 +117,9 @@ export function getDiscordHealthcheckPassPayload(
   return {
     embeds: [
       {
-        title: "run.gmc healthcheck passed",
-        description: `${response.summary.passed} checks passed`,
         color: discordPassColor,
+        description: `${response.summary.passed} checks passed`,
+        title: "run.gmc healthcheck passed",
       },
     ],
   };
@@ -138,9 +138,9 @@ function formatHealthcheckSummary(response: RssHealthcheckResponse, overflowCoun
 
 function formatRssHealthcheckFailureField(failure: RssHealthcheckFailure): DiscordEmbedField {
   return {
+    inline: false,
     name: `${failure.statusCode} ${getUrlPathname(failure.url)}`,
     value: `<${failure.url}>`,
-    inline: false,
   };
 }
 
@@ -152,7 +152,7 @@ function getUrlPathname(url: string): string {
   }
 }
 
-export function getRssHealthcheckPaths(routes: ReadonlyArray<RouteLike>): string[] {
+export function getRssHealthcheckPaths(routes: ReadonlyArray<RouteLike>): Array<string> {
   return [
     ...new Set(
       routes
@@ -183,15 +183,15 @@ export async function runRssHealthcheck(
         const response = await fetchUrl(url);
 
         return {
-          url,
-          statusCode: response.statusCode,
           passed: response.ok && rssFeedHasAtLeastOneEntry(response.body),
+          statusCode: response.statusCode,
+          url,
         };
       } catch {
         return {
-          url,
-          statusCode: 500,
           passed: false,
+          statusCode: 500,
+          url,
         };
       }
     }),
@@ -200,15 +200,15 @@ export async function runRssHealthcheck(
         const response = await fetchUrl(url);
 
         return {
-          url,
-          statusCode: response.statusCode,
           passed: response.ok,
+          statusCode: response.statusCode,
+          url,
         };
       } catch {
         return {
-          url,
-          statusCode: 500,
           passed: false,
+          statusCode: 500,
+          url,
         };
       }
     }),
@@ -226,14 +226,15 @@ export function summarizeRssHealthcheck(
     .filter((result) => !result.passed)
     .map((result) => ({
       url: result.url,
+      // Keep the established JSON field order used in healthcheck messages.
       statusCode: result.statusCode,
     }));
 
   return {
-    summary: {
-      passed: results.length - failures.length,
-      failed: failures.length,
-    },
     failures,
+    summary: {
+      failed: failures.length,
+      passed: results.length - failures.length,
+    },
   };
 }

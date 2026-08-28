@@ -13,14 +13,14 @@ const PT_WEEKDAYS = [
 ];
 
 interface CinematecaEntry extends RSSEntry {
-  infoBiblio: string[];
+  infoBiblio: Array<string>;
   infoDate: string;
 }
 
 function normalizeWS(input: string): string {
   return input
-    .replace(/\u00A0/g, " ")
-    .replace(/\s+/g, " ")
+    .replaceAll('\u00A0', " ")
+    .replaceAll(/\s+/g, " ")
     .trim();
 }
 
@@ -30,8 +30,8 @@ function getPTWeekday(date: Date): string {
 
 function parseDateTimeStrCinemateca(dateTimeStr: string): Date {
   const [datePartRaw, timePartRaw = ""] = dateTimeStr.split(",");
-  const dateStr = datePartRaw.replace(/\D/g, "");
-  const timeStr = timePartRaw.replace(/\D/g, "").padStart(4, "0");
+  const dateStr = datePartRaw.replaceAll(/\D/g, "");
+  const timeStr = timePartRaw.replaceAll(/\D/g, "").padStart(4, "0");
   return new Date(
     `${dateStr.slice(4, 8)}-${dateStr.slice(2, 4)}-${dateStr.slice(0, 2)} ${timeStr.slice(0, 2)}:${timeStr.slice(2, 4)}`,
   );
@@ -46,24 +46,24 @@ function* generateNextDates(count: number = 50): Generator<string> {
 }
 
 export async function parse(response: Response): Promise<RSSData> {
-  const entries: CinematecaEntry[] = [];
+  const entries: Array<CinematecaEntry> = [];
   let infoTitleCount = 0;
 
   const rewriter = new HTMLRewriter()
     .on(".sectionLayoutProgramLeft a[href*='id=']", {
       element(el) {
         const href = el.getAttribute("href");
-        if (!href) return;
+        if (!href) {return;}
 
         infoTitleCount = 0;
         const link = new URL(href, BASE_URL).href;
         entries.push({
           id: link,
-          link,
-          title: "",
-          text: "",
           infoBiblio: [],
           infoDate: "",
+          link,
+          text: "",
+          title: "",
         });
       },
     })
@@ -74,7 +74,7 @@ export async function parse(response: Response): Promise<RSSData> {
           infoTitleCount++;
         },
         text(text) {
-          const lastEntry = entries[entries.length - 1];
+          const lastEntry = entries.at(-1);
           // Only capture text from the first .infoTitle (original title)
           if (lastEntry && text.text && infoTitleCount === 1) {
             lastEntry.title = (lastEntry.title || "") + text.text;
@@ -84,13 +84,13 @@ export async function parse(response: Response): Promise<RSSData> {
     )
     .on(".sectionLayoutProgramLeft a[href*='id='] .infoBiblio", {
       element() {
-        const lastEntry = entries[entries.length - 1];
+        const lastEntry = entries.at(-1);
         if (lastEntry) {
           lastEntry.infoBiblio.push("");
         }
       },
       text(text) {
-        const lastEntry = entries[entries.length - 1];
+        const lastEntry = entries.at(-1);
         if (lastEntry && text.text && lastEntry.infoBiblio.length > 0) {
           lastEntry.infoBiblio[lastEntry.infoBiblio.length - 1] += text.text;
         }
@@ -98,7 +98,7 @@ export async function parse(response: Response): Promise<RSSData> {
     })
     .on(".sectionLayoutProgramLeft a[href*='id='] .infoDate", {
       text(text) {
-        const lastEntry = entries[entries.length - 1];
+        const lastEntry = entries.at(-1);
         if (lastEntry && text.text) {
           lastEntry.infoDate = (lastEntry.infoDate || "") + text.text;
         }
@@ -110,7 +110,7 @@ export async function parse(response: Response): Promise<RSSData> {
     await consume(transformed.body);
   }
 
-  const rssEntries: RSSEntry[] = entries.map((entry) => {
+  const rssEntries: Array<RSSEntry> = entries.map((entry) => {
     const infoBiblio = entry.infoBiblio.map(normalizeWS).filter(Boolean);
     const director = infoBiblio[1] ?? "";
     const extra = infoBiblio[0] ?? "";
@@ -128,27 +128,27 @@ export async function parse(response: Response): Promise<RSSData> {
     const text = `${weekday}, ${dateTimeStr}<br>${extra}<br>${extra2}<br>${room}<br><a href="${letterboxd}">Letterboxd Search</a>`;
 
     return {
+      datetime: dateTime,
       id: entry.id,
       link: entry.link,
-      title: fullTitle,
       text,
-      datetime: dateTime,
+      title: fullTitle,
     };
   });
 
   return {
+    description: "Programação da Cinemateca",
+    entries: rssEntries.filter(isValidRSSEntry),
     id: BASE_URL,
+    language: "pt",
     link: BASE_URL,
     title: "Programação Cinemateca",
-    description: "Programação da Cinemateca",
-    language: "pt",
-    entries: rssEntries.filter(isValidRSSEntry),
   };
 }
 
 export async function get(_ctx: ScraperContext): Promise<RSSData> {
   const scrapeUrls = Array.from(generateNextDates()).map((date) => `${BASE_URL}?date=${date}`);
-  const allEntries: RSSEntry[] = [];
+  const allEntries: Array<RSSEntry> = [];
 
   const MAX_IN_FLIGHT = 10;
   for (let i = 0; i < scrapeUrls.length; i += MAX_IN_FLIGHT) {
@@ -161,13 +161,13 @@ export async function get(_ctx: ScraperContext): Promise<RSSData> {
 
         try {
           return await parse(response);
-        } catch (err) {
+        } catch (error) {
           try {
             await response.body?.cancel();
           } catch {
             // ignore
           }
-          throw err;
+          throw error;
         }
       }),
     );
@@ -178,11 +178,11 @@ export async function get(_ctx: ScraperContext): Promise<RSSData> {
   }
 
   return {
+    description: "Programação da Cinemateca",
+    entries: allEntries,
     id: BASE_URL,
+    language: "pt",
     link: BASE_URL,
     title: "Programação Cinemateca",
-    description: "Programação da Cinemateca",
-    language: "pt",
-    entries: allEntries,
   };
 }

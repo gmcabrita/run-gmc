@@ -5,7 +5,7 @@ import { addIcs2GcalEndpoint, icsTextToGoogleCalendarUrl } from "./index";
 function googleUrlFrom(text: string): URL {
   const result = icsTextToGoogleCalendarUrl(text);
   expect(result.status).toBe("ok");
-  if (result.status !== "ok") throw new Error(result.message);
+  if (result.status !== "ok") {throw new Error(result.message);}
   return new URL(result.url);
 }
 
@@ -103,15 +103,15 @@ END:VCALENDAR`);
 
   it("returns an error for empty input", () => {
     expect(icsTextToGoogleCalendarUrl("  ")).toEqual({
-      status: "error",
       message: "No ICS text provided.",
+      status: "error",
     });
   });
 
   it("returns an error when there are no events", () => {
     expect(icsTextToGoogleCalendarUrl("BEGIN:VCALENDAR\nEND:VCALENDAR")).toEqual({
-      status: "error",
       message: "No VEVENT found in this ICS file.",
+      status: "error",
     });
   });
 });
@@ -122,7 +122,6 @@ describe("addIcs2GcalEndpoint", () => {
     addIcs2GcalEndpoint(app);
 
     const response = await app.request("/ics2gcal", {
-      method: "POST",
       body: `BEGIN:VCALENDAR
 BEGIN:VEVENT
 SUMMARY:Coffee
@@ -130,6 +129,7 @@ DTSTART:20260512T093000Z
 DTEND:20260512T100000Z
 END:VEVENT
 END:VCALENDAR`,
+      method: "POST",
     });
 
     expect(response.status).toBe(200);
@@ -143,8 +143,8 @@ END:VCALENDAR`,
     addIcs2GcalEndpoint(app);
 
     const response = await app.request("/ics2gcal", {
-      method: "POST",
       body: "BEGIN:VCALENDAR\nEND:VCALENDAR",
+      method: "POST",
     });
 
     expect(response.status).toBe(400);

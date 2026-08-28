@@ -7,11 +7,11 @@ const DESCRIPTION =
 
 interface AzerpasDraftEntry extends RSSEntry {
   metadata: string;
-  tags: string[];
+  tags: Array<string>;
 }
 
 function normalizeWhitespace(text: string): string {
-  return text.replace(/\s+/g, " ").trim();
+  return text.replaceAll(/\s+/g, " ").trim();
 }
 
 function parseMonth(month: string): number | undefined {
@@ -65,7 +65,7 @@ function parsePublishedAt(value: string): Date | undefined {
 }
 
 export async function parse(response: Response): Promise<RSSData> {
-  const entries: AzerpasDraftEntry[] = [];
+  const entries: Array<AzerpasDraftEntry> = [];
   let currentEntry: AzerpasDraftEntry | null = null;
 
   const rewriter = new HTMLRewriter()
@@ -74,9 +74,9 @@ export async function parse(response: Response): Promise<RSSData> {
         currentEntry = {
           id: "",
           link: "",
-          title: "",
           metadata: "",
           tags: [],
+          title: "",
         };
         entries.push(currentEntry);
       },
@@ -135,33 +135,33 @@ export async function parse(response: Response): Promise<RSSData> {
   await consume(body);
 
   return {
-    id: BASE_URL,
-    link: BASE_URL,
-    title: "Anthony Manikhouth",
     description: DESCRIPTION,
-    language: "en",
     entries: entries
       .map((entry) => {
         const title = normalizeWhitespace(entry.title);
         const metadata = normalizeWhitespace(entry.metadata);
         const tags = entry.tags.join(" ");
         return {
+          datetime: parsePublishedAt(metadata),
           id: entry.id,
           link: entry.link,
-          title,
           text: [metadata, tags].filter((part) => part !== "").join(" · "),
-          datetime: parsePublishedAt(metadata),
+          title,
         };
       })
       .filter(isValidRSSEntry),
+    id: BASE_URL,
+    language: "en",
+    link: BASE_URL,
+    title: "Anthony Manikhouth",
   };
 }
 
 export async function get(_ctx: ScraperContext): Promise<RSSData> {
   const response = await fetch(BASE_URL, {
     headers: {
-      "user-agent": USERAGENT,
       accept: "text/html",
+      "user-agent": USERAGENT,
     },
   });
 

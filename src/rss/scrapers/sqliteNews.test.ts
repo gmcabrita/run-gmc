@@ -13,11 +13,11 @@ describe("sqliteNews scraper", () => {
     const result = await parse(createResponse());
 
     expect(result).toMatchObject({
+      description: "Recent news from the SQLite project",
       id: "https://www.sqlite.org/news.html",
+      language: "en",
       link: "https://www.sqlite.org/news.html",
       title: "Recent SQLite News",
-      description: "Recent news from the SQLite project",
-      language: "en",
     });
     expect(result.entries).toHaveLength(3);
     expect(result.entries.map((entry) => entry.title)).toEqual([
@@ -31,19 +31,19 @@ describe("sqliteNews scraper", () => {
     const result = await parse(createResponse());
 
     expect(result.entries[0]).toEqual({
+      datetime: new Date("2026-06-26T00:00:00.000Z"),
       id: "https://www.sqlite.org/releaselog/3_53_3.html",
       link: "https://www.sqlite.org/releaselog/3_53_3.html",
-      title: "Version 3.53.3",
       text: "SQLite version 3.53.3 is a maintenance patch release for 3.53.",
-      datetime: new Date("2026-06-26T00:00:00.000Z"),
+      title: "Version 3.53.3",
     });
 
     expect(result.entries[2]).toEqual({
+      datetime: new Date("2026-04-09T00:00:00.000Z"),
       id: "https://www.sqlite.org/releaselog/3_53_0.html",
       link: "https://www.sqlite.org/releaselog/3_53_0.html",
-      title: "Version 3.53.0",
       text: "SQLite version 3.53.0 fixes the WAL-reset bug. Upgrading is recommended.",
-      datetime: new Date("2026-04-09T00:00:00.000Z"),
+      title: "Version 3.53.0",
     });
   });
 
@@ -51,11 +51,11 @@ describe("sqliteNews scraper", () => {
     const result = await parse(createResponse());
 
     expect(result.entries[1]).toEqual({
+      datetime: new Date("2026-05-05T00:00:00.000Z"),
       id: "https://www.sqlite.org/news.html#2026_05_05",
       link: "https://www.sqlite.org/news.html#2026_05_05",
-      title: "Patch release 3.53.1",
       text: "A release without a linked heading.",
-      datetime: new Date("2026-05-05T00:00:00.000Z"),
+      title: "Patch release 3.53.1",
     });
   });
 });

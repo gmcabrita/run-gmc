@@ -10,7 +10,7 @@ interface CcpjDraftEntry extends RSSEntry {
 }
 
 function normalizeWhitespace(text: string): string {
-  return text.replace(/\s+/g, " ").trim();
+  return text.replaceAll(/\s+/g, " ").trim();
 }
 
 function parseCcpjDatetimeAttr(datetimeAttr: string): Date | undefined {
@@ -51,24 +51,24 @@ function hasRequiredFields(entry: RSSEntry): boolean {
 }
 
 export async function parse(response: Response): Promise<RSSData> {
-  const entries: CcpjDraftEntry[] = [];
+  const entries: Array<CcpjDraftEntry> = [];
 
   const rewriter = new HTMLRewriter()
     .on("#frontpage-news article.article-item", {
       element() {
         entries.push({
-          id: "",
-          link: "",
-          title: "",
-          text: "",
           category: "",
           datetimeAttr: "",
+          id: "",
+          link: "",
+          text: "",
+          title: "",
         });
       },
     })
     .on("#frontpage-news article.article-item span.category", {
       text(text) {
-        const lastEntry = entries[entries.length - 1];
+        const lastEntry = entries.at(-1);
         if (lastEntry && text.text) {
           lastEntry.category += text.text;
         }
@@ -76,7 +76,7 @@ export async function parse(response: Response): Promise<RSSData> {
     })
     .on("#frontpage-news article.article-item h1.article-item-title > a", {
       element(el) {
-        const lastEntry = entries[entries.length - 1];
+        const lastEntry = entries.at(-1);
         const href = el.getAttribute("href");
         if (lastEntry && href) {
           const link = new URL(href, BASE_ORIGIN).href;
@@ -85,7 +85,7 @@ export async function parse(response: Response): Promise<RSSData> {
         }
       },
       text(text) {
-        const lastEntry = entries[entries.length - 1];
+        const lastEntry = entries.at(-1);
         if (lastEntry && text.text) {
           lastEntry.title += text.text;
         }
@@ -93,7 +93,7 @@ export async function parse(response: Response): Promise<RSSData> {
     })
     .on("#frontpage-news article.article-item time", {
       element(el) {
-        const lastEntry = entries[entries.length - 1];
+        const lastEntry = entries.at(-1);
         const datetimeAttr = el.getAttribute("datetime");
         if (lastEntry && datetimeAttr) {
           lastEntry.datetimeAttr = datetimeAttr;
@@ -107,36 +107,36 @@ export async function parse(response: Response): Promise<RSSData> {
   }
   await consume(transformed.body);
 
-  const rssEntries: RSSEntry[] = entries
+  const rssEntries: Array<RSSEntry> = entries
     .map((entry) => {
       const category = normalizeWhitespace(entry.category);
       const text = category ? `<strong>Categoria:</strong> ${category}` : "";
 
       return {
+        datetime: entry.datetimeAttr ? parseCcpjDatetimeAttr(entry.datetimeAttr) : undefined,
         id: entry.id,
         link: entry.link,
-        title: normalizeWhitespace(entry.title),
         text,
-        datetime: entry.datetimeAttr ? parseCcpjDatetimeAttr(entry.datetimeAttr) : undefined,
+        title: normalizeWhitespace(entry.title),
       };
     })
     .filter(hasRequiredFields);
 
   return {
+    description: "CCPJ - Destaques",
+    entries: rssEntries,
     id: BASE_URL,
+    language: "pt",
     link: BASE_URL,
     title: "CCPJ - Destaques",
-    description: "CCPJ - Destaques",
-    language: "pt",
-    entries: rssEntries,
   };
 }
 
 export async function get(_ctx: ScraperContext): Promise<RSSData> {
   const response = await fetch(BASE_URL, {
     headers: {
-      "user-agent": USERAGENT,
       accept: "text/html",
+      "user-agent": USERAGENT,
     },
   });
 

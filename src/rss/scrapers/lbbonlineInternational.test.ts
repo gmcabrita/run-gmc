@@ -36,12 +36,12 @@ describe("lbbonlineInternational json parser", () => {
     const result = await parse({
       hits: [
         {
-          id: 152_622,
-          title: "Current API response",
-          slug: "current-api-response",
-          description: "The live API returns numeric IDs.",
-          image: null,
           date: "2025-12-28T10:00:00Z",
+          description: "The live API returns numeric IDs.",
+          id: 152_622,
+          image: null,
+          slug: "current-api-response",
+          title: "Current API response",
         },
       ],
     });

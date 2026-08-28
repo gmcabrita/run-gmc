@@ -12,11 +12,11 @@ describe("x feed helpers", () => {
         data: {
           user: {
             result: {
-              rest_id: "1",
               legacy: {
-                screen_name: "someuser",
                 name: "Some User",
+                screen_name: "someuser",
               },
+              rest_id: "1",
             },
           },
         },
@@ -30,12 +30,12 @@ describe("x feed helpers", () => {
         data: {
           user: {
             result: {
-              rest_id: "1",
               legacy: {
-                screen_name: "someuser",
                 name: "Some User",
                 protected: true,
+                screen_name: "someuser",
               },
+              rest_id: "1",
             },
           },
         },

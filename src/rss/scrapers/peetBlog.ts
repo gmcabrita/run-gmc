@@ -11,7 +11,7 @@ interface PeetBlogDraftEntry extends RSSEntry {
 }
 
 function normalizeWhitespace(text: string): string {
-  return text.replace(/\s+/g, " ").trim();
+  return text.replaceAll(/\s+/g, " ").trim();
 }
 
 function parsePublishedAt(value: string): Date | undefined {
@@ -36,19 +36,19 @@ function parsePublishedAt(value: string): Date | undefined {
 }
 
 export async function parse(response: Response): Promise<RSSData> {
-  const entries: PeetBlogDraftEntry[] = [];
+  const entries: Array<PeetBlogDraftEntry> = [];
   let currentEntry: PeetBlogDraftEntry | null = null;
 
   const rewriter = new HTMLRewriter()
     .on("main li", {
       element() {
         currentEntry = {
-          id: "",
-          link: "",
-          title: "",
-          text: "",
           dateText: "",
           description: "",
+          id: "",
+          link: "",
+          text: "",
+          title: "",
         };
         entries.push(currentEntry);
       },
@@ -114,33 +114,33 @@ export async function parse(response: Response): Promise<RSSData> {
   await consume(body);
 
   return {
-    id: BASE_URL,
-    link: BASE_URL,
-    title: TITLE,
     description: DESCRIPTION,
-    language: "en",
     entries: entries
       .map((entry) => {
         const title = normalizeWhitespace(entry.title);
         const description = normalizeWhitespace(entry.description);
         const dateText = normalizeWhitespace(entry.dateText);
         return {
+          datetime: parsePublishedAt(dateText),
           id: entry.id,
           link: entry.link,
-          title,
           text: description,
-          datetime: parsePublishedAt(dateText),
+          title,
         };
       })
       .filter(isValidRSSEntry),
+    id: BASE_URL,
+    language: "en",
+    link: BASE_URL,
+    title: TITLE,
   };
 }
 
 export async function get(_ctx: ScraperContext): Promise<RSSData> {
   const response = await fetch(BASE_URL, {
     headers: {
-      "user-agent": USERAGENT,
       accept: "text/html",
+      "user-agent": USERAGENT,
     },
   });
 

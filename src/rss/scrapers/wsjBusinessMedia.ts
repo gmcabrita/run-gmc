@@ -39,7 +39,7 @@ function tagAttribute(xml: string, tagName: string, attributeName: string): stri
 }
 
 function normalizeText(value: string): string {
-  return value.replace(/\u00a0/g, " ").replace(/\s+/g, " ").trim();
+  return value.replaceAll('\u00A0', " ").replaceAll(/\s+/g, " ").trim();
 }
 
 function getCanonicalArticleUrl(value: string): string | undefined {
@@ -80,8 +80,8 @@ function parseItem(itemXml: string): RSSEntry | undefined {
   const entry: RSSEntry = {
     id: link,
     link,
-    title,
     text: description || title,
+    title,
   };
   const datetime = parseDatetime(tagText(itemXml, "pubDate"));
   const imageURL = tagAttribute(itemXml, "media:content", "url");
@@ -116,12 +116,12 @@ export function parse(xml: string): RSSData {
   );
 
   return {
+    description: "Media news and analysis from The Wall Street Journal",
+    entries,
     id: BASE_URL,
+    language: "en",
     link: BASE_URL,
     title: "WSJ - Business Media",
-    description: "Media news and analysis from The Wall Street Journal",
-    language: "en",
-    entries,
   };
 }
 

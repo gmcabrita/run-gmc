@@ -40,25 +40,25 @@ describe("primeFreeGames json parser", () => {
           items: [
             {
               assets: {
+                externalClaimLink: "https://example.com/game",
                 id: "valid-game",
                 title: "Valid Game",
-                externalClaimLink: "https://example.com/game",
               },
               offers: [{ startTime: "2025-12-25T00:00:00Z" }],
             },
             {
               assets: {
+                externalClaimLink: "https://example.com/game2",
                 id: "missing-title",
                 title: null,
-                externalClaimLink: "https://example.com/game2",
               },
               offers: [{ startTime: "2025-12-25T00:00:00Z" }],
             },
             {
               assets: {
+                externalClaimLink: null,
                 id: "missing-link",
                 title: "No Link Game",
-                externalClaimLink: null,
               },
               offers: [{ startTime: "2025-12-25T00:00:00Z" }],
             },

@@ -158,30 +158,30 @@ describe("ccbEventos scraper", () => {
     const result = await parse(createResponse());
 
     expect(result.entries[0]).toEqual({
-      id: "https://www.ccb.pt/evento/a-valentina-e-a-valeria-nao-estao-mortas/2026-03-19/",
-      link: "https://www.ccb.pt/evento/a-valentina-e-a-valeria-nao-estao-mortas/2026-03-19/",
-      title: "A Valentina e a Valeria não estão mortas",
-      text: "19 a 22, 26 a 29 março | Flávia Gusmão e Jacinto Lucas Pires | Black Box | Teatro",
-      imageURL: "https://www.ccb.pt/wp-content/uploads/valentina.jpg",
       datetime: new Date("2026-03-19T00:00:00.000Z"),
+      id: "https://www.ccb.pt/evento/a-valentina-e-a-valeria-nao-estao-mortas/2026-03-19/",
+      imageURL: "https://www.ccb.pt/wp-content/uploads/valentina.jpg",
+      link: "https://www.ccb.pt/evento/a-valentina-e-a-valeria-nao-estao-mortas/2026-03-19/",
+      text: "19 a 22, 26 a 29 março | Flávia Gusmão e Jacinto Lucas Pires | Black Box | Teatro",
+      title: "A Valentina e a Valeria não estão mortas",
     });
 
     expect(result.entries[1]).toEqual({
-      id: "https://www.ccb.pt/evento/instalacao-james-webb/",
-      link: "https://www.ccb.pt/evento/instalacao-james-webb/",
-      title: "James Webb There’s No Place Called Home (Belém, Lisbon)",
-      text: "Desde 18 julho | MAC/CCB",
-      imageURL: "https://www.ccb.pt/wp-content/uploads/james-webb.jpg",
       datetime: undefined,
+      id: "https://www.ccb.pt/evento/instalacao-james-webb/",
+      imageURL: "https://www.ccb.pt/wp-content/uploads/james-webb.jpg",
+      link: "https://www.ccb.pt/evento/instalacao-james-webb/",
+      text: "Desde 18 julho | MAC/CCB",
+      title: "James Webb There’s No Place Called Home (Belém, Lisbon)",
     });
 
     expect(result.entries[2]).toEqual({
-      id: "https://www.ccb.pt/evento/dia-mundial-da-poesia-2026/",
-      link: "https://www.ccb.pt/evento/dia-mundial-da-poesia-2026/",
-      title: "Dia Mundial da Poesia",
-      text: "21 março das 10:30 às 19:00 | Programação de Nuno Artur Silva",
-      imageURL: undefined,
       datetime: undefined,
+      id: "https://www.ccb.pt/evento/dia-mundial-da-poesia-2026/",
+      imageURL: undefined,
+      link: "https://www.ccb.pt/evento/dia-mundial-da-poesia-2026/",
+      text: "21 março das 10:30 às 19:00 | Programação de Nuno Artur Silva",
+      title: "Dia Mundial da Poesia",
     });
   });
 

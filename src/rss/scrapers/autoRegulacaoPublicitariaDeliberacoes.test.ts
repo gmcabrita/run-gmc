@@ -60,19 +60,19 @@ describe("autoRegulacaoPublicitariaDeliberacoes scraper", () => {
     );
 
     expect(result.entries[0]).toEqual({
+      datetime: new Date(2026, 4, 12),
       id: "https://auto-regulacaopublicitaria.pt/consulta-1j-2026-modelo-continente-vs-lidl-cia/",
       link: "https://auto-regulacaopublicitaria.pt/consulta-1j-2026-modelo-continente-vs-lidl-cia/",
-      title: "Consulta 1J/2026 – MODELO CONTINENTE vs. LIDL & CIA.",
       text: "Ano: 2026 | Data: Maio 12, 2026",
-      datetime: new Date(2026, 4, 12),
+      title: "Consulta 1J/2026 – MODELO CONTINENTE vs. LIDL & CIA.",
     });
 
     expect(result.entries[1]).toEqual({
+      datetime: new Date(2025, 6, 4),
       id: "https://auto-regulacaopublicitaria.pt/consulta-4j-2025-modelo-continente-vs-lidl-cia/",
       link: "https://auto-regulacaopublicitaria.pt/consulta-4j-2025-modelo-continente-vs-lidl-cia/",
-      title: "Consulta 4J/2025 – MODELO CONTINENTE vs. LIDL & CIA",
       text: "Ano: 2025 | Data: Julho 4, 2025",
-      datetime: new Date(2025, 6, 4),
+      title: "Consulta 4J/2025 – MODELO CONTINENTE vs. LIDL & CIA",
     });
   });
 });

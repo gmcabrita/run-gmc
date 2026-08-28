@@ -5,7 +5,7 @@ const BASE_URL = "https://www.mfemediaforeurope.com";
 const PAGE_URL = `${BASE_URL}/view/document_search/en?pageIndex=1`;
 
 function normalizeWhitespace(value: string) {
-  return value.replace(/\s+/g, " ").trim();
+  return value.replaceAll(/\s+/g, " ").trim();
 }
 
 export async function parse(response: Response): Promise<RSSData> {
@@ -18,8 +18,8 @@ export async function parse(response: Response): Promise<RSSData> {
         currentEntry = {
           id: "",
           link: "",
-          title: "",
           text: "",
+          title: "",
         };
         entries.push(currentEntry);
       },
@@ -79,20 +79,20 @@ export async function parse(response: Response): Promise<RSSData> {
   }
 
   return {
+    description: "Latest documents published by MFE-MEDIAFOREUROPE.",
+    entries: entries.filter((entry) => isValidRSSEntry(entry)),
     id: PAGE_URL,
+    language: "en",
     link: PAGE_URL,
     title: "MFE-MEDIAFOREUROPE - Document Search",
-    description: "Latest documents published by MFE-MEDIAFOREUROPE.",
-    language: "en",
-    entries: entries.filter((entry) => isValidRSSEntry(entry)),
   };
 }
 
 export async function get(_ctx: ScraperContext): Promise<RSSData> {
   const response = await fetch(PAGE_URL, {
     headers: {
-      "user-agent": USERAGENT,
       "Content-Type": "text/html",
+      "user-agent": USERAGENT,
     },
   });
 

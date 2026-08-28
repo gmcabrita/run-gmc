@@ -41,8 +41,8 @@ describe("cinemax RTP passatempos scraper", () => {
     expect(result.entries[0]).toMatchObject({
       id: "https://cinemax.rtp.pt/?post_type=passatempos&p=11778",
       link: "https://cinemax.rtp.pt/passatempos/antestreia-o-dia-da-revelacao/",
-      title: "Antestreia: “O Dia da Revelação”",
       text: "SINOPSE Como participar.",
+      title: "Antestreia: “O Dia da Revelação”",
     });
     expect(result.entries[1]?.title).toBe("[Terminado] Antestreia: “Mais Forte Que Eu”");
   });

@@ -25,8 +25,8 @@ describe("RTP financial document scrapers", () => {
     expect(result.entries[0]).toMatchObject({
       id: "https://cdn-images.rtp.pt/mcm/pdf/4d6/4d68af2f2bd1dffa6584548964f95ca61.pdf",
       link: "https://cdn-images.rtp.pt/mcm/pdf/4d6/4d68af2f2bd1dffa6584548964f95ca61.pdf",
-      title: "Plano de Atividades 2025",
       text: "Plano de Atividades 2025",
+      title: "Plano de Atividades 2025",
     });
     expect(result.entries.map((entry) => entry.title)).not.toContain("Código de Ética");
     expect(result.entries.map((entry) => entry.title)).not.toContain("Hidden");

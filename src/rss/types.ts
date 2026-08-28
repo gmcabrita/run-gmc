@@ -1,17 +1,17 @@
 export interface RSSData {
-  id: string;
-  title: string;
   description?: string;
-  link: string;
-  language: string;
   entries: Array<RSSEntry>;
+  id: string;
+  language: string;
+  link: string;
+  title: string;
 }
 
 export interface RSSEntry {
-  id: string;
-  link: string;
-  title: string;
-  text?: string;
   datetime?: Date;
+  id: string;
   imageURL?: string;
+  link: string;
+  text?: string;
+  title: string;
 }

@@ -14,19 +14,19 @@ const PT_WEEKDAYS = [
 ];
 
 interface NimasFilm {
-  film_title: string;
-  film_uri_title: string;
+  cycle_title: string | null;
+  film_age_rating: string;
   film_director: string;
   film_genre: string;
-  film_length: string;
-  film_age_rating: string;
   film_image: string;
-  cycle_title: string | null;
+  film_length: string;
+  film_title: string;
+  film_uri_title: string;
 }
 
 interface NimasSession {
+  films: Array<NimasFilm>;
   time: string;
-  films: NimasFilm[];
 }
 
 interface NimasDay {
@@ -35,10 +35,10 @@ interface NimasDay {
 }
 
 interface NimasData {
-  theatre?: {
+  theater?: {
     programme: Record<string, NimasDay>;
   };
-  theater?: {
+  theatre?: {
     programme: Record<string, NimasDay>;
   };
 }
@@ -52,12 +52,12 @@ export function parse(html: string): RSSData {
   const match = html.match(/global\.data\s*=\s*(\{[\s\S]*?\});?\s*<\/script>/);
   if (!match) {
     return {
+      description: "Programação do Cinema Medeia Nimas",
+      entries: [],
       id: BASE_URL,
+      language: "pt",
       link: BASE_URL,
       title: "Programação Nimas",
-      description: "Programação do Cinema Medeia Nimas",
-      language: "pt",
-      entries: [],
     };
   }
 
@@ -66,16 +66,16 @@ export function parse(html: string): RSSData {
 
   if (!programme) {
     return {
+      description: "Programação do Cinema Medeia Nimas",
+      entries: [],
       id: BASE_URL,
+      language: "pt",
       link: BASE_URL,
       title: "Programação Nimas",
-      description: "Programação do Cinema Medeia Nimas",
-      language: "pt",
-      entries: [],
     };
   }
 
-  const entries: RSSEntry[] = [];
+  const entries: Array<RSSEntry> = [];
 
   for (const [dateStr, day] of Object.entries(programme)) {
     // dateStr is in YYYY-MM-DD format
@@ -101,24 +101,24 @@ export function parse(html: string): RSSData {
         const text = `${weekday}, ${displayDate} ${time}<br>${extra}<br>${film.cycle_title || ""}<br><a href="${letterboxd}">Letterboxd Search</a>`;
 
         entries.push({
-          id: link,
-          link,
-          title: fullTitle,
-          text,
           datetime,
+          id: link,
           imageURL: film.film_image ? `${UPLOADS_BASE}${film.film_image}` : undefined,
+          link,
+          text,
+          title: fullTitle,
         });
       }
     }
   }
 
   return {
+    description: "Programação do Cinema Medeia Nimas",
+    entries: entries.filter(isValidRSSEntry),
     id: BASE_URL,
+    language: "pt",
     link: BASE_URL,
     title: "Programação Nimas",
-    description: "Programação do Cinema Medeia Nimas",
-    language: "pt",
-    entries: entries.filter(isValidRSSEntry),
   };
 }
 

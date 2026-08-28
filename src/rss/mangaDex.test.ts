@@ -7,12 +7,12 @@ import {
 } from "./mangaDex";
 
 const config = {
-  mangaId: "801513ba-a712-498c-8f57-cae55b38cc92",
-  mangaTitle: "Berserk",
-  mangaSlug: "berserk",
-  language: "en",
   excludedGroupIds: ["48d8a115-31b6-462f-a0db-04cc09846453"],
+  language: "en",
   limit: 10,
+  mangaId: "801513ba-a712-498c-8f57-cae55b38cc92",
+  mangaSlug: "berserk",
+  mangaTitle: "Berserk",
 } satisfies MangaDexFeedConfig;
 
 describe("buildMangaDexFeedUrl", () => {
@@ -45,8 +45,8 @@ describe("parseMangaDexFeed", () => {
     const result = parseMangaDexFeed(json, {
       ...config,
       mangaId: "another-manga-id",
-      mangaTitle: "Another Manga",
       mangaSlug: undefined,
+      mangaTitle: "Another Manga",
     });
 
     expect(result.id).toBe("https://mangadex.org/title/another-manga-id");
@@ -61,13 +61,13 @@ describe("parseMangaDexFeed", () => {
       {
         data: [
           {
-            id: "chapter-id",
             attributes: {
-              volume: 42,
               chapter: "7",
-              title: { invalid: true },
               publishAt: false,
+              title: { invalid: true },
+              volume: 42,
             },
+            id: "chapter-id",
             relationships: [],
           },
         ],
@@ -77,9 +77,9 @@ describe("parseMangaDexFeed", () => {
 
     expect(result.entries).toHaveLength(1);
     expect(result.entries[0]).toMatchObject({
+      datetime: undefined,
       id: "chapter-id",
       title: "Berserk — Chapter 7 — Unknown scanlation group",
-      datetime: undefined,
     });
   });
 });

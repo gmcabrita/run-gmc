@@ -9,14 +9,14 @@ export async function parse(response: Response): Promise<RSSData> {
         entries.push({
           id: "",
           link: "",
-          title: "",
           text: "",
+          title: "",
         });
       },
     })
     .on(".wrapper-news h1.title a", {
       element(el) {
-        const lastEntry = entries[entries.length - 1];
+        const lastEntry = entries.at(-1);
         const href = el.getAttribute("href");
         if (lastEntry && href) {
           lastEntry.id = href;
@@ -24,7 +24,7 @@ export async function parse(response: Response): Promise<RSSData> {
         }
       },
       text(text) {
-        const lastEntry = entries[entries.length - 1];
+        const lastEntry = entries.at(-1);
         if (lastEntry && text.text) {
           lastEntry.title = (lastEntry.title || "") + text.text;
         }
@@ -32,7 +32,7 @@ export async function parse(response: Response): Promise<RSSData> {
     })
     .on(".wrapper-news .publishedDate", {
       element(el) {
-        const lastEntry = entries[entries.length - 1];
+        const lastEntry = entries.at(-1);
         const datetime = el.getAttribute("datetime");
         if (lastEntry && datetime) {
           lastEntry.datetime = new Date(datetime);
@@ -42,18 +42,18 @@ export async function parse(response: Response): Promise<RSSData> {
 
   await consume(rewriter.transform(response).body!);
   return {
-    id: "https://www.impresa.pt/pt/investidores",
-    link: "https://www.impresa.pt/pt/investidores",
-    title: "Impresa – Investidores",
     description: "Impresa – Investidores",
-    language: "pt",
     entries: entries
       .map((entry) => ({
         ...entry,
-        title: entry.title.trim().replace(/\n/g, " | "),
-        text: entry.title.trim().replace(/\n/g, " | "),
+        text: entry.title.trim().replaceAll("\n", " | "),
+        title: entry.title.trim().replaceAll("\n", " | "),
       }))
       .filter((entry: RSSEntry) => isValidRSSEntry(entry)),
+    id: "https://www.impresa.pt/pt/investidores",
+    language: "pt",
+    link: "https://www.impresa.pt/pt/investidores",
+    title: "Impresa – Investidores",
   };
 }
 
@@ -62,8 +62,8 @@ export async function get(_ctx: ScraperContext): Promise<RSSData> {
     "https://www.impresa.pt/api/molecule/category/pt/investidores?types=MEDIA&limit=50",
     {
       headers: {
-        "user-agent": USERAGENT,
         "Content-Type": "text/html",
+        "user-agent": USERAGENT,
       },
     },
   );

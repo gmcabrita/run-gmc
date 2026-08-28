@@ -1,69 +1,84 @@
 import { Feed } from "feed";
 import { stripInvalidXmlChars } from "@rss/common";
-import * as v from "valibot";
+import {
+  array,
+  fallback,
+  looseObject,
+  nullish,
+  number,
+  parse,
+  pipe,
+  record,
+  safeParse,
+  string,
+  transform,
+  union,
+  unknown,
+  type InferOutput,
+} from "valibot";
 
-const NamedValueSchema = v.looseObject({
-  name: v.string(),
+const NamedValueSchema = looseObject({
+  name: string(),
 });
-const OptionalTextSchema = v.fallback(v.nullish(v.string()), undefined);
-const TextListSchema = v.pipe(
-  v.union([v.array(v.string()), v.string()]),
-  v.transform((value) =>
+const OptionalTextSchema = fallback(nullish(string()), undefined);
+const TextListSchema = pipe(
+  union([array(string()), string()]),
+  transform((value) =>
     Array.isArray(value) ? value : value.length > 0 ? [value] : [],
   ),
 );
-const AgendaLxEventSchema = v.looseObject({
-  id: v.pipe(
-    v.union([v.string(), v.number()]),
-    v.transform((value) => String(value)),
-  ),
-  title: v.fallback(
-    v.nullish(v.looseObject({ rendered: OptionalTextSchema })),
+const AgendaLxEventSchema = looseObject({
+  categories_name_list: fallback(
+    nullish(record(string(), NamedValueSchema)),
     undefined,
   ),
-  subtitle: v.fallback(v.nullish(TextListSchema), undefined),
-  description: v.fallback(v.nullish(v.array(v.string())), undefined),
-  venue: v.fallback(
-    v.nullish(
-      v.record(v.string(), v.looseObject({ name: OptionalTextSchema })),
+  description: fallback(nullish(array(string())), undefined),
+  featured_media_large: OptionalTextSchema,
+  id: pipe(
+    union([string(), number()]),
+    transform(String),
+  ),
+  LastDate: OptionalTextSchema,
+  link: string(),
+  StartDate: OptionalTextSchema,
+  string_dates: OptionalTextSchema,
+  string_times: OptionalTextSchema,
+  subtitle: fallback(nullish(TextListSchema), undefined),
+  tags_name_list: fallback(
+    nullish(record(string(), NamedValueSchema)),
+    undefined,
+  ),
+  title: fallback(
+    nullish(looseObject({ rendered: OptionalTextSchema })),
+    undefined,
+  ),
+  venue: fallback(
+    nullish(
+      record(string(), looseObject({ name: OptionalTextSchema })),
     ),
     undefined,
   ),
-  categories_name_list: v.fallback(
-    v.nullish(v.record(v.string(), NamedValueSchema)),
-    undefined,
-  ),
-  tags_name_list: v.fallback(
-    v.nullish(v.record(v.string(), NamedValueSchema)),
-    undefined,
-  ),
-  StartDate: OptionalTextSchema,
-  LastDate: OptionalTextSchema,
-  string_dates: OptionalTextSchema,
-  string_times: OptionalTextSchema,
-  featured_media_large: OptionalTextSchema,
-  link: v.string(),
 });
-const AgendaLxEventsPayloadSchema = v.array(v.unknown());
+const AgendaLxEventsPayloadSchema = array(unknown());
 
-type AgendaLxEvent = v.InferOutput<typeof AgendaLxEventSchema>;
-type AgendaLxEventsPayload = v.InferOutput<typeof AgendaLxEventsPayloadSchema>;
+type AgendaLxEvent = InferOutput<typeof AgendaLxEventSchema>;
+type AgendaLxEventsPayload = InferOutput<typeof AgendaLxEventsPayloadSchema>;
 
-function parseAgendaLxEvents(payload: AgendaLxEventsPayload): AgendaLxEvent[] {
+function parseAgendaLxEvents(payload: AgendaLxEventsPayload): Array<AgendaLxEvent> {
   return payload.flatMap((event) => {
-    const result = v.safeParse(AgendaLxEventSchema, event);
+    const result = safeParse(AgendaLxEventSchema, event);
     return result.success ? [result.output] : [];
   });
 }
 
 export async function cacheAgendaLx(env: CloudflareBindings) {
   const feed = new Feed({
-    title: `AgendaLX Events`,
-    id: `https://www.agendalx.pt`,
-    link: `https://www.agendalx.pt`,
-    description: "Cultural events in Lisbon from AgendaLX",
-    language: "pt",
     copyright: "",
+    description: "Cultural events in Lisbon from AgendaLX",
+    id: `https://www.agendalx.pt`,
+    language: "pt",
+    link: `https://www.agendalx.pt`,
+    title: `AgendaLX Events`,
     updated: new Date(),
   });
 
@@ -85,7 +100,7 @@ export async function cacheAgendaLx(env: CloudflareBindings) {
       const response = await fetch(
         `https://www.agendalx.pt/wp-json/agendalx/v1/events?per_page=5000&categories=${category}&_fields=id,link,title,subtitle,description,venue,categories_name_list,tags_name_list,StartDate,LastDate,string_dates,string_times,featured_media_large`,
       );
-      const payload = v.parse(AgendaLxEventsPayloadSchema, await response.json());
+      const payload = parse(AgendaLxEventsPayloadSchema, await response.json());
       return parseAgendaLxEvents(payload);
     }),
   );
@@ -162,11 +177,11 @@ export async function cacheAgendaLx(env: CloudflareBindings) {
         const guid = `agendalx-event-${event.id}`;
 
         feed.addItem({
-          title: fullTitle,
-          id: guid,
-          link,
           content,
           date: pubDate,
+          id: guid,
+          link,
+          title: fullTitle,
         });
       }
     }

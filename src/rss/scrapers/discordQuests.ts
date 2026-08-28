@@ -1,41 +1,48 @@
 import { isValidRSSEntry, type ScraperContext } from "@rss/common";
 import type { RSSData, RSSEntry } from "@rss/types";
-import * as v from "valibot";
+import {
+  array,
+  looseObject,
+  nullish,
+  parse as parseValibot,
+  string,
+  type InferOutput,
+} from "valibot";
 
 const BASE_URL = "https://discord.com/quest-home";
 
-const DiscordQuestsPayloadSchema = v.looseObject({
-  quests: v.array(
-    v.looseObject({
-      id: v.string(),
-      config: v.looseObject({
-        starts_at: v.string(),
-        expires_at: v.nullish(v.string()),
-        messages: v.looseObject({
-          quest_name: v.string(),
-          game_title: v.string(),
-          game_publisher: v.string(),
+const DiscordQuestsPayloadSchema = looseObject({
+  quests: array(
+    looseObject({
+      config: looseObject({
+        application: looseObject({ link: string() }),
+        expires_at: nullish(string()),
+        messages: looseObject({
+          game_publisher: string(),
+          game_title: string(),
+          quest_name: string(),
         }),
-        application: v.looseObject({ link: v.string() }),
-        rewards_config: v.looseObject({
-          rewards: v.array(
-            v.looseObject({
-              messages: v.looseObject({ name: v.string() }),
+        rewards_config: looseObject({
+          rewards: array(
+            looseObject({
+              messages: looseObject({ name: string() }),
             }),
           ),
         }),
+        starts_at: string(),
       }),
-      user_status: v.nullish(
-        v.looseObject({ claimed_at: v.nullish(v.string()) }),
+      id: string(),
+      user_status: nullish(
+        looseObject({ claimed_at: nullish(string()) }),
       ),
     }),
   ),
 });
 
-type DiscordQuestsPayload = v.InferOutput<typeof DiscordQuestsPayloadSchema>;
+type DiscordQuestsPayload = InferOutput<typeof DiscordQuestsPayloadSchema>;
 
 export function parse(json: DiscordQuestsPayload, nowDate: Date = new Date()): RSSData {
-  const entries: RSSEntry[] = json.quests
+  const entries: Array<RSSEntry> = json.quests
     .filter((quest) => {
       const expiresAt = quest.config.expires_at;
       const claimedAt = quest.user_status?.claimed_at;
@@ -54,22 +61,22 @@ export function parse(json: DiscordQuestsPayload, nowDate: Date = new Date()): R
       const text = `<strong>Publisher:</strong> ${config.messages.game_publisher}<br><strong>Reward:</strong> ${rewardNames}<br><strong>Expires:</strong> ${config.expires_at}`;
 
       return {
+        datetime: new Date(config.starts_at),
         id: quest.id,
         link: config.application.link,
-        title: `${config.messages.quest_name} - ${config.messages.game_title}`,
         text,
-        datetime: new Date(config.starts_at),
+        title: `${config.messages.quest_name} - ${config.messages.game_title}`,
       };
     })
     .filter(isValidRSSEntry);
 
   return {
+    description: "Available Discord Quests",
+    entries,
     id: BASE_URL,
+    language: "en",
     link: BASE_URL,
     title: "Discord Quests",
-    description: "Available Discord Quests",
-    language: "en",
-    entries,
   };
 }
 
@@ -95,6 +102,6 @@ export async function get(ctx: ScraperContext): Promise<RSSData> {
     method: "GET",
   });
 
-  const json = v.parse(DiscordQuestsPayloadSchema, await response.json());
+  const json = parseValibot(DiscordQuestsPayloadSchema, await response.json());
   return parse(json);
 }

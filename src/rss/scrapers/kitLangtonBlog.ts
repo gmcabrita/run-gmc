@@ -6,15 +6,15 @@ export async function parse(response: Response): Promise<RSSData> {
   let currentEntry: RSSEntry | null = null;
 
   const rewriter = new HTMLRewriter()
-    .on("[data-column] a.hover\\:text-yellow-400[href^='/posts/']", {
+    .on(String.raw`[data-column] a.hover\:text-yellow-400[href^='/posts/']`, {
       element(el) {
         const href = el.getAttribute("href");
         if (href) {
           currentEntry = {
             id: "",
             link: "",
-            title: "",
             text: "",
+            title: "",
           };
           const link = new URL(href, "https://www.kitlangton.com").href;
           currentEntry.id = link;
@@ -23,7 +23,7 @@ export async function parse(response: Response): Promise<RSSData> {
         }
       },
     })
-    .on("[data-column] a.hover\\:text-yellow-400[href^='/posts/'] > div:first-child", {
+    .on(String.raw`[data-column] a.hover\:text-yellow-400[href^='/posts/'] > div:first-child`, {
       text(text) {
         if (currentEntry && text.text) {
           currentEntry.title = (currentEntry.title || "") + text.text;
@@ -32,29 +32,29 @@ export async function parse(response: Response): Promise<RSSData> {
     })
   await consume(rewriter.transform(response).body!);
   return {
-    id: "https://www.kitlangton.com/",
-    link: "https://www.kitlangton.com/",
-    title: "Kit Langton",
     description: "Kit Langton",
-    language: "en",
     entries: entries
       .map((entry) => {
-        const title = entry.title.trim().replace(/\n/g, " | ");
+        const title = entry.title.trim().replaceAll('\n', " | ");
         return {
           ...entry,
-          title,
           text: title,
+          title,
         };
       })
       .filter((entry: RSSEntry) => isValidRSSEntry(entry)),
+    id: "https://www.kitlangton.com/",
+    language: "en",
+    link: "https://www.kitlangton.com/",
+    title: "Kit Langton",
   };
 }
 
 export async function get(_ctx: ScraperContext): Promise<RSSData> {
   const response = await fetch("https://www.kitlangton.com/", {
     headers: {
-      "user-agent": USERAGENT,
       "Content-Type": "text/html",
+      "user-agent": USERAGENT,
     },
   });
 

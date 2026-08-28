@@ -20,11 +20,11 @@ describe("azerpasBlog scraper", () => {
 
     expect(result.entries).toHaveLength(5);
     expect(result.entries[0]).toEqual({
+      datetime: new Date(Date.UTC(2026, 4, 18)),
       id: "https://blog.azerpas.com/writing/wasm-simd-fingerprinting",
       link: "https://blog.azerpas.com/writing/wasm-simd-fingerprinting",
-      title: "Fingerprinting CPUs from the Browser with WebAssembly SIMD",
       text: "2026 · May 18 · 10 min · #wasm #fingerprinting",
-      datetime: new Date(Date.UTC(2026, 4, 18)),
+      title: "Fingerprinting CPUs from the Browser with WebAssembly SIMD",
     });
   });
 

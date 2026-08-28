@@ -1,15 +1,15 @@
 export async function idempotentSendEmail(
   env: CloudflareBindings,
   {
-    idempotencyKey,
-    to,
-    subject,
     body,
+    idempotencyKey,
+    subject,
+    to,
   }: {
-    idempotencyKey: string;
-    to: string;
-    subject: string;
     body: string;
+    idempotencyKey: string;
+    subject: string;
+    to: string;
   },
 ): Promise<boolean> {
   const existing = await env.RUN_GMC_EMAIL_IDEMPOTENCY_KV.get(idempotencyKey);
@@ -18,7 +18,7 @@ export async function idempotentSendEmail(
     return false;
   }
 
-  await sendEmail(env, { to, subject, body });
+  await sendEmail(env, { body, subject, to });
 
   await env.RUN_GMC_EMAIL_IDEMPOTENCY_KV.put(idempotencyKey, "1");
 
@@ -28,24 +28,24 @@ export async function idempotentSendEmail(
 export async function sendEmail(
   env: CloudflareBindings,
   {
-    to,
-    subject,
     body,
+    subject,
+    to,
   }: {
-    to: string;
-    subject: string;
     body: string;
+    subject: string;
+    to: string;
   },
 ) {
   if (env.ENVIRONMENT !== "production") {
-    console.log(`[sendEmail] ${JSON.stringify({ to, subject, body }, null, 2)}`);
+    console.log(`[sendEmail] ${JSON.stringify({ body, subject, to }, null, 2)}`);
     return;
   }
 
   await env.EMAIL.send({
-    to,
     from: "run@gmcabrita.com",
-    subject,
     html: body,
+    subject,
+    to,
   });
 }

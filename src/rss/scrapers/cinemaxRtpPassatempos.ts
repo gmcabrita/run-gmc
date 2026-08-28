@@ -16,7 +16,7 @@ const XML_ENTITIES = new Map([
 ]);
 
 function decodeCodePoint(value: number, fallback: string) {
-  if (!Number.isInteger(value) || value < 0 || value > 0x10ffff) {
+  if (!Number.isInteger(value) || value < 0 || value > 0x10_ff_ff) {
     return fallback;
   }
 
@@ -35,13 +35,13 @@ function decodeXmlText(value: string) {
       : trimmed;
 
   return unwrapped
-    .replace(/&#x([0-9a-fA-F]+);/g, (entity, hex) =>
+    .replaceAll(/&#x([0-9a-fA-F]+);/g, (entity, hex) =>
       decodeCodePoint(Number.parseInt(hex, 16), entity),
     )
-    .replace(/&#([0-9]+);/g, (entity, decimal) =>
+    .replaceAll(/&#([0-9]+);/g, (entity, decimal) =>
       decodeCodePoint(Number.parseInt(decimal, 10), entity),
     )
-    .replace(/&([a-zA-Z]+);/g, (entity, name) => XML_ENTITIES.get(name) ?? entity);
+    .replaceAll(/&([a-zA-Z]+);/g, (entity, name) => XML_ENTITIES.get(name) ?? entity);
 }
 
 function tagText(xml: string, tagName: string) {
@@ -51,15 +51,15 @@ function tagText(xml: string, tagName: string) {
 }
 
 function normalizeText(value: string) {
-  return value.replace(/\s+/g, " ").trim();
+  return value.replaceAll(/\s+/g, " ").trim();
 }
 
 function stripHtml(value: string) {
   return normalizeText(
     value
-      .replace(/<script[\s\S]*?<\/script>/gi, " ")
-      .replace(/<style[\s\S]*?<\/style>/gi, " ")
-      .replace(/<[^>]+>/g, " "),
+      .replaceAll(/<script[\s\S]*?<\/script>/gi, " ")
+      .replaceAll(/<style[\s\S]*?<\/style>/gi, " ")
+      .replaceAll(/<[^>]+>/g, " "),
   );
 }
 
@@ -93,8 +93,8 @@ function entryFromItem(itemXml: string): RSSEntry | undefined {
   const entry: RSSEntry = {
     id,
     link,
-    title,
     text: stripHtml(content),
+    title,
   };
 
   if (datetime) {
@@ -118,23 +118,23 @@ export async function parse(response: Response): Promise<RSSData> {
     .filter((entry) => entry !== undefined);
 
   return {
-    id: FEED_URL,
-    link: normalizeText(tagText(channel, "link") ?? SITE_URL),
-    title: normalizeText(tagText(channel, "title") ?? "Passatempos Archive - RTP Cinemax"),
     description: normalizeText(
       tagText(channel, "description") ??
         "Um site português com um olhar sobre a actualidade do cinema: os filmes, as estreias, festivais e as rodagens.",
     ),
-    language: normalizeText(tagText(channel, "language") ?? "pt-PT"),
     entries,
+    id: FEED_URL,
+    language: normalizeText(tagText(channel, "language") ?? "pt-PT"),
+    link: normalizeText(tagText(channel, "link") ?? SITE_URL),
+    title: normalizeText(tagText(channel, "title") ?? "Passatempos Archive - RTP Cinemax"),
   };
 }
 
 export async function get(_ctx?: ScraperContext): Promise<RSSData> {
   const response = await fetch(FEED_URL, {
     headers: {
-      "user-agent": USERAGENT,
       "Content-Type": "application/rss+xml",
+      "user-agent": USERAGENT,
     },
   });
 
@@ -149,11 +149,11 @@ export async function sendCinemaxRtpPassatemposEntriesByEmail(env: CloudflareBin
 
   for (const entry of unfinishedEntries) {
     await idempotentSendEmail(env, {
-      to: "goncalo.mendes.cabrita@gmail.com",
-      subject: `[Passatempo Cinemax] ${entry.title}`,
       body: `<h2><a href="${entry.link}">${entry.title}</a></h2>
               ${entry.text ? `<p>${entry.text}</p>` : ""}${entry.imageURL ? `<br><img src="${entry.imageURL}"></img>` : ""}`.trim(),
       idempotencyKey: `cinemax-rtp-passatempos-${entry.id}`,
+      subject: `[Passatempo Cinemax] ${entry.title}`,
+      to: "goncalo.mendes.cabrita@gmail.com",
     });
   }
 

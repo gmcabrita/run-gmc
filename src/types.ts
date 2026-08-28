@@ -3,13 +3,13 @@
 // =====================================================
 
 export interface FilmspotMovie {
+  date: Date;
+  dateString: string;
   imgUrl?: string;
+  metadata?: string;
   originalTitle?: string;
   title?: string;
   url?: string;
-  metadata?: string;
-  date: Date;
-  dateString: string;
 }
 
 // =====================================================
@@ -17,16 +17,16 @@ export interface FilmspotMovie {
 // =====================================================
 
 export interface FeedItem {
-  id: string;
-  title: string;
-  link: string;
+  author?: Array<{
+    link: string;
+    name: string;
+  }>;
   content: string;
   date: Date;
-  author?: Array<{
-    name: string;
-    link: string;
-  }>;
+  id: string;
   image?: string;
+  link: string;
+  title: string;
 }
 
 // =====================================================
@@ -34,15 +34,15 @@ export interface FeedItem {
 // =====================================================
 
 export interface AnteEstreiasRssItem {
-  category?: string[];
-  description: string[];
-  pubDate: string[];
+  category?: Array<string>;
+  description: Array<string>;
+  pubDate: Array<string>;
 }
 
 export interface AnteEstreiasRssParsed {
   rss: {
     channel: Array<{
-      item: AnteEstreiasRssItem[];
+      item: Array<AnteEstreiasRssItem>;
     }>;
   };
 }

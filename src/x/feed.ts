@@ -10,22 +10,22 @@ export function createPrivateProfileNoticeFeed(userName: string): Feed {
   const feedUrl = `/rss.x?userName=${encodeURIComponent(userName)}`;
 
   const feed = new Feed({
-    title: `X // ${userName}`,
     description: "This profile is private and cannot be fetched with public credentials.",
-    id: profileUrl,
-    link: profileUrl,
-    language: "en",
     favicon: "https://x.com/favicon.ico",
-    updated: new Date(),
     generator: "X2RSS",
+    id: profileUrl,
+    language: "en",
+    link: profileUrl,
+    title: `X // ${userName}`,
+    updated: new Date(),
   });
 
   feed.addItem({
-    title: "Profile is now private",
-    id: `${profileUrl}/private-profile-notice-${new Date().toISOString()}`,
-    link: profileUrl,
     content: `<p>This profile is now private and cannot be fetched with public credentials.</p><p>Update your feed URL to remove <code>public=true</code>:</p><p><code>${feedUrl}</code></p>`,
     date: new Date(),
+    id: `${profileUrl}/private-profile-notice-${new Date().toISOString()}`,
+    link: profileUrl,
+    title: "Profile is now private",
   });
 
   return feed;

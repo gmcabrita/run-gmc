@@ -1,11 +1,11 @@
-import * as v from "valibot";
+import { number, object, parse } from "valibot";
 import {
   CoverflexAuthResponseSchema,
   type CoverflexAuthResponse,
 } from "../schemas";
 
-const JwtPayloadSchema = v.object({
-  exp: v.number(),
+const JwtPayloadSchema = object({
+  exp: number(),
 });
 
 const KV_TOKEN_KEY = "coverflex:token";
@@ -19,7 +19,7 @@ function parseJwtExpiration(token: string): number {
     throw new Error("Invalid JWT format");
   }
 
-  return v.parse(JwtPayloadSchema, JSON.parse(atob(encodedPayload))).exp;
+  return parse(JwtPayloadSchema, JSON.parse(atob(encodedPayload))).exp;
 }
 
 function getExpirationTtl(token: string): number {
@@ -51,8 +51,8 @@ async function refreshSession(refreshToken: string): Promise<CoverflexAuthRespon
     headers: {
       accept: "application/json, text/plain, */*",
       "accept-language": "en-US,en;q=0.9,pt-PT;q=0.8,pt;q=0.7",
-      "content-type": "application/json",
       authorization: `Bearer ${refreshToken}`,
+      "content-type": "application/json",
       priority: "u=1, i",
       "sec-ch-ua": '"Not)A;Brand";v="8", "Chromium";v="138", "Google Chrome";v="138"',
       "sec-ch-ua-mobile": "?0",
@@ -68,11 +68,16 @@ async function refreshSession(refreshToken: string): Promise<CoverflexAuthRespon
     throw new Error(`Refresh failed: ${response.status}`);
   }
 
-  return v.parse(CoverflexAuthResponseSchema, await response.json());
+  return parse(CoverflexAuthResponseSchema, await response.json());
 }
 
 async function loginWithCredentials(env: CloudflareBindings): Promise<CoverflexAuthResponse> {
   const response = await fetch("https://menhir-api.coverflex.com/api/employee/sessions", {
+    body: JSON.stringify({
+      email: env.COVERFLEX_EMAIL,
+      password: env.COVERFLEX_PASSWORD,
+      user_agent_token: env.COVERFLEX_USER_AGENT_TOKEN,
+    }),
     headers: {
       accept: "application/json, text/plain, */*",
       "accept-language": "en-US,en;q=0.9,pt-PT;q=0.8,pt;q=0.7",
@@ -85,11 +90,6 @@ async function loginWithCredentials(env: CloudflareBindings): Promise<CoverflexA
       "sec-fetch-mode": "cors",
       "sec-fetch-site": "same-site",
     },
-    body: JSON.stringify({
-      email: env.COVERFLEX_EMAIL,
-      password: env.COVERFLEX_PASSWORD,
-      user_agent_token: env.COVERFLEX_USER_AGENT_TOKEN,
-    }),
     method: "POST",
   });
 
@@ -97,7 +97,7 @@ async function loginWithCredentials(env: CloudflareBindings): Promise<CoverflexA
     throw new Error(`Login failed: ${response.status}`);
   }
 
-  return v.parse(CoverflexAuthResponseSchema, await response.json());
+  return parse(CoverflexAuthResponseSchema, await response.json());
 }
 
 export async function getAuthenticationToken(env: CloudflareBindings): Promise<string> {

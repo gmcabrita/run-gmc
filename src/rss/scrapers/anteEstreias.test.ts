@@ -26,10 +26,10 @@ describe("anteEstreias scraper", () => {
     const result = parse(html);
 
     expect(result.entries[0]).toMatchObject({
-      title: "Masters of The Universe",
-      text: "Metropolis: https://cinemametropolis.com/ganha-convites-masters-of-the-universe-lisboa-e-porto/",
-      imageURL: "https://www.passatemposportugal.com.pt/filmes/mastersoftheuniverse.gif",
       datetime: new Date("2026-06-04T08:49:00+01:00"),
+      imageURL: "https://www.passatemposportugal.com.pt/filmes/mastersoftheuniverse.gif",
+      text: "Metropolis: https://cinemametropolis.com/ganha-convites-masters-of-the-universe-lisboa-e-porto/",
+      title: "Masters of The Universe",
     });
     expect(result.entries[2]?.title).toBe("Algo Velho, Algo Novo, Algo Emprestado​​");
   });

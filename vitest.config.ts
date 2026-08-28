@@ -9,7 +9,7 @@ function rawTextPlugin(): Plugin {
     name: "raw-text",
     transform(_code, id) {
       if (id.endsWith(".html") || id.endsWith(".xml")) {
-        const content = readFileSync(id, "utf-8");
+        const content = readFileSync(id, "utf8");
         return {
           code: `export default ${JSON.stringify(content)};`,
           map: null,
@@ -29,15 +29,17 @@ export default defineConfig({
   ],
   resolve: {
     alias: {
-      "@email": resolve(__dirname, "src/email/index.ts"),
       "@coverflex": resolve(__dirname, "src/coverflex/index.ts"),
-      "@x": resolve(__dirname, "src/x/index.ts"),
+      "@email": resolve(__dirname, "src/email/index.ts"),
+      // Specific aliases must precede the matching prefix alias.
       "@rss/common": resolve(__dirname, "src/rss/common.ts"),
       "@rss/healthcheck": resolve(__dirname, "src/rss/healthcheck.ts"),
       "@rss/mangaDex": resolve(__dirname, "src/rss/mangaDex.ts"),
       "@rss/types": resolve(__dirname, "src/rss/types.ts"),
+      // Keep this prefix alias after all specific RSS aliases.
       "@rss": resolve(__dirname, "src/rss/index.ts"),
       "@types": resolve(__dirname, "src/types.ts"),
+      "@x": resolve(__dirname, "src/x/index.ts"),
     },
   },
 });

@@ -1,37 +1,43 @@
-import * as v from "valibot";
+import {
+  array,
+  number,
+  object,
+  string,
+  type InferOutput,
+} from "valibot";
 
-export const CoverflexAuthResponseSchema = v.object({
-  token: v.string(),
-  refresh_token: v.string(),
+export const CoverflexAuthResponseSchema = object({
+  refresh_token: string(),
+  token: string(),
 });
 
-const CoverflexFileSchema = v.object({
-  slug: v.string(),
-  name: v.string(),
-  url: v.string(),
+const CoverflexFileSchema = object({
+  name: string(),
+  slug: string(),
+  url: string(),
 });
 
-const CoverflexProductSchema = v.object({
-  slug: v.string(),
-  files: v.array(CoverflexFileSchema),
+const CoverflexProductSchema = object({
+  files: array(CoverflexFileSchema),
+  slug: string(),
 });
 
-export const CoverflexTechnologyResponseSchema = v.object({
-  benefit: v.object({
-    slug: v.string(),
-    products: v.array(CoverflexProductSchema),
+export const CoverflexTechnologyResponseSchema = object({
+  benefit: object({
+    products: array(CoverflexProductSchema),
+    slug: string(),
   }),
 });
 
-export const CoverflexPocketsResponseSchema = v.object({
-  pockets: v.array(
-    v.object({
-      type: v.string(),
-      balance: v.object({
-        amount: v.number(),
+export const CoverflexPocketsResponseSchema = object({
+  pockets: array(
+    object({
+      balance: object({
+        amount: number(),
       }),
+      type: string(),
     }),
   ),
 });
 
-export type CoverflexAuthResponse = v.InferOutput<typeof CoverflexAuthResponseSchema>;
+export type CoverflexAuthResponse = InferOutput<typeof CoverflexAuthResponseSchema>;

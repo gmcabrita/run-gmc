@@ -1,51 +1,61 @@
 import { decodeHtmlEntities, isValidRSSEntry, USERAGENT, type ScraperContext } from "@rss/common";
 import type { RSSData, RSSEntry } from "@rss/types";
 import { createProxiedFetch, type ProxiedFetch, type ProxiedFetchEnv } from "../../proxiedFetch";
-import * as v from "valibot";
+import {
+  array,
+  fallback,
+  looseObject,
+  nullish,
+  picklist,
+  safeParse,
+  string,
+  unknown,
+  type InferOutput,
+} from "valibot";
 
 const SITE_ORIGIN = "https://expresso.pt";
 const BASE_URL = `${SITE_ORIGIN}/media-comunicacao`;
 const API_URL =
   "https://expresso.pt/api/gs/expresso/v1/molecule/feed?categories=%2Fmedia-comunicacao&category=media-comunicacao&contentTypes=ARTICLE%2CSTREAM%2CNEWSLETTER%2CVIDEO&limit=20";
 
-const OptionalTextSchema = v.fallback(v.nullish(v.string()), undefined);
-const ExpressoPictureSchema = v.looseObject({
+const OptionalTextSchema = fallback(nullish(string()), undefined);
+const ExpressoPictureSchema = looseObject({
   urlLandscape: OptionalTextSchema,
   urlOriginal: OptionalTextSchema,
   urlThumbnail: OptionalTextSchema,
 });
-const OptionalExpressoPictureSchema = v.fallback(
-  v.nullish(ExpressoPictureSchema),
+const OptionalExpressoPictureSchema = fallback(
+  nullish(ExpressoPictureSchema),
   undefined,
 );
-const ExpressoContentSchema = v.looseObject({
-  type: v.picklist(["ARTICLE", "STREAM", "NEWSLETTER", "VIDEO"]),
-  uuid: OptionalTextSchema,
+const ExpressoContentSchema = looseObject({
   code: OptionalTextSchema,
-  link: OptionalTextSchema,
-  title: OptionalTextSchema,
   headlineTitle: OptionalTextSchema,
-  lead: OptionalTextSchema,
-  tickerDescription: OptionalTextSchema,
-  publishedDate: OptionalTextSchema,
   lastModifiedDate: OptionalTextSchema,
+  lead: OptionalTextSchema,
+  link: OptionalTextSchema,
   picture: OptionalExpressoPictureSchema,
+  publishedDate: OptionalTextSchema,
+  tickerDescription: OptionalTextSchema,
+  title: OptionalTextSchema,
+  type: picklist(["ARTICLE", "STREAM", "NEWSLETTER", "VIDEO"]),
+  uuid: OptionalTextSchema,
 });
-const ExpressoApiPayloadSchema = v.looseObject({
-  contents: v.array(v.unknown()),
+const ExpressoApiPayloadSchema = looseObject({
+  contents: array(unknown()),
 });
 
-export type ExpressoApiPayload = v.InferOutput<typeof ExpressoApiPayloadSchema>;
-type ExpressoContent = v.InferOutput<typeof ExpressoContentSchema>;
-type ExpressoPicture = v.InferOutput<typeof ExpressoPictureSchema>;
+export type ExpressoApiPayload = InferOutput<typeof ExpressoApiPayloadSchema>;
+type ExpressoContent = InferOutput<typeof ExpressoContentSchema>;
+type ExpressoPicture = InferOutput<typeof ExpressoPictureSchema>;
 
 interface ExpressoEntry {
-  id: string;
-  link: string;
-  title: string;
-  text: string;
   datetime?: Date;
+  id: string;
   imageURL?: string;
+  link: string;
+  text: string;
+  title: string;
 }
 
 const EMPTY_EXPRESSO_PAYLOAD = { contents: [] } satisfies ExpressoApiPayload;
@@ -56,9 +66,9 @@ function normalizeText(value: string | null | undefined): string | undefined {
   }
 
   return (
-    decodeHtmlEntities(value.replace(/<[^>]*>/g, " "))
-      .replace(/\u00a0/g, " ")
-      .replace(/\s+/g, " ")
+    decodeHtmlEntities(value.replaceAll(/<[^>]*>/g, " "))
+      .replaceAll('\u00A0', " ")
+      .replaceAll(/\s+/g, " ")
       .trim() || undefined
   );
 }
@@ -97,21 +107,21 @@ function parseContent(content: ExpressoContent): ExpressoEntry | undefined {
   }
 
   return {
-    id: normalizeText(content.uuid) ?? normalizeText(content.code) ?? link,
-    link,
-    title,
-    text: normalizeText(content.lead) ?? normalizeText(content.tickerDescription) ?? title,
     datetime: parseDate(content.publishedDate) ?? parseDate(content.lastModifiedDate),
+    id: normalizeText(content.uuid) ?? normalizeText(content.code) ?? link,
     imageURL: readImageUrl(content.picture),
+    link,
+    text: normalizeText(content.lead) ?? normalizeText(content.tickerDescription) ?? title,
+    title,
   };
 }
 
 export function parse(payload: ExpressoApiPayload): RSSData {
-  const payloadResult = v.safeParse(ExpressoApiPayloadSchema, payload);
+  const payloadResult = safeParse(ExpressoApiPayloadSchema, payload);
   const contents = payloadResult.success ? payloadResult.output.contents : [];
-  const entries: RSSEntry[] = contents
+  const entries: Array<RSSEntry> = contents
     .flatMap((content) => {
-      const contentResult = v.safeParse(ExpressoContentSchema, content);
+      const contentResult = safeParse(ExpressoContentSchema, content);
       if (!contentResult.success) {
         return [];
       }
@@ -122,12 +132,12 @@ export function parse(payload: ExpressoApiPayload): RSSData {
     .filter(isValidRSSEntry);
 
   return {
+    description: "Expresso Media e Comunicação",
+    entries,
     id: BASE_URL,
+    language: "pt",
     link: BASE_URL,
     title: "Expresso - Media e Comunicação",
-    description: "Expresso Media e Comunicação",
-    language: "pt",
-    entries,
   };
 }
 
@@ -147,7 +157,7 @@ export async function scrapeMediaApi(
     throw new Error(`Expresso media request failed: ${response.status}`);
   }
 
-  const payloadResult = v.safeParse(ExpressoApiPayloadSchema, await response.json());
+  const payloadResult = safeParse(ExpressoApiPayloadSchema, await response.json());
   return parse(payloadResult.success ? payloadResult.output : EMPTY_EXPRESSO_PAYLOAD);
 }
 

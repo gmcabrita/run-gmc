@@ -11,7 +11,7 @@ interface SQLiteNewsDraftEntry extends RSSEntry {
 }
 
 function normalizeWhitespace(text: string): string {
-  return text.replace(/\s+/g, " ").trim();
+  return text.replaceAll(/\s+/g, " ").trim();
 }
 
 function parseDate(value: string): Date | undefined {
@@ -49,18 +49,18 @@ function parseLink(href: string): string | undefined {
 }
 
 export async function parse(response: Response): Promise<RSSData> {
-  const entries: SQLiteNewsDraftEntry[] = [];
+  const entries: Array<SQLiteNewsDraftEntry> = [];
   let currentEntry: SQLiteNewsDraftEntry | null = null;
 
   const rewriter = new HTMLRewriter()
     .on("h3", {
       element() {
         currentEntry = {
+          heading: "",
           id: "",
           link: "",
-          title: "",
           text: "",
-          heading: "",
+          title: "",
         };
         entries.push(currentEntry);
       },
@@ -99,11 +99,7 @@ export async function parse(response: Response): Promise<RSSData> {
   await consume(body);
 
   return {
-    id: NEWS_URL,
-    link: NEWS_URL,
-    title: TITLE,
     description: DESCRIPTION,
-    language: "en",
     entries: entries
       .map((entry) => {
         const heading = normalizeWhitespace(entry.heading);
@@ -119,12 +115,12 @@ export async function parse(response: Response): Promise<RSSData> {
 
         const fallbackLink = `${NEWS_URL}#${dateText.replaceAll("-", "_")}`;
         return {
-          id: entry.id || fallbackLink,
-          link: entry.link || fallbackLink,
-          title,
-          text: normalizeWhitespace(entry.text),
           datetime: parseDate(dateText),
           heading: entry.heading,
+          id: entry.id || fallbackLink,
+          link: entry.link || fallbackLink,
+          text: normalizeWhitespace(entry.text),
+          title,
         };
       })
       .filter(isValidRSSEntry)
@@ -134,14 +130,18 @@ export async function parse(response: Response): Promise<RSSData> {
         const bTime = b.datetime?.getTime() ?? 0;
         return bTime - aTime;
       }),
+    id: NEWS_URL,
+    language: "en",
+    link: NEWS_URL,
+    title: TITLE,
   };
 }
 
 export async function get(_ctx: ScraperContext): Promise<RSSData> {
   const response = await fetch(NEWS_URL, {
     headers: {
-      "user-agent": USERAGENT,
       accept: "text/html",
+      "user-agent": USERAGENT,
     },
   });
 

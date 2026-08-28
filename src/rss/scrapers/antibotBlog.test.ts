@@ -13,11 +13,11 @@ describe("antibotBlog scraper", () => {
     const result = await parse(createResponse());
 
     expect(result).toMatchObject({
+      description: "A blog for reverse engineering code!",
       id: "https://antibot.blog/",
+      language: "en",
       link: "https://antibot.blog/",
       title: "antibot.blog",
-      description: "A blog for reverse engineering code!",
-      language: "en",
     });
     expect(result.entries).toHaveLength(3);
   });
@@ -26,11 +26,11 @@ describe("antibotBlog scraper", () => {
     const result = await parse(createResponse());
 
     expect(result.entries[0]).toEqual({
+      datetime: new Date("2026-03-15T00:00:00.000Z"),
       id: "https://antibot.blog/posts/1773605197805",
       link: "https://antibot.blog/posts/1773605197805",
-      title: "Reversing Akamai BMP 3.2.4 on Android",
       text: "Breaking down Akamai's mobile bot management SDK on Android - the encryption scheme, payload structure, and what it takes to generate valid sensor data at scale.",
-      datetime: new Date("2026-03-15T00:00:00.000Z"),
+      title: "Reversing Akamai BMP 3.2.4 on Android",
     });
 
     expect(result.entries.map((entry) => entry.datetime)).toEqual([

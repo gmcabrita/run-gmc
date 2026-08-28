@@ -1,6 +1,12 @@
 import { USERAGENT, consume, isValidRSSEntry, type ScraperContext } from "@rss/common";
 import type { RSSData, RSSEntry } from "@rss/types";
-import * as v from "valibot";
+import {
+  boolean,
+  fallback,
+  looseObject,
+  safeParse,
+  string,
+} from "valibot";
 
 const SITE_ORIGIN = "https://www.jornaldenegocios.pt";
 const SECTION_PATH = "/empresas/media";
@@ -11,34 +17,34 @@ const FIRST_PAGE_URL = new URL(
   SITE_ORIGIN,
 ).href;
 const REQUEST_RETRY_COUNT = 3;
-const RetryableFailureSchema = v.looseObject({
-  retryable: v.fallback(v.boolean(), false),
-  message: v.fallback(v.string(), ""),
+const RetryableFailureSchema = looseObject({
+  message: fallback(string(), ""),
+  retryable: fallback(boolean(), false),
 });
 
 type FetchFn = typeof fetch;
 
 interface DraftEntry extends RSSEntry {
-  publishedAt: string;
   authorName: string;
+  publishedAt: string;
 }
 
 interface LoadMorePage {
-  entries: RSSEntry[];
+  entries: Array<RSSEntry>;
   nextPageURL?: string;
 }
 
 interface ParsedPageResult {
-  page: LoadMorePage;
   isPartial: boolean;
+  page: LoadMorePage;
 }
 
 function normalizeWhitespace(text: string): string {
-  return text.replace(/\s+/g, " ").trim();
+  return text.replaceAll(/\s+/g, " ").trim();
 }
 
-function getLastEntry(entries: DraftEntry[]): DraftEntry | undefined {
-  return entries[entries.length - 1];
+function getLastEntry(entries: Array<DraftEntry>): DraftEntry | undefined {
+  return entries.at(-1);
 }
 
 function parsePtDate(value: string): Date | undefined {
@@ -94,14 +100,14 @@ async function fetchPage(url: string, fetchFn: FetchFn): Promise<Response> {
   return response;
 }
 
-function buildFeed(entries: RSSEntry[]): RSSData {
+function buildFeed(entries: Array<RSSEntry>): RSSData {
   return {
+    description: "Jornal de Negocios Media",
+    entries,
     id: BASE_URL,
+    language: "pt",
     link: BASE_URL,
     title: "Jornal de Negocios - Media",
-    description: "Jornal de Negocios Media",
-    language: "pt",
-    entries,
   };
 }
 
@@ -113,7 +119,7 @@ async function parsePageWithFallback(
   response: Response,
   fallbackNextPageURL?: string,
 ): Promise<ParsedPageResult> {
-  const draftEntries: DraftEntry[] = [];
+  const draftEntries: Array<DraftEntry> = [];
   let nextPageURL: string | undefined;
   let isPartial = false;
 
@@ -121,12 +127,12 @@ async function parsePageWithFallback(
     .on("article.destaque", {
       element() {
         draftEntries.push({
+          authorName: "",
           id: "",
           link: "",
-          title: "",
-          text: "",
           publishedAt: "",
-          authorName: "",
+          text: "",
+          title: "",
         });
       },
     })
@@ -195,7 +201,7 @@ async function parsePageWithFallback(
   try {
     await consume(body);
   } catch (error) {
-    const failureResult = v.safeParse(RetryableFailureSchema, error);
+    const failureResult = safeParse(RetryableFailureSchema, error);
     const isRetryable =
       failureResult.success &&
       (failureResult.output.retryable ||
@@ -220,12 +226,12 @@ async function parsePageWithFallback(
           const authorName = normalizeWhitespace(entry.authorName);
 
           return {
-            id: entry.id,
-            link: entry.link,
-            title,
-            text: authorName || title,
             datetime: parsePtDate(entry.publishedAt),
+            id: entry.id,
             imageURL: entry.imageURL,
+            link: entry.link,
+            text: authorName || title,
+            title,
           };
         })
         .filter(isValidRSSEntry),
@@ -250,7 +256,7 @@ async function loadPage(url: string, fetchFn: FetchFn): Promise<LoadMorePage> {
         return result.page;
       }
     } catch (error) {
-      const failureResult = v.safeParse(RetryableFailureSchema, error);
+      const failureResult = safeParse(RetryableFailureSchema, error);
       const isRetryable =
         failureResult.success &&
         (failureResult.output.retryable ||
@@ -277,7 +283,7 @@ async function loadPage(url: string, fetchFn: FetchFn): Promise<LoadMorePage> {
 }
 
 export async function scrapeFirstTwoPages(fetchFn: FetchFn): Promise<RSSData> {
-  const entries: RSSEntry[] = [];
+  const entries: Array<RSSEntry> = [];
   const seenIds = new Set<string>();
   let currentPageURL: string | undefined = FIRST_PAGE_URL;
 

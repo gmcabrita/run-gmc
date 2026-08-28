@@ -13,23 +13,23 @@ interface FundoAmbientalEntry extends RSSEntry {
 }
 
 export async function parse(response: Response): Promise<RSSData> {
-  const entries: FundoAmbientalEntry[] = [];
+  const entries: Array<FundoAmbientalEntry> = [];
 
   const rewriter = new HTMLRewriter()
     .on(".register", {
       element() {
         entries.push({
+          dateString: "",
           id: "",
           link: "",
-          title: "",
           text: "",
-          dateString: "",
+          title: "",
         });
       },
     })
     .on(".register .register-title", {
       text(text) {
-        const lastEntry = entries[entries.length - 1];
+        const lastEntry = entries.at(-1);
         if (lastEntry && text.text) {
           lastEntry.title = (lastEntry.title || "") + text.text;
         }
@@ -37,7 +37,7 @@ export async function parse(response: Response): Promise<RSSData> {
     })
     .on(".register .register-title > a", {
       element(el) {
-        const lastEntry = entries[entries.length - 1];
+        const lastEntry = entries.at(-1);
         const href = el.getAttribute("href");
         if (lastEntry && href) {
           lastEntry.id = href;
@@ -47,7 +47,7 @@ export async function parse(response: Response): Promise<RSSData> {
     })
     .on(".register .register-text", {
       text(text) {
-        const lastEntry = entries[entries.length - 1];
+        const lastEntry = entries.at(-1);
         if (lastEntry && text.text) {
           lastEntry.text = (lastEntry.text || "") + text.text;
         }
@@ -55,7 +55,7 @@ export async function parse(response: Response): Promise<RSSData> {
     })
     .on(".register .register-date", {
       text(text) {
-        const lastEntry = entries[entries.length - 1];
+        const lastEntry = entries.at(-1);
         if (lastEntry && text.text) {
           lastEntry.dateString = (lastEntry.dateString || "") + text.text;
         }
@@ -64,21 +64,21 @@ export async function parse(response: Response): Promise<RSSData> {
 
   await consume(rewriter.transform(response).body!);
 
-  const rssEntries: RSSEntry[] = entries.map((entry) => ({
+  const rssEntries: Array<RSSEntry> = entries.map((entry) => ({
+    datetime: parseDateFundoAmbiental(entry.dateString),
     id: entry.id,
     link: entry.link,
-    title: entry.title.trim(),
     text: (entry.text ?? "").trim(),
-    datetime: parseDateFundoAmbiental(entry.dateString),
+    title: entry.title.trim(),
   }));
 
   return {
+    description: "Fundo Ambiental – Últimas notícias",
+    entries: rssEntries.filter(isValidRSSEntry),
     id: BASE_URL,
+    language: "pt",
     link: BASE_URL,
     title: "Fundo Ambiental – Últimas notícias",
-    description: "Fundo Ambiental – Últimas notícias",
-    language: "pt",
-    entries: rssEntries.filter(isValidRSSEntry),
   };
 }
 

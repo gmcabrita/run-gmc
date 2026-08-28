@@ -1,30 +1,30 @@
-import * as fs from "fs";
-import * as path from "path";
-import * as readline from "readline";
-import * as v from "valibot";
+import { existsSync, readFileSync } from "node:fs";
+import { join } from "node:path";
+import { createInterface } from "node:readline";
+import { object, parse, string } from "valibot";
 
-const CoverflexAuthResponseSchema = v.object({
-  token: v.string(),
-  refresh_token: v.string(),
+const CoverflexAuthResponseSchema = object({
+  refresh_token: string(),
+  token: string(),
 });
-const TrustedUserAgentResponseSchema = v.object({
-  user_agent_token: v.string(),
+const TrustedUserAgentResponseSchema = object({
+  user_agent_token: string(),
 });
 
 const API_BASE = "https://menhir-api.coverflex.com/api";
 
 function loadDevVars() {
   const vars: Record<string, string> = {};
-  const devVarsPath = path.join(process.cwd(), ".dev.vars");
-  if (!fs.existsSync(devVarsPath)) return vars;
+  const devVarsPath = join(process.cwd(), ".dev.vars");
+  if (!existsSync(devVarsPath)) {return vars;}
 
-  const content = fs.readFileSync(devVarsPath, "utf-8");
+  const content = readFileSync(devVarsPath, "utf8");
 
   for (const line of content.split("\n")) {
     const trimmed = line.trim();
-    if (!trimmed || trimmed.startsWith("#")) continue;
+    if (!trimmed || trimmed.startsWith("#")) {continue;}
     const [key, ...valueParts] = trimmed.split("=");
-    if (key && valueParts) vars[key] = valueParts.join("=");
+    if (key && valueParts) {vars[key] = valueParts.join("=");}
   }
 
   return vars;
@@ -35,17 +35,17 @@ const COMMON_HEADERS = {
   "accept-language": "en-US,en;q=0.9,pt-PT;q=0.8,pt;q=0.7",
   "content-type": "application/json",
   priority: "u=1, i",
+  Referer: "https://my.coverflex.com/",
   "sec-ch-ua": '"Not)A;Brand";v="8", "Chromium";v="138", "Google Chrome";v="138"',
   "sec-ch-ua-mobile": "?0",
   "sec-ch-ua-platform": '"macOS"',
   "sec-fetch-dest": "empty",
   "sec-fetch-mode": "cors",
   "sec-fetch-site": "same-site",
-  Referer: "https://my.coverflex.com/",
 };
 
 function prompt(question: string): Promise<string> {
-  const rl = readline.createInterface({
+  const rl = createInterface({
     input: process.stdin,
     output: process.stdout,
   });
@@ -62,13 +62,13 @@ async function authenticate(
   email: string,
   password: string,
   otp?: string,
-): Promise<{ token: string; refresh_token: string }> {
-  const payload = otp ? { email, password, otp } : { email, password };
+): Promise<{ refresh_token: string; token: string; }> {
+  const payload = otp ? { email, otp, password } : { email, password };
 
   const response = await fetch(`${API_BASE}/employee/sessions`, {
-    method: "POST",
-    headers: COMMON_HEADERS,
     body: JSON.stringify(payload),
+    headers: COMMON_HEADERS,
+    method: "POST",
   });
 
   if (!response.ok) {
@@ -76,17 +76,17 @@ async function authenticate(
     throw new Error(`Authentication failed: ${response.status} - ${text}`);
   }
 
-  return v.parse(CoverflexAuthResponseSchema, await response.json());
+  return parse(CoverflexAuthResponseSchema, await response.json());
 }
 
 async function trustUserAgent(token: string): Promise<string> {
   const response = await fetch(`${API_BASE}/employee/sessions/trust-user-agent`, {
-    method: "POST",
     headers: {
       ...COMMON_HEADERS,
-      "content-type": "application/x-www-form-urlencoded",
       authorization: `Bearer ${token}`,
+      "content-type": "application/x-www-form-urlencoded",
     },
+    method: "POST",
   });
 
   if (!response.ok) {
@@ -94,7 +94,7 @@ async function trustUserAgent(token: string): Promise<string> {
     throw new Error(`Trust user agent failed: ${response.status} - ${text}`);
   }
 
-  const json = v.parse(TrustedUserAgentResponseSchema, await response.json());
+  const json = parse(TrustedUserAgentResponseSchema, await response.json());
   return json.user_agent_token;
 }
 
@@ -129,7 +129,9 @@ async function main() {
   );
 }
 
-main().catch((error) => {
+try {
+  await main();
+} catch (error) {
   console.error("Error:", error instanceof Error ? error.message : String(error));
   process.exit(1);
-});
+}

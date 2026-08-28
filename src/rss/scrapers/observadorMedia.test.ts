@@ -25,34 +25,34 @@ describe("observadorMedia scraper", () => {
     expect(result.language).toBe("pt");
     expect(result.entries).toEqual([
       {
-        id: "https://observador.pt/2026/04/17/story-one/",
-        link: "https://observador.pt/2026/04/17/story-one/",
-        title: "Story One com espaços",
-        text: "Lead One com espaços.",
         datetime: new Date("2026-04-17T10:10:16.000Z"),
+        id: "https://observador.pt/2026/04/17/story-one/",
         imageURL: "https://cdn.observador.pt/story-one.jpg",
+        link: "https://observador.pt/2026/04/17/story-one/",
+        text: "Lead One com espaços.",
+        title: "Story One com espaços",
       },
       {
-        id: "https://observador.pt/newsletters/360/story-two/",
-        link: "https://observador.pt/newsletters/360/story-two/",
-        title: "Story Two",
-        text: "Lead Two",
         datetime: new Date("2026-04-17T08:30:05.000Z"),
+        id: "https://observador.pt/newsletters/360/story-two/",
         imageURL: undefined,
+        link: "https://observador.pt/newsletters/360/story-two/",
+        text: "Lead Two",
+        title: "Story Two",
       },
       {
-        id: "https://observador.pt/opiniao/story-three/",
-        link: "https://observador.pt/opiniao/story-three/",
-        title: 'Story Three "Opinião"',
-        text: "Maria João Exemplo",
         datetime: new Date("2026-04-15T00:26:52.000Z"),
+        id: "https://observador.pt/opiniao/story-three/",
         imageURL: "https://cdn.observador.pt/story-three.jpg",
+        link: "https://observador.pt/opiniao/story-three/",
+        text: "Maria João Exemplo",
+        title: 'Story Three "Opinião"',
       },
     ]);
   });
 
   it("fetches the section page", async () => {
-    const fetchCalls: string[] = [];
+    const fetchCalls: Array<string> = [];
     const fetchFn: typeof fetch = async (input) => {
       const url = readFetchUrl(input);
       fetchCalls.push(url);

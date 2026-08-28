@@ -7,21 +7,21 @@ describe("berserk parser", () => {
     const result = parse(json);
 
     expect(result).toMatchObject({
+      description: "English Berserk chapter releases from MangaDex",
       id: "https://mangadex.org/title/801513ba-a712-498c-8f57-cae55b38cc92/berserk",
+      language: "en",
       link: "https://mangadex.org/title/801513ba-a712-498c-8f57-cae55b38cc92/berserk",
       title: "Berserk chapters",
-      description: "English Berserk chapter releases from MangaDex",
-      language: "en",
     });
     expect(result.entries).toHaveLength(2);
 
     expect(result.entries[0]).toEqual({
+      datetime: new Date("2026-07-09T22:35:41+00:00"),
       id: "a8a25d77-245f-4b35-9a24-b831e27e090e",
       link: "https://mangadex.org/chapter/a8a25d77-245f-4b35-9a24-b831e27e090e",
+      text: "<strong>Scanlation group:</strong> Evil Genius<br><strong>Chapter:</strong> 386<br>Can You Catch Hold of a Migrating Bird in the Clouds?",
       title:
         "Berserk — Chapter 386: Can You Catch Hold of a Migrating Bird in the Clouds? — Evil Genius",
-      text: "<strong>Scanlation group:</strong> Evil Genius<br><strong>Chapter:</strong> 386<br>Can You Catch Hold of a Migrating Bird in the Clouds?",
-      datetime: new Date("2026-07-09T22:35:41+00:00"),
     });
   });
 

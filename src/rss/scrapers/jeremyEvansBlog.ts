@@ -11,13 +11,13 @@ export async function parse(response: Response): Promise<RSSData> {
         entries.push({
           id: link,
           link: link,
-          title: "",
           text: "",
+          title: "",
         });
       }
     },
     text(text) {
-      const lastEntry = entries[entries.length - 1];
+      const lastEntry = entries.at(-1);
       if (lastEntry && text.text) {
         lastEntry.title = (lastEntry.title || "") + text.text;
       }
@@ -26,26 +26,26 @@ export async function parse(response: Response): Promise<RSSData> {
 
   await consume(rewriter.transform(response).body!);
   return {
-    id: "https://code.jeremyevans.net/",
-    link: "https://code.jeremyevans.net/",
-    title: "Jeremy Evans",
     description: "Jeremy Evans",
-    language: "en",
     entries: entries
       .map((entry) => ({
         ...entry,
-        title: entry.title.trim().replace(/\n/g, " | "),
-        text: entry.title.trim().replace(/\n/g, " | "),
+        text: entry.title.trim().replaceAll("\n", " | "),
+        title: entry.title.trim().replaceAll("\n", " | "),
       }))
       .filter((entry: RSSEntry) => isValidRSSEntry(entry)),
+    id: "https://code.jeremyevans.net/",
+    language: "en",
+    link: "https://code.jeremyevans.net/",
+    title: "Jeremy Evans",
   };
 }
 
 export async function get(_ctx: ScraperContext): Promise<RSSData> {
   const response = await fetch("https://code.jeremyevans.net/", {
     headers: {
-      "user-agent": USERAGENT,
       "Content-Type": "text/html",
+      "user-agent": USERAGENT,
     },
   });
 

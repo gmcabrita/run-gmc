@@ -4,11 +4,11 @@ import type { RSSData, RSSEntry } from "@rss/types";
 const BASE_URL = "https://brokenbrowser.com/";
 
 function normalizeWhitespace(text: string): string {
-  return text.replace(/\s+/g, " ").trim();
+  return text.replaceAll(/\s+/g, " ").trim();
 }
 
 export async function parse(response: Response): Promise<RSSData> {
-  const entries: RSSEntry[] = [];
+  const entries: Array<RSSEntry> = [];
   let currentEntry: RSSEntry | null = null;
 
   const rewriter = new HTMLRewriter()
@@ -17,8 +17,8 @@ export async function parse(response: Response): Promise<RSSData> {
         currentEntry = {
           id: "",
           link: "",
-          title: "",
           text: "",
+          title: "",
         };
         entries.push(currentEntry);
       },
@@ -72,18 +72,14 @@ export async function parse(response: Response): Promise<RSSData> {
   await consume(body);
 
   return {
-    id: BASE_URL,
-    link: BASE_URL,
-    title: "Broken Browser Blog",
     description: "Broken Browser blog posts",
-    language: "en",
     entries: entries
       .map((entry) => {
         const title = normalizeWhitespace(entry.title);
         return {
           ...entry,
-          title,
           text: title,
+          title,
         };
       })
       .filter(isValidRSSEntry)
@@ -92,16 +88,20 @@ export async function parse(response: Response): Promise<RSSData> {
         const bTime = b.datetime?.getTime() ?? 0;
         return bTime - aTime;
       }),
+    id: BASE_URL,
+    language: "en",
+    link: BASE_URL,
+    title: "Broken Browser Blog",
   };
 }
 
 export async function get(_ctx: ScraperContext): Promise<RSSData> {
   const response = await fetch(BASE_URL, {
-    redirect: "follow",
     headers: {
-      "user-agent": USERAGENT,
       accept: "text/html",
+      "user-agent": USERAGENT,
     },
+    redirect: "follow",
   });
 
   return parse(response);

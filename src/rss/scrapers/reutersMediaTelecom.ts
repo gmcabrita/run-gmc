@@ -1,7 +1,17 @@
 import { isValidRSSEntry, type ScraperContext } from "@rss/common";
 import { createProxiedFetch } from "../../proxiedFetch";
 import type { RSSData, RSSEntry } from "@rss/types";
-import * as v from "valibot";
+import {
+  array,
+  fallback,
+  looseObject,
+  nullish,
+  optional,
+  safeParse,
+  string,
+  unknown,
+  type InferOutput,
+} from "valibot";
 
 const SITE_URL = "https://www.reuters.com";
 const SECTION_PATH = "/business/media-telecom/";
@@ -20,42 +30,42 @@ const API_QUERY = {
   website: "reuters",
 };
 
-const OptionalTextSchema = v.fallback(v.nullish(v.string()), undefined);
-const ReutersThumbnailSchema = v.looseObject({
-  url: v.string(),
+const OptionalTextSchema = fallback(nullish(string()), undefined);
+const ReutersThumbnailSchema = looseObject({
+  url: string(),
 });
-const ReutersArticlePayloadSchema = v.looseObject({
-  id: v.string(),
-  canonical_url: OptionalTextSchema,
-  title: OptionalTextSchema,
+const ReutersArticlePayloadSchema = looseObject({
   basic_headline: OptionalTextSchema,
-  web: OptionalTextSchema,
-  native: OptionalTextSchema,
+  canonical_url: OptionalTextSchema,
   description: OptionalTextSchema,
+  id: string(),
+  native: OptionalTextSchema,
   published_time: OptionalTextSchema,
+  thumbnail: optional(unknown()),
+  title: OptionalTextSchema,
   updated_time: OptionalTextSchema,
-  thumbnail: v.optional(v.unknown()),
+  web: OptionalTextSchema,
 });
-const ReutersApiPayloadSchema = v.looseObject({
-  result: v.looseObject({
-    articles: v.array(v.unknown()),
+const ReutersApiPayloadSchema = looseObject({
+  result: looseObject({
+    articles: array(unknown()),
   }),
 });
 
-export type ReutersApiPayload = v.InferOutput<typeof ReutersApiPayloadSchema>;
-type ReutersArticlePayload = v.InferOutput<typeof ReutersArticlePayloadSchema>;
+export type ReutersApiPayload = InferOutput<typeof ReutersApiPayloadSchema>;
+type ReutersArticlePayload = InferOutput<typeof ReutersArticlePayloadSchema>;
 
 interface ReutersArticle {
-  id: string;
   canonicalUrl?: string;
-  title?: string;
   description?: string;
-  publishedAt?: string;
+  id: string;
   imageUrl?: string;
+  publishedAt?: string;
+  title?: string;
 }
 
 interface ReutersSectionResponse {
-  articles: ReutersArticle[];
+  articles: Array<ReutersArticle>;
 }
 
 const EMPTY_REUTERS_PAYLOAD = { result: { articles: [] } } satisfies ReutersApiPayload;
@@ -67,8 +77,8 @@ function normalizeOptionalText(value: string | null | undefined): string | undef
 function normalizeText(value: string | undefined): string | undefined {
   return (
     value
-      ?.replace(/\u00a0/g, " ")
-      .replace(/\s+/g, " ")
+      ?.replaceAll('\u00A0', " ")
+      .replaceAll(/\s+/g, " ")
       .trim() || undefined
   );
 }
@@ -79,7 +89,7 @@ function parseReutersArticle(payload: ReutersArticlePayload): ReutersArticle | u
     return undefined;
   }
 
-  const thumbnailResult = v.safeParse(ReutersThumbnailSchema, payload.thumbnail);
+  const thumbnailResult = safeParse(ReutersThumbnailSchema, payload.thumbnail);
   const title = normalizeText(
     normalizeOptionalText(payload.title) ??
       normalizeOptionalText(payload.basic_headline) ??
@@ -88,28 +98,28 @@ function parseReutersArticle(payload: ReutersArticlePayload): ReutersArticle | u
   );
 
   return {
-    id,
     canonicalUrl: normalizeOptionalText(payload.canonical_url),
-    title,
     description: normalizeText(normalizeOptionalText(payload.description)),
-    publishedAt:
-      normalizeOptionalText(payload.published_time) ??
-      normalizeOptionalText(payload.updated_time),
+    id,
     imageUrl: thumbnailResult.success
       ? normalizeOptionalText(thumbnailResult.output.url)
       : undefined,
+    publishedAt:
+      normalizeOptionalText(payload.published_time) ??
+      normalizeOptionalText(payload.updated_time),
+    title,
   };
 }
 
 function readReutersResponse(payload: ReutersApiPayload): ReutersSectionResponse {
-  const payloadResult = v.safeParse(ReutersApiPayloadSchema, payload);
+  const payloadResult = safeParse(ReutersApiPayloadSchema, payload);
   if (!payloadResult.success) {
     return { articles: [] };
   }
 
   return {
     articles: payloadResult.output.result.articles.flatMap((article) => {
-      const articleResult = v.safeParse(ReutersArticlePayloadSchema, article);
+      const articleResult = safeParse(ReutersArticlePayloadSchema, article);
       if (!articleResult.success) {
         return [];
       }
@@ -130,38 +140,38 @@ function buildApiUrl() {
 
 export function parse(payload: ReutersApiPayload): RSSData {
   const response = readReutersResponse(payload);
-  const entries: RSSEntry[] = response.articles
+  const entries: Array<RSSEntry> = response.articles
     .map((article) => {
       const link = article.canonicalUrl ? new URL(article.canonicalUrl, SITE_URL).href : "";
       const title = article.title ?? "";
 
       return {
-        id: article.id,
-        link,
-        title,
-        text: article.description ?? title,
         datetime: article.publishedAt ? new Date(article.publishedAt) : undefined,
+        id: article.id,
         imageURL: article.imageUrl,
+        link,
+        text: article.description ?? title,
+        title,
       };
     })
     .filter(isValidRSSEntry);
 
   return {
+    description: "Reuters Media & Telecom news",
+    entries,
     id: BASE_URL,
+    language: "en",
     link: BASE_URL,
     title: "Reuters - Media & Telecom",
-    description: "Reuters Media & Telecom news",
-    language: "en",
-    entries,
   };
 }
 
 export async function get(_ctx: ScraperContext): Promise<RSSData> {
   const response = await createProxiedFetch(_ctx.env)(buildApiUrl(), {
     headers: {
-      Referer: "https://www.reuters.com/business/media-telecom/",
       accept: "application/json, text/plain, */*",
       "accept-language": ACCEPT_LANGUAGE,
+      Referer: "https://www.reuters.com/business/media-telecom/",
     },
   });
 
@@ -169,6 +179,6 @@ export async function get(_ctx: ScraperContext): Promise<RSSData> {
     throw new Error(`Reuters request failed: ${response.status}`);
   }
 
-  const payloadResult = v.safeParse(ReutersApiPayloadSchema, await response.json());
+  const payloadResult = safeParse(ReutersApiPayloadSchema, await response.json());
   return parse(payloadResult.success ? payloadResult.output : EMPTY_REUTERS_PAYLOAD);
 }

@@ -25,25 +25,25 @@ describe("jornalDeNegociosMedia scraper", () => {
     expect(result.entries).toHaveLength(2);
     expect(result.nextPageURL).toBe(SECOND_PAGE_URL);
     expect(result.entries[0]).toEqual({
-      id: "https://www.jornaldenegocios.pt/empresas/media/detalhe/story-one",
-      link: "https://www.jornaldenegocios.pt/empresas/media/detalhe/story-one",
-      title: "Story One",
-      text: "Autor Um",
       datetime: new Date("2026-03-17T00:00:00.000Z"),
+      id: "https://www.jornaldenegocios.pt/empresas/media/detalhe/story-one",
       imageURL: "https://cdn.jornaldenegocios.pt/images/story-one.jpg",
+      link: "https://www.jornaldenegocios.pt/empresas/media/detalhe/story-one",
+      text: "Autor Um",
+      title: "Story One",
     });
     expect(result.entries[1]).toEqual({
-      id: "https://www.jornaldenegocios.pt/empresas/media/detalhe/story-two",
-      link: "https://www.jornaldenegocios.pt/empresas/media/detalhe/story-two",
-      title: 'Story Two "Premium"',
-      text: "Autor Dois",
       datetime: new Date("2026-03-16T00:00:00.000Z"),
+      id: "https://www.jornaldenegocios.pt/empresas/media/detalhe/story-two",
       imageURL: undefined,
+      link: "https://www.jornaldenegocios.pt/empresas/media/detalhe/story-two",
+      text: "Autor Dois",
+      title: 'Story Two "Premium"',
     });
   });
 
   it("fetches only the first two loadmore pages", async () => {
-    const fetchCalls: string[] = [];
+    const fetchCalls: Array<string> = [];
     const fetchFn: typeof fetch = async (input) => {
       const url = readFetchUrl(input);
       fetchCalls.push(url);
@@ -78,7 +78,7 @@ describe("jornalDeNegociosMedia scraper", () => {
   });
 
   it("retries retryable failures while loading a page", async () => {
-    const fetchCalls: string[] = [];
+    const fetchCalls: Array<string> = [];
     let firstPageAttempts = 0;
     const fetchFn: typeof fetch = async (input) => {
       const url = readFetchUrl(input);

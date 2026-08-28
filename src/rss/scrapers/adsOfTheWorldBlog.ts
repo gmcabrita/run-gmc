@@ -2,9 +2,9 @@ import { USERAGENT, isValidRSSEntry, consume, type ScraperContext } from "@rss/c
 import type { RSSData, RSSEntry } from "@rss/types";
 
 interface CampaignEntry extends RSSEntry {
+  agency?: string;
   brand?: string;
   campaign?: string;
-  agency?: string;
 }
 
 export async function parse(response: Response): Promise<RSSData> {
@@ -13,19 +13,19 @@ export async function parse(response: Response): Promise<RSSData> {
     .on("[id^='campaign_card_']", {
       element() {
         entries.push({
-          id: "",
-          link: "",
-          title: "",
-          text: "",
+          agency: "",
           brand: "",
           campaign: "",
-          agency: "",
+          id: "",
+          link: "",
+          text: "",
+          title: "",
         });
       },
     })
     .on("[id^='campaign_card_'] .karlasemibold a", {
       element(el) {
-        const lastEntry = entries[entries.length - 1];
+        const lastEntry = entries.at(-1);
         const href = el.getAttribute("href");
         if (lastEntry && href) {
           const link = new URL(href, "https://www.adsoftheworld.com").href;
@@ -36,7 +36,7 @@ export async function parse(response: Response): Promise<RSSData> {
     })
     .on("[id^='campaign_card_'] .karlasemibold a p", {
       text(text) {
-        const lastEntry = entries[entries.length - 1];
+        const lastEntry = entries.at(-1);
         if (lastEntry && text.text) {
           lastEntry.campaign = (lastEntry.campaign || "") + text.text;
         }
@@ -44,7 +44,7 @@ export async function parse(response: Response): Promise<RSSData> {
     })
     .on("[id^='campaign_card_'] .px-4 > .text-sm:first-child a", {
       text(text) {
-        const lastEntry = entries[entries.length - 1];
+        const lastEntry = entries.at(-1);
         if (lastEntry && text.text) {
           lastEntry.brand = (lastEntry.brand || "") + text.text;
         }
@@ -52,7 +52,7 @@ export async function parse(response: Response): Promise<RSSData> {
     })
     .on("[id^='campaign_card_'] .px-4 > .text-sm.mt-4 a", {
       text(text) {
-        const lastEntry = entries[entries.length - 1];
+        const lastEntry = entries.at(-1);
         if (lastEntry && text.text) {
           lastEntry.agency = (lastEntry.agency || "") + text.text;
         }
@@ -60,7 +60,7 @@ export async function parse(response: Response): Promise<RSSData> {
     })
     .on("[id^='campaign_card_'] picture img", {
       element(el) {
-        const lastEntry = entries[entries.length - 1];
+        const lastEntry = entries.at(-1);
         const src = el.getAttribute("src");
         if (lastEntry && src) {
           lastEntry.imageURL = src;
@@ -70,11 +70,7 @@ export async function parse(response: Response): Promise<RSSData> {
 
   await consume(rewriter.transform(response).body!);
   return {
-    id: "https://www.adsoftheworld.com/blog/feed",
-    link: "https://www.adsoftheworld.com/blog/feed",
-    title: "Highlighted Campaigns – Ads of the World",
     description: "Highlighted Campaigns – Ads of the World",
-    language: "en",
     entries: entries
       .map((entry) => {
         const parts = [entry.brand, entry.campaign, entry.agency].filter(
@@ -83,21 +79,25 @@ export async function parse(response: Response): Promise<RSSData> {
         const title = parts.join(" | ").trim();
         return {
           id: entry.id,
-          link: entry.link,
-          title,
-          text: title,
           imageURL: entry.imageURL,
+          link: entry.link,
+          text: title,
+          title,
         };
       })
       .filter((entry: RSSEntry) => isValidRSSEntry(entry)),
+    id: "https://www.adsoftheworld.com/blog/feed",
+    language: "en",
+    link: "https://www.adsoftheworld.com/blog/feed",
+    title: "Highlighted Campaigns – Ads of the World",
   };
 }
 
 export async function get(_ctx: ScraperContext): Promise<RSSData> {
   const response = await fetch("https://www.adsoftheworld.com/blog/feed", {
     headers: {
-      "user-agent": USERAGENT,
       "Content-Type": "text/html",
+      "user-agent": USERAGENT,
     },
   });
 

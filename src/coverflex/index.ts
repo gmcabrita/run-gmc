@@ -2,7 +2,7 @@ import { Hono } from "hono";
 import { getAuthenticationToken } from "./util";
 import { basicAuth } from "hono/basic-auth";
 import { idempotentSendEmail } from "@email";
-import * as v from "valibot";
+import { parse } from "valibot";
 import {
   CoverflexPocketsResponseSchema,
   CoverflexTechnologyResponseSchema,
@@ -15,10 +15,10 @@ export async function sendAppleCatalogueByEmail(env: CloudflareBindings) {
   idempotencyURL.search = "";
 
   await idempotentSendEmail(env, {
-    to: "goncalo.mendes.cabrita@gmail.com",
-    subject: `New Coverflex Apple catalogue available: ${name}`,
     body: `<a href="${url}" target="_blank">${url}</a>`,
     idempotencyKey: `coverflex-apple-catalogue-${idempotencyURL}`,
+    subject: `New Coverflex Apple catalogue available: ${name}`,
+    to: "goncalo.mendes.cabrita@gmail.com",
   });
 }
 
@@ -51,7 +51,7 @@ async function getAppleCatalogueFile(env: CloudflareBindings) {
     throw new Error(`Error:  ${response.status}`);
   }
 
-  const json = v.parse(CoverflexTechnologyResponseSchema, await response.json());
+  const json = parse(CoverflexTechnologyResponseSchema, await response.json());
   if (json.benefit.slug != "technology") {
     throw new Error(`Response: ${JSON.stringify(json)}`);
   }
@@ -95,7 +95,7 @@ async function getCoverflexBudget(env: CloudflareBindings) {
     throw new Error(`Error:  ${response.status}`);
   }
 
-  const json = v.parse(CoverflexPocketsResponseSchema, await response.json());
+  const json = parse(CoverflexPocketsResponseSchema, await response.json());
   const pocket = json.pockets.find((pocket) => pocket.type == "meals");
 
   if (!pocket) {
@@ -112,8 +112,8 @@ export function addCoverflexEndpoints(app: Hono<{ Bindings: CloudflareBindings }
     "/coverflex.getBudget",
     async (ctx, next) => {
       const auth = basicAuth({
-        username: ctx.env.PRIVATE_BASIC_AUTH_USERNAME,
         password: ctx.env.PRIVATE_BASIC_AUTH_PASSWORD,
+        username: ctx.env.PRIVATE_BASIC_AUTH_USERNAME,
       });
       return auth(ctx, next);
     },
@@ -127,8 +127,8 @@ export function addCoverflexEndpoints(app: Hono<{ Bindings: CloudflareBindings }
     "/coverflex.getAppleCatalogue",
     async (ctx, next) => {
       const auth = basicAuth({
-        username: ctx.env.PRIVATE_BASIC_AUTH_USERNAME,
         password: ctx.env.PRIVATE_BASIC_AUTH_PASSWORD,
+        username: ctx.env.PRIVATE_BASIC_AUTH_USERNAME,
       });
       return auth(ctx, next);
     },
@@ -141,8 +141,8 @@ export function addCoverflexEndpoints(app: Hono<{ Bindings: CloudflareBindings }
     "/coverflex.sendAppleCatalogueByEmail",
     async (ctx, next) => {
       const auth = basicAuth({
-        username: ctx.env.PRIVATE_BASIC_AUTH_USERNAME,
         password: ctx.env.PRIVATE_BASIC_AUTH_PASSWORD,
+        username: ctx.env.PRIVATE_BASIC_AUTH_USERNAME,
       });
       return auth(ctx, next);
     },

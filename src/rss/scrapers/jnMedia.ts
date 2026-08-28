@@ -12,7 +12,7 @@ interface DraftEntry extends RSSEntry {
 }
 
 interface ParsedPage {
-  entries: RSSEntry[];
+  entries: Array<RSSEntry>;
   nextPageURL?: string;
 }
 
@@ -26,7 +26,7 @@ const HTML_ENTITY_BY_NAME = new Map([
 ]);
 
 function decodeHtmlEntities(text: string): string {
-  return text.replace(/&(#x[0-9a-f]+|#\d+|[a-z]+);/gi, (match, entity) => {
+  return text.replaceAll(/&(#x[0-9a-f]+|#\d+|[a-z]+);/gi, (match, entity) => {
     const normalizedEntity = entity.toLowerCase();
     if (normalizedEntity.startsWith("#x")) {
       const codePoint = Number.parseInt(normalizedEntity.slice(2), 16);
@@ -43,11 +43,11 @@ function decodeHtmlEntities(text: string): string {
 }
 
 function normalizeWhitespace(text: string): string {
-  return decodeHtmlEntities(text).replace(/\u00a0/g, " ").replace(/\s+/g, " ").trim();
+  return decodeHtmlEntities(text).replaceAll('\u00A0', " ").replaceAll(/\s+/g, " ").trim();
 }
 
-function getLastEntry(entries: DraftEntry[]): DraftEntry | undefined {
-  return entries[entries.length - 1];
+function getLastEntry(entries: Array<DraftEntry>): DraftEntry | undefined {
+  return entries.at(-1);
 }
 
 function getImageURL(el: Element): string | undefined {
@@ -83,14 +83,14 @@ async function fetchPage(url: string, fetchFn: FetchFn): Promise<Response> {
   return response;
 }
 
-function buildFeed(entries: RSSEntry[]): RSSData {
+function buildFeed(entries: Array<RSSEntry>): RSSData {
   return {
+    description: "Jornal de Notícias Média",
+    entries,
     id: BASE_URL,
+    language: "pt",
     link: BASE_URL,
     title: "JN - Média",
-    description: "Jornal de Notícias Média",
-    language: "pt",
-    entries,
   };
 }
 
@@ -104,7 +104,7 @@ export async function parsePage(response: Response): Promise<ParsedPage> {
       },
     })
     .transform(response);
-  const draftEntries: DraftEntry[] = [];
+  const draftEntries: Array<DraftEntry> = [];
   let nextPageURL: string | undefined;
   const articleSelector =
     'main#main-content [class*="section-regular"][class*="ArticlesList"] article[class*="ArticleWrap"]';
@@ -115,9 +115,9 @@ export async function parsePage(response: Response): Promise<ParsedPage> {
         draftEntries.push({
           id: "",
           link: "",
-          title: "",
-          text: "",
           section: "",
+          text: "",
+          title: "",
         });
       },
     })
@@ -185,10 +185,10 @@ export async function parsePage(response: Response): Promise<ParsedPage> {
 
         return {
           id: entry.id,
-          link: entry.link,
-          title,
-          text: section || title,
           imageURL: entry.imageURL,
+          link: entry.link,
+          text: section || title,
+          title,
         };
       })
       .filter(isValidRSSEntry),
@@ -197,7 +197,7 @@ export async function parsePage(response: Response): Promise<ParsedPage> {
 }
 
 export async function scrapeFirstTwoPages(fetchFn: FetchFn): Promise<RSSData> {
-  const entries: RSSEntry[] = [];
+  const entries: Array<RSSEntry> = [];
   const seenIds = new Set<string>();
   let currentPageURL: string | undefined = BASE_URL;
 

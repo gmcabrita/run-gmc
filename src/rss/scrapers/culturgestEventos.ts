@@ -35,38 +35,38 @@ const PT_MONTH_INDEX = new Map([
 type FetchFn = typeof fetch;
 
 type DraftEvent = {
-  link: string;
-  title: string;
-  subtitle: string;
-  fallbackTitle: string;
   dateLabel: string;
-  types: string[];
-  tags: string[];
-  imageURL?: string;
   datetime?: Date;
+  fallbackTitle: string;
+  imageURL?: string;
+  link: string;
+  subtitle: string;
+  tags: Array<string>;
+  title: string;
+  types: Array<string>;
 };
 
 function normalizeWhitespace(value: string): string {
-  return value.replace(/\s+/g, " ").trim();
+  return value.replaceAll(/\s+/g, " ").trim();
 }
 
 function normalizeToken(value: string): string {
   return normalizeWhitespace(value)
     .toLowerCase()
     .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .replace(/\./g, "");
+    .replaceAll(/[\u0300-\u036f]/g, "")
+    .replaceAll('.', "");
 }
 
 function normalizeDateLabel(value: string): string {
-  return normalizeWhitespace(value).replace(/\s*([\u2013\u2014-])\s*/g, " $1 ");
+  return normalizeWhitespace(value).replaceAll(/\s*([\u2013\u2014-])\s*/g, " $1 ");
 }
 
-function getLastEvent(events: DraftEvent[]): DraftEvent | undefined {
-  return events[events.length - 1];
+function getLastEvent(events: Array<DraftEvent>): DraftEvent | undefined {
+  return events.at(-1);
 }
 
-function pushUnique(values: string[], value: string): void {
+function pushUnique(values: Array<string>, value: string): void {
   const normalized = normalizeWhitespace(value);
   if (normalized.length === 0 || values.includes(normalized)) {
     return;
@@ -106,7 +106,7 @@ function parseUtcDate(year: number, monthIndex: number, day: number): Date | und
 }
 
 function parsePtDate(value: string): Date | undefined {
-  const normalized = normalizeToken(value).replace(/[\u2013\u2014]/g, "-");
+  const normalized = normalizeToken(value).replaceAll(/[\u2013\u2014]/g, "-");
 
   const crossMonthMatch = normalized.match(/^(\d{1,2})\s+([a-z]+)\s*-\s*\d{1,2}\s+([a-z]+)\s+(\d{4})$/);
   if (crossMonthMatch) {
@@ -156,17 +156,17 @@ function buildText(event: DraftEvent): string | undefined {
 
 function buildEntry(event: DraftEvent): RSSEntry {
   return {
-    id: event.link,
-    link: event.link,
-    title: buildTitle(event),
-    text: buildText(event),
-    imageURL: event.imageURL,
     datetime: event.datetime,
+    id: event.link,
+    imageURL: event.imageURL,
+    link: event.link,
+    text: buildText(event),
+    title: buildTitle(event),
   };
 }
 
 export async function parse(response: Response): Promise<RSSData> {
-  const events: DraftEvent[] = [];
+  const events: Array<DraftEvent> = [];
   let currentType = "";
   let currentTag = "";
   let insideMobileTypes = false;
@@ -176,13 +176,13 @@ export async function parse(response: Response): Promise<RSSData> {
     .on("article.events-item", {
       element() {
         events.push({
-          link: "",
-          title: "",
-          subtitle: "",
-          fallbackTitle: "",
           dateLabel: "",
-          types: [],
+          fallbackTitle: "",
+          link: "",
+          subtitle: "",
           tags: [],
+          title: "",
+          types: [],
         });
       },
     })
@@ -220,14 +220,6 @@ export async function parse(response: Response): Promise<RSSData> {
       },
     })
     .on("article.events-item .event-date", {
-      text(text) {
-        const event = getLastEvent(events);
-        if (!event || !text.text) {
-          return;
-        }
-
-        event.dateLabel += text.text;
-      },
       element(el) {
         el.onEndTag(() => {
           const event = getLastEvent(events);
@@ -237,6 +229,14 @@ export async function parse(response: Response): Promise<RSSData> {
 
           event.datetime = parsePtDate(event.dateLabel);
         });
+      },
+      text(text) {
+        const event = getLastEvent(events);
+        if (!event || !text.text) {
+          return;
+        }
+
+        event.dateLabel += text.text;
       },
     })
     .on("article.events-item .event-title", {
@@ -315,20 +315,20 @@ export async function parse(response: Response): Promise<RSSData> {
   await consume(transformed.body);
 
   return {
+    description: "Agenda de eventos da Culturgest",
+    entries: events.map(buildEntry).filter(isValidRSSEntry),
     id: BASE_URL,
+    language: "pt",
     link: BASE_URL,
     title: "Agenda | Culturgest",
-    description: "Agenda de eventos da Culturgest",
-    language: "pt",
-    entries: events.map(buildEntry).filter(isValidRSSEntry),
   };
 }
 
 export async function scrape(fetchFn: FetchFn): Promise<RSSData> {
   const response = await fetchFn(AJAX_URL, {
     headers: {
-      "X-Requested-With": "XMLHttpRequest",
       "user-agent": USERAGENT,
+      "X-Requested-With": "XMLHttpRequest",
     },
   });
 

@@ -1,5 +1,11 @@
 import { idempotentSendEmail } from "@email";
-import * as v from "valibot";
+import {
+  object,
+  picklist,
+  safeParse,
+  string,
+  type InferOutput,
+} from "valibot";
 import { createProxiedFetch } from "../proxiedFetch";
 
 const MAUSER_SC1176_PRODUCT_URL =
@@ -12,16 +18,16 @@ const EMAIL_RECIPIENT = "goncalo.mendes.cabrita@gmail.com";
 
 export type MauserStockStatus = "in_stock" | "out_of_stock";
 
-const MauserStockStateSchema = v.object({
-  status: v.picklist(["in_stock", "out_of_stock"]),
-  observedAt: v.string(),
+const MauserStockStateSchema = object({
+  observedAt: string(),
+  status: picklist(["in_stock", "out_of_stock"]),
 });
 
-type MauserStockState = v.InferOutput<typeof MauserStockStateSchema>;
+type MauserStockState = InferOutput<typeof MauserStockStateSchema>;
 
 export interface MauserStockCheckResult {
-  status: MauserStockStatus;
   evidence: string;
+  status: MauserStockStatus;
 }
 
 function parseMauserStockState(raw: string | null): MauserStockState | undefined {
@@ -30,7 +36,7 @@ function parseMauserStockState(raw: string | null): MauserStockState | undefined
   }
 
   try {
-    const result = v.safeParse(MauserStockStateSchema, JSON.parse(raw));
+    const result = safeParse(MauserStockStateSchema, JSON.parse(raw));
     return result.success ? result.output : undefined;
   } catch {
     return undefined;
@@ -39,11 +45,11 @@ function parseMauserStockState(raw: string | null): MauserStockState | undefined
 
 function escapeHtml(value: string): string {
   return value
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#39;");
+    .replaceAll('&', "&amp;")
+    .replaceAll('<', "&lt;")
+    .replaceAll('>', "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll('\'', "&#39;");
 }
 
 function dailyKey(date: Date): string {
@@ -51,7 +57,7 @@ function dailyKey(date: Date): string {
 }
 
 function normalizeText(value: string): string {
-  return value.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim();
+  return value.replaceAll(/<[^>]+>/g, " ").replaceAll(/\s+/g, " ").trim();
 }
 
 function findStockStatus(html: string): { classes: string; snippet: string } | undefined {
@@ -64,7 +70,7 @@ function findStockStatus(html: string): { classes: string; snippet: string } | u
 
   return {
     classes,
-    snippet: html.slice(index, index + 1_500),
+    snippet: html.slice(index, index + 1500),
   };
 }
 
@@ -88,8 +94,8 @@ export function parseMauserSc1176StockPage(html: string): MauserStockCheckResult
     normalizedEvidence.includes("esgotado")
   ) {
     return {
-      status: "out_of_stock",
       evidence,
+      status: "out_of_stock",
     };
   }
 
@@ -100,8 +106,8 @@ export function parseMauserSc1176StockPage(html: string): MauserStockCheckResult
     /\bdispon[ií]vel\b/i.test(evidence)
   ) {
     return {
-      status: "in_stock",
       evidence,
+      status: "in_stock",
     };
   }
 
@@ -137,18 +143,18 @@ async function reportMauserSc1176Stock(
 
   if (result.status === "in_stock" && previous?.status !== "in_stock") {
     await idempotentSendEmail(env, {
-      to: EMAIL_RECIPIENT,
-      subject: "Mauser has Raspberry Pi SC1176 in stock",
       body: `<p>${escapeHtml(MAUSER_SC1176_PRODUCT_NAME)} is in stock.</p>
 <p><a href="${MAUSER_SC1176_PRODUCT_URL}">${MAUSER_SC1176_PRODUCT_URL}</a></p>
 <p>Evidence: ${escapeHtml(result.evidence)}</p>`,
       idempotencyKey: `mauser-sc1176-restocked-${previous?.observedAt ?? "initial"}`,
+      subject: "Mauser has Raspberry Pi SC1176 in stock",
+      to: EMAIL_RECIPIENT,
     });
   }
 
   await env.RUN_GMC_GENERIC_CACHE_KV.put(
     MAUSER_STOCK_STATE_KV_KEY,
-    JSON.stringify({ status: result.status, observedAt: checkedAt.toISOString() }),
+    JSON.stringify({ observedAt: checkedAt.toISOString(), status: result.status }),
   );
 }
 
@@ -158,12 +164,12 @@ async function sendMauserSc1176FailureEmail(
   checkedAt: Date,
 ): Promise<void> {
   await idempotentSendEmail(env, {
-    to: EMAIL_RECIPIENT,
-    subject: "Mauser Raspberry Pi SC1176 stock check failed",
     body: `<p>Mauser Raspberry Pi SC1176 stock check failed.</p>
 <p><a href="${MAUSER_SC1176_PRODUCT_URL}">${MAUSER_SC1176_PRODUCT_URL}</a></p>
 <p>${escapeHtml(failureDetail)}</p>`,
     idempotencyKey: `mauser-sc1176-check-failed-${dailyKey(checkedAt)}`,
+    subject: "Mauser Raspberry Pi SC1176 stock check failed",
+    to: EMAIL_RECIPIENT,
   });
 }
 

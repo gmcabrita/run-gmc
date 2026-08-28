@@ -22,20 +22,20 @@ describe("RTP Conselho Geral Independente scraper", () => {
       {
         id: "https://cdn-images.rtp.pt/mcm/pdf/4c6/4c6dc3a7e6b7ae6911c91ddea093f0761.pdf",
         link: "https://cdn-images.rtp.pt/mcm/pdf/4c6/4c6dc3a7e6b7ae6911c91ddea093f0761.pdf",
-        title: "Recrutamento do Órgão de Gestão da RTP para o Triénio 2027-2029",
         text: "Recrutamento do Órgão de Gestão da RTP para o Triénio 2027-2029",
+        title: "Recrutamento do Órgão de Gestão da RTP para o Triénio 2027-2029",
       },
       {
         id: "https://cdn-images.rtp.pt/mcm/pdf/6fb/6fb3d01b6fec796df3596fbe9690bd241.pdf",
         link: "https://cdn-images.rtp.pt/mcm/pdf/6fb/6fb3d01b6fec796df3596fbe9690bd241.pdf",
-        title: "Comunicado de 9 de julho de 2026",
         text: "Comunicado de 9 de julho de 2026",
+        title: "Comunicado de 9 de julho de 2026",
       },
       {
         id: "https://media.rtp.pt/docs/linhas-orientacao.pdf",
         link: "https://media.rtp.pt/docs/linhas-orientacao.pdf",
-        title: "Linhas de Orientação Estratégica 2027-2029",
         text: "Linhas de Orientação Estratégica 2027-2029",
+        title: "Linhas de Orientação Estratégica 2027-2029",
       },
     ]);
   });

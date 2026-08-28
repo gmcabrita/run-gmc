@@ -1,6 +1,18 @@
 import { USERAGENT, isValidRSSEntry, type ScraperContext } from "@rss/common";
 import type { RSSData, RSSEntry } from "@rss/types";
-import * as v from "valibot";
+import {
+  array,
+  boolean,
+  fallback,
+  looseObject,
+  nullish,
+  optional,
+  safeParse,
+  string,
+  union,
+  unknown,
+  type InferOutput,
+} from "valibot";
 
 const SITE_ORIGIN = "https://www.publico.pt";
 const SECTION_PATH = "/media";
@@ -9,53 +21,53 @@ const API_URL = "https://www.publico.pt/api/list/media?page=1&size=20";
 
 type FetchFn = typeof fetch;
 
-const OptionalTextSchema = v.fallback(v.nullish(v.string()), undefined);
-const OptionalBooleanSchema = v.fallback(v.nullish(v.boolean()), undefined);
-const PublicoTagListSchema = v.fallback(
-  v.nullish(v.array(v.unknown())),
+const OptionalTextSchema = fallback(nullish(string()), undefined);
+const OptionalBooleanSchema = fallback(nullish(boolean()), undefined);
+const PublicoTagListSchema = fallback(
+  nullish(array(unknown())),
   undefined,
 );
-const PublicoTagSchema = v.looseObject({
-  nome: OptionalTextSchema,
+const PublicoTagSchema = looseObject({
   isPrincipal: OptionalBooleanSchema,
+  nome: OptionalTextSchema,
 });
-const PublicoArticlePayloadSchema = v.looseObject({
-  fullUrl: OptionalTextSchema,
-  url: OptionalTextSchema,
-  shareUrl: OptionalTextSchema,
-  tituloNoticia: OptionalTextSchema,
-  titulo: OptionalTextSchema,
+const PublicoArticlePayloadSchema = looseObject({
   cleanTitle: OptionalTextSchema,
-  descricao: OptionalTextSchema,
-  lead: OptionalTextSchema,
-  subtitulo: OptionalTextSchema,
-  rubrica: OptionalTextSchema,
   data: OptionalTextSchema,
   dataActualizacao: OptionalTextSchema,
-  multimediaPrincipal: OptionalTextSchema,
+  descricao: OptionalTextSchema,
   escondeImagem: OptionalBooleanSchema,
+  fullUrl: OptionalTextSchema,
+  lead: OptionalTextSchema,
+  multimediaPrincipal: OptionalTextSchema,
+  rubrica: OptionalTextSchema,
+  shareUrl: OptionalTextSchema,
+  subtitulo: OptionalTextSchema,
   tags: PublicoTagListSchema,
+  titulo: OptionalTextSchema,
+  tituloNoticia: OptionalTextSchema,
+  url: OptionalTextSchema,
 });
-const PublicoApiPayloadSchema = v.union([
-  v.array(v.unknown()),
-  v.looseObject({
-    items: v.optional(v.unknown()),
-    results: v.optional(v.unknown()),
-    data: v.optional(v.unknown()),
+const PublicoApiPayloadSchema = union([
+  array(unknown()),
+  looseObject({
+    data: optional(unknown()),
+    items: optional(unknown()),
+    results: optional(unknown()),
   }),
 ]);
 
-export type PublicoApiPayload = v.InferOutput<typeof PublicoApiPayloadSchema>;
-type PublicoArticlePayload = v.InferOutput<typeof PublicoArticlePayloadSchema>;
-type PublicoTagList = v.InferOutput<typeof PublicoTagListSchema>;
+export type PublicoApiPayload = InferOutput<typeof PublicoApiPayloadSchema>;
+type PublicoArticlePayload = InferOutput<typeof PublicoArticlePayloadSchema>;
+type PublicoTagList = InferOutput<typeof PublicoTagListSchema>;
 
 interface PublicoArticle {
-  id: string;
-  link: string;
-  title: string;
-  text?: string;
   datetime?: Date;
+  id: string;
   imageURL?: string;
+  link: string;
+  text?: string;
+  title: string;
 }
 
 const EMPTY_PUBLICO_PAYLOAD = [] satisfies PublicoApiPayload;
@@ -69,7 +81,7 @@ const HTML_ENTITY_BY_NAME = new Map([
 ]);
 
 function decodeHtmlEntities(text: string): string {
-  return text.replace(/&(#x[0-9a-f]+|#\d+|[a-z]+);/gi, (match, entity) => {
+  return text.replaceAll(/&(#x[0-9a-f]+|#\d+|[a-z]+);/gi, (match, entity) => {
     const normalizedEntity = entity.toLowerCase();
     if (normalizedEntity.startsWith("#x")) {
       const codePoint = Number.parseInt(normalizedEntity.slice(2), 16);
@@ -86,7 +98,7 @@ function decodeHtmlEntities(text: string): string {
 }
 
 function stripTags(text: string): string {
-  return text.replace(/<[^>]*>/g, " ");
+  return text.replaceAll(/<[^>]*>/g, " ");
 }
 
 function normalizeOptionalText(value: string | null | undefined): string | undefined {
@@ -98,7 +110,7 @@ function normalizeWhitespace(text: string | null | undefined): string | undefine
     return undefined;
   }
 
-  return decodeHtmlEntities(stripTags(text)).replace(/\u00a0/g, " ").replace(/\s+/g, " ").trim() || undefined;
+  return decodeHtmlEntities(stripTags(text)).replaceAll('\u00A0', " ").replaceAll(/\s+/g, " ").trim() || undefined;
 }
 
 function normalizeUrl(href: string | null | undefined): string | undefined {
@@ -121,7 +133,7 @@ function parseDate(value: string | null | undefined): Date | undefined {
 
 function readPrimaryTagName(tags: PublicoTagList): string | undefined {
   for (const tag of tags ?? []) {
-    const tagResult = v.safeParse(PublicoTagSchema, tag);
+    const tagResult = safeParse(PublicoTagSchema, tag);
     if (!tagResult.success || tagResult.output.isPrincipal !== true) {
       continue;
     }
@@ -161,22 +173,22 @@ function parseArticle(payload: PublicoArticlePayload): PublicoArticle | undefine
     title;
 
   return {
-    id: link,
-    link,
-    title,
-    text,
     datetime: parseDate(
       normalizeOptionalText(payload.data) ?? normalizeOptionalText(payload.dataActualizacao),
     ),
+    id: link,
     imageURL:
       payload.escondeImagem === true ? undefined : normalizeUrl(payload.multimediaPrincipal),
+    link,
+    text,
+    title,
   };
 }
 
-function readArticles(payload: PublicoApiPayload): PublicoArticle[] {
+function readArticles(payload: PublicoApiPayload): Array<PublicoArticle> {
   if (Array.isArray(payload)) {
     return payload.flatMap((item) => {
-      const articleResult = v.safeParse(PublicoArticlePayloadSchema, item);
+      const articleResult = safeParse(PublicoArticlePayloadSchema, item);
       if (articleResult.success) {
         const article = parseArticle(articleResult.output);
         if (article) {
@@ -184,13 +196,13 @@ function readArticles(payload: PublicoApiPayload): PublicoArticle[] {
         }
       }
 
-      const containerResult = v.safeParse(PublicoApiPayloadSchema, item);
+      const containerResult = safeParse(PublicoApiPayloadSchema, item);
       return containerResult.success ? readArticles(containerResult.output) : [];
     });
   }
 
   for (const nestedPayload of [payload.items, payload.results, payload.data]) {
-    const containerResult = v.safeParse(PublicoApiPayloadSchema, nestedPayload);
+    const containerResult = safeParse(PublicoApiPayloadSchema, nestedPayload);
     if (!containerResult.success) {
       continue;
     }
@@ -204,26 +216,26 @@ function readArticles(payload: PublicoApiPayload): PublicoArticle[] {
   return [];
 }
 
-function buildFeed(entries: RSSEntry[]): RSSData {
+function buildFeed(entries: Array<RSSEntry>): RSSData {
   return {
+    description: "Público Media",
+    entries,
     id: BASE_URL,
+    language: "pt",
     link: BASE_URL,
     title: "Público - Media",
-    description: "Público Media",
-    language: "pt",
-    entries,
   };
 }
 
 export function parseApiResponse(payload: PublicoApiPayload): RSSData {
-  const entries: RSSEntry[] = readArticles(payload)
+  const entries: Array<RSSEntry> = readArticles(payload)
     .map((article) => ({
-      id: article.id,
-      link: article.link,
-      title: article.title,
-      text: article.text,
       datetime: article.datetime,
+      id: article.id,
       imageURL: article.imageURL,
+      link: article.link,
+      text: article.text,
+      title: article.title,
     }))
     .filter(isValidRSSEntry);
 
@@ -242,7 +254,7 @@ export async function scrapeMediaApi(fetchFn: FetchFn): Promise<RSSData> {
     throw new Error(`Público media request failed: ${response.status}`);
   }
 
-  const payloadResult = v.safeParse(PublicoApiPayloadSchema, await response.json());
+  const payloadResult = safeParse(PublicoApiPayloadSchema, await response.json());
   return parseApiResponse(
     payloadResult.success ? payloadResult.output : EMPTY_PUBLICO_PAYLOAD,
   );

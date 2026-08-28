@@ -46,14 +46,14 @@ describe("reutersMediaTelecom parser", () => {
       result: {
         articles: [
           {
-            id: "tolerant-entry",
-            canonical_url: "/business/media-telecom/tolerant-entry/",
-            title: 42,
             basic_headline: "Tolerant headline",
+            canonical_url: "/business/media-telecom/tolerant-entry/",
             description: { invalid: true },
+            id: "tolerant-entry",
             published_time: false,
-            updated_time: "2025-01-01T12:00:00Z",
             thumbnail: { url: 99 },
+            title: 42,
+            updated_time: "2025-01-01T12:00:00Z",
           },
         ],
       },
@@ -61,12 +61,12 @@ describe("reutersMediaTelecom parser", () => {
 
     expect(result.entries).toEqual([
       {
-        id: "tolerant-entry",
-        link: "https://www.reuters.com/business/media-telecom/tolerant-entry/",
-        title: "Tolerant headline",
-        text: "Tolerant headline",
         datetime: new Date("2025-01-01T12:00:00Z"),
+        id: "tolerant-entry",
         imageURL: undefined,
+        link: "https://www.reuters.com/business/media-telecom/tolerant-entry/",
+        text: "Tolerant headline",
+        title: "Tolerant headline",
       },
     ]);
   });

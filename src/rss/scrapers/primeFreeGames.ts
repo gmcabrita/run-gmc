@@ -1,6 +1,13 @@
 import { USERAGENT, isValidRSSEntry, consume, type ScraperContext } from "@rss/common";
 import type { RSSData, RSSEntry } from "@rss/types";
-import * as v from "valibot";
+import {
+  array,
+  looseObject,
+  nullish,
+  parse as parseValibot,
+  string,
+  type InferOutput,
+} from "valibot";
 
 const BASE_URL = "https://gaming.amazon.com/home";
 const GRAPHQL_URL = "https://gaming.amazon.com/graphql";
@@ -106,27 +113,27 @@ fragment Item on Item {
   __typename
 }`;
 
-const PrimeGamingPayloadSchema = v.looseObject({
-  data: v.looseObject({
-    games: v.looseObject({
-      items: v.array(
-        v.looseObject({
-          assets: v.looseObject({
-            id: v.string(),
-            title: v.nullish(v.string()),
-            externalClaimLink: v.nullish(v.string()),
+const PrimeGamingPayloadSchema = looseObject({
+  data: looseObject({
+    games: looseObject({
+      items: array(
+        looseObject({
+          assets: looseObject({
+            externalClaimLink: nullish(string()),
+            id: string(),
+            title: nullish(string()),
           }),
-          offers: v.array(v.looseObject({ startTime: v.string() })),
+          offers: array(looseObject({ startTime: string() })),
         }),
       ),
     }),
   }),
 });
 
-type PrimeGamingPayload = v.InferOutput<typeof PrimeGamingPayloadSchema>;
+type PrimeGamingPayload = InferOutput<typeof PrimeGamingPayloadSchema>;
 
 export function parse(json: PrimeGamingPayload): RSSData {
-  const entries: RSSEntry[] = json.data.games.items
+  const entries: Array<RSSEntry> = json.data.games.items
     .flatMap((game) => {
       const { externalClaimLink, id, title } = game.assets;
       const offer = game.offers[0];
@@ -136,27 +143,27 @@ export function parse(json: PrimeGamingPayload): RSSData {
 
       return [
         {
+          datetime: new Date(offer.startTime),
           id,
           link: externalClaimLink,
-          title,
           text: title,
-          datetime: new Date(offer.startTime),
+          title,
         },
       ];
     })
     .filter(isValidRSSEntry);
 
   return {
+    description: "Free games from Prime Gaming",
+    entries,
     id: BASE_URL,
+    language: "en",
     link: BASE_URL,
     title: "Free games: Prime Gaming",
-    description: "Free games from Prime Gaming",
-    language: "en",
-    entries,
   };
 }
 
-async function fetchCsrfTokenAndCookie(): Promise<{ csrfToken: string; cookie: string }> {
+async function fetchCsrfTokenAndCookie(): Promise<{ cookie: string; csrfToken: string; }> {
   const initialResponse = await fetch(BASE_URL);
   const cookie = (initialResponse.headers.get("set-cookie") ?? "")
     .split("Secure, ")
@@ -174,13 +181,19 @@ async function fetchCsrfTokenAndCookie(): Promise<{ csrfToken: string; cookie: s
   const rewritten = rewriter.transform(initialResponse);
   await consume(rewritten.body!);
 
-  return { csrfToken, cookie };
+  return { cookie, csrfToken };
 }
 
 export async function get(_ctx: ScraperContext): Promise<RSSData> {
-  const { csrfToken, cookie } = await fetchCsrfTokenAndCookie();
+  const { cookie, csrfToken } = await fetchCsrfTokenAndCookie();
 
   const response = await fetch(GRAPHQL_URL, {
+    body: JSON.stringify({
+      extensions: {},
+      operationName: "OffersContext_Offers_And_Items",
+      query: GRAPHQL_QUERY,
+      variables: { pageSize: 999 },
+    }),
     headers: {
       accept: "*/*",
       "accept-language": "en-US,en;q=0.9",
@@ -191,24 +204,18 @@ export async function get(_ctx: ScraperContext): Promise<RSSData> {
       "csrf-token": csrfToken,
       pragma: "no-cache",
       "prime-gaming-language": "en-US",
-      "user-agent": USERAGENT,
+      referer: BASE_URL,
       "sec-ch-ua": '"Chromium";v="140", "Not=A?Brand";v="24", "Google Chrome";v="140"',
       "sec-ch-ua-mobile": "?0",
       "sec-ch-ua-platform": '"macOS"',
       "sec-fetch-dest": "empty",
       "sec-fetch-mode": "cors",
       "sec-fetch-site": "same-origin",
-      referer: BASE_URL,
+      "user-agent": USERAGENT,
     },
-    body: JSON.stringify({
-      operationName: "OffersContext_Offers_And_Items",
-      variables: { pageSize: 999 },
-      extensions: {},
-      query: GRAPHQL_QUERY,
-    }),
     method: "POST",
   });
 
-  const json = v.parse(PrimeGamingPayloadSchema, await response.json());
+  const json = parseValibot(PrimeGamingPayloadSchema, await response.json());
   return parse(json);
 }

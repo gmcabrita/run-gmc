@@ -25,35 +25,35 @@ export async function parse(response: Response): Promise<RSSData> {
 
   await consume(rewriter.transform(response).body!);
 
-  const title = currentTitle.trim().replace(/\s+/g, " ");
+  const title = currentTitle.trim().replaceAll(/\s+/g, " ");
   if (title && currentDate) {
     const link = `https://www.marktest.com/pod_scope/?date=${currentDate}`;
     const datetime = new Date();
 
     entries.push({
+      datetime,
       id: link,
       link,
-      title,
       text: title,
-      datetime,
+      title,
     });
   }
 
   return {
+    description: "Ranking Nacional de Podcasts Auditados",
+    entries: entries.filter((entry: RSSEntry) => isValidRSSEntry(entry)),
     id: "https://www.marktest.com/pod_scope/",
+    language: "pt",
     link: "https://www.marktest.com/pod_scope/",
     title: "Marktest POD_SCOPE RANK",
-    description: "Ranking Nacional de Podcasts Auditados",
-    language: "pt",
-    entries: entries.filter((entry: RSSEntry) => isValidRSSEntry(entry)),
   };
 }
 
 export async function get(_ctx: ScraperContext): Promise<RSSData> {
   const response = await fetch("https://www.marktest.com/pod_scope", {
     headers: {
-      "User-Agent": USERAGENT,
       "Content-Type": "text/html",
+      "User-Agent": USERAGENT,
     },
     redirect: "follow",
   });

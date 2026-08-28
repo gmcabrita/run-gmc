@@ -13,13 +13,13 @@ type XCredentialsBindings = Pick<
 function getCookieValue(cookie: string, name: string): string | undefined {
   for (const part of cookie.split(";")) {
     const [rawName, ...valueParts] = part.trim().split("=");
-    if (rawName === name) return valueParts.join("=");
+    if (rawName === name) {return valueParts.join("=");}
   }
 }
 
 export function getCsrfTokenFromCookie(cookie: string): string {
   const csrfToken = getCookieValue(cookie, "ct0");
-  if (!csrfToken) throw new Error("X cookie missing ct0");
+  if (!csrfToken) {throw new Error("X cookie missing ct0");}
 
   return csrfToken;
 }
@@ -84,6 +84,7 @@ export function buildXApiHeaders(
     "accept-language": "en-US,en;q=0.9,pt-PT;q=0.8,pt;q=0.7",
     authorization: `Bearer ${credentials.bearer}`,
     "content-type": "application/json",
+    cookie: credentials.cookie,
     dnt: "1",
     priority: "u=1, i",
     "sec-ch-ua": '"Google Chrome";v="131", "Chromium";v="131", "Not_A Brand";v="24"',
@@ -96,7 +97,6 @@ export function buildXApiHeaders(
     "x-twitter-active-user": "yes",
     "x-twitter-auth-type": "OAuth2Session",
     "x-twitter-client-language": "en",
-    cookie: credentials.cookie,
     ...extraHeaders,
   };
 }

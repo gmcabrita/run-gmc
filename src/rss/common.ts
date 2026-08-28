@@ -20,7 +20,7 @@ const namedHtmlEntities = new Map([
 ]);
 
 export function decodeHtmlEntities(value: string) {
-  return value.replace(/&(#x[0-9a-f]+|#\d+|amp|lt|gt|quot|apos|nbsp);/gi, (match, entity: string) => {
+  return value.replaceAll(/&(#x[0-9a-f]+|#\d+|amp|lt|gt|quot|apos|nbsp);/gi, (match, entity: string) => {
     const normalizedEntity = entity.toLowerCase();
 
     if (normalizedEntity.startsWith("#")) {
@@ -29,8 +29,8 @@ export function decodeHtmlEntities(value: string) {
       const codePoint = Number.parseInt(digits, radix);
       const isValidCodePoint =
         codePoint > 0 &&
-        codePoint <= 0x10ffff &&
-        (codePoint < 0xd800 || codePoint > 0xdfff);
+        codePoint <= 0x10_ff_ff &&
+        (codePoint < 0xd8_00 || codePoint > 0xdf_ff);
 
       return isValidCodePoint ? String.fromCodePoint(codePoint) : match;
     }
@@ -47,9 +47,9 @@ export function stripInvalidXmlChars(value: string) {
         codePoint === 0x09 ||
         codePoint === 0x0a ||
         codePoint === 0x0d ||
-        (codePoint >= 0x20 && codePoint <= 0xd7ff) ||
-        (codePoint >= 0xe000 && codePoint <= 0xfffd) ||
-        (codePoint >= 0x10000 && codePoint <= 0x10ffff)
+        (codePoint >= 0x20 && codePoint <= 0xd7_ff) ||
+        (codePoint >= 0xe0_00 && codePoint <= 0xff_fd) ||
+        (codePoint >= 0x1_00_00 && codePoint <= 0x10_ff_ff)
       );
     })
     .join("");
@@ -57,5 +57,9 @@ export function stripInvalidXmlChars(value: string) {
 
 export async function consume(stream: ReadableStream) {
   const reader = stream.getReader();
-  while (!(await reader.read()).done) {}
+  while (true) {
+    if ((await reader.read()).done) {
+      return;
+    }
+  }
 }

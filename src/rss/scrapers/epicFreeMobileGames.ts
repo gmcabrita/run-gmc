@@ -1,35 +1,44 @@
 import { USERAGENT, isValidRSSEntry, type ScraperContext } from "@rss/common";
 import type { RSSData, RSSEntry } from "@rss/types";
-import * as v from "valibot";
+import {
+  array,
+  looseObject,
+  nullish,
+  number,
+  parse as parseValibot,
+  string,
+  unknown,
+  type InferInput,
+} from "valibot";
 
 const BASE_URL = "https://store.epicgames.com/en-US/free-games";
 
-const EpicMobileOfferSchema = v.looseObject({
-  content: v.looseObject({
-    title: v.string(),
-    categories: v.nullish(v.array(v.string())),
-    catalogItemId: v.string(),
-    mapping: v.looseObject({ slug: v.string() }),
-    purchase: v.nullish(
-      v.array(
-        v.looseObject({
-          purchaseType: v.string(),
-          price: v.looseObject({ decimalPrice: v.number() }),
+const EpicMobileOfferSchema = looseObject({
+  content: looseObject({
+    catalogItemId: string(),
+    categories: nullish(array(string())),
+    mapping: looseObject({ slug: string() }),
+    purchase: nullish(
+      array(
+        looseObject({
+          price: looseObject({ decimalPrice: number() }),
+          purchaseType: string(),
         }),
       ),
     ),
+    title: string(),
   }),
 });
-const EpicMobileDiscoverPayloadSchema = v.looseObject({
-  data: v.array(
-    v.looseObject({
-      type: v.string(),
-      offers: v.array(v.unknown()),
+const EpicMobileDiscoverPayloadSchema = looseObject({
+  data: array(
+    looseObject({
+      offers: array(unknown()),
+      type: string(),
     }),
   ),
 });
 
-type EpicMobileDiscoverPayload = v.InferInput<
+type EpicMobileDiscoverPayload = InferInput<
   typeof EpicMobileDiscoverPayloadSchema
 >;
 
@@ -37,11 +46,11 @@ export async function parse(
   payload: EpicMobileDiscoverPayload,
   platform: "ios" | "android",
 ): Promise<RSSData> {
-  const json = v.parse(EpicMobileDiscoverPayloadSchema, payload);
+  const json = parseValibot(EpicMobileDiscoverPayloadSchema, payload);
   const freeGames = json.data.find((item) => item.type === "freeGame");
-  const offers = v.parse(v.array(EpicMobileOfferSchema), freeGames?.offers ?? []);
+  const offers = parseValibot(array(EpicMobileOfferSchema), freeGames?.offers ?? []);
 
-  const entries: RSSEntry[] = offers
+  const entries: Array<RSSEntry> = offers
     .filter((game) => {
       return game.content.purchase?.find(
         (purchase) => purchase.purchaseType === "Claim" && purchase.price.decimalPrice === 0,
@@ -59,11 +68,11 @@ export async function parse(
       const id = game.content.catalogItemId;
 
       return {
+        datetime: new Date(),
         id,
         link,
-        title,
         text: title,
-        datetime: new Date(),
+        title,
       };
     })
     .filter(isValidRSSEntry);
@@ -71,12 +80,12 @@ export async function parse(
   const platformLabel = platform === "ios" ? "iOS" : "Android";
 
   return {
+    description: `Free games from Epic Games Store (${platformLabel})`,
+    entries,
     id: BASE_URL,
+    language: "en",
     link: BASE_URL,
     title: `Free games: Epic Games Store (${platformLabel})`,
-    description: `Free games from Epic Games Store (${platformLabel})`,
-    language: "en",
-    entries,
   };
 }
 

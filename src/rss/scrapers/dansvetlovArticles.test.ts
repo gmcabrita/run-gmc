@@ -26,30 +26,30 @@ describe("dansvetlovArticles scraper", () => {
     const result = await parse(createResponse());
 
     expect(result.entries[0]).toEqual({
-      id: "https://dansvetlov.me/postgres-anomalies/",
-      link: "https://dansvetlov.me/postgres-anomalies/",
-      title: "A Practical Guide to Taming Postgres Isolation Anomalies",
-      text: "Exploring the isolation anomalies possible at each PostgreSQL transaction isolation level, and practical strategies to deal with them.",
       datetime: new Date("2025-03-14T00:00:00.000Z"),
+      id: "https://dansvetlov.me/postgres-anomalies/",
       imageURL: "https://dansvetlov.me/images/articles/postgres-anomalies/masthead.jpg",
+      link: "https://dansvetlov.me/postgres-anomalies/",
+      text: "Exploring the isolation anomalies possible at each PostgreSQL transaction isolation level, and practical strategies to deal with them.",
+      title: "A Practical Guide to Taming Postgres Isolation Anomalies",
     });
 
     expect(result.entries[1]).toEqual({
-      id: "https://dansvetlov.me/puma-internals/",
-      link: "https://dansvetlov.me/puma-internals/",
-      title: "Dissecting Puma: Anatomy of a Ruby Web Server",
-      text: "Taking a comprehensive look at how Puma, one of the most popular Ruby web servers, works under the hood.",
       datetime: new Date("2024-12-30T00:00:00.000Z"),
+      id: "https://dansvetlov.me/puma-internals/",
       imageURL: undefined,
+      link: "https://dansvetlov.me/puma-internals/",
+      text: "Taking a comprehensive look at how Puma, one of the most popular Ruby web servers, works under the hood.",
+      title: "Dissecting Puma: Anatomy of a Ruby Web Server",
     });
 
     expect(result.entries[2]).toEqual({
-      id: "https://dansvetlov.me/sidekiq-internals/",
-      link: "https://dansvetlov.me/sidekiq-internals/",
-      title: "How does Sidekiq really work?",
-      text: "An investigation into the internals of Sidekiq, one of the most popular Ruby background job processors.",
       datetime: new Date("2024-02-04T00:00:00.000Z"),
+      id: "https://dansvetlov.me/sidekiq-internals/",
       imageURL: undefined,
+      link: "https://dansvetlov.me/sidekiq-internals/",
+      text: "An investigation into the internals of Sidekiq, one of the most popular Ruby background job processors.",
+      title: "How does Sidekiq really work?",
     });
   });
 });

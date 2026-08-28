@@ -1,33 +1,62 @@
 import { USERAGENT, isValidRSSEntry, type ScraperContext } from "@rss/common";
 import type { RSSData, RSSEntry } from "@rss/types";
-import * as v from "valibot";
+import {
+  array,
+  fallback,
+  looseObject,
+  nullish,
+  record,
+  safeParse,
+  string,
+  unknown,
+  type InferOutput,
+} from "valibot";
 import { createProxiedFetch } from "../../proxiedFetch";
 
 const BASE_URL = "https://adage.com/news/";
 const SITE_ORIGIN = "https://adage.com";
 const CONTENT_CACHE_PATTERN = /Fusion\.contentCache=(\{[\s\S]*?\});Fusion\./;
 
-const OptionalTextSchema = v.fallback(v.nullish(v.string()), undefined);
-const JsonRecordSchema = v.record(v.string(), v.unknown());
-const StoryFeedSectionSchema = v.looseObject({
-  data: v.nullish(
-    v.looseObject({
-      content_elements: v.nullish(v.array(v.unknown())),
+const OptionalTextSchema = fallback(nullish(string()), undefined);
+const JsonRecordSchema = record(string(), unknown());
+const StoryFeedSectionSchema = looseObject({
+  data: nullish(
+    looseObject({
+      content_elements: nullish(array(unknown())),
     }),
   ),
 });
-const AdAgeEntrySchema = v.looseObject({
-  website_url: OptionalTextSchema,
+const AdAgeEntrySchema = looseObject({
   canonical_url: OptionalTextSchema,
+  description: fallback(
+    nullish(looseObject({ basic: OptionalTextSchema })),
+    undefined,
+  ),
   display_date: OptionalTextSchema,
-  publish_date: OptionalTextSchema,
   first_publish_date: OptionalTextSchema,
-  websites: v.fallback(
-    v.nullish(
-      v.looseObject({
-        adage: v.fallback(
-          v.nullish(
-            v.looseObject({
+  headlines: fallback(
+    nullish(looseObject({ basic: OptionalTextSchema })),
+    undefined,
+  ),
+  promo_items: fallback(
+    nullish(
+      looseObject({
+        basic: fallback(
+          nullish(looseObject({ url: OptionalTextSchema })),
+          undefined,
+        ),
+      }),
+    ),
+    undefined,
+  ),
+  publish_date: OptionalTextSchema,
+  website_url: OptionalTextSchema,
+  websites: fallback(
+    nullish(
+      looseObject({
+        adage: fallback(
+          nullish(
+            looseObject({
               website_url: OptionalTextSchema,
             }),
           ),
@@ -37,44 +66,25 @@ const AdAgeEntrySchema = v.looseObject({
     ),
     undefined,
   ),
-  headlines: v.fallback(
-    v.nullish(v.looseObject({ basic: OptionalTextSchema })),
-    undefined,
-  ),
-  description: v.fallback(
-    v.nullish(v.looseObject({ basic: OptionalTextSchema })),
-    undefined,
-  ),
-  promo_items: v.fallback(
-    v.nullish(
-      v.looseObject({
-        basic: v.fallback(
-          v.nullish(v.looseObject({ url: OptionalTextSchema })),
-          undefined,
-        ),
-      }),
-    ),
-    undefined,
-  ),
 });
 
-type AdAgeContentCache = v.InferOutput<typeof JsonRecordSchema>;
-type AdAgeEntry = v.InferOutput<typeof AdAgeEntrySchema>;
+type AdAgeContentCache = InferOutput<typeof JsonRecordSchema>;
+type AdAgeEntry = InferOutput<typeof AdAgeEntrySchema>;
 
-function getEntries(cache: AdAgeContentCache): AdAgeEntry[] {
-  const sectionsResult = v.safeParse(JsonRecordSchema, cache["story-feed-sections"]);
+function getEntries(cache: AdAgeContentCache): Array<AdAgeEntry> {
+  const sectionsResult = safeParse(JsonRecordSchema, cache["story-feed-sections"]);
   if (!sectionsResult.success) {
     return [];
   }
 
   return Object.values(sectionsResult.output).flatMap((section) => {
-    const sectionResult = v.safeParse(StoryFeedSectionSchema, section);
+    const sectionResult = safeParse(StoryFeedSectionSchema, section);
     if (!sectionResult.success) {
       return [];
     }
 
     return (sectionResult.output.data?.content_elements ?? []).flatMap((entry) => {
-      const entryResult = v.safeParse(AdAgeEntrySchema, entry);
+      const entryResult = safeParse(AdAgeEntrySchema, entry);
       return entryResult.success ? [entryResult.output] : [];
     });
   });
@@ -121,7 +131,7 @@ function parseContentCache(html: string): AdAgeContentCache {
     throw new Error("Missing Fusion.contentCache payload");
   }
 
-  const result = v.safeParse(JsonRecordSchema, JSON.parse(contentCache));
+  const result = safeParse(JsonRecordSchema, JSON.parse(contentCache));
   if (!result.success) {
     throw new Error("Invalid Fusion.contentCache payload");
   }
@@ -133,7 +143,7 @@ export async function parse(response: Response, now: Date = new Date()): Promise
   const html = await response.text();
   const contentCache = parseContentCache(html);
 
-  const entries: RSSEntry[] = getEntries(contentCache)
+  const entries: Array<RSSEntry> = getEntries(contentCache)
     .flatMap((entry) => {
       const link = getEntryLink(entry);
       const title = getEntryTitle(entry);
@@ -145,32 +155,32 @@ export async function parse(response: Response, now: Date = new Date()): Promise
 
       return [
         {
-          id: link,
-          link,
-          title,
-          text: getEntryText(entry, title),
           datetime,
+          id: link,
           imageURL: getEntryImageURL(entry),
+          link,
+          text: getEntryText(entry, title),
+          title,
         },
       ];
     })
     .filter(isValidRSSEntry);
 
   return {
+    description: "Latest News",
+    entries,
     id: BASE_URL,
+    language: "en",
     link: BASE_URL,
     title: "Latest News - Ad Age",
-    description: "Latest News",
-    language: "en",
-    entries,
   };
 }
 
 export async function get(ctx: ScraperContext): Promise<RSSData> {
   const response = await createProxiedFetch(ctx.env)(BASE_URL, {
     headers: {
-      "user-agent": USERAGENT,
       accept: "text/html",
+      "user-agent": USERAGENT,
     },
   });
 

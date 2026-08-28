@@ -13,12 +13,12 @@ function encodeHtmlAttribute(value: string): string {
 
 function createCard(id: number): string {
   const calendarData = JSON.stringify({
+    endDate: "2026-09-15",
+    endTime: "23:00",
+    location: "Auditório Fernando Lopes Graça (Almada)",
     name: `Evento ${id} & Convidados`,
     startDate: "2026-09-15",
-    endDate: "2026-09-15",
-    location: "Auditório Fernando Lopes Graça (Almada)",
     startTime: "21:00",
-    endTime: "23:00",
   });
 
   return `
@@ -48,22 +48,22 @@ function createAjaxResponse(html: string, pageTotal: number): Response {
 
 describe("viralAgendaAlmada scraper", () => {
   it("decodes and parses calendar data from event cards", () => {
-    const result = parse(createCard(1834686));
+    const result = parse(createCard(1_834_686));
 
     expect(result).toMatchObject({
       id: "https://www.viralagenda.com/pt/setubal/almada",
+      language: "pt",
       link: "https://www.viralagenda.com/pt/setubal/almada",
       title: "Agenda Cultural de Almada | Viral Agenda",
-      language: "pt",
     });
     expect(result.entries).toEqual([
       {
-        id: "https://www.viralagenda.com/pt/events/1834686/evento-1834686",
-        link: "https://www.viralagenda.com/pt/events/1834686/evento-1834686",
-        title: "Evento 1834686 & Convidados",
-        text: "2026-09-15 | 21:00–23:00 | Auditório Fernando Lopes Graça (Almada)",
         datetime: new Date("2026-09-15T20:00:00.000Z"),
+        id: "https://www.viralagenda.com/pt/events/1834686/evento-1834686",
         imageURL: "https://cdn.viralagenda.com/images/events/1834686.jpg",
+        link: "https://www.viralagenda.com/pt/events/1834686/evento-1834686",
+        text: "2026-09-15 | 21:00–23:00 | Auditório Fernando Lopes Graça (Almada)",
+        title: "Evento 1834686 & Convidados",
       },
     ]);
   });
@@ -82,7 +82,7 @@ describe("viralAgendaAlmada scraper", () => {
   });
 
   it("follows pagination into ongoing events until Viral Agenda returns a partial page", async () => {
-    const requests: Array<{ url: string; headers: Headers }> = [];
+    const requests: Array<{ headers: Headers; url: string; }> = [];
     const responses = [
       createHtmlResponse(createPage(1, 30)),
       createAjaxResponse(`${ongoingMarker}${createPage(31, 30)}`, 30),
@@ -91,12 +91,12 @@ describe("viralAgendaAlmada scraper", () => {
 
     const fetchFn: typeof fetch = async (input, init) => {
       requests.push({
-        url: String(input),
         headers: new Headers(init?.headers),
+        url: String(input),
       });
 
       const response = responses.shift();
-      if (!response) throw new Error("Unexpected request");
+      if (!response) {throw new Error("Unexpected request");}
       return response;
     };
 

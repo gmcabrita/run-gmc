@@ -8,9 +8,9 @@ const BASE_URL = new URL(SECTION_PATH, SITE_ORIGIN).href;
 type FetchFn = typeof fetch;
 
 interface DraftEntry extends RSSEntry {
-  topic: string;
   columnistName: string;
   publishedAt: string;
+  topic: string;
 }
 
 const HTML_ENTITY_BY_NAME = new Map([
@@ -23,7 +23,7 @@ const HTML_ENTITY_BY_NAME = new Map([
 ]);
 
 function decodeHtmlEntities(text: string): string {
-  return text.replace(/&(#x[0-9a-f]+|#\d+|[a-z]+);/gi, (match, entity) => {
+  return text.replaceAll(/&(#x[0-9a-f]+|#\d+|[a-z]+);/gi, (match, entity) => {
     const normalizedEntity = entity.toLowerCase();
     if (normalizedEntity.startsWith("#x")) {
       const codePoint = Number.parseInt(normalizedEntity.slice(2), 16);
@@ -40,11 +40,11 @@ function decodeHtmlEntities(text: string): string {
 }
 
 function normalizeWhitespace(text: string): string {
-  return decodeHtmlEntities(text).replace(/\u00a0/g, " ").replace(/\s+/g, " ").trim();
+  return decodeHtmlEntities(text).replaceAll('\u00A0', " ").replaceAll(/\s+/g, " ").trim();
 }
 
-function getLastEntry(entries: DraftEntry[]): DraftEntry | undefined {
-  return entries[entries.length - 1];
+function getLastEntry(entries: Array<DraftEntry>): DraftEntry | undefined {
+  return entries.at(-1);
 }
 
 function parseIsoDateTime(value: string): Date | undefined {
@@ -81,32 +81,32 @@ async function fetchPage(url: string, fetchFn: FetchFn): Promise<Response> {
   return response;
 }
 
-function buildFeed(entries: RSSEntry[]): RSSData {
+function buildFeed(entries: Array<RSSEntry>): RSSData {
   return {
+    description: "Observador Media",
+    entries,
     id: BASE_URL,
+    language: "pt",
     link: BASE_URL,
     title: "Observador - Media",
-    description: "Observador Media",
-    language: "pt",
-    entries,
   };
 }
 
 export async function parsePage(response: Response): Promise<RSSData> {
-  const draftEntries: DraftEntry[] = [];
+  const draftEntries: Array<DraftEntry> = [];
   const entrySelector = '.editorial-grid .mod[class*="mod-posttype-"]';
 
   const rewriter = new HTMLRewriter()
     .on(entrySelector, {
       element() {
         draftEntries.push({
+          columnistName: "",
           id: "",
           link: "",
-          title: "",
-          text: "",
-          topic: "",
-          columnistName: "",
           publishedAt: "",
+          text: "",
+          title: "",
+          topic: "",
         });
       },
     })
@@ -188,12 +188,12 @@ export async function parsePage(response: Response): Promise<RSSData> {
         const topic = normalizeWhitespace(entry.topic);
 
         return {
-          id: entry.id,
-          link: entry.link,
-          title,
-          text: lead || columnistName || topic || title,
           datetime: parseIsoDateTime(entry.publishedAt),
+          id: entry.id,
           imageURL: entry.imageURL,
+          link: entry.link,
+          text: lead || columnistName || topic || title,
+          title,
         };
       })
       .filter(isValidRSSEntry),

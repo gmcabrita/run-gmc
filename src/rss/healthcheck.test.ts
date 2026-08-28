@@ -53,37 +53,37 @@ describe("runRssHealthcheck", () => {
       async (url) => {
         if (url === "https://run.gmcabrita.com/rss.a") {
           return {
-            statusCode: 200,
-            ok: true,
             body: "<rss><channel><item></item></channel></rss>",
+            ok: true,
+            statusCode: 200,
           };
         }
 
         if (url === "https://run.gmcabrita.com/rss.b") {
           return {
-            statusCode: 200,
-            ok: true,
             body: "<rss><channel></channel></rss>",
+            ok: true,
+            statusCode: 200,
           };
         }
 
         return {
-          statusCode: 500,
-          ok: false,
           body: "",
+          ok: false,
+          statusCode: 500,
         };
       },
     );
 
     expect(response).toEqual({
-      summary: {
-        passed: 1,
-        failed: 2,
-      },
       failures: [
-        { url: "https://run.gmcabrita.com/rss.b", statusCode: 200 },
-        { url: "https://run.gmcabrita.com/rss.c", statusCode: 500 },
+        { statusCode: 200, url: "https://run.gmcabrita.com/rss.b" },
+        { statusCode: 500, url: "https://run.gmcabrita.com/rss.c" },
       ],
+      summary: {
+        failed: 2,
+        passed: 1,
+      },
     });
   });
 
@@ -93,11 +93,11 @@ describe("runRssHealthcheck", () => {
         throw new Error("failed");
       }),
     ).resolves.toEqual({
+      failures: [{ statusCode: 500, url: "https://run.gmcabrita.com/rss.a" }],
       summary: {
-        passed: 0,
         failed: 1,
+        passed: 0,
       },
-      failures: [{ url: "https://run.gmcabrita.com/rss.a", statusCode: 500 }],
     });
   });
 
@@ -108,27 +108,27 @@ describe("runRssHealthcheck", () => {
       async (url) => {
         if (url === "https://run.gmcabrita.com/rss.a") {
           return {
-            statusCode: 200,
-            ok: true,
             body: "<rss><channel><item></item></channel></rss>",
+            ok: true,
+            statusCode: 200,
           };
         }
 
         return {
-          statusCode: 200,
-          ok: true,
           body: "",
+          ok: true,
+          statusCode: 200,
         };
       },
       ["https://relay.example.com/healthz"],
     );
 
     expect(response).toEqual({
-      summary: {
-        passed: 2,
-        failed: 0,
-      },
       failures: [],
+      summary: {
+        failed: 0,
+        passed: 2,
+      },
     });
   });
 });
@@ -145,19 +145,19 @@ describe("summarizeRssHealthcheck", () => {
   it("counts passes and returns only failures", () => {
     expect(
       summarizeRssHealthcheck([
-        { url: "https://run.gmcabrita.com/rss.a", statusCode: 200, passed: true },
-        { url: "https://run.gmcabrita.com/rss.b", statusCode: 502, passed: false },
-        { url: "https://run.gmcabrita.com/rss.c", statusCode: 200, passed: false },
+        { passed: true, statusCode: 200, url: "https://run.gmcabrita.com/rss.a" },
+        { passed: false, statusCode: 502, url: "https://run.gmcabrita.com/rss.b" },
+        { passed: false, statusCode: 200, url: "https://run.gmcabrita.com/rss.c" },
       ]),
     ).toEqual({
-      summary: {
-        passed: 1,
-        failed: 2,
-      },
       failures: [
-        { url: "https://run.gmcabrita.com/rss.b", statusCode: 502 },
-        { url: "https://run.gmcabrita.com/rss.c", statusCode: 200 },
+        { statusCode: 502, url: "https://run.gmcabrita.com/rss.b" },
+        { statusCode: 200, url: "https://run.gmcabrita.com/rss.c" },
       ],
+      summary: {
+        failed: 2,
+        passed: 1,
+      },
     });
   });
 });
@@ -166,8 +166,8 @@ describe("getRssHealthcheckFailureReason", () => {
   it("returns undefined when healthcheck passed", () => {
     expect(
       getRssHealthcheckFailureReason({
-        summary: { passed: 1, failed: 0 },
         failures: [],
+        summary: { failed: 0, passed: 1 },
       }),
     ).toBeUndefined();
   });
@@ -175,8 +175,14 @@ describe("getRssHealthcheckFailureReason", () => {
   it("returns failures array contents when healthcheck failed", () => {
     expect(
       getRssHealthcheckFailureReason({
-        summary: { passed: 0, failed: 1 },
-        failures: [{ url: "https://run.gmcabrita.com/rss.a", statusCode: 500 }],
+        failures: [
+          {
+            url: "https://run.gmcabrita.com/rss.a",
+            // Keep the established JSON field order used in healthcheck messages.
+            statusCode: 500,
+          },
+        ],
+        summary: { failed: 1, passed: 0 },
       }),
     ).toBe('[{"url":"https://run.gmcabrita.com/rss.a","statusCode":500}]');
   });
@@ -200,30 +206,30 @@ describe("getDiscordHealthcheckFailurePayload", () => {
   it("formats failures as Discord embeds", () => {
     expect(
       getDiscordHealthcheckFailurePayload({
-        summary: { passed: 2, failed: 2 },
         failures: [
-          { url: "https://run.gmcabrita.com/rss.informacaoLisboa", statusCode: 500 },
-          { url: "https://run.gmcabrita.com/rss.reutersMediaTelecom", statusCode: 502 },
+          { statusCode: 500, url: "https://run.gmcabrita.com/rss.informacaoLisboa" },
+          { statusCode: 502, url: "https://run.gmcabrita.com/rss.reutersMediaTelecom" },
         ],
+        summary: { failed: 2, passed: 2 },
       }),
     ).toEqual({
       embeds: [
         {
-          title: "run.gmc healthcheck failed",
+          color: 0xff_3b_30,
           description: "2 failed, 2 passed",
-          color: 0xff3b30,
           fields: [
             {
+              inline: false,
               name: "500 /rss.informacaoLisboa",
               value: "<https://run.gmcabrita.com/rss.informacaoLisboa>",
-              inline: false,
             },
             {
+              inline: false,
               name: "502 /rss.reutersMediaTelecom",
               value: "<https://run.gmcabrita.com/rss.reutersMediaTelecom>",
-              inline: false,
             },
           ],
+          title: "run.gmc healthcheck failed",
         },
       ],
     });
@@ -234,15 +240,15 @@ describe("getDiscordHealthcheckPassPayload", () => {
   it("formats passes as Discord embeds", () => {
     expect(
       getDiscordHealthcheckPassPayload({
-        summary: { passed: 2, failed: 0 },
         failures: [],
+        summary: { failed: 0, passed: 2 },
       }),
     ).toEqual({
       embeds: [
         {
-          title: "run.gmc healthcheck passed",
+          color: 0x34_c7_59,
           description: "2 checks passed",
-          color: 0x34c759,
+          title: "run.gmc healthcheck passed",
         },
       ],
     });

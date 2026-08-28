@@ -24,21 +24,21 @@ describe("kernelShBlog scraper", () => {
     const result = await parse(createResponse());
 
     expect(result.entries[0]).toEqual({
-      id: "https://www.kernel.sh/blog/firecracker-faster",
-      link: "https://www.kernel.sh/blog/firecracker-faster",
-      title: "how to make firecracker fast(er) to start chromium in < 20ms",
-      text: "kernel got our start running chromium in a firecracker vm.",
       datetime: new Date("2026-06-05T13:00:00.000Z"),
+      id: "https://www.kernel.sh/blog/firecracker-faster",
       imageURL: "https://cdn.sanity.io/images/7o5bsuld/production/firecracker.png",
+      link: "https://www.kernel.sh/blog/firecracker-faster",
+      text: "kernel got our start running chromium in a firecracker vm.",
+      title: "how to make firecracker fast(er) to start chromium in < 20ms",
     });
 
     expect(result.entries[1]).toEqual({
-      id: "https://www.kernel.sh/blog/scale",
-      link: "https://www.kernel.sh/blog/scale",
-      title: "Lessons learned from scaling Chromium on bare metal",
-      text: "Learn how Kernel runs thousands of Chromium browsers on bare metal.",
       datetime: new Date("2026-05-26T13:18:00.000Z"),
+      id: "https://www.kernel.sh/blog/scale",
       imageURL: "https://cdn.sanity.io/images/7o5bsuld/production/scale.png",
+      link: "https://www.kernel.sh/blog/scale",
+      text: "Learn how Kernel runs thousands of Chromium browsers on bare metal.",
+      title: "Lessons learned from scaling Chromium on bare metal",
     });
   });
 
@@ -46,12 +46,12 @@ describe("kernelShBlog scraper", () => {
     const result = await parse(createResponse());
 
     expect(result.entries[2]).toEqual({
-      id: "https://www.kernel.sh/blog/computer-use-2025",
-      link: "https://www.kernel.sh/blog/computer-use-2025",
-      title: "\"So how are you better than Browserbase?\"",
-      text: "",
       datetime: new Date("2025-12-10T14:00:00.000Z"),
+      id: "https://www.kernel.sh/blog/computer-use-2025",
       imageURL: "https://cdn.sanity.io/images/7o5bsuld/production/wrapped.png",
+      link: "https://www.kernel.sh/blog/computer-use-2025",
+      text: "",
+      title: "\"So how are you better than Browserbase?\"",
     });
   });
 
@@ -59,12 +59,12 @@ describe("kernelShBlog scraper", () => {
     const nextData = JSON.stringify({
       posts: [
         {
-          title: "Tolerant post",
+          excerpt: 42,
+          mainImage: { invalid: true },
+          previewImage: { asset: { url: false } },
           publishedAt: "2025-01-01T12:00:00Z",
           slug: { current: "tolerant-post" },
-          excerpt: 42,
-          previewImage: { asset: { url: false } },
-          mainImage: { invalid: true },
+          title: "Tolerant post",
         },
       ],
     });
@@ -76,11 +76,11 @@ describe("kernelShBlog scraper", () => {
 
     expect(result.entries).toEqual([
       {
+        datetime: new Date("2025-01-01T12:00:00Z"),
         id: "https://www.kernel.sh/blog/tolerant-post",
         link: "https://www.kernel.sh/blog/tolerant-post",
-        title: "Tolerant post",
         text: "",
-        datetime: new Date("2025-01-01T12:00:00Z"),
+        title: "Tolerant post",
       },
     ]);
   });

@@ -29,13 +29,13 @@ describe("imagensDeMarca parser", () => {
     const result = await parse({
       items: [
         {
-          id: "invalid-date",
-          _title: { all: "Invalid date" },
           _slug: { all: "invalid-date" },
-          image_cHyPyUtO1f: null,
-          image_cSyfYQnEab: null,
-          image_crJeRfSWfz: null,
+          _title: { all: "Invalid date" },
           datetime_cB1vB7YcXz: "not-a-date",
+          id: "invalid-date",
+          image_cHyPyUtO1f: null,
+          image_crJeRfSWfz: null,
+          image_cSyfYQnEab: null,
         },
       ],
     });

@@ -2,13 +2,13 @@ import { USERAGENT, consume, isValidRSSEntry, type ScraperContext } from "@rss/c
 import type { RSSData, RSSEntry } from "@rss/types";
 
 export interface RtpFinancialDocumentPageConfig {
+  description: string;
   pageUrl: string;
   title: string;
-  description: string;
 }
 
 function normalizeWhitespace(value: string) {
-  return value.replace(/\s+/g, " ").trim();
+  return value.replaceAll(/\s+/g, " ").trim();
 }
 
 export async function parseRtpFinancialDocumentPage(
@@ -30,8 +30,8 @@ export async function parseRtpFinancialDocumentPage(
       currentEntry = {
         id: link,
         link,
-        title: "",
         text: "",
+        title: "",
       };
       entries.push(currentEntry);
     },
@@ -50,21 +50,21 @@ export async function parseRtpFinancialDocumentPage(
   }
 
   return {
-    id: config.pageUrl,
-    link: config.pageUrl,
-    title: config.title,
     description: config.description,
-    language: "pt",
     entries: entries
       .map((entry) => {
         const title = normalizeWhitespace(entry.title);
         return {
           ...entry,
-          title,
           text: title,
+          title,
         };
       })
       .filter((entry) => isValidRSSEntry(entry)),
+    id: config.pageUrl,
+    language: "pt",
+    link: config.pageUrl,
+    title: config.title,
   };
 }
 
@@ -74,8 +74,8 @@ export async function fetchRtpFinancialDocumentPage(
 ): Promise<RSSData> {
   const response = await fetch(config.pageUrl, {
     headers: {
-      "user-agent": USERAGENT,
       "Content-Type": "text/html",
+      "user-agent": USERAGENT,
     },
   });
 

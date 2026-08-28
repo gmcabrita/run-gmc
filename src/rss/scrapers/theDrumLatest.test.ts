@@ -28,12 +28,12 @@ describe("theDrumLatest scraper", () => {
     const result = await parse(createResponse(), now);
 
     expect(result.entries[0]).toEqual({
-      id: "https://www.thedrum.com/news/story-one",
-      link: "https://www.thedrum.com/news/story-one",
-      title: "Story One",
-      text: "Story One",
       datetime: undefined,
+      id: "https://www.thedrum.com/news/story-one",
       imageURL: "https://thedrum-media.imgix.net/story-one.jpg",
+      link: "https://www.thedrum.com/news/story-one",
+      text: "Story One",
+      title: "Story One",
     });
 
     expect(result.entries[1]?.datetime).toEqual(new Date("2026-03-09T12:00:00Z"));

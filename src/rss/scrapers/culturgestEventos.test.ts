@@ -98,30 +98,30 @@ describe("culturgestEventos scraper", () => {
     const result = await parse(createResponse());
 
     expect(result.entries[0]).toEqual({
-      id: "https://www.culturgest.pt/pt/programacao/falta-de-cha-humor-tabus-censura/",
-      link: "https://www.culturgest.pt/pt/programacao/falta-de-cha-humor-tabus-censura/",
-      title: "Falta de Chá: Humor, Tabus e Censura - Mélanie Toulhoat, Rui Lopes, Rita Luís",
-      text: "25 Mar 2026 | Conferências e Debates",
-      imageURL: "https://www.culturgest.pt/media/filer_public/falta-cha.jpg",
       datetime: new Date("2026-03-25T00:00:00.000Z"),
+      id: "https://www.culturgest.pt/pt/programacao/falta-de-cha-humor-tabus-censura/",
+      imageURL: "https://www.culturgest.pt/media/filer_public/falta-cha.jpg",
+      link: "https://www.culturgest.pt/pt/programacao/falta-de-cha-humor-tabus-censura/",
+      text: "25 Mar 2026 | Conferências e Debates",
+      title: "Falta de Chá: Humor, Tabus e Censura - Mélanie Toulhoat, Rui Lopes, Rita Luís",
     });
 
     expect(result.entries[1]).toEqual({
-      id: "https://www.culturgest.pt/pt/programacao/diana-niepce-hornfuckers/",
-      link: "https://www.culturgest.pt/pt/programacao/diana-niepce-hornfuckers/",
-      title: "Diana Niepce - Hornfuckers",
-      text: "26 – 28 Mar 2026 | Dança | Performance | Temporada 2026",
-      imageURL: "https://www.culturgest.pt/media/filer_public/diana.jpg",
       datetime: new Date("2026-03-26T00:00:00.000Z"),
+      id: "https://www.culturgest.pt/pt/programacao/diana-niepce-hornfuckers/",
+      imageURL: "https://www.culturgest.pt/media/filer_public/diana.jpg",
+      link: "https://www.culturgest.pt/pt/programacao/diana-niepce-hornfuckers/",
+      text: "26 – 28 Mar 2026 | Dança | Performance | Temporada 2026",
+      title: "Diana Niepce - Hornfuckers",
     });
 
     expect(result.entries[2]).toEqual({
-      id: "https://www.culturgest.pt/pt/programacao/mater-partir-da-colecao-da-cgd/",
-      link: "https://www.culturgest.pt/pt/programacao/mater-partir-da-colecao-da-cgd/",
-      title: "MATER - A partir da Coleção da CGD",
-      text: "11 Abr – 21 Jun 2026 | Artes Visuais | Fora de Portas | Desconcentrar",
-      imageURL: "https://www.culturgest.pt/media/filer_public/mater.jpg",
       datetime: new Date("2026-04-11T00:00:00.000Z"),
+      id: "https://www.culturgest.pt/pt/programacao/mater-partir-da-colecao-da-cgd/",
+      imageURL: "https://www.culturgest.pt/media/filer_public/mater.jpg",
+      link: "https://www.culturgest.pt/pt/programacao/mater-partir-da-colecao-da-cgd/",
+      text: "11 Abr – 21 Jun 2026 | Artes Visuais | Fora de Portas | Desconcentrar",
+      title: "MATER - A partir da Coleção da CGD",
     });
   });
 

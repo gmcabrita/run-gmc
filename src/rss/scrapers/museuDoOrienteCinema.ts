@@ -5,7 +5,7 @@ const BASE_URL = "https://www.foriente.pt";
 const AJAX_URL = `${BASE_URL}/agenda_ajax.php`;
 
 export async function parse(response: Response): Promise<RSSData> {
-  const entries: RSSEntry[] = [];
+  const entries: Array<RSSEntry> = [];
   let currentEntry: Partial<RSSEntry> & { eventType: string } = { eventType: "" };
 
   const rewriter = new HTMLRewriter()
@@ -14,9 +14,9 @@ export async function parse(response: Response): Promise<RSSData> {
         const dataId = el.getAttribute("data-id");
         if (dataId) {
           currentEntry = {
+            eventType: "",
             id: dataId,
             link: `${BASE_URL}/detalhe.php?id=${dataId}`,
-            eventType: "",
           };
         }
       },
@@ -36,45 +36,45 @@ export async function parse(response: Response): Promise<RSSData> {
       },
     })
     .on(".rectangle[data-id] .event-type", {
-      text(text) {
-        if (text.text) {
-          currentEntry.eventType = (currentEntry.eventType ?? "") + text.text;
-        }
-      },
       element(el) {
         el.onEndTag(() => {
           if (currentEntry.id && currentEntry.eventType.toLowerCase().includes("cinema")) {
             entries.push({
               id: currentEntry.id,
               link: currentEntry.link ?? "",
-              title: currentEntry.title ?? "",
               text: currentEntry.text,
+              title: currentEntry.title ?? "",
             });
           }
         });
+      },
+      text(text) {
+        if (text.text) {
+          currentEntry.eventType = (currentEntry.eventType ?? "") + text.text;
+        }
       },
     });
 
   await consume(rewriter.transform(response).body!);
 
   return {
+    description: "Programação de cinema do Museu do Oriente",
+    entries: entries.filter(isValidRSSEntry),
     id: BASE_URL,
+    language: "pt",
     link: BASE_URL,
     title: "Museu do Oriente - Cinema",
-    description: "Programação de cinema do Museu do Oriente",
-    language: "pt",
-    entries: entries.filter(isValidRSSEntry),
   };
 }
 
 export async function get(_ctx: ScraperContext): Promise<RSSData> {
   const response = await fetch(AJAX_URL, {
-    method: "POST",
-    headers: {
-      "User-Agent": USERAGENT,
-      "Content-Type": "application/x-www-form-urlencoded",
-    },
     body: "categoria=espectaculos&datas=",
+    headers: {
+      "Content-Type": "application/x-www-form-urlencoded",
+      "User-Agent": USERAGENT,
+    },
+    method: "POST",
   });
 
   return parse(response);

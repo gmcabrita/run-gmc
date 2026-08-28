@@ -1,5 +1,5 @@
 import { Hono, type ExecutionContext as HonoExecutionContext } from "hono";
-import * as Sentry from "@sentry/cloudflare";
+import { consoleLoggingIntegration, withMonitor, withSentry } from "@sentry/cloudflare";
 import { basicAuth } from "hono/basic-auth";
 import { cors } from "hono/cors";
 import { addCoverflexEndpoints, sendAppleCatalogueByEmail } from "@coverflex";
@@ -9,7 +9,14 @@ import { addXEndpoints } from "@x";
 import { addIcs2GcalEndpoint } from "./ics2gcal";
 import { checkMauserSc1176StockAndNotify } from "./mauser";
 import { addScrapedRssEndpoints, cacheAgendaLx } from "@rss/scrapers";
-import * as v from "valibot";
+import {
+  array,
+  boolean,
+  looseObject,
+  nullish,
+  parse,
+  string,
+} from "valibot";
 import {
   getDiscordHealthcheckErrorPayload,
   getDiscordHealthcheckFailurePayload,
@@ -23,15 +30,15 @@ import {
 } from "@rss/healthcheck";
 
 const rssHealthcheckOrigin = "https://run.gmcabrita.com";
-const FertagusResponseSchema = v.looseObject({
-  response: v.array(
-    v.looseObject({
-      NodesComboioTabelsPartidasChegadas: v.array(
-        v.looseObject({
-          ComboioPassou: v.boolean(),
-          NomeEstacaoDestino: v.string(),
-          DataHoraPartidaChegada_ToOrderBy: v.string(),
-          Observacoes: v.nullish(v.string()),
+const FertagusResponseSchema = looseObject({
+  response: array(
+    looseObject({
+      NodesComboioTabelsPartidasChegadas: array(
+        looseObject({
+          ComboioPassou: boolean(),
+          DataHoraPartidaChegada_ToOrderBy: string(),
+          NomeEstacaoDestino: string(),
+          Observacoes: nullish(string()),
         }),
       ),
     }),
@@ -47,11 +54,11 @@ async function sendDiscordHealthcheckPayload(
   }
 
   const response = await fetch(webhookUrl, {
-    method: "POST",
+    body: JSON.stringify(payload),
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify(payload),
+    method: "POST",
   });
 
   if (!response.ok) {
@@ -77,9 +84,9 @@ async function fetchRssHealthcheckUrl(
   const body = await response.text();
 
   return {
-    statusCode: response.status,
-    ok: response.ok,
     body,
+    ok: response.ok,
+    statusCode: response.status,
   };
 }
 
@@ -88,9 +95,9 @@ async function fetchHttpHealthcheckUrl(url: string): Promise<RssHealthcheckFetch
   const body = await response.text();
 
   return {
-    statusCode: response.status,
-    ok: response.ok,
     body,
+    ok: response.ok,
+    statusCode: response.status,
   };
 }
 
@@ -171,9 +178,9 @@ app.get("/ip.getTrainInformation/:trainId/:date", cors({ origin: "*" }), async (
     {
       headers: {
         accept: "application/json, text/plain, */*",
+        Referer: "https://www.infraestruturasdeportugal.pt/negocios-e-servicos/horarios",
         "user-agent":
           "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36",
-        Referer: "https://www.infraestruturasdeportugal.pt/negocios-e-servicos/horarios",
       },
       method: "GET",
     },
@@ -189,9 +196,9 @@ app.get("/ip.getStations/:name", cors({ origin: "*" }), async (ctx) => {
     {
       headers: {
         accept: "application/json, text/plain, */*",
+        Referer: "https://www.infraestruturasdeportugal.pt/negocios-e-servicos/horarios",
         "user-agent":
           "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36",
-        Referer: "https://www.infraestruturasdeportugal.pt/negocios-e-servicos/horarios",
       },
       method: "GET",
     },
@@ -213,9 +220,9 @@ app.get(
       {
         headers: {
           accept: "application/json, text/plain, */*",
+          Referer: "https://www.infraestruturasdeportugal.pt/negocios-e-servicos/horarios",
           "user-agent":
             "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36",
-          Referer: "https://www.infraestruturasdeportugal.pt/negocios-e-servicos/horarios",
         },
         method: "GET",
       },
@@ -229,17 +236,17 @@ app.get("/fertagus.nextTrainLeavingCorroios", async (ctx) => {
   const response = await fetch(
     "https://www.infraestruturasdeportugal.pt/negocios-e-servicos/partidas-chegadas/9417137/%2000:00/%2023:59/URB%7CSUBUR",
     {
+      body: null,
       headers: {
         accept: "application/json, text/plain, */*",
+        Referer: "https://www.infraestruturasdeportugal.pt/negocios-e-servicos/horarios",
         "user-agent":
           "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36",
-        Referer: "https://www.infraestruturasdeportugal.pt/negocios-e-servicos/horarios",
       },
-      body: null,
       method: "GET",
     },
   );
-  const json = v.parse(FertagusResponseSchema, await response.json());
+  const json = parse(FertagusResponseSchema, await response.json());
   const train = json.response[1].NodesComboioTabelsPartidasChegadas.find(
     (train) => !train.ComboioPassou && train.NomeEstacaoDestino === "ROMA-AREEIRO",
   );
@@ -271,7 +278,7 @@ app.get("/fertagus.nextTrainLeavingCorroios", async (ctx) => {
   if (delayInMinutes) {
     dateTime.setMinutes(dateTime.getMinutes() + delayInMinutes);
   }
-  if (delayInHours) dateTime.setHours(dateTime.getHours() + delayInHours);
+  if (delayInHours) {dateTime.setHours(dateTime.getHours() + delayInHours);}
   const expectedDateTime = dateTime.toISOString();
   const expectedTime = originalDateTime.match(/T(\d+:\d+)/)?.[1];
   const expectedTimeWithDelay = `${expectedTime}${delayInMinutes ? ` (${delayInMinutes})` : ""}`;
@@ -279,11 +286,11 @@ app.get("/fertagus.nextTrainLeavingCorroios", async (ctx) => {
   ctx.header("Cache-Control", "public, max-age=60");
   return ctx.json({
     delayText,
-    originalDateTime,
     expectedDateTime,
-    originalTime,
     expectedTime,
     expectedTimeWithDelay,
+    originalDateTime,
+    originalTime,
   });
 });
 
@@ -291,8 +298,8 @@ app.get(
   "/sentry.debug.throwError",
   async (ctx, next) => {
     const auth = basicAuth({
-      username: ctx.env.PRIVATE_BASIC_AUTH_USERNAME,
       password: ctx.env.PRIVATE_BASIC_AUTH_PASSWORD,
+      username: ctx.env.PRIVATE_BASIC_AUTH_USERNAME,
     });
     return auth(ctx, next);
   },
@@ -305,8 +312,8 @@ app.get(
   "/healthcheck",
   async (ctx, next) => {
     const auth = basicAuth({
-      username: ctx.env.PRIVATE_BASIC_AUTH_USERNAME,
       password: ctx.env.PRIVATE_BASIC_AUTH_PASSWORD,
+      username: ctx.env.PRIVATE_BASIC_AUTH_USERNAME,
     });
     return auth(ctx, next);
   },
@@ -326,8 +333,8 @@ app.get(
   "/sentry.debug.log",
   async (ctx, next) => {
     const auth = basicAuth({
-      username: ctx.env.PRIVATE_BASIC_AUTH_USERNAME,
       password: ctx.env.PRIVATE_BASIC_AUTH_PASSWORD,
+      username: ctx.env.PRIVATE_BASIC_AUTH_USERNAME,
     });
     return auth(ctx, next);
   },
@@ -343,8 +350,8 @@ app.get(
   "/sentry.debug.tracing",
   async (ctx, next) => {
     const auth = basicAuth({
-      username: ctx.env.PRIVATE_BASIC_AUTH_USERNAME,
       password: ctx.env.PRIVATE_BASIC_AUTH_PASSWORD,
+      username: ctx.env.PRIVATE_BASIC_AUTH_USERNAME,
     });
     return auth(ctx, next);
   },
@@ -359,8 +366,8 @@ app.get(
   "/",
   async (ctx, next) => {
     const auth = basicAuth({
-      username: ctx.env.PRIVATE_BASIC_AUTH_USERNAME,
       password: ctx.env.PRIVATE_BASIC_AUTH_PASSWORD,
+      username: ctx.env.PRIVATE_BASIC_AUTH_USERNAME,
     });
     return auth(ctx, next);
   },
@@ -378,17 +385,17 @@ app.get(
   },
 );
 
-export default Sentry.withSentry(
+export default withSentry(
   (env: CloudflareBindings) => {
     const { id: versionId } = env.CF_VERSION_METADATA;
     return {
       dsn: env.SENTRY_DSN,
-      release: versionId,
-      tracesSampleRate: 1,
-      sendDefaultPii: true,
-      integrations: [Sentry.consoleLoggingIntegration({ levels: ["log", "warn", "error"] })],
-      enableLogs: true,
       enabled: env.ENVIRONMENT === "production",
+      enableLogs: true,
+      integrations: [consoleLoggingIntegration({ levels: ["log", "warn", "error"] })],
+      release: versionId,
+      sendDefaultPii: true,
+      tracesSampleRate: 1,
     };
   },
   {
@@ -397,89 +404,89 @@ export default Sentry.withSentry(
       switch (controller.cron) {
         case "* * * * *":
           await Promise.all([
-            Sentry.withMonitor(
+            withMonitor(
               "rss.sendCinecartazEntriesByEmail",
               async () => {
                 await sendCinecartazEntriesByEmail(env);
               },
               {
+                checkinMargin: 2,
                 schedule: {
                   type: "crontab",
                   value: "* * * * *",
                 },
-                checkinMargin: 2,
               },
             ),
-            Sentry.withMonitor(
+            withMonitor(
               "rss.sendCinemaxRtpPassatemposEntriesByEmail",
               async () => {
                 await sendCinemaxRtpPassatemposEntriesByEmail(env);
               },
               {
+                checkinMargin: 2,
                 schedule: {
                   type: "crontab",
                   value: "* * * * *",
                 },
-                checkinMargin: 2,
               },
             ),
-            Sentry.withMonitor(
+            withMonitor(
               "mauser.checkSc1176StockAndNotify",
               async () => {
                 await checkMauserSc1176StockAndNotify(env, new Date(controller.scheduledTime));
               },
               {
+                checkinMargin: 2,
                 schedule: {
                   type: "crontab",
                   value: "* * * * *",
                 },
-                checkinMargin: 2,
               },
             ),
           ]);
           break;
         case "*/15 * * * *":
-          await Sentry.withMonitor(
+          await withMonitor(
             "coverflex.sendAppleCatalogueByEmail",
             async () => {
               await sendAppleCatalogueByEmail(env);
             },
             {
+              checkinMargin: 2,
               schedule: {
                 type: "crontab",
                 value: "*/15 * * * *",
               },
-              checkinMargin: 2,
             },
           );
           break;
         case "0 1 * * *":
-          await Sentry.withMonitor(
+          await withMonitor(
             "rss.cacheAgendaLx",
             async () => {
               await cacheAgendaLx(env);
             },
             {
+              checkinMargin: 10,
               schedule: {
                 type: "crontab",
                 value: "0 1 * * *",
               },
-              checkinMargin: 10,
             },
           );
           break;
         case "0 12 * * *":
-          await Sentry.withMonitor(
+          await withMonitor(
             "rss.healthcheck",
             async () => {
               await runRssHealthcheckAndReport(rssHealthcheckOrigin, env, ctx);
             },
             {
+              checkinMargin: 10,
               schedule: {
                 type: "crontab",
                 value: "0 12 * * *",
               },
-              checkinMargin: 10,
             },
           );
           break;

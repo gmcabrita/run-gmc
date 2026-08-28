@@ -23,7 +23,7 @@ interface TheDrumDraftEntry extends RSSEntry {
 }
 
 function normalizeWhitespace(text: string): string {
-  return text.replace(/\s+/g, " ").trim();
+  return text.replaceAll(/\s+/g, " ").trim();
 }
 
 function toDurationMillis(count: number, unit: string): number | undefined {
@@ -92,7 +92,7 @@ export function parseReleaseDate(releaseText: string, now: Date = new Date()): D
 }
 
 export async function parse(response: Response, now: Date = new Date()): Promise<RSSData> {
-  const entries: TheDrumDraftEntry[] = [];
+  const entries: Array<TheDrumDraftEntry> = [];
   let currentEntry: TheDrumDraftEntry | null = null;
 
   const rewriter = new HTMLRewriter()
@@ -101,9 +101,9 @@ export async function parse(response: Response, now: Date = new Date()): Promise
         currentEntry = {
           id: "",
           link: "",
-          title: "",
-          text: "",
           releaseText: "",
+          text: "",
+          title: "",
         };
         entries.push(currentEntry);
       },
@@ -162,33 +162,33 @@ export async function parse(response: Response, now: Date = new Date()): Promise
   await consume(body);
 
   return {
-    id: BASE_URL,
-    link: BASE_URL,
-    title: "Latest Marketing News | The Drum",
     description:
       "Get the latest marketing news here at The Drum. Browse the latest industry and brand news as it happens, including in-depth journalism and analysis.",
-    language: "en",
     entries: entries
       .map((entry) => {
         const title = normalizeWhitespace(entry.title);
         return {
-          id: entry.id,
-          link: entry.link,
-          title,
-          text: title,
           datetime: parseReleaseDate(entry.releaseText, now),
+          id: entry.id,
           imageURL: entry.imageURL,
+          link: entry.link,
+          text: title,
+          title,
         };
       })
       .filter(isValidRSSEntry),
+    id: BASE_URL,
+    language: "en",
+    link: BASE_URL,
+    title: "Latest Marketing News | The Drum",
   };
 }
 
 export async function get(_ctx: ScraperContext): Promise<RSSData> {
   const response = await fetch(BASE_URL, {
     headers: {
-      "user-agent": USERAGENT,
       accept: "text/html",
+      "user-agent": USERAGENT,
     },
   });
 

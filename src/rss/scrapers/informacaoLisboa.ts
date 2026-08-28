@@ -1,29 +1,37 @@
 import { isValidRSSEntry, type ScraperContext } from "@rss/common";
 import { createProxiedFetch } from "../../proxiedFetch";
 import type { RSSData, RSSEntry } from "@rss/types";
-import * as v from "valibot";
+import {
+  array,
+  looseObject,
+  nullish,
+  number,
+  parse as parseValibot,
+  string,
+  type InferOutput,
+} from "valibot";
 
 const BASE_URL = "https://informacao.lisboa.pt";
 const API_URL =
   "https://informacao.lisboa.pt/noticias?extensao=news&ambito=news_filter&pid=6&lang=0&offset=0";
 
-const InformacaoLisboaPayloadSchema = v.looseObject({
-  registos: v.array(
-    v.looseObject({
-      uid: v.number(),
-      url: v.string(),
-      titulo: v.string(),
-      noticia: v.string(),
-      categorias: v.nullish(
-        v.array(v.looseObject({ nome: v.string() })),
+const InformacaoLisboaPayloadSchema = looseObject({
+  registos: array(
+    looseObject({
+      categorias: nullish(
+        array(looseObject({ nome: string() })),
       ),
-      data: v.string(),
-      hora: v.string(),
+      data: string(),
+      hora: string(),
+      noticia: string(),
+      titulo: string(),
+      uid: number(),
+      url: string(),
     }),
   ),
 });
 
-type InformacaoLisboaPayload = v.InferOutput<typeof InformacaoLisboaPayloadSchema>;
+type InformacaoLisboaPayload = InferOutput<typeof InformacaoLisboaPayloadSchema>;
 
 function parseDateTimeInformacaoLisboa(dateStr: string): Date {
   const months = new Map([
@@ -58,28 +66,28 @@ function parseDateTimeInformacaoLisboa(dateStr: string): Date {
 }
 
 export async function parse(json: InformacaoLisboaPayload): Promise<RSSData> {
-  const entries: RSSEntry[] = json.registos
+  const entries: Array<RSSEntry> = json.registos
     .map((item) => {
       const link = `${BASE_URL}/noticias/detalhe/${item.url}`;
       const text = `<strong>Categorias:</strong> ${(item.categorias ?? []).map((c) => c.nome).join(", ")}<br>${item.noticia}`;
 
       return {
+        datetime: parseDateTimeInformacaoLisboa(`${item.data}, ${item.hora}`),
         id: String(item.uid),
         link,
-        title: item.titulo,
         text,
-        datetime: parseDateTimeInformacaoLisboa(`${item.data}, ${item.hora}`),
+        title: item.titulo,
       };
     })
     .filter(isValidRSSEntry);
 
   return {
+    description: "Informação Lisboa",
+    entries,
     id: BASE_URL,
+    language: "pt",
     link: BASE_URL,
     title: "Informação Lisboa",
-    description: "Informação Lisboa",
-    language: "pt",
-    entries,
   };
 }
 
@@ -90,6 +98,6 @@ export async function get(_ctx: ScraperContext): Promise<RSSData> {
     },
   });
 
-  const json = v.parse(InformacaoLisboaPayloadSchema, await response.json());
+  const json = parseValibot(InformacaoLisboaPayloadSchema, await response.json());
   return parse(json);
 }

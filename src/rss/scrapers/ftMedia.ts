@@ -8,7 +8,7 @@ const USER_AGENT =
   "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36";
 
 function getAttribute(attributes: string, name: string): string | undefined {
-  const escapedName = name.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  const escapedName = name.replaceAll(/[.*+?^${}()|[\]\\]/g, String.raw`\$&`);
   const match = attributes.match(new RegExp(`(?:^|\\s)${escapedName}=(?:"([^"]*)"|'([^']*)')`, "i"));
   return match?.[1] ?? match?.[2];
 }
@@ -18,10 +18,10 @@ function hasClass(attributes: string, className: string): boolean {
 }
 
 function normalizeText(html: string): string {
-  return decodeHtmlEntities(html.replace(/<[^>]*>/g, " "))
-    .replace(/<[^>]*>/g, " ")
-    .replace(/\u00a0/g, " ")
-    .replace(/\s+/g, " ")
+  return decodeHtmlEntities(html.replaceAll(/<[^>]*>/g, " "))
+    .replaceAll(/<[^>]*>/g, " ")
+    .replaceAll('\u00A0', " ")
+    .replaceAll(/\s+/g, " ")
     .trim();
 }
 
@@ -142,7 +142,7 @@ function findStreamList(html: string): string {
   throw new Error("Missing FT media stream");
 }
 
-function getStreamItems(streamList: string): string[] {
+function getStreamItems(streamList: string): Array<string> {
   const starts = [...streamList.matchAll(/<li\b([^>]*)>/gi)].filter(
     (match) =>
       hasClass(match[1], "o-teaser-collection__item") && hasClass(match[1], "o-grid-row"),
@@ -167,12 +167,12 @@ function parseStreamItem(chunk: string): RSSEntry | undefined {
   }
 
   return {
-    id: link,
-    link,
-    title: heading.title,
-    text: findStandfirst(chunk) ?? heading.title,
     datetime: findDatetime(chunk),
+    id: link,
     imageURL: findImage(chunk),
+    link,
+    text: findStandfirst(chunk) ?? heading.title,
+    title: heading.title,
   };
 }
 
@@ -191,30 +191,30 @@ export function parse(html: string): RSSData {
     .filter(isValidRSSEntry);
 
   return {
+    description: "Media news, analysis and opinion from the Financial Times",
+    entries,
     id: BASE_URL,
+    language: "en",
     link: BASE_URL,
     title: "Financial Times - Media",
-    description: "Media news, analysis and opinion from the Financial Times",
-    language: "en",
-    entries,
   };
 }
 
 function getRequestHeaders(): HeadersInit {
   return {
-    "User-Agent": USER_AGENT,
     Accept:
       "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8",
     "Accept-Language": "en-GB,en;q=0.9",
+    Priority: "u=0, i",
     "Sec-CH-UA": '"Chromium";v="146", "Not-A.Brand";v="24", "Google Chrome";v="146"',
     "Sec-CH-UA-Mobile": "?0",
     "Sec-CH-UA-Platform": '"macOS"',
-    "Upgrade-Insecure-Requests": "1",
-    "Sec-Fetch-Site": "none",
-    "Sec-Fetch-Mode": "navigate",
-    "Sec-Fetch-User": "?1",
     "Sec-Fetch-Dest": "document",
-    Priority: "u=0, i",
+    "Sec-Fetch-Mode": "navigate",
+    "Sec-Fetch-Site": "none",
+    "Sec-Fetch-User": "?1",
+    "Upgrade-Insecure-Requests": "1",
+    "User-Agent": USER_AGENT,
   };
 }
 

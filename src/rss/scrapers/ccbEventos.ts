@@ -5,16 +5,16 @@ const BASE_URL = "https://www.ccb.pt/eventos/";
 const AJAX_URL = "https://www.ccb.pt/wp-admin/admin-ajax.php";
 
 type CCBCard = {
-  id: string;
-  link: string;
-  title: string;
-  fallbackTitle: string;
   dateLabel: string;
-  description: string;
-  venue: string;
-  tags: string[];
-  imageURL?: string;
   datetime?: Date;
+  description: string;
+  fallbackTitle: string;
+  id: string;
+  imageURL?: string;
+  link: string;
+  tags: Array<string>;
+  title: string;
+  venue: string;
 };
 
 const IGNORED_TAGS = new Set(["Atividades", "Exposições"]);
@@ -34,23 +34,23 @@ const IGNORED_TEXT_PATTERNS = [
 ];
 
 function normalizeText(value: string): string {
-  return value.replace(/\s+/g, " ").trim();
+  return value.replaceAll(/\s+/g, " ").trim();
 }
 
 function normalizeSearchText(value: string): string {
   return normalizeText(value).toLocaleLowerCase("pt-PT");
 }
 
-function getLastCard(cards: CCBCard[]): CCBCard | undefined {
-  return cards[cards.length - 1];
+function getLastCard(cards: Array<CCBCard>): CCBCard | undefined {
+  return cards.at(-1);
 }
 
 function parseImageUrl(style: string | null): string | undefined {
-  if (!style) return undefined;
+  if (!style) {return undefined;}
 
   const match = /url\((['"]?)(.*?)\1\)/.exec(style);
   const imagePath = match?.[2]?.trim();
-  if (!imagePath) return undefined;
+  if (!imagePath) {return undefined;}
 
   return new URL(imagePath, BASE_URL).href;
 }
@@ -58,7 +58,7 @@ function parseImageUrl(style: string | null): string | undefined {
 function parseDatetimeFromLink(link: string): Date | undefined {
   const pathname = new URL(link).pathname;
   const match = /\/(\d{4})-(\d{2})-(\d{2})\/?$/.exec(pathname);
-  if (!match) return undefined;
+  if (!match) {return undefined;}
 
   const year = Number(match[1]);
   const month = Number(match[2]);
@@ -92,7 +92,7 @@ function getCardTitle(card: CCBCard): string {
 }
 
 function shouldIgnoreCard(card: CCBCard): boolean {
-  if (card.tags.some((tag) => IGNORED_TAGS.has(tag))) return true;
+  if (card.tags.some((tag) => IGNORED_TAGS.has(tag))) {return true;}
 
   const haystack = normalizeSearchText(
     [getCardTitle(card), card.link, buildEntryText(card) ?? ""].join(" | "),
@@ -105,38 +105,38 @@ function buildEntry(card: CCBCard): RSSEntry {
   const title = getCardTitle(card);
 
   return {
-    id: card.id,
-    link: card.link,
-    title,
-    text: buildEntryText(card),
-    imageURL: card.imageURL,
     datetime: card.datetime,
+    id: card.id,
+    imageURL: card.imageURL,
+    link: card.link,
+    text: buildEntryText(card),
+    title,
   };
 }
 
 export async function parse(response: Response): Promise<RSSData> {
-  const cards: CCBCard[] = [];
+  const cards: Array<CCBCard> = [];
   let currentTag = "";
 
   const rewriter = new HTMLRewriter()
     .on(".cards[id^='post-']", {
       element() {
         cards.push({
-          id: "",
-          link: "",
-          title: "",
-          fallbackTitle: "",
           dateLabel: "",
           description: "",
-          venue: "",
+          fallbackTitle: "",
+          id: "",
+          link: "",
           tags: [],
+          title: "",
+          venue: "",
         });
       },
     })
     .on(".cards[id^='post-'] a.card_click", {
       element(el) {
         const card = getLastCard(cards);
-        if (!card) return;
+        if (!card) {return;}
 
         const href = el.getAttribute("href")?.trim();
         if (href) {
@@ -155,7 +155,7 @@ export async function parse(response: Response): Promise<RSSData> {
     .on(".cards[id^='post-'] .card_img", {
       element(el) {
         const card = getLastCard(cards);
-        if (!card || card.imageURL) return;
+        if (!card || card.imageURL) {return;}
 
         card.imageURL = parseImageUrl(el.getAttribute("style"));
       },
@@ -163,7 +163,7 @@ export async function parse(response: Response): Promise<RSSData> {
     .on(".cards[id^='post-'] .card_title", {
       text(text) {
         const card = getLastCard(cards);
-        if (!card || !text.text) return;
+        if (!card || !text.text) {return;}
 
         card.title += text.text;
       },
@@ -171,7 +171,7 @@ export async function parse(response: Response): Promise<RSSData> {
     .on(".cards[id^='post-'] .card_date", {
       text(text) {
         const card = getLastCard(cards);
-        if (!card || !text.text) return;
+        if (!card || !text.text) {return;}
 
         card.dateLabel += text.text;
       },
@@ -179,7 +179,7 @@ export async function parse(response: Response): Promise<RSSData> {
     .on(".cards[id^='post-'] .card_desc", {
       text(text) {
         const card = getLastCard(cards);
-        if (!card || !text.text) return;
+        if (!card || !text.text) {return;}
 
         card.description += text.text;
       },
@@ -187,7 +187,7 @@ export async function parse(response: Response): Promise<RSSData> {
     .on(".cards[id^='post-'] .card_info", {
       text(text) {
         const card = getLastCard(cards);
-        if (!card || !text.text) return;
+        if (!card || !text.text) {return;}
 
         card.venue += text.text;
       },
@@ -197,10 +197,10 @@ export async function parse(response: Response): Promise<RSSData> {
         currentTag = "";
         el.onEndTag(() => {
           const card = getLastCard(cards);
-          if (!card) return;
+          if (!card) {return;}
 
           const tag = normalizeText(currentTag);
-          if (tag.length === 0 || tag === "..." || card.tags.includes(tag)) return;
+          if (tag.length === 0 || tag === "..." || card.tags.includes(tag)) {return;}
           card.tags.push(tag);
         });
       },
@@ -217,25 +217,25 @@ export async function parse(response: Response): Promise<RSSData> {
   await consume(transformed.body);
 
   return {
+    description: "Agenda de eventos do CCB",
+    entries: cards.filter((card) => !shouldIgnoreCard(card)).map(buildEntry).filter(isValidRSSEntry),
     id: BASE_URL,
+    language: "pt",
     link: BASE_URL,
     title: "Eventos | CCB",
-    description: "Agenda de eventos do CCB",
-    language: "pt",
-    entries: cards.filter((card) => !shouldIgnoreCard(card)).map(buildEntry).filter(isValidRSSEntry),
   };
 }
 
 export async function get(_ctx: ScraperContext): Promise<RSSData> {
   const response = await fetch(AJAX_URL, {
-    method: "POST",
-    headers: {
-      "user-agent": USERAGENT,
-    },
     body: new URLSearchParams({
       action: "ccbfilter",
       sortby: "cronologica",
     }),
+    headers: {
+      "user-agent": USERAGENT,
+    },
+    method: "POST",
   });
 
   if (!response.ok) {

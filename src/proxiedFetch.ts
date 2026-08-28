@@ -1,23 +1,23 @@
 export interface ProxiedFetchEnv {
-  HTTP_RELAY_URL: string;
   HTTP_RELAY_TOKEN: string;
+  HTTP_RELAY_URL: string;
 }
 
 export type ProxiedFetch = typeof fetch;
 
 export interface ProxiedFetchOptions {
-  retryCount?: number;
   baseDelayMs?: number;
   jitterDelayMs?: number;
   random?: () => number;
+  retryCount?: number;
   sleep?: (milliseconds: number, signal: AbortSignal) => Promise<void>;
 }
 
 interface RelayRetryPolicy {
-  retryCount: number;
   baseDelayMs: number;
   jitterDelayMs: number;
   random: () => number;
+  retryCount: number;
   sleep: (milliseconds: number, signal: AbortSignal) => Promise<void>;
 }
 
@@ -41,7 +41,7 @@ const RELAY_RETRY_COUNT = 3;
 const RELAY_RETRY_BASE_DELAY_MS = 250;
 const RELAY_RETRY_JITTER_DELAY_MS = 250;
 
-const RELAY_FORWARDED_HEADERS: RelayForwardedHeader[] = [
+const RELAY_FORWARDED_HEADERS: Array<RelayForwardedHeader> = [
   "User-Agent",
   "Accept",
   "Accept-Language",
@@ -98,10 +98,10 @@ function sleep(milliseconds: number, signal: AbortSignal): Promise<void> {
 
 function getRelayRetryPolicy(options: ProxiedFetchOptions | undefined): RelayRetryPolicy {
   return {
-    retryCount: options?.retryCount ?? RELAY_RETRY_COUNT,
     baseDelayMs: options?.baseDelayMs ?? RELAY_RETRY_BASE_DELAY_MS,
     jitterDelayMs: options?.jitterDelayMs ?? RELAY_RETRY_JITTER_DELAY_MS,
     random: options?.random ?? Math.random,
+    retryCount: options?.retryCount ?? RELAY_RETRY_COUNT,
     sleep: options?.sleep ?? sleep,
   };
 }
@@ -120,9 +120,9 @@ function createRelayRequestInit(env: ProxiedFetchEnv, targetRequest: Request): R
   }
 
   return {
-    method: targetRequest.method,
-    headers,
     body: targetRequest.body,
+    headers,
+    method: targetRequest.method,
     signal: targetRequest.signal,
   };
 }

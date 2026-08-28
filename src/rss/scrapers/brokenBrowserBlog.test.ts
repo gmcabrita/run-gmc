@@ -24,35 +24,35 @@ describe("brokenBrowserBlog scraper", () => {
     const result = await parse(createResponse());
 
     expect(result.entries[0]).toEqual({
+      datetime: new Date("2026-05-09T00:00:00.000Z"),
       id: "https://brokenbrowser.com/blog/2026-05-09-prerender-stealth-csp-bypass/",
       link: "https://brokenbrowser.com/blog/2026-05-09-prerender-stealth-csp-bypass/",
-      title: "Stealth Request That Bypasses CSP, Hides from DevTools, and Leaks the Real User-Agent",
       text: "Stealth Request That Bypasses CSP, Hides from DevTools, and Leaks the Real User-Agent",
-      datetime: new Date("2026-05-09T00:00:00.000Z"),
+      title: "Stealth Request That Bypasses CSP, Hides from DevTools, and Leaks the Real User-Agent",
     });
 
     expect(result.entries[1]).toEqual({
+      datetime: new Date("2024-11-12T00:00:00.000Z"),
       id: "https://brokenbrowser.com/blog/2024-11-12-detecting-chrome-extensions-without-console-noise/",
       link: "https://brokenbrowser.com/blog/2024-11-12-detecting-chrome-extensions-without-console-noise/",
-      title: "Detecting Chrome Extensions Without Console Noise",
       text: "Detecting Chrome Extensions Without Console Noise",
-      datetime: new Date("2024-11-12T00:00:00.000Z"),
+      title: "Detecting Chrome Extensions Without Console Noise",
     });
 
     expect(result.entries[2]).toEqual({
+      datetime: new Date("2024-06-10T00:00:00.000Z"),
       id: "https://brokenbrowser.com/blog/2024-06-10-wasm-shared-memory-timer/",
       link: "https://brokenbrowser.com/blog/2024-06-10-wasm-shared-memory-timer/",
-      title: "Building a High-Resolution Timer from WebAssembly.Memory",
       text: "Building a High-Resolution Timer from WebAssembly.Memory",
-      datetime: new Date("2024-06-10T00:00:00.000Z"),
+      title: "Building a High-Resolution Timer from WebAssembly.Memory",
     });
 
     expect(result.entries[3]).toEqual({
+      datetime: new Date("2006-02-17T00:00:00.000Z"),
       id: "https://brokenbrowser.com/blog/2006-02-17-uxss-object-createpopup-iframe/",
       link: "https://brokenbrowser.com/blog/2006-02-17-uxss-object-createpopup-iframe/",
-      title: "UXSS via object.createPopup and an iFrame",
       text: "UXSS via object.createPopup and an iFrame",
-      datetime: new Date("2006-02-17T00:00:00.000Z"),
+      title: "UXSS via object.createPopup and an iFrame",
     });
   });
 });

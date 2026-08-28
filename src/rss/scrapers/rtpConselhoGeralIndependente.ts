@@ -4,7 +4,7 @@ import type { RSSData, RSSEntry } from "@rss/types";
 const PAGE_URL = "https://media.rtp.pt/empresa/orgaos-sociais/conselho-geral-independente/";
 
 function normalizeWhitespace(value: string) {
-  return value.replace(/\s+/g, " ").trim();
+  return value.replaceAll(/\s+/g, " ").trim();
 }
 
 export async function parse(response: Response): Promise<RSSData> {
@@ -43,8 +43,8 @@ export async function parse(response: Response): Promise<RSSData> {
         currentEntry = {
           id: link,
           link,
-          title: "",
           text: "",
+          title: "",
         };
         entries.push(currentEntry);
       },
@@ -61,29 +61,29 @@ export async function parse(response: Response): Promise<RSSData> {
   }
 
   return {
-    id: PAGE_URL,
-    link: PAGE_URL,
-    title: "RTP – Conselho Geral Independente",
     description: "Destaques publicados pelo Conselho Geral Independente da RTP.",
-    language: "pt",
     entries: entries
       .map((entry) => {
         const title = normalizeWhitespace(entry.title);
         return {
           ...entry,
-          title,
           text: title,
+          title,
         };
       })
       .filter((entry) => isValidRSSEntry(entry)),
+    id: PAGE_URL,
+    language: "pt",
+    link: PAGE_URL,
+    title: "RTP – Conselho Geral Independente",
   };
 }
 
 export async function get(_ctx: ScraperContext): Promise<RSSData> {
   const response = await fetch(PAGE_URL, {
     headers: {
-      "user-agent": USERAGENT,
       "Content-Type": "text/html",
+      "user-agent": USERAGENT,
     },
   });
 

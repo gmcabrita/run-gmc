@@ -5,9 +5,9 @@ const BASE_URL = "https://www.group.dentsu.com/en/news/release";
 
 function parseDate(dateStr: string): Date | undefined {
   // Format: "Dec 25, 2025" or "Dec  2, 2025" (with extra space for single-digit days)
-  const normalized = dateStr.replace(/\s+/g, " ").trim();
+  const normalized = dateStr.replaceAll(/\s+/g, " ").trim();
   const parsed = new Date(normalized);
-  if (!isNaN(parsed.getTime())) {
+  if (!Number.isNaN(parsed.getTime())) {
     return parsed;
   }
   return undefined;
@@ -28,8 +28,8 @@ export async function parse(response: Response): Promise<RSSData> {
           currentEntry = {
             id: link,
             link: link,
-            title: "",
             text: "",
+            title: "",
           };
           entries.push(currentEntry);
         }
@@ -69,20 +69,20 @@ export async function parse(response: Response): Promise<RSSData> {
   await consume(rewriter.transform(response).body!);
 
   return {
+    description: "News Releases from Dentsu Group",
+    entries: entries.filter((entry) => isValidRSSEntry(entry)),
     id: BASE_URL,
+    language: "en",
     link: BASE_URL,
     title: "News Releases - Dentsu Group Inc.",
-    description: "News Releases from Dentsu Group",
-    language: "en",
-    entries: entries.filter((entry) => isValidRSSEntry(entry)),
   };
 }
 
 export async function get(_ctx: ScraperContext): Promise<RSSData> {
   const response = await fetch(BASE_URL, {
     headers: {
-      "user-agent": USERAGENT,
       "Content-Type": "text/html",
+      "user-agent": USERAGENT,
     },
   });
 

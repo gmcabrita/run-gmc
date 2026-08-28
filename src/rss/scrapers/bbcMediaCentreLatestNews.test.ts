@@ -47,13 +47,13 @@ describe("bbcMediaCentreLatestNews parser", () => {
           {
             _id: "tolerant-entry",
             _source: {
-              fullUrl: 42,
-              url: "/mediacentre/tolerant-entry",
-              name: "Tolerant entry",
               description: { invalid: true },
+              fullUrl: 42,
               imageUrl: false,
-              originalDate: ["invalid"],
               modifiedDate: "2025-01-01T12:00:00Z",
+              name: "Tolerant entry",
+              originalDate: ["invalid"],
+              url: "/mediacentre/tolerant-entry",
             },
           },
         ],
@@ -62,12 +62,12 @@ describe("bbcMediaCentreLatestNews parser", () => {
 
     expect(result.entries).toEqual([
       {
-        id: "tolerant-entry",
-        link: "https://www.bbc.co.uk/mediacentre/tolerant-entry",
-        title: "Tolerant entry",
-        text: "Tolerant entry",
         datetime: new Date("2025-01-01T12:00:00Z"),
+        id: "tolerant-entry",
         imageURL: undefined,
+        link: "https://www.bbc.co.uk/mediacentre/tolerant-entry",
+        text: "Tolerant entry",
+        title: "Tolerant entry",
       },
     ]);
   });

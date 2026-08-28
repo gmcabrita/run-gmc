@@ -26,21 +26,21 @@ describe("adAgeNews scraper", () => {
     const result = await parse(createResponse(), now);
 
     expect(result.entries[0]).toEqual({
-      id: "https://adage.com/agency-news/aa-nike-taps-new-agency-after-global-review/",
-      link: "https://adage.com/agency-news/aa-nike-taps-new-agency-after-global-review/",
-      title: "Nike taps new agency after global review",
-      text: "Brand resets roster after monthslong pitch.",
       datetime: new Date("2026-04-08T10:00:00.000Z"),
+      id: "https://adage.com/agency-news/aa-nike-taps-new-agency-after-global-review/",
       imageURL: "https://example.com/nike.jpg",
+      link: "https://adage.com/agency-news/aa-nike-taps-new-agency-after-global-review/",
+      text: "Brand resets roster after monthslong pitch.",
+      title: "Nike taps new agency after global review",
     });
 
     expect(result.entries[1]).toEqual({
-      id: "https://adage.com/media/aa-how-brands-use-creators-during-playoffs/",
-      link: "https://adage.com/media/aa-how-brands-use-creators-during-playoffs/",
-      title: "How brands use creators during playoffs",
-      text: "Sports marketers test new creator formats.",
       datetime: new Date("2026-04-07T14:30:00.000Z"),
+      id: "https://adage.com/media/aa-how-brands-use-creators-during-playoffs/",
       imageURL: undefined,
+      link: "https://adage.com/media/aa-how-brands-use-creators-during-playoffs/",
+      text: "Sports marketers test new creator formats.",
+      title: "How brands use creators during playoffs",
     });
   });
 
@@ -60,13 +60,13 @@ describe("adAgeNews scraper", () => {
           data: {
             content_elements: [
               {
-                website_url: "/tolerant-story/",
-                websites: 42,
-                headlines: { basic: "Tolerant story" },
                 description: { basic: false },
                 display_date: { invalid: true },
-                publish_date: "2025-01-01T12:00:00Z",
+                headlines: { basic: "Tolerant story" },
                 promo_items: ["invalid"],
+                publish_date: "2025-01-01T12:00:00Z",
+                website_url: "/tolerant-story/",
+                websites: 42,
               },
             ],
           },
@@ -80,12 +80,12 @@ describe("adAgeNews scraper", () => {
 
     expect(result.entries).toEqual([
       {
-        id: "https://adage.com/tolerant-story/",
-        link: "https://adage.com/tolerant-story/",
-        title: "Tolerant story",
-        text: "Tolerant story",
         datetime: new Date("2025-01-01T12:00:00Z"),
+        id: "https://adage.com/tolerant-story/",
         imageURL: undefined,
+        link: "https://adage.com/tolerant-story/",
+        text: "Tolerant story",
+        title: "Tolerant story",
       },
     ]);
   });

@@ -1,30 +1,38 @@
 import { USERAGENT, isValidRSSEntry, type ScraperContext } from "@rss/common";
 import type { RSSData, RSSEntry } from "@rss/types";
-import * as v from "valibot";
+import {
+  array,
+  looseObject,
+  nullish,
+  number,
+  parse as parseValibot,
+  string,
+  type InferOutput,
+} from "valibot";
 
 const BASE_URL = "https://www.ucicinemas.pt/promocoes/";
 const API_URL =
   "https://www.ucicinemas.pt/api/omnia/v1/pageList?friendly=/promocoes/&properties=promotionImage&properties=header&properties=introText";
 const IMAGE_BASE_URL = "https://www.ucicinemas.pt";
 
-const UciPromocoesPayloadSchema = v.array(
-  v.looseObject({
-    name: v.string(),
-    url: v.string(),
-    nodeId: v.number(),
-    createDate: v.string(),
-    promotionImage: v.nullish(
-      v.looseObject({ desktop: v.string() }),
+const UciPromocoesPayloadSchema = array(
+  looseObject({
+    createDate: string(),
+    header: nullish(string()),
+    introText: nullish(string()),
+    name: string(),
+    nodeId: number(),
+    promotionImage: nullish(
+      looseObject({ desktop: string() }),
     ),
-    introText: v.nullish(v.string()),
-    header: v.nullish(v.string()),
+    url: string(),
   }),
 );
 
-type UciPromocoesPayload = v.InferOutput<typeof UciPromocoesPayloadSchema>;
+type UciPromocoesPayload = InferOutput<typeof UciPromocoesPayloadSchema>;
 
 export function parse(json: UciPromocoesPayload): RSSData {
-  const entries: RSSEntry[] = json
+  const entries: Array<RSSEntry> = json
     .map((promo) => {
       const link = new URL(promo.url, BASE_URL).href;
       const imageUrl = promo.promotionImage?.desktop
@@ -32,26 +40,26 @@ export function parse(json: UciPromocoesPayload): RSSData {
         : undefined;
 
       // Strip HTML tags from introText for the text field
-      const text = promo.introText?.replace(/<[^>]*>/g, "").trim();
+      const text = promo.introText?.replaceAll(/<[^>]*>/g, "").trim();
 
       return {
-        id: String(promo.nodeId),
-        link,
-        title: promo.header || promo.name,
-        text,
         datetime: new Date(promo.createDate),
+        id: String(promo.nodeId),
         imageURL: imageUrl,
+        link,
+        text,
+        title: promo.header || promo.name,
       };
     })
     .filter(isValidRSSEntry);
 
   return {
+    description: "Promoções UCI Cinemas Portugal",
+    entries,
     id: BASE_URL,
+    language: "pt",
     link: BASE_URL,
     title: "UCI Cinemas - Promoções",
-    description: "Promoções UCI Cinemas Portugal",
-    language: "pt",
-    entries,
   };
 }
 
@@ -62,7 +70,7 @@ export async function get(_ctx: ScraperContext): Promise<RSSData> {
   };
 
   let currentUrl = API_URL;
-  const cookies: string[] = [];
+  const cookies: Array<string> = [];
   const maxRedirects = 10;
 
   for (let redirectCount = 0; redirectCount <= maxRedirects; redirectCount += 1) {
@@ -90,7 +98,7 @@ export async function get(_ctx: ScraperContext): Promise<RSSData> {
     const isRedirect = response.status >= 300 && response.status < 400;
     const location = isRedirect ? response.headers.get("location") : undefined;
     if (!location) {
-      return parse(v.parse(UciPromocoesPayloadSchema, await response.json()));
+      return parse(parseValibot(UciPromocoesPayloadSchema, await response.json()));
     }
 
     if (redirectCount === maxRedirects) {

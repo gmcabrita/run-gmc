@@ -11,12 +11,12 @@ const BASE_URL = "https://antibot.blog/";
 const DESCRIPTION = "A blog for reverse engineering code!";
 
 interface AntibotBlogDraftEntry extends RSSEntry {
-  text: string;
   publishedAt: string;
+  text: string;
 }
 
 function normalizeHtmlText(value: string): string {
-  return decodeHtmlEntities(value).replace(/\s+/g, " ").trim();
+  return decodeHtmlEntities(value).replaceAll(/\s+/g, " ").trim();
 }
 
 function parsePublishedAt(value: string): Date | undefined {
@@ -46,7 +46,7 @@ function parsePublishedAt(value: string): Date | undefined {
 }
 
 export async function parse(response: Response): Promise<RSSData> {
-  const entries: AntibotBlogDraftEntry[] = [];
+  const entries: Array<AntibotBlogDraftEntry> = [];
   let currentEntry: AntibotBlogDraftEntry | null = null;
 
   const rewriter = new HTMLRewriter()
@@ -55,9 +55,9 @@ export async function parse(response: Response): Promise<RSSData> {
         currentEntry = {
           id: "",
           link: "",
-          title: "",
-          text: "",
           publishedAt: "",
+          text: "",
+          title: "",
         };
         entries.push(currentEntry);
       },
@@ -107,18 +107,14 @@ export async function parse(response: Response): Promise<RSSData> {
   await consume(body);
 
   return {
-    id: BASE_URL,
-    link: BASE_URL,
-    title: "antibot.blog",
     description: DESCRIPTION,
-    language: "en",
     entries: entries
       .map((entry) => ({
+        datetime: parsePublishedAt(entry.publishedAt),
         id: entry.id,
         link: entry.link,
-        title: normalizeHtmlText(entry.title),
         text: normalizeHtmlText(entry.text),
-        datetime: parsePublishedAt(entry.publishedAt),
+        title: normalizeHtmlText(entry.title),
       }))
       .filter(isValidRSSEntry)
       .sort((a, b) => {
@@ -126,16 +122,20 @@ export async function parse(response: Response): Promise<RSSData> {
         const bTime = b.datetime?.getTime() ?? 0;
         return bTime - aTime;
       }),
+    id: BASE_URL,
+    language: "en",
+    link: BASE_URL,
+    title: "antibot.blog",
   };
 }
 
 export async function get(_ctx: ScraperContext): Promise<RSSData> {
   const response = await fetch(BASE_URL, {
-    redirect: "follow",
     headers: {
-      "user-agent": USERAGENT,
       accept: "text/html",
+      "user-agent": USERAGENT,
     },
+    redirect: "follow",
   });
   if (!response.ok) {
     throw new Error(`Failed to fetch ${BASE_URL}: ${response.status} ${response.statusText}`);

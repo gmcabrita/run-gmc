@@ -19,7 +19,7 @@ function parseDateFilmspot(dateString: string): Date {
 
 export async function parse(response: Response, maxDateStr?: string): Promise<RSSData> {
   const maxDate = maxDateStr ?? sevenDaysFromNow();
-  const movies: FilmspotMovie[] = [];
+  const movies: Array<FilmspotMovie> = [];
   let currentDateString = "";
   let currentDateText = "";
   let currentDate = new Date();
@@ -42,22 +42,22 @@ export async function parse(response: Response, maxDateStr?: string): Promise<RS
     })
     .on(".filmeLista", {
       element() {
-        if (skipCurrentSection) return;
+        if (skipCurrentSection) {return;}
         movies.push({
+          date: currentDate,
+          dateString: currentDateText,
           imgUrl: undefined,
+          metadata: "",
           originalTitle: undefined,
           title: "",
           url: undefined,
-          metadata: "",
-          date: currentDate,
-          dateString: currentDateText,
         });
       },
     })
     .on(".filmeLista .filmeListaPoster > a > img", {
       element(el) {
-        if (skipCurrentSection) return;
-        const lastMovie = movies[movies.length - 1];
+        if (skipCurrentSection) {return;}
+        const lastMovie = movies.at(-1);
         const src = el.getAttribute("src");
         if (lastMovie && src) {
           lastMovie.imgUrl = src.replace("/thumb", "");
@@ -66,8 +66,8 @@ export async function parse(response: Response, maxDateStr?: string): Promise<RS
     })
     .on(".filmeLista .filmeListaInfo > h3 > a", {
       element(el) {
-        if (skipCurrentSection) return;
-        const lastMovie = movies[movies.length - 1];
+        if (skipCurrentSection) {return;}
+        const lastMovie = movies.at(-1);
         const href = el.getAttribute("href");
         if (lastMovie && href) {
           lastMovie.url = href;
@@ -76,8 +76,8 @@ export async function parse(response: Response, maxDateStr?: string): Promise<RS
     })
     .on(".filmeLista .filmeListaInfo > h3 > a > span:first-child", {
       text(text) {
-        if (skipCurrentSection) return;
-        const lastMovie = movies[movies.length - 1];
+        if (skipCurrentSection) {return;}
+        const lastMovie = movies.at(-1);
         if (lastMovie && text.text) {
           lastMovie.title = (lastMovie.title || "") + text.text;
         }
@@ -85,8 +85,8 @@ export async function parse(response: Response, maxDateStr?: string): Promise<RS
     })
     .on(".filmeLista .filmeListaInfo .tituloOriginal", {
       text(text) {
-        if (skipCurrentSection) return;
-        const lastMovie = movies[movies.length - 1];
+        if (skipCurrentSection) {return;}
+        const lastMovie = movies.at(-1);
         if (lastMovie && text.text) {
           lastMovie.originalTitle = (lastMovie.originalTitle || "") + text.text;
         }
@@ -94,15 +94,15 @@ export async function parse(response: Response, maxDateStr?: string): Promise<RS
     })
     .on(".filmeLista .filmeListaInfo > p.zsmall", {
       element() {
-        if (skipCurrentSection) return;
-        const lastMovie = movies[movies.length - 1];
+        if (skipCurrentSection) {return;}
+        const lastMovie = movies.at(-1);
         if (lastMovie && lastMovie.metadata) {
           lastMovie.metadata += "<br>";
         }
       },
       text(text) {
-        if (skipCurrentSection) return;
-        const lastMovie = movies[movies.length - 1];
+        if (skipCurrentSection) {return;}
+        const lastMovie = movies.at(-1);
         if (lastMovie && text.text && text.text !== "Ver trailer") {
           lastMovie.metadata = (lastMovie.metadata || "") + text.text;
         }
@@ -111,28 +111,28 @@ export async function parse(response: Response, maxDateStr?: string): Promise<RS
 
   await consume(rewriter.transform(response).body!);
 
-  const entries: RSSEntry[] = movies.map((m) => {
+  const entries: Array<RSSEntry> = movies.map((m) => {
     const link = `https://filmspot.pt${m.url ?? ""}`;
     const title = m.originalTitle ? `${m.title} (${m.originalTitle})` : (m.title ?? "");
     const text = `<strong>Estreia:</strong> ${m.dateString}<br><strong>Metadata:</strong> ${m.metadata ?? ""}`;
 
     return {
-      id: link,
-      link,
-      title,
-      text,
       datetime: m.date,
+      id: link,
       imageURL: m.imgUrl,
+      link,
+      text,
+      title,
     };
   });
 
   return {
+    description: "filmSPOT – Próximas estreias",
+    entries: entries.filter(isValidRSSEntry),
     id: BASE_URL,
+    language: "pt",
     link: BASE_URL,
     title: "filmSPOT – Próximas estreias",
-    description: "filmSPOT – Próximas estreias",
-    language: "pt",
-    entries: entries.filter(isValidRSSEntry),
   };
 }
 

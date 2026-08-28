@@ -1,6 +1,11 @@
+import nkzwConfig from "@nkzw/oxlint-config";
 import { defineConfig } from "oxlint";
 
 export default defineConfig({
+	categories: {
+		correctness: "error",
+	},
+	extends: [nkzwConfig],
 	ignorePatterns: [
 		".agent/**",
 		".agents/**",
@@ -14,11 +19,20 @@ export default defineConfig({
 		".roo/**",
 		".windsurf/**",
 		"tools/oxlint/anti-slop/**",
+		"worker-configuration.d.ts",
 	],
 	jsPlugins: [
 		{
 			name: "anti-slop",
 			specifier: "./tools/oxlint/anti-slop/index.ts",
+		},
+	],
+	overrides: [
+		{
+			files: ["bin/**/*.ts", "src/email/**/*.ts", "src/index.ts"],
+			rules: {
+				"no-console": "off",
+			},
 		},
 	],
 	rules: {

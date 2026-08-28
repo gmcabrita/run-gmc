@@ -7,27 +7,27 @@ describe("epicFreeMobileGames JSON parser", () => {
       {
         data: [
           {
-            type: "featured",
             offers: [{ content: null }],
+            type: "featured",
           },
           {
-            type: "freeGame",
             offers: [
               {
                 content: {
-                  title: "Free bundle",
-                  categories: ["freegames", "bundles"],
                   catalogItemId: "free-bundle",
+                  categories: ["freegames", "bundles"],
                   mapping: { slug: "free-bundle" },
                   purchase: [
                     {
-                      purchaseType: "Claim",
                       price: { decimalPrice: 0 },
+                      purchaseType: "Claim",
                     },
                   ],
+                  title: "Free bundle",
                 },
               },
             ],
+            type: "freeGame",
           },
         ],
       },

@@ -13,8 +13,8 @@ export async function parse(response: Response): Promise<RSSData> {
         currentEntry = {
           id: "",
           link: "",
-          title: "",
           text: "",
+          title: "",
         };
         entries.push(currentEntry);
       },
@@ -40,7 +40,7 @@ export async function parse(response: Response): Promise<RSSData> {
         currentEntry.title += text.text;
 
         if (text.lastInTextNode) {
-          const normalizedTitle = currentEntry.title.replace(/\s+/g, " ").trim();
+          const normalizedTitle = currentEntry.title.replaceAll(/\s+/g, " ").trim();
           currentEntry.title = normalizedTitle;
           currentEntry.text = normalizedTitle;
         }
@@ -70,20 +70,20 @@ export async function parse(response: Response): Promise<RSSData> {
   }
 
   return {
+    description: "Find announcements and updates from The Walt Disney Company and explore our archive of press releases.",
+    entries: entries.filter((entry) => isValidRSSEntry(entry)),
     id: BASE_URL,
+    language: "en",
     link: BASE_URL,
     title: "Press Release Archives | The Walt Disney Company",
-    description: "Find announcements and updates from The Walt Disney Company and explore our archive of press releases.",
-    language: "en",
-    entries: entries.filter((entry) => isValidRSSEntry(entry)),
   };
 }
 
 export async function get(_ctx: ScraperContext): Promise<RSSData> {
   const response = await fetch(BASE_URL, {
     headers: {
-      "user-agent": USERAGENT,
       "Content-Type": "text/html",
+      "user-agent": USERAGENT,
     },
   });
 
