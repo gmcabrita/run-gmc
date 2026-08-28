@@ -41,7 +41,7 @@ export async function parse(response: Response): Promise<RSSData> {
         const href = el.getAttribute("href");
         if (lastEntry && href) {
           lastEntry.id = href;
-          lastEntry.link = href;
+          lastEntry.link = new URL(href, BASE_URL).href;
         }
       },
     })
