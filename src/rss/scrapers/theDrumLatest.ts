@@ -45,50 +45,50 @@ function toDurationMillis(count: number, unit: string): number | undefined {
   }
 }
 
+function parseRelativeDate(value: string, now: Date): Date | undefined {
+  const match = value.match(/^(\d+)\s+(minute|minutes|hour|hours|day|days|week|weeks)\s+ago$/);
+  if (!match) {
+    return undefined;
+  }
+
+  const count = Number(match[1]);
+  const unit = match[2];
+  if (!Number.isFinite(count) || !unit) {
+    return undefined;
+  }
+
+  const durationMillis = toDurationMillis(count, unit);
+  return durationMillis == null ? undefined : new Date(now.getTime() - durationMillis);
+}
+
+function parseAbsoluteDate(value: string): Date | undefined {
+  const match = value.match(/^(\d{1,2})\s+([a-z]{3})\s+(\d{4})$/);
+  if (!match) {
+    return undefined;
+  }
+
+  const day = Number(match[1]);
+  const monthIndex = RELEASE_MONTHS.get(match[2]);
+  const year = Number(match[3]);
+  if (!Number.isFinite(day) || monthIndex == null || !Number.isFinite(year)) {
+    return undefined;
+  }
+
+  const parsed = new Date(Date.UTC(year, monthIndex, day));
+  const isSameDate =
+    parsed.getUTCFullYear() === year &&
+    parsed.getUTCMonth() === monthIndex &&
+    parsed.getUTCDate() === day;
+  return isSameDate ? parsed : undefined;
+}
+
 export function parseReleaseDate(releaseText: string, now: Date = new Date()): Date | undefined {
   const normalized = normalizeWhitespace(releaseText).toLowerCase();
   if (normalized === "" || normalized === "new") {
     return undefined;
   }
 
-  const relativeMatch = normalized.match(/^(\d+)\s+(minute|minutes|hour|hours|day|days|week|weeks)\s+ago$/);
-  if (relativeMatch) {
-    const count = Number(relativeMatch[1]);
-    const unit = relativeMatch[2];
-    if (!Number.isFinite(count) || !unit) {
-      return undefined;
-    }
-
-    const durationMillis = toDurationMillis(count, unit);
-    if (durationMillis == null) {
-      return undefined;
-    }
-
-    return new Date(now.getTime() - durationMillis);
-  }
-
-  const absoluteMatch = normalized.match(/^(\d{1,2})\s+([a-z]{3})\s+(\d{4})$/);
-  if (!absoluteMatch) {
-    return undefined;
-  }
-
-  const day = Number(absoluteMatch[1]);
-  const monthIndex = RELEASE_MONTHS.get(absoluteMatch[2]);
-  const year = Number(absoluteMatch[3]);
-  if (!Number.isFinite(day) || monthIndex == null || !Number.isFinite(year)) {
-    return undefined;
-  }
-
-  const parsed = new Date(Date.UTC(year, monthIndex, day));
-  if (
-    parsed.getUTCFullYear() !== year ||
-    parsed.getUTCMonth() !== monthIndex ||
-    parsed.getUTCDate() !== day
-  ) {
-    return undefined;
-  }
-
-  return parsed;
+  return parseRelativeDate(normalized, now) ?? parseAbsoluteDate(normalized);
 }
 
 export async function parse(response: Response, now: Date = new Date()): Promise<RSSData> {

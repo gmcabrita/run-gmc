@@ -16,6 +16,7 @@ import {
   nullish,
   parse,
   string,
+  type InferOutput,
 } from "valibot";
 import {
   getDiscordHealthcheckErrorPayload,
@@ -30,20 +31,70 @@ import {
 } from "@rss/healthcheck";
 
 const rssHealthcheckOrigin = "https://run.gmcabrita.com";
+const FertagusTrainSchema = looseObject({
+  ComboioPassou: boolean(),
+  DataHoraPartidaChegada_ToOrderBy: string(),
+  NomeEstacaoDestino: string(),
+  Observacoes: nullish(string()),
+});
+
 const FertagusResponseSchema = looseObject({
   response: array(
     looseObject({
-      NodesComboioTabelsPartidasChegadas: array(
-        looseObject({
-          ComboioPassou: boolean(),
-          DataHoraPartidaChegada_ToOrderBy: string(),
-          NomeEstacaoDestino: string(),
-          Observacoes: nullish(string()),
-        }),
-      ),
+      NodesComboioTabelsPartidasChegadas: array(FertagusTrainSchema),
     }),
   ),
 });
+
+type FertagusTrainTiming = InferOutput<typeof FertagusTrainSchema>;
+
+function parseFertagusDateTime(value: string): Date {
+  const [datePart, timePart] = value.split(" ");
+  const [day, month, year] = datePart.split("-");
+  const [hours, minutes, seconds] = timePart.split(":");
+  return new Date(
+    Number(year),
+    Number(month) - 1,
+    Number(day),
+    Number(hours),
+    Number(minutes),
+    Number(seconds),
+  );
+}
+
+function parseFertagusDelay(delayText: null | string | undefined) {
+  return {
+    hours: Number.parseInt(delayText?.match(/(\d+) hora?/)?.[1] ?? "0"),
+    minutes: Number.parseInt(delayText?.match(/(\d+) minutos?/)?.[1] ?? "0"),
+  };
+}
+
+function addFertagusDelay(dateTime: Date, hours: number, minutes: number): Date {
+  const delayedDateTime = new Date(dateTime);
+  if (minutes) {delayedDateTime.setMinutes(delayedDateTime.getMinutes() + minutes);}
+  if (hours) {delayedDateTime.setHours(delayedDateTime.getHours() + hours);}
+  return delayedDateTime;
+}
+
+function getFertagusTrainTiming(train: FertagusTrainTiming) {
+  const dateTime = parseFertagusDateTime(train.DataHoraPartidaChegada_ToOrderBy);
+  const originalDateTime = dateTime.toISOString();
+  const originalTime = originalDateTime.match(/T(\d+:\d+)/)?.[1];
+  const delayText = train.Observacoes;
+  const { hours: delayInHours, minutes: delayInMinutes } = parseFertagusDelay(delayText);
+  const expectedDateTime = addFertagusDelay(dateTime, delayInHours, delayInMinutes).toISOString();
+  const expectedTime = originalDateTime.match(/T(\d+:\d+)/)?.[1];
+  const expectedTimeWithDelay = `${expectedTime}${delayInMinutes ? ` (${delayInMinutes})` : ""}`;
+
+  return {
+    delayText,
+    expectedDateTime,
+    expectedTime,
+    expectedTimeWithDelay,
+    originalDateTime,
+    originalTime,
+  };
+}
 
 async function sendDiscordHealthcheckPayload(
   webhookUrl: string,
@@ -256,42 +307,8 @@ app.get("/fertagus.nextTrainLeavingCorroios", async (ctx) => {
     return ctx.json({});
   }
 
-  const dateStr = train.DataHoraPartidaChegada_ToOrderBy;
-  const [datePart, timePart] = dateStr.split(" ");
-  const [day, month, year] = datePart.split("-");
-  const [hours, minutes, seconds] = timePart.split(":");
-
-  const dateTime = new Date(
-    Number(year),
-    Number(month) - 1,
-    Number(day),
-    Number(hours),
-    Number(minutes),
-    Number(seconds),
-  );
-  const originalDateTime = dateTime.toISOString();
-  const originalTime = originalDateTime.match(/T(\d+:\d+)/)?.[1];
-
-  const delayText = train.Observacoes;
-  const delayInMinutes = Number.parseInt(delayText?.match(/(\d+) minutos?/)?.[1] ?? "0");
-  const delayInHours = Number.parseInt(delayText?.match(/(\d+) hora?/)?.[1] ?? "0");
-  if (delayInMinutes) {
-    dateTime.setMinutes(dateTime.getMinutes() + delayInMinutes);
-  }
-  if (delayInHours) {dateTime.setHours(dateTime.getHours() + delayInHours);}
-  const expectedDateTime = dateTime.toISOString();
-  const expectedTime = originalDateTime.match(/T(\d+:\d+)/)?.[1];
-  const expectedTimeWithDelay = `${expectedTime}${delayInMinutes ? ` (${delayInMinutes})` : ""}`;
-
   ctx.header("Cache-Control", "public, max-age=60");
-  return ctx.json({
-    delayText,
-    expectedDateTime,
-    expectedTime,
-    expectedTimeWithDelay,
-    originalDateTime,
-    originalTime,
-  });
+  return ctx.json(getFertagusTrainTiming(train));
 });
 
 app.get(

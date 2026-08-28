@@ -81,39 +81,68 @@ function getPostBodies(blogPostsHtml: string) {
   return [{ body: blogPostsHtml }];
 }
 
+interface RowImage {
+  imageURL?: string;
+  movieTitle?: string;
+}
+
+function readRowImage(rowHtml: string): RowImage {
+  const imageTag = rowHtml.match(/<img\b[^>]*>/i)?.[0];
+  if (!imageTag) {
+    return {};
+  }
+
+  return {
+    imageURL: normalizeUrl(readHtmlAttribute(imageTag, "src") || ""),
+    movieTitle:
+      readHtmlAttribute(imageTag, "title") || readHtmlAttribute(imageTag, "alt"),
+  };
+}
+
+function parseExternalLink(
+  match: RegExpExecArray,
+  image: RowImage,
+  datetime?: Date,
+): RSSEntry | undefined {
+  const url = normalizeUrl(decodeHtmlEntities(match[2] || ""));
+  if (!url || !isExternalUrl(url)) {
+    return undefined;
+  }
+
+  const linkText = stripHtml(match[3] || "");
+  return {
+    datetime,
+    id: url,
+    imageURL: image.imageURL,
+    link: url,
+    text: linkText ? `${linkText}: ${url}` : url,
+    title: image.movieTitle || linkText || url,
+  };
+}
+
+function parseRow(rowHtml: string, datetime?: Date): Array<RSSEntry> {
+  const entries: Array<RSSEntry> = [];
+  const image = readRowImage(rowHtml);
+  const linkRegex = /<a\b[^>]*href=(['"])([\s\S]*?)\1[^>]*>([\s\S]*?)<\/a>/gi;
+  let linkMatch;
+
+  while ((linkMatch = linkRegex.exec(rowHtml)) !== null) {
+    const entry = parseExternalLink(linkMatch, image, datetime);
+    if (entry) {
+      entries.push(entry);
+    }
+  }
+
+  return entries;
+}
+
 function parseRows(body: string, datetime?: Date) {
   const entries: Array<RSSEntry> = [];
   const trRegex = /<tr\b[^>]*>([\s\S]*?)<\/tr>/gi;
   let trMatch;
 
   while ((trMatch = trRegex.exec(body)) !== null) {
-    const trContent = trMatch[1];
-    const imageTag = trContent?.match(/<img\b[^>]*>/i)?.[0];
-    const movieTitle = imageTag
-      ? readHtmlAttribute(imageTag, "title") || readHtmlAttribute(imageTag, "alt")
-      : undefined;
-    const imageURL = imageTag ? normalizeUrl(readHtmlAttribute(imageTag, "src") || "") : undefined;
-    const linkRegex = /<a\b[^>]*href=(['"])([\s\S]*?)\1[^>]*>([\s\S]*?)<\/a>/gi;
-    let linkMatch;
-
-    while ((linkMatch = linkRegex.exec(trContent || "")) !== null) {
-      const url = normalizeUrl(decodeHtmlEntities(linkMatch[2] || ""));
-
-      if (!url || !isExternalUrl(url)) {
-        continue;
-      }
-
-      const linkText = stripHtml(linkMatch[3] || "");
-
-      entries.push({
-        datetime,
-        id: url,
-        imageURL,
-        link: url,
-        text: linkText ? `${linkText}: ${url}` : url,
-        title: movieTitle || linkText || url,
-      });
-    }
+    entries.push(...parseRow(trMatch[1] || "", datetime));
   }
 
   return entries;

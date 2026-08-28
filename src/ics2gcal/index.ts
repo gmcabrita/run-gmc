@@ -160,54 +160,113 @@ function parseIcsEvents(text: string): Array<IcsEvent> {
   return events;
 }
 
-function eventToGoogleCalendarUrl(event: IcsEvent): GoogleCalendarEvent {
-  const summary = firstProperty(event, "SUMMARY");
-  const description = firstProperty(event, "DESCRIPTION");
-  const location = firstProperty(event, "LOCATION");
+function getEventStart(
+  event: IcsEvent,
+  durationSeconds: number | undefined,
+): IcsProperty | undefined {
   const declaredStart = firstProperty(event, "DTSTART");
-  const end = firstProperty(event, "DTEND");
-  const duration = firstProperty(event, "DURATION");
-  const durationSeconds = duration ? parseDuration(duration.value) : undefined;
-  const start =
-    declaredStart ??
-    (durationSeconds !== undefined ? firstProperty(event, "DTSTAMP") : undefined);
-  const rrule = firstProperty(event, "RRULE");
+  if (declaredStart || durationSeconds === undefined) {return declaredStart;}
+  return firstProperty(event, "DTSTAMP");
+}
 
-  const startValue = normalizeDateValue(start);
-  let endValue = normalizeDateValue(end);
+function getEventEndValue(
+  start: IcsProperty | undefined,
+  startValue: string,
+  declaredEnd: IcsProperty | undefined,
+  durationSeconds: number | undefined,
+): string {
+  const endValue = normalizeDateValue(declaredEnd);
+  if (endValue || !startValue) {return endValue;}
 
-  if (!endValue && startValue) {
-    if (durationSeconds !== undefined && !isAllDay(start)) {
-      endValue = addSecondsToIcsDate(startValue, durationSeconds);
-    }
-    if (durationSeconds !== undefined && isAllDay(start)) {
-      endValue = addDays(startValue, Math.max(1, Math.round(durationSeconds / 86_400)));
-    }
-    if (!endValue && isAllDay(start)) {endValue = addDays(startValue, 1);}
-    if (!endValue) {endValue = addSecondsToIcsDate(startValue, 3600);}
+  if (durationSeconds !== undefined) {
+    return isAllDay(start)
+      ? addDays(startValue, Math.max(1, Math.round(durationSeconds / 86_400)))
+      : addSecondsToIcsDate(startValue, durationSeconds);
   }
 
-  const attendees = allProperties(event, "ATTENDEE")
+  return isAllDay(start) ? addDays(startValue, 1) : addSecondsToIcsDate(startValue, 3600);
+}
+
+function getEventAttendees(event: IcsEvent): Array<string> {
+  return allProperties(event, "ATTENDEE")
     .map((attendee) => attendee.value.replace(/^mailto:/i, "").trim())
     .filter(Boolean);
+}
 
-  const timezone = start ? start.params.get("TZID") || "" : "";
+function getEventTimezone(start: IcsProperty | undefined): string {
+  if (!start) {return "";}
+  return start.params.get("TZID") || "";
+}
+
+type GoogleCalendarParams = {
+  attendees: ReadonlyArray<string>;
+  description: IcsProperty | undefined;
+  endValue: string;
+  location: IcsProperty | undefined;
+  rrule: IcsProperty | undefined;
+  startValue: string;
+  timezone: string;
+  title: string;
+};
+
+function addGoogleCalendarProperty(
+  params: URLSearchParams,
+  key: string,
+  property: IcsProperty | undefined,
+  valuePrefix = "",
+): void {
+  if (property?.value) {params.set(key, `${valuePrefix}${property.value}`);}
+}
+
+function createGoogleCalendarParams(options: GoogleCalendarParams): URLSearchParams {
   const params = new URLSearchParams();
   params.set("action", "TEMPLATE");
-  params.set("text", summary ? summary.value : "Untitled event");
-  if (startValue && endValue) {params.set("dates", `${startValue}/${endValue}`);}
-  if (description && description.value) {params.set("details", description.value);}
-  if (location && location.value) {params.set("location", location.value);}
-  if (attendees.length > 0) {params.set("add", attendees.join(","));}
-  if (timezone && startValue && !startValue.endsWith("Z")) {params.set("ctz", timezone);}
-  if (rrule && rrule.value) {params.set("recur", `RRULE:${rrule.value}`);}
+  params.set("text", options.title);
+  if (options.startValue && options.endValue) {
+    params.set("dates", `${options.startValue}/${options.endValue}`);
+  }
+  addGoogleCalendarProperty(params, "details", options.description);
+  addGoogleCalendarProperty(params, "location", options.location);
+  if (options.attendees.length > 0) {params.set("add", options.attendees.join(","));}
+  if (options.timezone && options.startValue && !options.startValue.endsWith("Z")) {
+    params.set("ctz", options.timezone);
+  }
+  addGoogleCalendarProperty(params, "recur", options.rrule, "RRULE:");
+  return params;
+}
+
+function eventToGoogleCalendarUrl(event: IcsEvent): GoogleCalendarEvent {
+  const summary = firstProperty(event, "SUMMARY");
+  const duration = firstProperty(event, "DURATION");
+  const durationSeconds = duration ? parseDuration(duration.value) : undefined;
+  const start = getEventStart(event, durationSeconds);
+  const startValue = normalizeDateValue(start);
+  const endValue = getEventEndValue(
+    start,
+    startValue,
+    firstProperty(event, "DTEND"),
+    durationSeconds,
+  );
+  const attendees = getEventAttendees(event);
+  const timezone = getEventTimezone(start);
+  const title = summary ? summary.value : "Untitled event";
+  const params = createGoogleCalendarParams({
+    attendees,
+    description: firstProperty(event, "DESCRIPTION"),
+    endValue,
+    location: firstProperty(event, "LOCATION"),
+    rrule: firstProperty(event, "RRULE"),
+    startValue,
+    timezone,
+    title,
+  });
 
   return {
     attendees,
     end: endValue,
     start: startValue,
     timezone,
-    title: summary ? summary.value : "Untitled event",
+    title,
     url: `https://calendar.google.com/calendar/render?${params.toString()}`,
   };
 }

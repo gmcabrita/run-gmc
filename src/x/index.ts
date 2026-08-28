@@ -113,46 +113,88 @@ async function getEmbed(env: CloudflareBindings, postUrl: string): Promise<strin
   return json.html;
 }
 
-async function x2Rss(env: CloudflareBindings, userName: string, data: XUserTweetsResponse) {
-  const entries = getTimelineEntries(data);
-  const firstUser =
-    entries?.[0]?.content?.itemContent?.tweet_results?.result?.core?.user_results?.result?.legacy;
+type TimelineEntry = ReturnType<typeof getTimelineEntries>[number];
 
-  const feed = new Feed({
-    author: {
-      link: `https://x.com/${firstUser?.screen_name}`,
-      name: firstUser?.name || "",
-    },
-    copyright: `All rights reserved ${new Date().getFullYear()}, ${firstUser?.name}`,
+type TimelineItemContent = ReturnType<typeof getDirectItemContent>;
+
+function getDirectItemContent(entry: TimelineEntry) {
+  return entry.content?.itemContent;
+}
+
+function getThreadedItemContent(entry: TimelineEntry) {
+  return entry.content?.items?.[0]?.item?.itemContent;
+}
+
+function getPostFromItemContent(itemContent: TimelineItemContent): XPost | undefined {
+  return itemContent?.tweet_results?.result ?? undefined;
+}
+
+function isPromotedItem(itemContent: TimelineItemContent): boolean {
+  return Boolean(itemContent?.promotedMetadata);
+}
+
+function getEntryPosts(entry: TimelineEntry): Array<XPost | undefined> {
+  const directItem = getDirectItemContent(entry);
+  if (isPromotedItem(directItem)) {return [];}
+
+  const directPost = getPostFromItemContent(directItem);
+  const threadedItem = getThreadedItemContent(entry);
+  if (isPromotedItem(threadedItem)) {return [directPost];}
+
+  return [directPost, getPostFromItemContent(threadedItem)];
+}
+
+function getFirstTimelineUser(entries: ReadonlyArray<TimelineEntry>) {
+  const firstEntry = entries[0];
+  if (!firstEntry) {return;}
+  return getPostFromItemContent(getDirectItemContent(firstEntry))?.core?.user_results.result.legacy;
+}
+
+function getXFeedMetadata(
+  userName: string,
+  firstUser: ReturnType<typeof getFirstTimelineUser>,
+) {
+  const screenName = firstUser?.screen_name;
+  const name = firstUser?.name;
+  return {
+    authorLink: `https://x.com/${screenName}`,
+    authorName: name || "",
+    copyrightName: name,
     description: firstUser?.description || userName,
+    identityName: name || userName,
+    identityUrl: `https://x.com/${screenName || userName}`,
+    image: firstUser?.profile_image_url_https ?? undefined,
+  };
+}
+
+function createXFeed(userName: string, entries: ReadonlyArray<TimelineEntry>): Feed {
+  const metadata = getXFeedMetadata(userName, getFirstTimelineUser(entries));
+  return new Feed({
+    author: {
+      link: metadata.authorLink,
+      name: metadata.authorName,
+    },
+    copyright: `All rights reserved ${new Date().getFullYear()}, ${metadata.copyrightName}`,
+    description: metadata.description,
     favicon: "https://x.com/favicon.ico",
     generator: "X2RSS",
-    id: `https://x.com/${firstUser?.screen_name || userName}`,
-    image: firstUser?.profile_image_url_https ?? undefined,
+    id: metadata.identityUrl,
+    image: metadata.image,
     language: "en",
-    link: `https://x.com/${firstUser?.screen_name || userName}`,
-    title: `X // ${firstUser?.name || userName}`,
+    link: metadata.identityUrl,
+    title: `X // ${metadata.identityName}`,
     updated: new Date(),
   });
+}
+
+async function x2Rss(env: CloudflareBindings, userName: string, data: XUserTweetsResponse) {
+  const entries = getTimelineEntries(data);
+  const feed = createXFeed(userName, entries);
 
   for (const entry of entries) {
-    if (entry.content?.itemContent?.promotedMetadata) {continue;}
-
-    const post = await transformPost(
-      env,
-      entry.content?.itemContent?.tweet_results?.result ?? undefined,
-    );
-    if (post) {
-      feed.addItem(post);
-    }
-
-    if (entry.content?.items?.[0]?.item?.itemContent?.promotedMetadata) {continue;}
-    const threadedPost = await transformPost(
-      env,
-      entry.content?.items?.[0]?.item?.itemContent?.tweet_results?.result ?? undefined,
-    );
-    if (threadedPost) {
-      feed.addItem(threadedPost);
+    for (const candidate of getEntryPosts(entry)) {
+      const post = await transformPost(env, candidate);
+      if (post) {feed.addItem(post);}
     }
   }
 

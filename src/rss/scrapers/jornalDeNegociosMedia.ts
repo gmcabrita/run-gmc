@@ -6,6 +6,7 @@ import {
   looseObject,
   safeParse,
   string,
+  type InferOutput,
 } from "valibot";
 
 const SITE_ORIGIN = "https://www.jornaldenegocios.pt";
@@ -23,6 +24,7 @@ const RetryableFailureSchema = looseObject({
 });
 
 type FetchFn = typeof fetch;
+type RetryableFailure = InferOutput<typeof RetryableFailureSchema>;
 
 interface DraftEntry extends RSSEntry {
   authorName: string;
@@ -37,6 +39,10 @@ interface LoadMorePage {
 interface ParsedPageResult {
   isPartial: boolean;
   page: LoadMorePage;
+}
+
+function isRetryableFailure(failure: RetryableFailure): boolean {
+  return failure.retryable || failure.message.includes("Network connection lost");
 }
 
 function normalizeWhitespace(text: string): string {
@@ -201,12 +207,12 @@ async function parsePageWithFallback(
   try {
     await consume(body);
   } catch (error) {
-    const failureResult = safeParse(RetryableFailureSchema, error);
-    const isRetryable =
-      failureResult.success &&
-      (failureResult.output.retryable ||
-        failureResult.output.message.includes("Network connection lost"));
-    if (!isRetryable || draftEntries.length === 0) {
+    const failure = safeParse(RetryableFailureSchema, error);
+    if (
+      !failure.success ||
+      !isRetryableFailure(failure.output) ||
+      draftEntries.length === 0
+    ) {
       throw error;
     }
 
@@ -240,32 +246,39 @@ async function parsePageWithFallback(
   };
 }
 
+function selectBestPage(
+  bestPage: LoadMorePage | undefined,
+  candidate: LoadMorePage,
+): LoadMorePage {
+  return !bestPage || candidate.entries.length > bestPage.entries.length
+    ? candidate
+    : bestPage;
+}
+
+function shouldRetryLoad(failure: RetryableFailure | undefined, attempt: number): boolean {
+  return Boolean(failure && isRetryableFailure(failure) && attempt < REQUEST_RETRY_COUNT - 1);
+}
+
 async function loadPage(url: string, fetchFn: FetchFn): Promise<LoadMorePage> {
   let bestPage: LoadMorePage | undefined;
   let lastError: Error | undefined;
 
   for (let attempt = 0; attempt < REQUEST_RETRY_COUNT; attempt += 1) {
     try {
-      const result = await parsePageWithFallback(await fetchPage(url, fetchFn), buildFallbackNextPageURL(url));
-
-      if (!bestPage || result.page.entries.length > bestPage.entries.length) {
-        bestPage = result.page;
-      }
+      const response = await fetchPage(url, fetchFn);
+      const result = await parsePageWithFallback(response, buildFallbackNextPageURL(url));
+      bestPage = selectBestPage(bestPage, result.page);
 
       if (!result.isPartial || result.page.entries.length >= PAGE_SIZE) {
         return result.page;
       }
     } catch (error) {
-      const failureResult = safeParse(RetryableFailureSchema, error);
-      const isRetryable =
-        failureResult.success &&
-        (failureResult.output.retryable ||
-          failureResult.output.message.includes("Network connection lost"));
       if (error instanceof Error) {
         lastError = error;
       }
 
-      if (!isRetryable || attempt === REQUEST_RETRY_COUNT - 1) {
+      const failure = safeParse(RetryableFailureSchema, error);
+      if (!shouldRetryLoad(failure.success ? failure.output : undefined, attempt)) {
         if (bestPage) {
           return bestPage;
         }

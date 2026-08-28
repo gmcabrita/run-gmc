@@ -13,37 +13,57 @@ function normalizeWhitespace(text: string): string {
   return text.replaceAll(/\s+/g, " ").trim();
 }
 
+interface CcpjDateParts {
+  day: number;
+  hour: number;
+  minute: number;
+  month: number;
+  second: number;
+  year: number;
+}
+
+function readCcpjDateParts(match: RegExpMatchArray): CcpjDateParts {
+  const [, day, month, year, hour, minute, second] = match;
+  return {
+    day: Number(day),
+    hour: Number(hour ?? "0"),
+    minute: Number(minute ?? "0"),
+    month: Number(month),
+    second: Number(second ?? "0"),
+    year: Number(year),
+  };
+}
+
+function hasValidCcpjDateParts(parts: CcpjDateParts): boolean {
+  const { day, hour, minute, month, second, year } = parts;
+  const allParts = [day, month, year, hour, minute, second];
+  const hasValidDate = month >= 1 && month <= 12 && day >= 1 && day <= 31;
+  const hasValidTime =
+    hour >= 0 && hour <= 23 && minute >= 0 && minute <= 59 && second >= 0 && second <= 59;
+  return allParts.every(Number.isFinite) && hasValidDate && hasValidTime;
+}
+
 function parseCcpjDatetimeAttr(datetimeAttr: string): Date | undefined {
   const match = datetimeAttr
     .trim()
     .match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})(?:\s+(\d{1,2}):(\d{2})(?::(\d{2}))?)?$/);
-
   if (!match) {
     return undefined;
   }
 
-  const [, dayStr, monthStr, yearStr, hourStr, minuteStr, secondStr] = match;
-
-  const day = Number(dayStr);
-  const month = Number(monthStr);
-  const year = Number(yearStr);
-  const hour = Number(hourStr ?? "0");
-  const minute = Number(minuteStr ?? "0");
-  const second = Number(secondStr ?? "0");
-
-  if (![day, month, year, hour, minute, second].every(Number.isFinite)) {
+  const parts = readCcpjDateParts(match);
+  if (!hasValidCcpjDateParts(parts)) {
     return undefined;
   }
 
-  if (month < 1 || month > 12 || day < 1 || day > 31) {
-    return undefined;
-  }
-
-  if (hour < 0 || hour > 23 || minute < 0 || minute > 59 || second < 0 || second > 59) {
-    return undefined;
-  }
-
-  return new Date(year, month - 1, day, hour, minute, second);
+  return new Date(
+    parts.year,
+    parts.month - 1,
+    parts.day,
+    parts.hour,
+    parts.minute,
+    parts.second,
+  );
 }
 
 function hasRequiredFields(entry: RSSEntry): boolean {

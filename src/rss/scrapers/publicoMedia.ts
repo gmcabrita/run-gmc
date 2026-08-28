@@ -147,30 +147,43 @@ function readPrimaryTagName(tags: PublicoTagList): string | undefined {
   return undefined;
 }
 
-function parseArticle(payload: PublicoArticlePayload): PublicoArticle | undefined {
-  const link =
+function readArticleLink(payload: PublicoArticlePayload): string | undefined {
+  return (
     normalizeUrl(payload.fullUrl) ??
     normalizeUrl(payload.url) ??
-    normalizeUrl(payload.shareUrl);
-  if (!link) {
-    return undefined;
-  }
+    normalizeUrl(payload.shareUrl)
+  );
+}
 
-  const title =
+function readArticleTitle(payload: PublicoArticlePayload): string | undefined {
+  return (
     normalizeWhitespace(payload.tituloNoticia) ??
     normalizeWhitespace(payload.titulo) ??
-    normalizeWhitespace(payload.cleanTitle);
-  if (!title) {
-    return undefined;
-  }
+    normalizeWhitespace(payload.cleanTitle)
+  );
+}
 
-  const text =
+function readArticleText(payload: PublicoArticlePayload, title: string): string {
+  return (
     normalizeWhitespace(payload.descricao) ??
     normalizeWhitespace(payload.lead) ??
     normalizeWhitespace(payload.subtitulo) ??
     normalizeWhitespace(payload.rubrica) ??
     readPrimaryTagName(payload.tags) ??
-    title;
+    title
+  );
+}
+
+function parseArticle(payload: PublicoArticlePayload): PublicoArticle | undefined {
+  const link = readArticleLink(payload);
+  if (!link) {
+    return undefined;
+  }
+
+  const title = readArticleTitle(payload);
+  if (!title) {
+    return undefined;
+  }
 
   return {
     datetime: parseDate(
@@ -180,7 +193,7 @@ function parseArticle(payload: PublicoArticlePayload): PublicoArticle | undefine
     imageURL:
       payload.escondeImagem === true ? undefined : normalizeUrl(payload.multimediaPrincipal),
     link,
-    text,
+    text: readArticleText(payload, title),
     title,
   };
 }

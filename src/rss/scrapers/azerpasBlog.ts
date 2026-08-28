@@ -14,33 +14,23 @@ function normalizeWhitespace(text: string): string {
   return text.replaceAll(/\s+/g, " ").trim();
 }
 
+const MONTH_INDEX_BY_NAME = new Map([
+  ["Jan", 0],
+  ["Feb", 1],
+  ["Mar", 2],
+  ["Apr", 3],
+  ["May", 4],
+  ["Jun", 5],
+  ["Jul", 6],
+  ["Aug", 7],
+  ["Sep", 8],
+  ["Oct", 9],
+  ["Nov", 10],
+  ["Dec", 11],
+]);
+
 function parseMonth(month: string): number | undefined {
-  switch (month) {
-    case "Jan":
-      return 0;
-    case "Feb":
-      return 1;
-    case "Mar":
-      return 2;
-    case "Apr":
-      return 3;
-    case "May":
-      return 4;
-    case "Jun":
-      return 5;
-    case "Jul":
-      return 6;
-    case "Aug":
-      return 7;
-    case "Sep":
-      return 8;
-    case "Oct":
-      return 9;
-    case "Nov":
-      return 10;
-    case "Dec":
-      return 11;
-  }
+  return MONTH_INDEX_BY_NAME.get(month);
 }
 
 function parsePublishedAt(value: string): Date | undefined {
