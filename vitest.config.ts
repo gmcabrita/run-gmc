@@ -29,17 +29,17 @@ export default defineConfig({
   ],
   resolve: {
     alias: {
-      "@coverflex": resolve(__dirname, "src/coverflex/index.ts"),
-      "@email": resolve(__dirname, "src/email/index.ts"),
+      "@coverflex": resolve(import.meta.dirname, "src/coverflex/index.ts"),
+      "@email": resolve(import.meta.dirname, "src/email/index.ts"),
       // Specific aliases must precede the matching prefix alias.
-      "@rss/common": resolve(__dirname, "src/rss/common.ts"),
-      "@rss/healthcheck": resolve(__dirname, "src/rss/healthcheck.ts"),
-      "@rss/mangaDex": resolve(__dirname, "src/rss/mangaDex.ts"),
-      "@rss/types": resolve(__dirname, "src/rss/types.ts"),
+      "@rss/common": resolve(import.meta.dirname, "src/rss/common.ts"),
+      "@rss/healthcheck": resolve(import.meta.dirname, "src/rss/healthcheck.ts"),
+      "@rss/mangaDex": resolve(import.meta.dirname, "src/rss/mangaDex.ts"),
+      "@rss/types": resolve(import.meta.dirname, "src/rss/types.ts"),
       // Keep this prefix alias after all specific RSS aliases.
-      "@rss": resolve(__dirname, "src/rss/index.ts"),
-      "@types": resolve(__dirname, "src/types.ts"),
-      "@x": resolve(__dirname, "src/x/index.ts"),
+      "@rss": resolve(import.meta.dirname, "src/rss/index.ts"),
+      "@types": resolve(import.meta.dirname, "src/types.ts"),
+      "@x": resolve(import.meta.dirname, "src/x/index.ts"),
     },
   },
 });
