@@ -13,7 +13,9 @@ describe("mfeMediaForEuropeDocuments scraper", () => {
     const result = await parse(createResponse());
 
     expect(result.id).toBe("https://www.mfemediaforeurope.com/view/document_search/en?pageIndex=1");
-    expect(result.link).toBe("https://www.mfemediaforeurope.com/view/document_search/en?pageIndex=1");
+    expect(result.link).toBe(
+      "https://www.mfemediaforeurope.com/view/document_search/en?pageIndex=1",
+    );
     expect(result.title).toBe("MFE-MEDIAFOREUROPE - Document Search");
     expect(result.description).toBe("Latest documents published by MFE-MEDIAFOREUROPE.");
     expect(result.language).toBe("en");

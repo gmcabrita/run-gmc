@@ -10,9 +10,7 @@ describe("ercDeliberacoes scraper", () => {
   });
 
   it("clamps the date to the last day of a shorter target month", () => {
-    expect(buildRequestUrl(new Date("2026-05-31T12:00:00Z"))).toContain(
-      "date_from=28%2F02%2F2026",
-    );
+    expect(buildRequestUrl(new Date("2026-05-31T12:00:00Z"))).toContain("date_from=28%2F02%2F2026");
   });
 
   it("parses deliberacoes from HTML", async () => {

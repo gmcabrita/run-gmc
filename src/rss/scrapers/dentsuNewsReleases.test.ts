@@ -46,12 +46,8 @@ describe("dentsuNewsReleases scraper", () => {
     const result = await parse(response);
 
     const firstEntry = result.entries[0];
-    expect(firstEntry.id).toBe(
-      "https://www.group.dentsu.com/en/news/release/001593.html",
-    );
-    expect(firstEntry.link).toBe(
-      "https://www.group.dentsu.com/en/news/release/001593.html",
-    );
+    expect(firstEntry.id).toBe("https://www.group.dentsu.com/en/news/release/001593.html");
+    expect(firstEntry.link).toBe("https://www.group.dentsu.com/en/news/release/001593.html");
     expect(firstEntry.title).toContain("Yasuharu Sasaki");
     expect(firstEntry.title).toContain("Dubai Lynx Awards 2026");
   });

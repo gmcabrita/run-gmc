@@ -18,7 +18,8 @@ const apiResponse = [
       { isPrincipal: false, nome: "Media" },
     ],
     titulo: "Chega vai ter de pagar 30 mil euros por falsa sondagem nas legislativas de 2025",
-    tituloNoticia: "Chega vai ter de pagar 30 mil euros por falsa sondagem nas legislativas de 2025",
+    tituloNoticia:
+      "Chega vai ter de pagar 30 mil euros por falsa sondagem nas legislativas de 2025",
     url: "https://www.publico.pt/2026/06/22/politica/noticia/chega-vai-pagar-30-mil-euros-falsa-sondagem-legislativas-2025-2179050",
   },
   {

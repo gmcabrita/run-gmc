@@ -163,7 +163,7 @@ export function parse(json: PrimeGamingPayload): RSSData {
   };
 }
 
-async function fetchCsrfTokenAndCookie(): Promise<{ cookie: string; csrfToken: string; }> {
+async function fetchCsrfTokenAndCookie(): Promise<{ cookie: string; csrfToken: string }> {
   const initialResponse = await fetch(BASE_URL);
   const cookie = (initialResponse.headers.get("set-cookie") ?? "")
     .split("Secure, ")

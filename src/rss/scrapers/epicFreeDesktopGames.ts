@@ -35,9 +35,7 @@ const EpicDesktopFreeGamesPayloadSchema = looseObject({
                 offerMappings: nullish(array(CatalogMappingSchema)),
               }),
             ),
-            categories: nullish(
-              array(looseObject({ path: string() })),
-            ),
+            categories: nullish(array(looseObject({ path: string() }))),
             id: string(),
             productSlug: nullish(string()),
             promotions: nullish(
@@ -57,9 +55,7 @@ const EpicDesktopFreeGamesPayloadSchema = looseObject({
   }),
 });
 
-type EpicDesktopFreeGamesPayload = InferOutput<
-  typeof EpicDesktopFreeGamesPayloadSchema
->;
+type EpicDesktopFreeGamesPayload = InferOutput<typeof EpicDesktopFreeGamesPayloadSchema>;
 type EpicDesktopGame =
   EpicDesktopFreeGamesPayload["data"]["Catalog"]["searchStore"]["elements"][number];
 type PromotionalOffer = InferOutput<typeof PromotionalOfferSchema>;
@@ -74,9 +70,7 @@ function getActivePromotionalOffer(
       const startDate = new Date(offer.startDate);
       const endDate = new Date(offer.endDate);
       return (
-        startDate <= nowDate &&
-        nowDate <= endDate &&
-        offer.discountSetting.discountPercentage === 0
+        startDate <= nowDate && nowDate <= endDate && offer.discountSetting.discountPercentage === 0
       );
     });
 }
@@ -93,8 +87,7 @@ export async function parse(
       }
 
       const pageSlug =
-        game.catalogNs?.mappings?.find((mapping) => mapping.pageType === "productHome")
-          ?.pageSlug ??
+        game.catalogNs?.mappings?.find((mapping) => mapping.pageType === "productHome")?.pageSlug ??
         game.catalogNs?.offerMappings?.find((mapping) => mapping.pageType === "productHome")
           ?.pageSlug ??
         game.productSlug;

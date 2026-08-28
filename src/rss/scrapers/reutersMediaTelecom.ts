@@ -75,12 +75,7 @@ function normalizeOptionalText(value: string | null | undefined): string | undef
 }
 
 function normalizeText(value: string | undefined): string | undefined {
-  return (
-    value
-      ?.replaceAll('\u00A0', " ")
-      .replaceAll(/\s+/g, " ")
-      .trim() || undefined
-  );
+  return value?.replaceAll("\u00A0", " ").replaceAll(/\s+/g, " ").trim() || undefined;
 }
 
 function parseReutersArticle(payload: ReutersArticlePayload): ReutersArticle | undefined {
@@ -105,8 +100,7 @@ function parseReutersArticle(payload: ReutersArticlePayload): ReutersArticle | u
       ? normalizeOptionalText(thumbnailResult.output.url)
       : undefined,
     publishedAt:
-      normalizeOptionalText(payload.published_time) ??
-      normalizeOptionalText(payload.updated_time),
+      normalizeOptionalText(payload.published_time) ?? normalizeOptionalText(payload.updated_time),
     title,
   };
 }

@@ -50,10 +50,9 @@ describe("parseMauserSc1176StockPage", () => {
   it("rejects pages without the target SKU", () => {
     expect(() =>
       parseMauserSc1176StockPage(
-        pageWithStockStatus(`<div class="stock big in-stock stock-status">Disponível</div>`).replace(
-          "096-4559",
-          "095-0000",
-        ),
+        pageWithStockStatus(
+          `<div class="stock big in-stock stock-status">Disponível</div>`,
+        ).replace("096-4559", "095-0000"),
       ),
     ).toThrow("Mauser product page missing SKU 096-4559");
   });

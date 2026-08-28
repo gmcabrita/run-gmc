@@ -38,9 +38,7 @@ const EpicMobileDiscoverPayloadSchema = looseObject({
   ),
 });
 
-type EpicMobileDiscoverPayload = InferInput<
-  typeof EpicMobileDiscoverPayloadSchema
->;
+type EpicMobileDiscoverPayload = InferInput<typeof EpicMobileDiscoverPayloadSchema>;
 
 export async function parse(
   payload: EpicMobileDiscoverPayload,
@@ -89,7 +87,10 @@ export async function parse(
   };
 }
 
-async function fetchForPlatform(_ctx: ScraperContext, platform: "ios" | "android"): Promise<RSSData> {
+async function fetchForPlatform(
+  _ctx: ScraperContext,
+  platform: "ios" | "android",
+): Promise<RSSData> {
   const apiUrl = `https://http-proxy.val.run/?finalUrl=https%3A%2F%2Fegs-platform-service.store.epicgames.com%2Fapi%2Fv2%2Fpublic%2Fdiscover%2Fhome%3Fcount%3D10%26country%3DPT%26locale%3Den%26platform%3D${platform}%26start%3D0%26store%3DEGS`;
 
   const response = await fetch(apiUrl, {

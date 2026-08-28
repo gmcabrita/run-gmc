@@ -55,7 +55,7 @@ function normalizeToken(value: string): string {
     .toLowerCase()
     .normalize("NFD")
     .replaceAll(/[\u0300-\u036f]/g, "")
-    .replaceAll('.', "");
+    .replaceAll(".", "");
 }
 
 function normalizeDateLabel(value: string): string {
@@ -108,7 +108,9 @@ function parseUtcDate(year: number, monthIndex: number, day: number): Date | und
 function parsePtDate(value: string): Date | undefined {
   const normalized = normalizeToken(value).replaceAll(/[\u2013\u2014]/g, "-");
 
-  const crossMonthMatch = normalized.match(/^(\d{1,2})\s+([a-z]+)\s*-\s*\d{1,2}\s+([a-z]+)\s+(\d{4})$/);
+  const crossMonthMatch = normalized.match(
+    /^(\d{1,2})\s+([a-z]+)\s*-\s*\d{1,2}\s+([a-z]+)\s+(\d{4})$/,
+  );
   if (crossMonthMatch) {
     const day = Number(crossMonthMatch[1]);
     const monthIndex = PT_MONTH_INDEX.get(crossMonthMatch[2] ?? "");

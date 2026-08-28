@@ -1,8 +1,5 @@
 import { number, object, parse } from "valibot";
-import {
-  CoverflexAuthResponseSchema,
-  type CoverflexAuthResponse,
-} from "../schemas";
+import { CoverflexAuthResponseSchema, type CoverflexAuthResponse } from "../schemas";
 
 const JwtPayloadSchema = object({
   exp: number(),

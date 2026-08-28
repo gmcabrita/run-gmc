@@ -28,23 +28,14 @@ const StoryFeedSectionSchema = looseObject({
 });
 const AdAgeEntrySchema = looseObject({
   canonical_url: OptionalTextSchema,
-  description: fallback(
-    nullish(looseObject({ basic: OptionalTextSchema })),
-    undefined,
-  ),
+  description: fallback(nullish(looseObject({ basic: OptionalTextSchema })), undefined),
   display_date: OptionalTextSchema,
   first_publish_date: OptionalTextSchema,
-  headlines: fallback(
-    nullish(looseObject({ basic: OptionalTextSchema })),
-    undefined,
-  ),
+  headlines: fallback(nullish(looseObject({ basic: OptionalTextSchema })), undefined),
   promo_items: fallback(
     nullish(
       looseObject({
-        basic: fallback(
-          nullish(looseObject({ url: OptionalTextSchema })),
-          undefined,
-        ),
+        basic: fallback(nullish(looseObject({ url: OptionalTextSchema })), undefined),
       }),
     ),
     undefined,
@@ -91,8 +82,7 @@ function getEntries(cache: AdAgeContentCache): Array<AdAgeEntry> {
 }
 
 function getEntryLink(entry: AdAgeEntry): string | undefined {
-  const path =
-    entry.website_url ?? entry.websites?.adage?.website_url ?? entry.canonical_url;
+  const path = entry.website_url ?? entry.websites?.adage?.website_url ?? entry.canonical_url;
 
   if (!path || path.trim() === "") {
     return undefined;

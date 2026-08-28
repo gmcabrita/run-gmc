@@ -1,10 +1,4 @@
-import {
-  array,
-  number,
-  object,
-  string,
-  type InferOutput,
-} from "valibot";
+import { array, number, object, string, type InferOutput } from "valibot";
 
 export const CoverflexAuthResponseSchema = object({
   refresh_token: string(),

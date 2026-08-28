@@ -1,9 +1,5 @@
 import { describe, expect, it } from "vitest";
-import {
-  createPrivateProfileNoticeFeed,
-  getTimelineEntries,
-  isProtectedProfile,
-} from "./feed";
+import { createPrivateProfileNoticeFeed, getTimelineEntries, isProtectedProfile } from "./feed";
 
 describe("x feed helpers", () => {
   it("detects public profiles", () => {

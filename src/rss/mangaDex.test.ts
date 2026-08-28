@@ -1,10 +1,6 @@
 import { describe, expect, it } from "vitest";
 import json from "./scrapers/__fixtures__/berserk.json";
-import {
-  buildMangaDexFeedUrl,
-  parseMangaDexFeed,
-  type MangaDexFeedConfig,
-} from "./mangaDex";
+import { buildMangaDexFeedUrl, parseMangaDexFeed, type MangaDexFeedConfig } from "./mangaDex";
 
 const config = {
   excludedGroupIds: ["48d8a115-31b6-462f-a0db-04cc09846453"],

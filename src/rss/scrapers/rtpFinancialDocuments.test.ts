@@ -59,6 +59,8 @@ describe("RTP financial document scrapers", () => {
       "Relatório e Parecer do Conselho Fiscal sobre os documentos de prestação de contas de 2021",
       "Relatório e Contas",
     ]);
-    expect(result.entries[3].link).toBe("https://media.rtp.pt/docs/pdf/2006%20relatorio%20e%20contas.pdf");
+    expect(result.entries[3].link).toBe(
+      "https://media.rtp.pt/docs/pdf/2006%20relatorio%20e%20contas.pdf",
+    );
   });
 });

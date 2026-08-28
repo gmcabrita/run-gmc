@@ -1,5 +1,5 @@
 allowBuilds:
-  '@sentry/cli': true
+  "@sentry/cli": true
   esbuild: true
   sharp: true
   workerd: true

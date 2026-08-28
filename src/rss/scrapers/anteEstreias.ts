@@ -1,9 +1,4 @@
-import {
-  USERAGENT,
-  decodeHtmlEntities,
-  isValidRSSEntry,
-  type ScraperContext,
-} from "@rss/common";
+import { USERAGENT, decodeHtmlEntities, isValidRSSEntry, type ScraperContext } from "@rss/common";
 import type { RSSData, RSSEntry } from "@rss/types";
 
 const BASE_URL = "https://anteestreias.blogspot.com";
@@ -59,7 +54,8 @@ function getBlogPostsHtml(htmlText: string) {
 
 function getPostBodies(blogPostsHtml: string) {
   const posts: Array<{ body: string; datetime?: Date }> = [];
-  const postRegex = /<div class='post hentry[\s\S]*?<div class='post-body[^>]*>([\s\S]*?)<div style='clear: both;'><\/div>\s*<\/div>[\s\S]*?<abbr class='published'[^>]*title='([^']+)'/gi;
+  const postRegex =
+    /<div class='post hentry[\s\S]*?<div class='post-body[^>]*>([\s\S]*?)<div style='clear: both;'><\/div>\s*<\/div>[\s\S]*?<abbr class='published'[^>]*title='([^']+)'/gi;
   let postMatch;
 
   while ((postMatch = postRegex.exec(blogPostsHtml)) !== null) {
@@ -94,8 +90,7 @@ function readRowImage(rowHtml: string): RowImage {
 
   return {
     imageURL: normalizeUrl(readHtmlAttribute(imageTag, "src") || ""),
-    movieTitle:
-      readHtmlAttribute(imageTag, "title") || readHtmlAttribute(imageTag, "alt"),
+    movieTitle: readHtmlAttribute(imageTag, "title") || readHtmlAttribute(imageTag, "alt"),
   };
 }
 

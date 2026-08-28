@@ -28,9 +28,7 @@ const InformacaoLisboaAgendaPayloadSchema = array(
   }),
 );
 
-type InformacaoLisboaAgendaPayload = InferOutput<
-  typeof InformacaoLisboaAgendaPayloadSchema
->;
+type InformacaoLisboaAgendaPayload = InferOutput<typeof InformacaoLisboaAgendaPayloadSchema>;
 
 export async function parse(json: InformacaoLisboaAgendaPayload): Promise<RSSData> {
   const entries: Array<RSSEntry> = json

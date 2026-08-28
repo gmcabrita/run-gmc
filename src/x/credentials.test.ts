@@ -66,9 +66,7 @@ describe("x credentials", () => {
   });
 
   it("reads csrf token from cookie", () => {
-    expect(getCsrfTokenFromCookie("guest_id=v; ct0=csrf-token; auth_token=v")).toBe(
-      "csrf-token",
-    );
+    expect(getCsrfTokenFromCookie("guest_id=v; ct0=csrf-token; auth_token=v")).toBe("csrf-token");
   });
 
   it("sets csrf header from cookie", () => {
@@ -81,6 +79,8 @@ describe("x credentials", () => {
   });
 
   it("requires csrf token in cookie", () => {
-    expect(() => getCsrfTokenFromCookie("guest_id=v; auth_token=v")).toThrow("X cookie missing ct0");
+    expect(() => getCsrfTokenFromCookie("guest_id=v; auth_token=v")).toThrow(
+      "X cookie missing ct0",
+    );
   });
 });

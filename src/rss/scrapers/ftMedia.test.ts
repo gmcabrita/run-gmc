@@ -54,9 +54,7 @@ describe("ftMedia scraper", () => {
     const result = await scrape(relayEnv, fetcher);
 
     expect(result.entries).toHaveLength(2);
-    expect(relayRequest?.url).toBe(
-      "https://relay.example.com/fetch/https://www.ft.com/media",
-    );
+    expect(relayRequest?.url).toBe("https://relay.example.com/fetch/https://www.ft.com/media");
     expect(relayRequest?.headers.get("Authorization")).toBe("Bearer relay-token");
     expect(relayRequest?.headers.get("Sec-Fetch-Mode")).toBe("navigate");
     expect(relayRequest?.headers.get("Sec-CH-UA")).toContain('"Google Chrome";v="146"');

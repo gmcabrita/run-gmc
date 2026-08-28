@@ -16,7 +16,7 @@ const BASE_URL = "https://www.kernel.sh/";
 const BLOG_URL = "https://www.kernel.sh/blog";
 const TITLE = "Kernel Blog";
 const DESCRIPTION = "Engineering Blog for Fast Browser Agents";
-const NEXT_DATA_PREFIX = "self.__next_f.push([1,\"";
+const NEXT_DATA_PREFIX = 'self.__next_f.push([1,"';
 const POSTS_MARKER = '"posts":';
 
 const KernelPostImageSchema = looseObject({
@@ -75,7 +75,7 @@ function decodeNextDataScripts(html: string): Array<string> {
         escaped = false;
       } else if (char === "\\") {
         escaped = true;
-      } else if (char === "\"") {
+      } else if (char === '"') {
         break;
       }
       contentEnd += 1;
@@ -109,13 +109,13 @@ function extractBalancedArray(source: string, arrayStart: number): string | unde
         escaped = false;
       } else if (char === "\\") {
         escaped = true;
-      } else if (char === "\"") {
+      } else if (char === '"') {
         inString = false;
       }
       continue;
     }
 
-    if (char === "\"") {
+    if (char === '"') {
       inString = true;
       continue;
     }

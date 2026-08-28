@@ -13,13 +13,17 @@ type XCredentialsBindings = Pick<
 function getCookieValue(cookie: string, name: string): string | undefined {
   for (const part of cookie.split(";")) {
     const [rawName, ...valueParts] = part.trim().split("=");
-    if (rawName === name) {return valueParts.join("=");}
+    if (rawName === name) {
+      return valueParts.join("=");
+    }
   }
 }
 
 export function getCsrfTokenFromCookie(cookie: string): string {
   const csrfToken = getCookieValue(cookie, "ct0");
-  if (!csrfToken) {throw new Error("X cookie missing ct0");}
+  if (!csrfToken) {
+    throw new Error("X cookie missing ct0");
+  }
 
   return csrfToken;
 }

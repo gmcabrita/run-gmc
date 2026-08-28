@@ -23,22 +23,28 @@ type GoogleCalendarEvent = {
 
 export type IcsToGoogleCalendarUrlResult =
   | { status: "ok"; url: string }
-  | { message: string; status: "error"; };
+  | { message: string; status: "error" };
 
 function splitParamValue(part: string): [string, string] {
   const index = part.indexOf("=");
-  if (index === -1) {return [part.toUpperCase(), ""];}
+  if (index === -1) {
+    return [part.toUpperCase(), ""];
+  }
   return [part.slice(0, index).toUpperCase(), unquoteParam(part.slice(index + 1))];
 }
 
 function unquoteParam(value: string): string {
-  if (value.startsWith('"') && value.endsWith('"')) {return value.slice(1, -1);}
+  if (value.startsWith('"') && value.endsWith('"')) {
+    return value.slice(1, -1);
+  }
   return value;
 }
 
 function parseLine(line: string): IcsProperty | undefined {
   const colon = line.indexOf(":");
-  if (colon === -1) {return;}
+  if (colon === -1) {
+    return;
+  }
 
   const left = line.slice(0, colon);
   const value = line.slice(colon + 1);
@@ -73,10 +79,10 @@ function addDays(yyyymmdd: string, days: number): string {
 }
 
 function parseDuration(duration: string): number | undefined {
-  const match = /^P(?:(\d+)W)?(?:(\d+)D)?(?:T(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?)?$/.exec(
-    duration,
-  );
-  if (!match || match.slice(1).every((part) => part === undefined)) {return;}
+  const match = /^P(?:(\d+)W)?(?:(\d+)D)?(?:T(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?)?$/.exec(duration);
+  if (!match || match.slice(1).every((part) => part === undefined)) {
+    return;
+  }
 
   const weeks = Number(match[1] || 0);
   const days = Number(match[2] || 0);
@@ -88,7 +94,9 @@ function parseDuration(duration: string): number | undefined {
 
 function addSecondsToIcsDate(value: string, seconds: number): string {
   const match = /^(\d{4})(\d{2})(\d{2})T(\d{2})(\d{2})(\d{2})(Z?)$/.exec(value);
-  if (!match) {return value;}
+  if (!match) {
+    return value;
+  }
 
   const date = new Date(
     Date.UTC(
@@ -111,12 +119,16 @@ function addSecondsToIcsDate(value: string, seconds: number): string {
 }
 
 function normalizeDateValue(prop: IcsProperty | undefined): string {
-  if (!prop) {return "";}
+  if (!prop) {
+    return "";
+  }
   return prop.value.replaceAll(/[-:]/g, "");
 }
 
 function isAllDay(prop: IcsProperty | undefined): boolean {
-  if (!prop) {return false;}
+  if (!prop) {
+    return false;
+  }
   return prop.params.get("VALUE") === "DATE" || /^\d{8}$/.test(prop.value);
 }
 
@@ -140,15 +152,21 @@ function parseIcsEvents(text: string): Array<IcsEvent> {
     }
 
     if (line === "END:VEVENT") {
-      if (active) {events.push(active);}
+      if (active) {
+        events.push(active);
+      }
       active = undefined;
       continue;
     }
 
-    if (!active) {continue;}
+    if (!active) {
+      continue;
+    }
 
     const property = parseLine(line);
-    if (!property) {continue;}
+    if (!property) {
+      continue;
+    }
 
     if (textProperties.has(property.name)) {
       active.properties.push({ ...property, value: unescapeIcsText(property.value) });
@@ -165,7 +183,9 @@ function getEventStart(
   durationSeconds: number | undefined,
 ): IcsProperty | undefined {
   const declaredStart = firstProperty(event, "DTSTART");
-  if (declaredStart || durationSeconds === undefined) {return declaredStart;}
+  if (declaredStart || durationSeconds === undefined) {
+    return declaredStart;
+  }
   return firstProperty(event, "DTSTAMP");
 }
 
@@ -176,7 +196,9 @@ function getEventEndValue(
   durationSeconds: number | undefined,
 ): string {
   const endValue = normalizeDateValue(declaredEnd);
-  if (endValue || !startValue) {return endValue;}
+  if (endValue || !startValue) {
+    return endValue;
+  }
 
   if (durationSeconds !== undefined) {
     return isAllDay(start)
@@ -194,7 +216,9 @@ function getEventAttendees(event: IcsEvent): Array<string> {
 }
 
 function getEventTimezone(start: IcsProperty | undefined): string {
-  if (!start) {return "";}
+  if (!start) {
+    return "";
+  }
   return start.params.get("TZID") || "";
 }
 
@@ -215,7 +239,9 @@ function addGoogleCalendarProperty(
   property: IcsProperty | undefined,
   valuePrefix = "",
 ): void {
-  if (property?.value) {params.set(key, `${valuePrefix}${property.value}`);}
+  if (property?.value) {
+    params.set(key, `${valuePrefix}${property.value}`);
+  }
 }
 
 function createGoogleCalendarParams(options: GoogleCalendarParams): URLSearchParams {
@@ -227,7 +253,9 @@ function createGoogleCalendarParams(options: GoogleCalendarParams): URLSearchPar
   }
   addGoogleCalendarProperty(params, "details", options.description);
   addGoogleCalendarProperty(params, "location", options.location);
-  if (options.attendees.length > 0) {params.set("add", options.attendees.join(","));}
+  if (options.attendees.length > 0) {
+    params.set("add", options.attendees.join(","));
+  }
   if (options.timezone && options.startValue && !options.startValue.endsWith("Z")) {
     params.set("ctz", options.timezone);
   }

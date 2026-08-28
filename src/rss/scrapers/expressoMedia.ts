@@ -24,10 +24,7 @@ const ExpressoPictureSchema = looseObject({
   urlOriginal: OptionalTextSchema,
   urlThumbnail: OptionalTextSchema,
 });
-const OptionalExpressoPictureSchema = fallback(
-  nullish(ExpressoPictureSchema),
-  undefined,
-);
+const OptionalExpressoPictureSchema = fallback(nullish(ExpressoPictureSchema), undefined);
 const ExpressoContentSchema = looseObject({
   code: OptionalTextSchema,
   headlineTitle: OptionalTextSchema,
@@ -67,7 +64,7 @@ function normalizeText(value: string | null | undefined): string | undefined {
 
   return (
     decodeHtmlEntities(value.replaceAll(/<[^>]*>/g, " "))
-      .replaceAll('\u00A0', " ")
+      .replaceAll("\u00A0", " ")
       .replaceAll(/\s+/g, " ")
       .trim() || undefined
   );

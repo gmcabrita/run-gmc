@@ -29,13 +29,13 @@ export async function parse(response: Response): Promise<RSSData> {
           currentEntry.title = (currentEntry.title || "") + text.text;
         }
       },
-    })
+    });
   await consume(rewriter.transform(response).body!);
   return {
     description: "Kit Langton",
     entries: entries
       .map((entry) => {
-        const title = entry.title.trim().replaceAll('\n', " | ");
+        const title = entry.title.trim().replaceAll("\n", " | ");
         return {
           ...entry,
           text: title,

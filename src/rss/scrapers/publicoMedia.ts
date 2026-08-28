@@ -23,10 +23,7 @@ type FetchFn = typeof fetch;
 
 const OptionalTextSchema = fallback(nullish(string()), undefined);
 const OptionalBooleanSchema = fallback(nullish(boolean()), undefined);
-const PublicoTagListSchema = fallback(
-  nullish(array(unknown())),
-  undefined,
-);
+const PublicoTagListSchema = fallback(nullish(array(unknown())), undefined);
 const PublicoTagSchema = looseObject({
   isPrincipal: OptionalBooleanSchema,
   nome: OptionalTextSchema,
@@ -110,7 +107,10 @@ function normalizeWhitespace(text: string | null | undefined): string | undefine
     return undefined;
   }
 
-  return decodeHtmlEntities(stripTags(text)).replaceAll('\u00A0', " ").replaceAll(/\s+/g, " ").trim() || undefined;
+  return (
+    decodeHtmlEntities(stripTags(text)).replaceAll("\u00A0", " ").replaceAll(/\s+/g, " ").trim() ||
+    undefined
+  );
 }
 
 function normalizeUrl(href: string | null | undefined): string | undefined {
@@ -149,9 +149,7 @@ function readPrimaryTagName(tags: PublicoTagList): string | undefined {
 
 function readArticleLink(payload: PublicoArticlePayload): string | undefined {
   return (
-    normalizeUrl(payload.fullUrl) ??
-    normalizeUrl(payload.url) ??
-    normalizeUrl(payload.shareUrl)
+    normalizeUrl(payload.fullUrl) ?? normalizeUrl(payload.url) ?? normalizeUrl(payload.shareUrl)
   );
 }
 
@@ -268,9 +266,7 @@ export async function scrapeMediaApi(fetchFn: FetchFn): Promise<RSSData> {
   }
 
   const payloadResult = safeParse(PublicoApiPayloadSchema, await response.json());
-  return parseApiResponse(
-    payloadResult.success ? payloadResult.output : EMPTY_PUBLICO_PAYLOAD,
-  );
+  return parseApiResponse(payloadResult.success ? payloadResult.output : EMPTY_PUBLICO_PAYLOAD);
 }
 
 export async function get(_ctx: ScraperContext, fetchFn: FetchFn = fetch): Promise<RSSData> {

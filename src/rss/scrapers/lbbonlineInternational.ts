@@ -22,10 +22,7 @@ const LbbOnlinePayloadSchema = looseObject({
     looseObject({
       date: string(),
       description: string(),
-      id: pipe(
-        union([string(), number()]),
-        transform(String),
-      ),
+      id: pipe(union([string(), number()]), transform(String)),
       image: nullish(string()),
       slug: string(),
       title: string(),

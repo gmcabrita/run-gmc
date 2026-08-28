@@ -1,13 +1,6 @@
 import { USERAGENT, consume, isValidRSSEntry, type ScraperContext } from "@rss/common";
 import type { RSSData, RSSEntry } from "@rss/types";
-import {
-  boolean,
-  fallback,
-  looseObject,
-  safeParse,
-  string,
-  type InferOutput,
-} from "valibot";
+import { boolean, fallback, looseObject, safeParse, string, type InferOutput } from "valibot";
 
 const SITE_ORIGIN = "https://www.jornaldenegocios.pt";
 const SECTION_PATH = "/empresas/media";
@@ -208,11 +201,7 @@ async function parsePageWithFallback(
     await consume(body);
   } catch (error) {
     const failure = safeParse(RetryableFailureSchema, error);
-    if (
-      !failure.success ||
-      !isRetryableFailure(failure.output) ||
-      draftEntries.length === 0
-    ) {
+    if (!failure.success || !isRetryableFailure(failure.output) || draftEntries.length === 0) {
       throw error;
     }
 
@@ -246,13 +235,8 @@ async function parsePageWithFallback(
   };
 }
 
-function selectBestPage(
-  bestPage: LoadMorePage | undefined,
-  candidate: LoadMorePage,
-): LoadMorePage {
-  return !bestPage || candidate.entries.length > bestPage.entries.length
-    ? candidate
-    : bestPage;
+function selectBestPage(bestPage: LoadMorePage | undefined, candidate: LoadMorePage): LoadMorePage {
+  return !bestPage || candidate.entries.length > bestPage.entries.length ? candidate : bestPage;
 }
 
 function shouldRetryLoad(failure: RetryableFailure | undefined, attempt: number): boolean {

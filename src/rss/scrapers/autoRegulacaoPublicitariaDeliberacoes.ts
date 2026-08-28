@@ -31,7 +31,7 @@ const NAMED_HTML_ENTITIES = new Map([
   ["gt", ">"],
   ["lt", "<"],
   ["nbsp", " "],
-  ["quot", "\""],
+  ["quot", '"'],
 ]);
 
 function decodeHtmlEntities(value: string): string {

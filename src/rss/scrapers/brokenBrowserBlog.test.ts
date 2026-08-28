@@ -28,7 +28,8 @@ describe("brokenBrowserBlog scraper", () => {
       id: "https://brokenbrowser.com/blog/2026-05-09-prerender-stealth-csp-bypass/",
       link: "https://brokenbrowser.com/blog/2026-05-09-prerender-stealth-csp-bypass/",
       text: "Stealth Request That Bypasses CSP, Hides from DevTools, and Leaks the Real User-Agent",
-      title: "Stealth Request That Bypasses CSP, Hides from DevTools, and Leaks the Real User-Agent",
+      title:
+        "Stealth Request That Bypasses CSP, Hides from DevTools, and Leaks the Real User-Agent",
     });
 
     expect(result.entries[1]).toEqual({

@@ -18,9 +18,7 @@ const API_URL =
 const InformacaoLisboaPayloadSchema = looseObject({
   registos: array(
     looseObject({
-      categorias: nullish(
-        array(looseObject({ nome: string() })),
-      ),
+      categorias: nullish(array(looseObject({ nome: string() }))),
       data: string(),
       hora: string(),
       noticia: string(),

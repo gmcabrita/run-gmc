@@ -1,9 +1,4 @@
-import {
-  USERAGENT,
-  decodeHtmlEntities,
-  isValidRSSEntry,
-  type ScraperContext,
-} from "@rss/common";
+import { USERAGENT, decodeHtmlEntities, isValidRSSEntry, type ScraperContext } from "@rss/common";
 import type { RSSData, RSSEntry } from "@rss/types";
 import {
   fallback,
@@ -66,7 +61,9 @@ function parseCalendarData(value: string): CalendarData | undefined {
 }
 
 function parseDatetime(value: string | undefined): Date | undefined {
-  if (!value) {return undefined;}
+  if (!value) {
+    return undefined;
+  }
 
   const datetime = new Date(value);
   return Number.isNaN(datetime.getTime()) ? undefined : datetime;
@@ -101,11 +98,15 @@ function parsePage(html: string): ParsedPage {
     const card = cardMatch[0];
     const openingTag = /^<li\b[^>]*>/i.exec(card)?.[0];
     const encodedCalendarData = readHtmlAttribute(card, "data-atcb");
-    if (!openingTag || !encodedCalendarData) {continue;}
+    if (!openingTag || !encodedCalendarData) {
+      continue;
+    }
 
     const relativeLink = readHtmlAttribute(openingTag, "data-url");
     const calendarData = parseCalendarData(encodedCalendarData);
-    if (!relativeLink || !calendarData) {continue;}
+    if (!relativeLink || !calendarData) {
+      continue;
+    }
 
     let link: string;
     try {
@@ -157,7 +158,9 @@ async function fetchResponse(fetchFn: FetchFn, url: string, ajax: boolean): Prom
   const headers = new Headers({
     "user-agent": USERAGENT,
   });
-  if (ajax) {headers.set("X-Requested-With", "XMLHttpRequest");}
+  if (ajax) {
+    headers.set("X-Requested-With", "XMLHttpRequest");
+  }
 
   const response = await fetchFn(url, { headers });
   if (!response.ok) {
@@ -168,11 +171,7 @@ async function fetchResponse(fetchFn: FetchFn, url: string, ajax: boolean): Prom
 }
 
 export async function scrape(fetchFn: FetchFn): Promise<RSSData> {
-  const firstResponse = await fetchResponse(
-    fetchFn,
-    `${BASE_URL}?perpage=${PAGE_SIZE}`,
-    false,
-  );
+  const firstResponse = await fetchResponse(fetchFn, `${BASE_URL}?perpage=${PAGE_SIZE}`, false);
   const firstPage = parsePage(await firstResponse.text());
   const entriesById = new Map(firstPage.entries.map((entry) => [entry.id, entry]));
   let hasOngoingMarker = firstPage.hasOngoingMarker;
@@ -189,10 +188,7 @@ export async function scrape(fetchFn: FetchFn): Promise<RSSData> {
       getAjaxUrl(offset, hasPastMarker, hasOngoingMarker),
       true,
     );
-    const payloadResult = safeParse(
-      ViralAgendaAjaxPayloadSchema,
-      await response.json(),
-    );
+    const payloadResult = safeParse(ViralAgendaAjaxPayloadSchema, await response.json());
     if (!payloadResult.success) {
       throw new Error("Invalid Viral Agenda pagination response");
     }

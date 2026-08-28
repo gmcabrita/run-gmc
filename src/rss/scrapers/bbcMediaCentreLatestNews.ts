@@ -54,7 +54,7 @@ function normalizeOptionalText(value: string | null | undefined): string | undef
 }
 
 function normalizeText(value: string | undefined): string | undefined {
-  return value?.replaceAll('\u00A0', " ").replaceAll(/\s+/g, " ").trim() || undefined;
+  return value?.replaceAll("\u00A0", " ").replaceAll(/\s+/g, " ").trim() || undefined;
 }
 
 function parseDate(value: string | undefined): Date | undefined {

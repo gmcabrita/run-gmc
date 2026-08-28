@@ -76,13 +76,11 @@ describe("viralAgendaAlmada scraper", () => {
     const result = parse(html);
 
     expect(result.entries).toHaveLength(1);
-    expect(result.entries[0]?.text).toBe(
-      "2026-09-15 | Auditório Fernando Lopes Graça (Almada)",
-    );
+    expect(result.entries[0]?.text).toBe("2026-09-15 | Auditório Fernando Lopes Graça (Almada)");
   });
 
   it("follows pagination into ongoing events until Viral Agenda returns a partial page", async () => {
-    const requests: Array<{ headers: Headers; url: string; }> = [];
+    const requests: Array<{ headers: Headers; url: string }> = [];
     const responses = [
       createHtmlResponse(createPage(1, 30)),
       createAjaxResponse(`${ongoingMarker}${createPage(31, 30)}`, 30),
@@ -96,7 +94,9 @@ describe("viralAgendaAlmada scraper", () => {
       });
 
       const response = responses.shift();
-      if (!response) {throw new Error("Unexpected request");}
+      if (!response) {
+        throw new Error("Unexpected request");
+      }
       return response;
     };
 

@@ -9,7 +9,9 @@ const USER_AGENT =
 
 function getAttribute(attributes: string, name: string): string | undefined {
   const escapedName = name.replaceAll(/[.*+?^${}()|[\]\\]/g, String.raw`\$&`);
-  const match = attributes.match(new RegExp(`(?:^|\\s)${escapedName}=(?:"([^"]*)"|'([^']*)')`, "i"));
+  const match = attributes.match(
+    new RegExp(`(?:^|\\s)${escapedName}=(?:"([^"]*)"|'([^']*)')`, "i"),
+  );
   return match?.[1] ?? match?.[2];
 }
 
@@ -20,7 +22,7 @@ function hasClass(attributes: string, className: string): boolean {
 function normalizeText(html: string): string {
   return decodeHtmlEntities(html.replaceAll(/<[^>]*>/g, " "))
     .replaceAll(/<[^>]*>/g, " ")
-    .replaceAll('\u00A0', " ")
+    .replaceAll("\u00A0", " ")
     .replaceAll(/\s+/g, " ")
     .trim();
 }
@@ -114,9 +116,7 @@ function findImage(chunk: string): string | undefined {
       continue;
     }
 
-    return getImageUrl(
-      getAttribute(match[1], "data-src") ?? getAttribute(match[1], "src"),
-    );
+    return getImageUrl(getAttribute(match[1], "data-src") ?? getAttribute(match[1], "src"));
   }
 
   return undefined;
@@ -144,8 +144,7 @@ function findStreamList(html: string): string {
 
 function getStreamItems(streamList: string): Array<string> {
   const starts = [...streamList.matchAll(/<li\b([^>]*)>/gi)].filter(
-    (match) =>
-      hasClass(match[1], "o-teaser-collection__item") && hasClass(match[1], "o-grid-row"),
+    (match) => hasClass(match[1], "o-teaser-collection__item") && hasClass(match[1], "o-grid-row"),
   );
 
   return starts.map((match, index) => {

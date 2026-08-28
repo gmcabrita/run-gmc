@@ -13,11 +13,7 @@ import {
   type XUserTweetsResponse,
 } from "./schemas";
 import { buildXApiHeaders, resolveCredentials, type XCredentials } from "./credentials";
-import {
-  createPrivateProfileNoticeFeed,
-  getTimelineEntries,
-  isProtectedProfile,
-} from "./feed";
+import { createPrivateProfileNoticeFeed, getTimelineEntries, isProtectedProfile } from "./feed";
 
 async function fetchUser(
   env: CloudflareBindings,
@@ -35,7 +31,9 @@ async function fetchUser(
     },
   );
 
-  if (response.status == 429) {throw new Error("Rate Limited");}
+  if (response.status == 429) {
+    throw new Error("Rate Limited");
+  }
 
   return parse(XUserByScreenNameResponseSchema, await response.json());
 }
@@ -53,7 +51,9 @@ async function fetchPosts(
     },
   );
 
-  if (response.status == 429) {throw new Error("Rate Limited");}
+  if (response.status == 429) {
+    throw new Error("Rate Limited");
+  }
   return parse(XUserTweetsResponseSchema, await response.json());
 }
 
@@ -75,8 +75,7 @@ async function transformPost(
       date: new Date(post.legacy.created_at),
       id: post.legacy.id_str,
       link: postUrl,
-      title:
-        post.legacy.full_text.slice(0, 50) + (post.legacy.full_text.length > 50 ? "..." : ""),
+      title: post.legacy.full_text.slice(0, 50) + (post.legacy.full_text.length > 50 ? "..." : ""),
     };
   }
 }
@@ -95,13 +94,17 @@ async function getEmbedWithRetries(
     }
   }
 
-  if (lastError) {throw lastError;}
+  if (lastError) {
+    throw lastError;
+  }
 }
 
 async function getEmbed(env: CloudflareBindings, postUrl: string): Promise<string> {
   const cachedHtml = await env.RUN_GMC_X_CACHE_KV.get(postUrl);
 
-  if (cachedHtml) {return cachedHtml;}
+  if (cachedHtml) {
+    return cachedHtml;
+  }
 
   const response = await fetch(
     `https://publish.twitter.com/oembed?url=${encodeURIComponent(postUrl)}`,
@@ -135,25 +138,28 @@ function isPromotedItem(itemContent: TimelineItemContent): boolean {
 
 function getEntryPosts(entry: TimelineEntry): Array<XPost | undefined> {
   const directItem = getDirectItemContent(entry);
-  if (isPromotedItem(directItem)) {return [];}
+  if (isPromotedItem(directItem)) {
+    return [];
+  }
 
   const directPost = getPostFromItemContent(directItem);
   const threadedItem = getThreadedItemContent(entry);
-  if (isPromotedItem(threadedItem)) {return [directPost];}
+  if (isPromotedItem(threadedItem)) {
+    return [directPost];
+  }
 
   return [directPost, getPostFromItemContent(threadedItem)];
 }
 
 function getFirstTimelineUser(entries: ReadonlyArray<TimelineEntry>) {
   const firstEntry = entries[0];
-  if (!firstEntry) {return;}
+  if (!firstEntry) {
+    return;
+  }
   return getPostFromItemContent(getDirectItemContent(firstEntry))?.core?.user_results.result.legacy;
 }
 
-function getXFeedMetadata(
-  userName: string,
-  firstUser: ReturnType<typeof getFirstTimelineUser>,
-) {
+function getXFeedMetadata(userName: string, firstUser: ReturnType<typeof getFirstTimelineUser>) {
   const screenName = firstUser?.screen_name;
   const name = firstUser?.name;
   return {
@@ -194,7 +200,9 @@ async function x2Rss(env: CloudflareBindings, userName: string, data: XUserTweet
   for (const entry of entries) {
     for (const candidate of getEntryPosts(entry)) {
       const post = await transformPost(env, candidate);
-      if (post) {feed.addItem(post);}
+      if (post) {
+        feed.addItem(post);
+      }
     }
   }
 

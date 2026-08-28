@@ -40,7 +40,7 @@ function decodeHtmlEntities(text: string): string {
 }
 
 function normalizeWhitespace(text: string): string {
-  return decodeHtmlEntities(text).replaceAll('\u00A0', " ").replaceAll(/\s+/g, " ").trim();
+  return decodeHtmlEntities(text).replaceAll("\u00A0", " ").replaceAll(/\s+/g, " ").trim();
 }
 
 function getLastEntry(entries: Array<DraftEntry>): DraftEntry | undefined {

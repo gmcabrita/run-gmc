@@ -16,9 +16,7 @@ describe("uciPromocoes json parser", () => {
 
     const firstEntry = result.entries[0];
     expect(firstEntry.id).toBe("14951");
-    expect(firstEntry.link).toBe(
-      "https://www.ucicinemas.pt/promocoes/estreias-warner-bros-2026/",
-    );
+    expect(firstEntry.link).toBe("https://www.ucicinemas.pt/promocoes/estreias-warner-bros-2026/");
     expect(firstEntry.title).toBe(
       "Estreias Warner Bros 2026 | Habilite-se a ganhar um ano de cinema grátis!",
     );

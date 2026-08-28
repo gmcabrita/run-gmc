@@ -51,7 +51,7 @@ describe("kernelShBlog scraper", () => {
       imageURL: "https://cdn.sanity.io/images/7o5bsuld/production/wrapped.png",
       link: "https://www.kernel.sh/blog/computer-use-2025",
       text: "",
-      title: "\"So how are you better than Browserbase?\"",
+      title: '"So how are you better than Browserbase?"',
     });
   });
 
@@ -69,9 +69,7 @@ describe("kernelShBlog scraper", () => {
       ],
     });
     const encodedNextData = JSON.stringify(nextData).slice(1, -1);
-    const response = new Response(
-      `<script>self.__next_f.push([1,"${encodedNextData}"])</script>`,
-    );
+    const response = new Response(`<script>self.__next_f.push([1,"${encodedNextData}"])</script>`);
     const result = await parse(response);
 
     expect(result.entries).toEqual([

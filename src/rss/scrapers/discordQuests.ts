@@ -32,9 +32,7 @@ const DiscordQuestsPayloadSchema = looseObject({
         starts_at: string(),
       }),
       id: string(),
-      user_status: nullish(
-        looseObject({ claimed_at: nullish(string()) }),
-      ),
+      user_status: nullish(looseObject({ claimed_at: nullish(string()) })),
     }),
   ),
 });

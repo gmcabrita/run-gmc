@@ -6,8 +6,12 @@ describe("anteEstreias scraper", () => {
   it("parses feed metadata", () => {
     const result = parse(html);
 
-    expect(result.id).toBe("https://anteestreias.blogspot.com/search/label/-%20bilhetes%20cinema?m=0");
-    expect(result.link).toBe("https://anteestreias.blogspot.com/search/label/-%20bilhetes%20cinema?m=0");
+    expect(result.id).toBe(
+      "https://anteestreias.blogspot.com/search/label/-%20bilhetes%20cinema?m=0",
+    );
+    expect(result.link).toBe(
+      "https://anteestreias.blogspot.com/search/label/-%20bilhetes%20cinema?m=0",
+    );
     expect(result.title).toBe("Ante-Estreias Cinema");
     expect(result.language).toBe("pt");
   });

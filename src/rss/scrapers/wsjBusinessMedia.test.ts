@@ -53,9 +53,7 @@ describe("wsjBusinessMedia scraper", () => {
     const result = await scrape(fetcher);
 
     expect(result.entries).toHaveLength(4);
-    expect(feedRequest?.url).toBe(
-      "https://feeds.content.dowjones.io/public/rss/WSJcomUSBusiness",
-    );
+    expect(feedRequest?.url).toBe("https://feeds.content.dowjones.io/public/rss/WSJcomUSBusiness");
     expect(feedRequest?.headers.get("Accept")).toContain("application/rss+xml");
   });
 

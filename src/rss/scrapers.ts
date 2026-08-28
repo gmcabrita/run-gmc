@@ -24,7 +24,10 @@ import { get as discordQuests } from "./scrapers/discordQuests";
 import { get as cinemateca } from "./scrapers/cinemateca";
 import { get as cinemaxRtpPassatempos } from "./scrapers/cinemaxRtpPassatempos";
 import { get as epicFreeDesktopGames } from "./scrapers/epicFreeDesktopGames";
-import { getAndroid as epicFreeAndroidGames, getiOS as epicFreeiOSGames } from "./scrapers/epicFreeMobileGames";
+import {
+  getAndroid as epicFreeAndroidGames,
+  getiOS as epicFreeiOSGames,
+} from "./scrapers/epicFreeMobileGames";
 import { get as ercDeliberacoes } from "./scrapers/ercDeliberacoes";
 import { get as ercNoticias } from "./scrapers/ercNoticias";
 import { get as expressoMedia } from "./scrapers/expressoMedia";

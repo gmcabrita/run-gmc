@@ -39,9 +39,9 @@ describe("rssFeedHasAtLeastOneEntry", () => {
   });
 
   it("returns false when rss contains no items", () => {
-    expect(
-      rssFeedHasAtLeastOneEntry(`<?xml version="1.0"?><rss><channel></channel></rss>`),
-    ).toBe(false);
+    expect(rssFeedHasAtLeastOneEntry(`<?xml version="1.0"?><rss><channel></channel></rss>`)).toBe(
+      false,
+    );
   });
 });
 

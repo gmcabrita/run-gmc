@@ -56,14 +56,7 @@ function parseCcpjDatetimeAttr(datetimeAttr: string): Date | undefined {
     return undefined;
   }
 
-  return new Date(
-    parts.year,
-    parts.month - 1,
-    parts.day,
-    parts.hour,
-    parts.minute,
-    parts.second,
-  );
+  return new Date(parts.year, parts.month - 1, parts.day, parts.hour, parts.minute, parts.second);
 }
 
 function hasRequiredFields(entry: RSSEntry): boolean {

@@ -5,7 +5,9 @@ import { addIcs2GcalEndpoint, icsTextToGoogleCalendarUrl } from "./index";
 function googleUrlFrom(text: string): URL {
   const result = icsTextToGoogleCalendarUrl(text);
   expect(result.status).toBe("ok");
-  if (result.status !== "ok") {throw new Error(result.message);}
+  if (result.status !== "ok") {
+    throw new Error(result.message);
+  }
   return new URL(result.url);
 }
 

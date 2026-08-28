@@ -3,10 +3,7 @@ import { getAuthenticationToken } from "./util";
 import { basicAuth } from "hono/basic-auth";
 import { idempotentSendEmail } from "@email";
 import { parse } from "valibot";
-import {
-  CoverflexPocketsResponseSchema,
-  CoverflexTechnologyResponseSchema,
-} from "./schemas";
+import { CoverflexPocketsResponseSchema, CoverflexTechnologyResponseSchema } from "./schemas";
 
 export async function sendAppleCatalogueByEmail(env: CloudflareBindings) {
   const { name, url } = await getAppleCatalogueFile(env);

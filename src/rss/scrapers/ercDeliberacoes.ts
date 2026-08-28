@@ -9,11 +9,7 @@ export function buildRequestUrl(now: Date = new Date()): string {
     Date.UTC(now.getUTCFullYear(), targetMonth + 1, 0),
   ).getUTCDate();
   const dateFrom = new Date(
-    Date.UTC(
-      now.getUTCFullYear(),
-      targetMonth,
-      Math.min(now.getUTCDate(), daysInTargetMonth),
-    ),
+    Date.UTC(now.getUTCFullYear(), targetMonth, Math.min(now.getUTCDate(), daysInTargetMonth)),
   );
   const day = String(dateFrom.getUTCDate()).padStart(2, "0");
   const month = String(dateFrom.getUTCMonth() + 1).padStart(2, "0");

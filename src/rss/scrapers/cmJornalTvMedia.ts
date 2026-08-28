@@ -1,13 +1,6 @@
 import { USERAGENT, consume, isValidRSSEntry, type ScraperContext } from "@rss/common";
 import type { RSSData, RSSEntry } from "@rss/types";
-import {
-  boolean,
-  fallback,
-  looseObject,
-  safeParse,
-  string,
-  type InferOutput,
-} from "valibot";
+import { boolean, fallback, looseObject, safeParse, string, type InferOutput } from "valibot";
 
 const SITE_ORIGIN = "https://www.cmjornal.pt";
 const SECTION_PATH = "/tv-media";
@@ -105,7 +98,9 @@ function normalizeAjaxUrl(value: string): string {
 }
 
 function parsePtDateTime(value: string): Date | undefined {
-  const match = normalizeToken(value).match(/(\d{1,2})\s+de\s+([a-z]+)\s+de\s+(\d{4})\s+as\s+(\d{1,2}):(\d{2})/);
+  const match = normalizeToken(value).match(
+    /(\d{1,2})\s+de\s+([a-z]+)\s+de\s+(\d{4})\s+as\s+(\d{1,2}):(\d{2})/,
+  );
   if (!match) {
     return undefined;
   }
@@ -280,11 +275,7 @@ async function parsePageWithFallback(
     await consume(body);
   } catch (error) {
     const failure = safeParse(RetryableFailureSchema, error);
-    if (
-      !failure.success ||
-      !isRetryableFailure(failure.output) ||
-      draftEntries.length === 0
-    ) {
+    if (!failure.success || !isRetryableFailure(failure.output) || draftEntries.length === 0) {
       throw error;
     }
 
@@ -318,13 +309,8 @@ async function parsePageWithFallback(
   };
 }
 
-function selectBestPage(
-  bestPage: LoadMorePage | undefined,
-  candidate: LoadMorePage,
-): LoadMorePage {
-  return !bestPage || candidate.entries.length > bestPage.entries.length
-    ? candidate
-    : bestPage;
+function selectBestPage(bestPage: LoadMorePage | undefined, candidate: LoadMorePage): LoadMorePage {
+  return !bestPage || candidate.entries.length > bestPage.entries.length ? candidate : bestPage;
 }
 
 function shouldRetryLoad(failure: RetryableFailure | undefined, attempt: number): boolean {

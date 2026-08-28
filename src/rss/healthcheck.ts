@@ -86,9 +86,7 @@ export function getDiscordHealthcheckFailurePayload(
     const isFirstEmbed = index === 0;
     embeds.push({
       color: discordFailureColor,
-      description: isFirstEmbed
-        ? formatHealthcheckSummary(response, overflowCount)
-        : undefined,
+      description: isFirstEmbed ? formatHealthcheckSummary(response, overflowCount) : undefined,
       fields: fields.slice(index, index + discordEmbedFieldLimit),
       title: isFirstEmbed ? "run.gmc healthcheck failed" : "More healthcheck failures",
     });
@@ -153,13 +151,7 @@ function getUrlPathname(url: string): string {
 }
 
 export function getRssHealthcheckPaths(routes: ReadonlyArray<RouteLike>): Array<string> {
-  return [
-    ...new Set(
-      routes
-        .filter((route) => route.method === "GET")
-        .map((route) => route.path),
-    ),
-  ]
+  return [...new Set(routes.filter((route) => route.method === "GET").map((route) => route.path))]
     .filter((path) => path.startsWith("/rss."))
     .filter((path) => !rssHealthcheckExcludedPaths.has(path))
     .sort();

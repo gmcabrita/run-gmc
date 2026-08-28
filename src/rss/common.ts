@@ -20,23 +20,24 @@ const namedHtmlEntities = new Map([
 ]);
 
 export function decodeHtmlEntities(value: string) {
-  return value.replaceAll(/&(#x[0-9a-f]+|#\d+|amp|lt|gt|quot|apos|nbsp);/gi, (match, entity: string) => {
-    const normalizedEntity = entity.toLowerCase();
+  return value.replaceAll(
+    /&(#x[0-9a-f]+|#\d+|amp|lt|gt|quot|apos|nbsp);/gi,
+    (match, entity: string) => {
+      const normalizedEntity = entity.toLowerCase();
 
-    if (normalizedEntity.startsWith("#")) {
-      const radix = normalizedEntity.startsWith("#x") ? 16 : 10;
-      const digits = normalizedEntity.slice(radix === 16 ? 2 : 1);
-      const codePoint = Number.parseInt(digits, radix);
-      const isValidCodePoint =
-        codePoint > 0 &&
-        codePoint <= 0x10_ff_ff &&
-        (codePoint < 0xd8_00 || codePoint > 0xdf_ff);
+      if (normalizedEntity.startsWith("#")) {
+        const radix = normalizedEntity.startsWith("#x") ? 16 : 10;
+        const digits = normalizedEntity.slice(radix === 16 ? 2 : 1);
+        const codePoint = Number.parseInt(digits, radix);
+        const isValidCodePoint =
+          codePoint > 0 && codePoint <= 0x10_ff_ff && (codePoint < 0xd8_00 || codePoint > 0xdf_ff);
 
-      return isValidCodePoint ? String.fromCodePoint(codePoint) : match;
-    }
+        return isValidCodePoint ? String.fromCodePoint(codePoint) : match;
+      }
 
-    return namedHtmlEntities.get(normalizedEntity) ?? match;
-  });
+      return namedHtmlEntities.get(normalizedEntity) ?? match;
+    },
+  );
 }
 
 export function stripInvalidXmlChars(value: string) {

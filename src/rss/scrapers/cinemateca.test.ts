@@ -43,8 +43,12 @@ describe("cinemateca scraper", () => {
     const result = await parse(response);
 
     const firstEntry = result.entries[0];
-    expect(firstEntry.id).toBe("https://www.cinemateca.pt/Programacao.aspx?id=19531&date=2026-02-02");
-    expect(firstEntry.link).toBe("https://www.cinemateca.pt/Programacao.aspx?id=19531&date=2026-02-02");
+    expect(firstEntry.id).toBe(
+      "https://www.cinemateca.pt/Programacao.aspx?id=19531&date=2026-02-02",
+    );
+    expect(firstEntry.link).toBe(
+      "https://www.cinemateca.pt/Programacao.aspx?id=19531&date=2026-02-02",
+    );
     expect(firstEntry.title).toBe("LA VIE DE PLAISIR, de Albert Valentin");
     expect(firstEntry.datetime).toEqual(new Date("2026-02-02 16:30"));
     expect(firstEntry.text).toContain("segunda-feira, 02/02/2026, 16h30");

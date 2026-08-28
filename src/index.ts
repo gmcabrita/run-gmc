@@ -9,15 +9,7 @@ import { addXEndpoints } from "@x";
 import { addIcs2GcalEndpoint } from "./ics2gcal";
 import { checkMauserSc1176StockAndNotify } from "./mauser";
 import { addScrapedRssEndpoints, cacheAgendaLx } from "@rss/scrapers";
-import {
-  array,
-  boolean,
-  looseObject,
-  nullish,
-  parse,
-  string,
-  type InferOutput,
-} from "valibot";
+import { array, boolean, looseObject, nullish, parse, string, type InferOutput } from "valibot";
 import {
   getDiscordHealthcheckErrorPayload,
   getDiscordHealthcheckFailurePayload,
@@ -71,8 +63,12 @@ function parseFertagusDelay(delayText: null | string | undefined) {
 
 function addFertagusDelay(dateTime: Date, hours: number, minutes: number): Date {
   const delayedDateTime = new Date(dateTime);
-  if (minutes) {delayedDateTime.setMinutes(delayedDateTime.getMinutes() + minutes);}
-  if (hours) {delayedDateTime.setHours(delayedDateTime.getHours() + hours);}
+  if (minutes) {
+    delayedDateTime.setMinutes(delayedDateTime.getMinutes() + minutes);
+  }
+  if (hours) {
+    delayedDateTime.setHours(delayedDateTime.getHours() + hours);
+  }
   return delayedDateTime;
 }
 

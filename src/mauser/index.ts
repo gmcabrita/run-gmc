@@ -1,11 +1,5 @@
 import { idempotentSendEmail } from "@email";
-import {
-  object,
-  picklist,
-  safeParse,
-  string,
-  type InferOutput,
-} from "valibot";
+import { object, picklist, safeParse, string, type InferOutput } from "valibot";
 import { createProxiedFetch } from "../proxiedFetch";
 
 const MAUSER_SC1176_PRODUCT_URL =
@@ -45,11 +39,11 @@ function parseMauserStockState(raw: string | null): MauserStockState | undefined
 
 function escapeHtml(value: string): string {
   return value
-    .replaceAll('&', "&amp;")
-    .replaceAll('<', "&lt;")
-    .replaceAll('>', "&gt;")
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
     .replaceAll('"', "&quot;")
-    .replaceAll('\'', "&#39;");
+    .replaceAll("'", "&#39;");
 }
 
 function dailyKey(date: Date): string {
@@ -57,7 +51,10 @@ function dailyKey(date: Date): string {
 }
 
 function normalizeText(value: string): string {
-  return value.replaceAll(/<[^>]+>/g, " ").replaceAll(/\s+/g, " ").trim();
+  return value
+    .replaceAll(/<[^>]+>/g, " ")
+    .replaceAll(/\s+/g, " ")
+    .trim();
 }
 
 function findStockStatus(html: string): { classes: string; snippet: string } | undefined {

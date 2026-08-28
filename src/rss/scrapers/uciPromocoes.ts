@@ -22,9 +22,7 @@ const UciPromocoesPayloadSchema = array(
     introText: nullish(string()),
     name: string(),
     nodeId: number(),
-    promotionImage: nullish(
-      looseObject({ desktop: string() }),
-    ),
+    promotionImage: nullish(looseObject({ desktop: string() })),
     url: string(),
   }),
 );

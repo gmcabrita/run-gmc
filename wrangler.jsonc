@@ -12,12 +12,7 @@
     },
   ],
   "triggers": {
-    "crons": [
-      "* * * * *",
-      "*/15 * * * *",
-      "0 1 * * *",
-      "0 12 * * *",
-    ],
+    "crons": ["* * * * *", "*/15 * * * *", "0 1 * * *", "0 12 * * *"],
   },
   "compatibility_flags": ["nodejs_compat"],
   "version_metadata": {

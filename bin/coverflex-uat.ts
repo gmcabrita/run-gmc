@@ -16,15 +16,21 @@ const API_BASE = "https://menhir-api.coverflex.com/api";
 function loadDevVars() {
   const vars: Record<string, string> = {};
   const devVarsPath = join(process.cwd(), ".dev.vars");
-  if (!existsSync(devVarsPath)) {return vars;}
+  if (!existsSync(devVarsPath)) {
+    return vars;
+  }
 
   const content = readFileSync(devVarsPath, "utf8");
 
   for (const line of content.split("\n")) {
     const trimmed = line.trim();
-    if (!trimmed || trimmed.startsWith("#")) {continue;}
+    if (!trimmed || trimmed.startsWith("#")) {
+      continue;
+    }
     const [key, ...valueParts] = trimmed.split("=");
-    if (key && valueParts) {vars[key] = valueParts.join("=");}
+    if (key && valueParts) {
+      vars[key] = valueParts.join("=");
+    }
   }
 
   return vars;
@@ -62,7 +68,7 @@ async function authenticate(
   email: string,
   password: string,
   otp?: string,
-): Promise<{ refresh_token: string; token: string; }> {
+): Promise<{ refresh_token: string; token: string }> {
   const payload = otp ? { email, otp, password } : { email, password };
 
   const response = await fetch(`${API_BASE}/employee/sessions`, {

@@ -18,10 +18,7 @@ interface CinematecaEntry extends RSSEntry {
 }
 
 function normalizeWS(input: string): string {
-  return input
-    .replaceAll('\u00A0', " ")
-    .replaceAll(/\s+/g, " ")
-    .trim();
+  return input.replaceAll("\u00A0", " ").replaceAll(/\s+/g, " ").trim();
 }
 
 function getPTWeekday(date: Date): string {
@@ -53,7 +50,9 @@ export async function parse(response: Response): Promise<RSSData> {
     .on(".sectionLayoutProgramLeft a[href*='id=']", {
       element(el) {
         const href = el.getAttribute("href");
-        if (!href) {return;}
+        if (!href) {
+          return;
+        }
 
         infoTitleCount = 0;
         const link = new URL(href, BASE_URL).href;

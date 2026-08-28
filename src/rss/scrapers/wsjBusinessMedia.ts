@@ -1,9 +1,4 @@
-import {
-  USERAGENT,
-  decodeHtmlEntities,
-  isValidRSSEntry,
-  type ScraperContext,
-} from "@rss/common";
+import { USERAGENT, decodeHtmlEntities, isValidRSSEntry, type ScraperContext } from "@rss/common";
 import type { RSSData, RSSEntry } from "@rss/types";
 
 const BASE_URL = "https://www.wsj.com/business/media";
@@ -21,9 +16,7 @@ function decodeXmlText(value: string): string {
 }
 
 function tagText(xml: string, tagName: string): string | undefined {
-  const match = new RegExp(`<${tagName}(?:\\s[^>]*)?>([\\s\\S]*?)<\\/${tagName}>`, "i").exec(
-    xml,
-  );
+  const match = new RegExp(`<${tagName}(?:\\s[^>]*)?>([\\s\\S]*?)<\\/${tagName}>`, "i").exec(xml);
   const value = match?.[1];
   return value === undefined ? undefined : decodeXmlText(value);
 }
@@ -39,7 +32,7 @@ function tagAttribute(xml: string, tagName: string, attributeName: string): stri
 }
 
 function normalizeText(value: string): string {
-  return value.replaceAll('\u00A0', " ").replaceAll(/\s+/g, " ").trim();
+  return value.replaceAll("\u00A0", " ").replaceAll(/\s+/g, " ").trim();
 }
 
 function getCanonicalArticleUrl(value: string): string | undefined {

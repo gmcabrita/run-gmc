@@ -107,12 +107,7 @@ describe("cmJornalTvMedia scraper", () => {
 
     const result = await scrapeFirstTwoPages(fetchFn);
 
-    expect(fetchCalls).toEqual([
-      FIRST_PAGE_URL,
-      FIRST_PAGE_URL,
-      FIRST_PAGE_URL,
-      SECOND_PAGE_URL,
-    ]);
+    expect(fetchCalls).toEqual([FIRST_PAGE_URL, FIRST_PAGE_URL, FIRST_PAGE_URL, SECOND_PAGE_URL]);
     expect(result.entries).toHaveLength(4);
   });
 });

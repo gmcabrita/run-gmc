@@ -73,9 +73,7 @@ export async function parse(response: Response): Promise<RSSData> {
     description: "Highlighted Campaigns – Ads of the World",
     entries: entries
       .map((entry) => {
-        const parts = [entry.brand, entry.campaign, entry.agency].filter(
-          (p) => p && p.trim()
-        );
+        const parts = [entry.brand, entry.campaign, entry.agency].filter((p) => p && p.trim());
         const title = parts.join(" | ").trim();
         return {
           id: entry.id,

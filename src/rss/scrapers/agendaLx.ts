@@ -23,41 +23,22 @@ const NamedValueSchema = looseObject({
 const OptionalTextSchema = fallback(nullish(string()), undefined);
 const TextListSchema = pipe(
   union([array(string()), string()]),
-  transform((value) =>
-    Array.isArray(value) ? value : value.length > 0 ? [value] : [],
-  ),
+  transform((value) => (Array.isArray(value) ? value : value.length > 0 ? [value] : [])),
 );
 const AgendaLxEventSchema = looseObject({
-  categories_name_list: fallback(
-    nullish(record(string(), NamedValueSchema)),
-    undefined,
-  ),
+  categories_name_list: fallback(nullish(record(string(), NamedValueSchema)), undefined),
   description: fallback(nullish(array(string())), undefined),
   featured_media_large: OptionalTextSchema,
-  id: pipe(
-    union([string(), number()]),
-    transform(String),
-  ),
+  id: pipe(union([string(), number()]), transform(String)),
   LastDate: OptionalTextSchema,
   link: string(),
   StartDate: OptionalTextSchema,
   string_dates: OptionalTextSchema,
   string_times: OptionalTextSchema,
   subtitle: fallback(nullish(TextListSchema), undefined),
-  tags_name_list: fallback(
-    nullish(record(string(), NamedValueSchema)),
-    undefined,
-  ),
-  title: fallback(
-    nullish(looseObject({ rendered: OptionalTextSchema })),
-    undefined,
-  ),
-  venue: fallback(
-    nullish(
-      record(string(), looseObject({ name: OptionalTextSchema })),
-    ),
-    undefined,
-  ),
+  tags_name_list: fallback(nullish(record(string(), NamedValueSchema)), undefined),
+  title: fallback(nullish(looseObject({ rendered: OptionalTextSchema })), undefined),
+  venue: fallback(nullish(record(string(), looseObject({ name: OptionalTextSchema }))), undefined),
 });
 const AgendaLxEventsPayloadSchema = array(unknown());
 
@@ -112,9 +93,7 @@ function joinNames(values: NamedValues): string {
 
 function buildEventContent(event: AgendaLxEvent, title: string): string {
   const description =
-    event.description && event.description.length > 0
-      ? event.description.join("\n\n")
-      : "";
+    event.description && event.description.length > 0 ? event.description.join("\n\n") : "";
   const venue = readVenue(event);
   const categories = joinNames(event.categories_name_list);
   const tags = joinNames(event.tags_name_list);
@@ -145,11 +124,7 @@ function buildEventContent(event: AgendaLxEvent, title: string): string {
   return content;
 }
 
-function addEventsToFeed(
-  feed: Feed,
-  responses: Array<Array<AgendaLxEvent>>,
-  now: Date,
-): void {
+function addEventsToFeed(feed: Feed, responses: Array<Array<AgendaLxEvent>>, now: Date): void {
   const seenIds = new Set<string>();
 
   for (const responseEvents of responses) {

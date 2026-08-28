@@ -42,7 +42,9 @@ describe("waltDisneyPressReleases scraper", () => {
     const result = await parse(createResponse());
 
     const allLinks = result.entries.map((entry) => entry.link);
-    expect(allLinks).not.toContain("https://thewaltdisneycompany.com/press-releases/featured-item/");
+    expect(allLinks).not.toContain(
+      "https://thewaltdisneycompany.com/press-releases/featured-item/",
+    );
     expect(result.entries[1].link).toBe(
       "https://thewaltdisneycompany.com/press-releases/kristina-schake-to-depart-as-chief-communications-officer-of-the-walt-disney-company/",
     );

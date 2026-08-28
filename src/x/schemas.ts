@@ -102,7 +102,5 @@ export const XOEmbedResponseSchema = looseObject({
 });
 
 export type XPost = InferOutput<typeof XPostSchema>;
-export type XUserByScreenNameResponse = InferOutput<
-  typeof XUserByScreenNameResponseSchema
->;
+export type XUserByScreenNameResponse = InferOutput<typeof XUserByScreenNameResponseSchema>;
 export type XUserTweetsResponse = InferOutput<typeof XUserTweetsResponseSchema>;
