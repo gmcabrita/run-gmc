@@ -21,6 +21,7 @@ import { get as culturgestEventos } from "./scrapers/culturgestEventos";
 import { get as dansvetlovArticles } from "./scrapers/dansvetlovArticles";
 import { get as dentsuNewsReleases } from "./scrapers/dentsuNewsReleases";
 import { get as discordQuests } from "./scrapers/discordQuests";
+import { get as dnMedia } from "./scrapers/dnMedia";
 import { get as cinemateca } from "./scrapers/cinemateca";
 import { get as cinemaxRtpPassatempos } from "./scrapers/cinemaxRtpPassatempos";
 import { get as epicFreeDesktopGames } from "./scrapers/epicFreeDesktopGames";
@@ -92,6 +93,7 @@ const scrapers = {
   dansvetlovArticles,
   dentsuNewsReleases,
   discordQuests,
+  dnMedia,
   epicFreeDesktopGames,
   ercDeliberacoes,
   ercNoticias,
