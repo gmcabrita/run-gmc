@@ -53,6 +53,7 @@ import { get as museuDoOrienteCinema } from "./scrapers/museuDoOrienteCinema";
 import { get as nimas } from "./scrapers/nimas";
 import { get as observadorMedia } from "./scrapers/observadorMedia";
 import { get as peetBlog } from "./scrapers/peetBlog";
+import { get as pressGazetteLatest } from "./scrapers/pressGazetteLatest";
 import { get as primeFreeGames } from "./scrapers/primeFreeGames";
 import { get as publicoMedia } from "./scrapers/publicoMedia";
 import { get as reutersMediaTelecom } from "./scrapers/reutersMediaTelecom";
@@ -119,6 +120,7 @@ const scrapers = {
   nimas,
   observadorMedia,
   peetBlog,
+  pressGazetteLatest,
   primeFreeGames,
   publicoMedia,
   reutersMediaTelecom,

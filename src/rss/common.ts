@@ -14,6 +14,7 @@ const namedHtmlEntities = new Map([
   ["amp", "&"],
   ["apos", "'"],
   ["gt", ">"],
+  ["hellip", "…"],
   ["lt", "<"],
   ["nbsp", " "],
   ["quot", '"'],
@@ -21,7 +22,7 @@ const namedHtmlEntities = new Map([
 
 export function decodeHtmlEntities(value: string) {
   return value.replaceAll(
-    /&(#x[0-9a-f]+|#\d+|amp|lt|gt|quot|apos|nbsp);/gi,
+    /&(#x[0-9a-f]+|#\d+|amp|lt|gt|quot|apos|nbsp|hellip);/gi,
     (match, entity: string) => {
       const normalizedEntity = entity.toLowerCase();
 
