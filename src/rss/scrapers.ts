@@ -17,6 +17,7 @@ import { get as ccbEventos } from "./scrapers/ccbEventos";
 import { get as cinecartaz } from "./scrapers/cinecartaz";
 import { get as ccpjDestaques } from "./scrapers/ccpjDestaques";
 import { get as cmJornalTvMedia } from "./scrapers/cmJornalTvMedia";
+import { get as colossusArticles } from "./scrapers/colossusArticles";
 import { get as culturgestEventos } from "./scrapers/culturgestEventos";
 import { get as dansvetlovArticles } from "./scrapers/dansvetlovArticles";
 import { get as dentsuNewsReleases } from "./scrapers/dentsuNewsReleases";
@@ -90,6 +91,7 @@ const scrapers = {
   cinemateca,
   cinemaxRtpPassatempos,
   cmJornalTvMedia,
+  colossusArticles,
   culturgestEventos,
   dansvetlovArticles,
   dentsuNewsReleases,
