@@ -53,6 +53,7 @@ import { get as mfeMediaForEuropeDocuments } from "./scrapers/mfeMediaForEuropeD
 import { get as museuDoOrienteCinema } from "./scrapers/museuDoOrienteCinema";
 import { get as nimas } from "./scrapers/nimas";
 import { get as observadorMedia } from "./scrapers/observadorMedia";
+import { getParlamentoCccjd as parlamentoCccjd } from "./scrapers/parlamentoCccjd";
 import { get as peetBlog } from "./scrapers/peetBlog";
 import { get as pressGazetteLatest } from "./scrapers/pressGazetteLatest";
 import { get as primeFreeGames } from "./scrapers/primeFreeGames";
@@ -121,6 +122,7 @@ const scrapers = {
   museuDoOrienteCinema,
   nimas,
   observadorMedia,
+  parlamentoCccjd,
   peetBlog,
   pressGazetteLatest,
   primeFreeGames,
@@ -172,9 +174,9 @@ function createRssHandler(getFn: (ctx: ScraperContext) => Promise<RSSData>) {
 
     const rss2 = stripInvalidXmlChars(feed.rss2());
 
-    ctx.header("Content-Type", "application/rss+xml");
+    ctx.header("Content-Type", "application/rss+xml; charset=utf-8");
     ctx.header("Cache-Control", "public, max-age=600");
-    return ctx.text(rss2);
+    return ctx.body(rss2);
   };
 }
 
@@ -196,8 +198,9 @@ export function addScrapedRssEndpoints(app: Hono<{ Bindings: CloudflareBindings 
     );
 
     if (rss2) {
-      ctx.header("Content-Type", "application/rss+xml");
+      ctx.header("Content-Type", "application/rss+xml; charset=utf-8");
       ctx.header("Cache-Control", "public, max-age=600");
+      return ctx.body(rss2);
     }
     return ctx.text(rss2);
   });
@@ -206,8 +209,8 @@ export function addScrapedRssEndpoints(app: Hono<{ Bindings: CloudflareBindings 
   app.get("/rss.cacheAgendaLx", async (ctx) => {
     const rss2 = await cacheAgendaLx(ctx.env);
 
-    ctx.header("Content-Type", "application/rss+xml");
+    ctx.header("Content-Type", "application/rss+xml; charset=utf-8");
     ctx.header("Cache-Control", "public, max-age=600");
-    return ctx.text(rss2);
+    return ctx.body(rss2);
   });
 }

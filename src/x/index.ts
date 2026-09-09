@@ -236,9 +236,9 @@ export function addXEndpoints(app: Hono<{ Bindings: CloudflareBindings }>) {
         }>(cacheKey);
         if (cachedRss && metadata) {
           const remainingTtl = Math.max(0, Math.floor((metadata.expiresAt - Date.now()) / 1000));
-          ctx.header("Content-Type", "application/rss+xml");
+          ctx.header("Content-Type", "application/rss+xml; charset=utf-8");
           ctx.header("Cache-Control", `max-age=${remainingTtl + 1}`);
-          return ctx.text(stripInvalidXmlChars(cachedRss));
+          return ctx.body(stripInvalidXmlChars(cachedRss));
         }
 
         const maxAge = Math.floor(Math.random() * (2400 - 1200 + 1)) + 1200;
@@ -256,9 +256,9 @@ export function addXEndpoints(app: Hono<{ Bindings: CloudflareBindings }>) {
           metadata: { expiresAt: Date.now() + maxAge * 1000 },
         });
 
-        ctx.header("Content-Type", "application/rss+xml");
+        ctx.header("Content-Type", "application/rss+xml; charset=utf-8");
         ctx.header("Cache-Control", `max-age=${maxAge + 1}`);
-        return ctx.text(rss2);
+        return ctx.body(rss2);
       } catch (error: unknown) {
         if (error instanceof Error && error.message == "Rate Limited") {
           ctx.header("Retry-After", `${Math.floor(Math.random() * (240 - 120 + 1)) + 120}`);
