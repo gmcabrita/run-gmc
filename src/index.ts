@@ -7,7 +7,6 @@ import { sendCinecartazEntriesByEmail } from "@rss/scrapers/cinecartaz";
 import { sendCinemaxRtpPassatemposEntriesByEmail } from "@rss/scrapers/cinemaxRtpPassatempos";
 import { addXEndpoints } from "@x";
 import { addIcs2GcalEndpoint } from "./ics2gcal";
-import { checkMauserSc1176StockAndNotify } from "./mauser";
 import { addScrapedRssEndpoints, cacheAgendaLx } from "@rss/scrapers";
 import { array, boolean, looseObject, nullish, parse, string, type InferOutput } from "valibot";
 import {
@@ -434,19 +433,6 @@ export default withSentry(
               "rss.sendCinemaxRtpPassatemposEntriesByEmail",
               async () => {
                 await sendCinemaxRtpPassatemposEntriesByEmail(env);
-              },
-              {
-                checkinMargin: 2,
-                schedule: {
-                  type: "crontab",
-                  value: "* * * * *",
-                },
-              },
-            ),
-            withMonitor(
-              "mauser.checkSc1176StockAndNotify",
-              async () => {
-                await checkMauserSc1176StockAndNotify(env, new Date(controller.scheduledTime));
               },
               {
                 checkinMargin: 2,
