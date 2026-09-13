@@ -1,0 +1,612 @@
+{
+  "days": [
+    {
+      "name": "Terça-feira 15/12",
+      "theaters": [
+        {
+          "name": "Cinemas NOS Ferrara Plaza",
+          "regionId": "f889907b-97ae-4ab7-a8a8-b6c22cc8584d",
+          "theaterId": "bff605fe-f8dc-4d07-85c9-d6f3a868e65a",
+          "location": "41.285103,-8.361283",
+          "sessions": [
+            {
+              "uuid": "93007489-89aa-4a79-a43d-746c4c55c96b",
+              "time": "20:50",
+              "type": "Normal",
+              "description": "Sala 2",
+              "operationalDate": "2026-12-15Z",
+              "format": "2d",
+              "version": "VO"
+            }
+          ]
+        },
+        {
+          "name": "Cinemas NOS Colombo",
+          "regionId": "f989907b-97ae-4ab7-a8a8-b6c22cc8584d",
+          "theaterId": "e0ea3044-4a1b-46b1-bca2-69fd8eae16d7",
+          "location": "38.755174,-9.187056",
+          "sessions": [
+            {
+              "uuid": "e9eafe96-a83e-4d78-be83-a5431791b12c",
+              "time": "21:00",
+              "type": "Normal",
+              "description": "Sala 4",
+              "operationalDate": "2026-12-15Z",
+              "format": "atmos",
+              "version": "VO"
+            },
+            {
+              "uuid": "1077a007-846a-4d05-ad56-1d5b1c85a617",
+              "time": "00:15",
+              "type": "Normal",
+              "description": "Sala 4",
+              "operationalDate": "2026-12-15Z",
+              "format": "atmos",
+              "version": "VO"
+            },
+            {
+              "uuid": "721e8050-8a9e-451a-a3b1-e37950143ff9",
+              "time": "20:20",
+              "type": "Normal",
+              "description": "IMAX",
+              "operationalDate": "2026-12-15Z",
+              "format": "imax",
+              "version": "VO"
+            },
+            {
+              "uuid": "d5f5bbf0-b5a6-4aae-a124-ba43e2275d95",
+              "time": "23:40",
+              "type": "Normal",
+              "description": "IMAX",
+              "operationalDate": "2026-12-15Z",
+              "format": "imax",
+              "version": "VO"
+            }
+          ]
+        },
+        {
+          "name": "Cinemas NOS Braga Parque",
+          "regionId": "26ef691e-ab57-4449-98ca-78460896aa2b",
+          "theaterId": "f9de9674-e3ed-495d-8c40-d9a8abcc3117",
+          "location": "41.558053,-8.405177",
+          "sessions": [
+            {
+              "uuid": "0ed36d07-233c-4e8a-99e4-6253676372db",
+              "time": "20:30",
+              "type": "Normal",
+              "description": "Sala 3",
+              "operationalDate": "2026-12-15Z",
+              "format": "atmos",
+              "version": "VO"
+            },
+            {
+              "uuid": "a4352c0e-4b50-478b-b45e-f69946fee2d0",
+              "time": "00:00",
+              "type": "Normal",
+              "description": "Sala 3",
+              "operationalDate": "2026-12-15Z",
+              "format": "atmos",
+              "version": "VO"
+            }
+          ]
+        },
+        {
+          "name": "Cinemas NOS Mar Algarve Shopping",
+          "regionId": "b96ae19e-81ce-4b04-a2c8-0563dffe910d",
+          "theaterId": "bd354975-cb8a-4c2d-8a9b-6e87782e0915",
+          "location": "37.097527,-7.996048",
+          "sessions": [
+            {
+              "uuid": "eaf42ccb-17cb-45a2-b2c1-bf0cebbba61d",
+              "time": "21:00",
+              "type": "Normal",
+              "description": "Sala 4",
+              "operationalDate": "2026-12-15Z",
+              "format": "atmos",
+              "version": "VO"
+            }
+          ]
+        },
+        {
+          "name": "Cinemas NOS NorteShopping",
+          "regionId": "f889907b-97ae-4ab7-a8a8-b6c22cc8584d",
+          "theaterId": "60cd7224-4e1f-43cf-a6f7-dac90f09e8ac",
+          "location": "41.180532,-8.655573",
+          "sessions": [
+            {
+              "uuid": "fbfff0a5-e6c3-4d75-871e-0a1a4f404866",
+              "time": "20:40",
+              "type": "Premium",
+              "description": "Premium 7",
+              "operationalDate": "2026-12-15Z",
+              "format": "atmos",
+              "version": "VO"
+            },
+            {
+              "uuid": "59f313c3-ce9c-415f-80f1-8d4a7752b098",
+              "time": "20:40",
+              "type": "Normal",
+              "description": "Sala 7",
+              "operationalDate": "2026-12-15Z",
+              "format": "atmos",
+              "version": "VO"
+            },
+            {
+              "uuid": "852c5085-a4cd-490e-a0fc-a79caf451134",
+              "time": "00:00",
+              "type": "Premium",
+              "description": "Premium 7",
+              "operationalDate": "2026-12-15Z",
+              "format": "atmos",
+              "version": "VO"
+            },
+            {
+              "uuid": "43ccb0ed-8a83-4813-bb9d-bd6c2e23856d",
+              "time": "00:00",
+              "type": "Normal",
+              "description": "Sala 7",
+              "operationalDate": "2026-12-15Z",
+              "format": "atmos",
+              "version": "VO"
+            }
+          ]
+        },
+        {
+          "name": "Cinemas NOS Torres Vedras",
+          "regionId": "f989907b-97ae-4ab7-a8a8-b6c22cc8584d",
+          "theaterId": "0daccf88-2236-4c79-a74d-a39a2f563350",
+          "location": "39.102001,-9.252868",
+          "sessions": [
+            {
+              "uuid": "03320ad7-c168-4f74-80f9-9eb3d8becd88",
+              "time": "21:00",
+              "type": "Normal",
+              "description": "Sala 1",
+              "operationalDate": "2026-12-15Z",
+              "format": "2d",
+              "version": "VO"
+            }
+          ]
+        },
+        {
+          "name": "Cinemas NOS Vasco da Gama",
+          "regionId": "f989907b-97ae-4ab7-a8a8-b6c22cc8584d",
+          "theaterId": "4686b0dd-f485-40a6-afcb-5babdcfc467b",
+          "location": "38.768247,-9.097286",
+          "sessions": [
+            {
+              "uuid": "d4a11c2f-f6d9-42e8-b084-eddda3a13667",
+              "time": "21:00",
+              "type": "Normal",
+              "description": "Sala 5",
+              "operationalDate": "2026-12-15Z",
+              "format": "2d",
+              "version": "VO"
+            },
+            {
+              "uuid": "4d0f20ef-67f3-40e2-b6c1-a3b455b78648",
+              "time": "00:15",
+              "type": "Normal",
+              "description": "Sala 5",
+              "operationalDate": "2026-12-15Z",
+              "format": "2d",
+              "version": "VO"
+            }
+          ]
+        },
+        {
+          "name": "Cinemas NOS Odivelas Strada",
+          "regionId": "f989907b-97ae-4ab7-a8a8-b6c22cc8584d",
+          "theaterId": "dcd7d577-ad37-4382-b750-f44940a75b1a",
+          "location": "38.782220,-9.191667",
+          "sessions": [
+            {
+              "uuid": "ff02436e-bc81-4269-a84a-109de65d066c",
+              "time": "20:30",
+              "type": "Normal",
+              "description": "Sala 4",
+              "operationalDate": "2026-12-15Z",
+              "format": "2d",
+              "version": "VO"
+            }
+          ]
+        },
+        {
+          "name": "Cinemas NOS Forum Coimbra",
+          "regionId": "9bc0dffe-6a18-4257-86a8-a3a492934055",
+          "theaterId": "9e83a6e1-6840-4b5d-a4fc-7508699c06ba",
+          "location": "40.211289,-8.442844",
+          "sessions": [
+            {
+              "uuid": "2d46345b-2717-4a53-8bf5-f9b60b510b5a",
+              "time": "21:40",
+              "type": "Normal",
+              "description": "Sala 5",
+              "operationalDate": "2026-12-15Z",
+              "format": "2d",
+              "version": "VO"
+            }
+          ]
+        },
+        {
+          "name": "Cinemas NOS Forum Montijo",
+          "regionId": "f989907b-97ae-4ab7-a8a8-b6c22cc8584d",
+          "theaterId": "433306d2-1f37-4f72-a6eb-83bdb389feb8",
+          "location": "38.694195,-8.941312",
+          "sessions": [
+            {
+              "uuid": "1105149d-f1fa-409b-8812-0fcfd33b2000",
+              "time": "21:45",
+              "type": "Normal",
+              "description": "Sala 1",
+              "operationalDate": "2026-12-15Z",
+              "format": "2d",
+              "version": "VO"
+            }
+          ]
+        },
+        {
+          "name": "Cinemas NOS Gaia Shopping",
+          "regionId": "f889907b-97ae-4ab7-a8a8-b6c22cc8584d",
+          "theaterId": "728fce0f-c50d-4428-9791-779d0d8d9003",
+          "location": "41.117007,-8.622525",
+          "sessions": [
+            {
+              "uuid": "2433edf7-575e-4d61-8342-cb9a2317879c",
+              "time": "21:00",
+              "type": "Normal",
+              "description": "Sala 4",
+              "operationalDate": "2026-12-15Z",
+              "format": "2d",
+              "version": "VO"
+            }
+          ]
+        },
+        {
+          "name": "Cinemas NOS Palácio do Gelo",
+          "regionId": "9bc0dffe-6a18-4257-86a8-a3a492934055",
+          "theaterId": "2dcfa026-07f8-4378-b8ac-0f3c1d26f540",
+          "location": "40.643563,-7.910690",
+          "sessions": [
+            {
+              "uuid": "ff218483-8bb4-47e8-8dbb-cb7fbe8f13e0",
+              "time": "21:00",
+              "type": "Normal",
+              "description": "Sala 1",
+              "operationalDate": "2026-12-15Z",
+              "format": "2d",
+              "version": "VO"
+            }
+          ]
+        },
+        {
+          "name": "Cinemas NOS Foz Plaza",
+          "regionId": "9bc0dffe-6a18-4257-86a8-a3a492934055",
+          "theaterId": "e1f01031-bf13-47ff-a7d7-23647d24ed63",
+          "location": "40.165901,-8.859652",
+          "sessions": [
+            {
+              "uuid": "a27ac4c0-e44a-423f-9574-c1b9ab7039c2",
+              "time": "21:15",
+              "type": "Normal",
+              "description": "Sala 4",
+              "operationalDate": "2026-12-15Z",
+              "format": "2d",
+              "version": "VO"
+            }
+          ]
+        },
+        {
+          "name": "Cinemas NOS CascaiShopping",
+          "regionId": "f989907b-97ae-4ab7-a8a8-b6c22cc8584d",
+          "theaterId": "54b58378-917a-45b3-ab7b-890ae6b567cb",
+          "location": "38.738149,-9.397750",
+          "sessions": [
+            {
+              "uuid": "a7f788ff-24a8-4a8c-aba3-9dd45914e336",
+              "time": "20:30",
+              "type": "Normal",
+              "description": "Sala 4",
+              "operationalDate": "2026-12-15Z",
+              "format": "2d",
+              "version": "VO"
+            },
+            {
+              "uuid": "8b9e1e80-76b5-4e07-b73e-37b106d5285e",
+              "time": "21:30",
+              "type": "Normal",
+              "description": "IMAX",
+              "operationalDate": "2026-12-15Z",
+              "format": "imax",
+              "version": "VO"
+            }
+          ]
+        },
+        {
+          "name": "Cinemas NOS Amoreiras",
+          "regionId": "f989907b-97ae-4ab7-a8a8-b6c22cc8584d",
+          "theaterId": "ea2970b2-8c00-4bd5-8716-586269b2f98f",
+          "location": "38.722801,-9.162378",
+          "sessions": [
+            {
+              "uuid": "bccdf00a-5fc7-43a5-a8de-7276e561e22c",
+              "time": "20:50",
+              "type": "Normal",
+              "description": "Sala NOS XVision",
+              "operationalDate": "2026-12-15Z",
+              "format": "xvision atmos",
+              "version": "VO"
+            }
+          ]
+        },
+        {
+          "name": "Cinemas NOS Parque Atlantico",
+          "regionId": "0cf6ebc6-de24-42c1-a975-e51cd7db97e3",
+          "theaterId": "1eb6acbb-1571-441c-9da3-f97bbb87833a",
+          "location": "37.747574, -25.67566899999997",
+          "sessions": [
+            {
+              "uuid": "95a4d9c5-de20-4d9b-add2-58f89e24a53c",
+              "time": "21:00",
+              "type": "Normal",
+              "description": "Sala 1",
+              "operationalDate": "2026-12-15-01:00",
+              "format": "2d",
+              "version": "VO"
+            }
+          ]
+        },
+        {
+          "name": "Cinemas NOS Parque Nascente",
+          "regionId": "f889907b-97ae-4ab7-a8a8-b6c22cc8584d",
+          "theaterId": "510ca29f-bfd9-4544-a5bf-db7e31508009",
+          "location": "41.174066,-8.565982",
+          "sessions": [
+            {
+              "uuid": "14c53870-9cff-45be-8645-374df22b19b6",
+              "time": "20:40",
+              "type": "Normal",
+              "description": "Sala 3",
+              "operationalDate": "2026-12-15Z",
+              "format": "atmos",
+              "version": "VO"
+            },
+            {
+              "uuid": "69dd0920-b810-4e55-8133-4881e1ece8b5",
+              "time": "00:10",
+              "type": "Normal",
+              "description": "Sala 3",
+              "operationalDate": "2026-12-15Z",
+              "format": "atmos",
+              "version": "VO"
+            }
+          ]
+        },
+        {
+          "name": "Cinemas NOS Mar Matosinhos Shopping",
+          "regionId": "f889907b-97ae-4ab7-a8a8-b6c22cc8584d",
+          "theaterId": "feb840ea-bb8e-4203-9d71-d37690b6d5a3",
+          "location": "41.209937,-8.686301",
+          "sessions": [
+            {
+              "uuid": "c86086d2-1068-405a-bfbc-59da2c6583fd",
+              "time": "20:20",
+              "type": "Normal",
+              "description": "IMAX",
+              "operationalDate": "2026-12-15Z",
+              "format": "imax",
+              "version": "VO"
+            },
+            {
+              "uuid": "5dbd3e13-d0d3-4a9f-b196-49c1b9f8d4b1",
+              "time": "23:50",
+              "type": "Normal",
+              "description": "IMAX",
+              "operationalDate": "2026-12-15Z",
+              "format": "imax",
+              "version": "VO"
+            },
+            {
+              "uuid": "a5620a08-61de-41f3-bdee-a4c77026fea5",
+              "time": "20:50",
+              "type": "Normal",
+              "description": "Sala 4",
+              "operationalDate": "2026-12-15Z",
+              "format": "2d",
+              "version": "VO"
+            },
+            {
+              "uuid": "75b57353-e228-4b89-98d0-eeca0e0abc0d",
+              "time": "00:20",
+              "type": "Normal",
+              "description": "Sala 4",
+              "operationalDate": "2026-12-15Z",
+              "format": "2d",
+              "version": "VO"
+            }
+          ]
+        },
+        {
+          "name": "Cinemas NOS Almada Forum",
+          "regionId": "f989907b-97ae-4ab7-a8a8-b6c22cc8584d",
+          "theaterId": "cf8fe24f-5589-40b8-acac-f2b230c63598",
+          "location": "38.660752,-9.175168",
+          "sessions": [
+            {
+              "uuid": "f7d9c7c4-a386-4e09-817a-770949671d20",
+              "time": "21:00",
+              "type": "Normal",
+              "description": "Sala 2",
+              "operationalDate": "2026-12-15Z",
+              "format": "2d",
+              "version": "VO"
+            }
+          ]
+        },
+        {
+          "name": "Cinemas NOS Nosso Shopping",
+          "regionId": "26ef691e-ab57-4449-98ca-78460896aa2b",
+          "theaterId": "59f0bcf4-f668-4312-8af6-dc1ab8fdfbdd",
+          "location": "41.296846,-7.734714",
+          "sessions": [
+            {
+              "uuid": "62cba95f-d2d1-4bea-8ee5-f5e29780d131",
+              "time": "21:30",
+              "type": "Normal",
+              "description": "Sala 1",
+              "operationalDate": "2026-12-15Z",
+              "format": "2d",
+              "version": "VO"
+            }
+          ]
+        },
+        {
+          "name": "Cinemas NOS Forum Algarve",
+          "regionId": "b96ae19e-81ce-4b04-a2c8-0563dffe910d",
+          "theaterId": "50767870-b6d8-490a-a237-8fdf975abee0",
+          "location": "37.029170,-7.946098",
+          "sessions": [
+            {
+              "uuid": "d5cf9a1c-016a-4733-baa2-334e340f9135",
+              "time": "21:30",
+              "type": "Normal",
+              "description": "Sala 5",
+              "operationalDate": "2026-12-15Z",
+              "format": "2d",
+              "version": "VO"
+            }
+          ]
+        },
+        {
+          "name": "Cinemas NOS Oeiras Parque",
+          "regionId": "f989907b-97ae-4ab7-a8a8-b6c22cc8584d",
+          "theaterId": "9ac5a984-6792-4cec-870c-5e6beaba6d69",
+          "location": "38.705344,-9.301801",
+          "sessions": [
+            {
+              "uuid": "1ade44ef-7608-4392-8a08-266ccedac523",
+              "time": "21:00",
+              "type": "Normal",
+              "description": "Sala 1",
+              "operationalDate": "2026-12-15Z",
+              "format": "atmos",
+              "version": "VO"
+            }
+          ]
+        },
+        {
+          "name": "Cinemas NOS Alameda Shop e Spot",
+          "regionId": "f889907b-97ae-4ab7-a8a8-b6c22cc8584d",
+          "theaterId": "31a79d05-27e3-4fd4-bf19-a7259449f8da",
+          "location": "41.163703,-8.584516",
+          "sessions": [
+            {
+              "uuid": "adc946c1-2dce-4360-b972-0df29a67586e",
+              "time": "21:00",
+              "type": "Normal",
+              "description": "Sala 1",
+              "operationalDate": "2026-12-15Z",
+              "format": "atmos",
+              "version": "VO"
+            }
+          ]
+        },
+        {
+          "name": "Cinemas NOS Forum Madeira",
+          "regionId": "f789907b-97ae-4ab7-a8a8-b6c22cc8584d",
+          "theaterId": "d895b009-af87-4393-b9e7-c334e231a903",
+          "location": "32.636769,-16.943668",
+          "sessions": [
+            {
+              "uuid": "95c55c08-53a2-43ed-bf46-31ae6984741c",
+              "time": "21:00",
+              "type": "Normal",
+              "description": "Sala 4",
+              "operationalDate": "2026-12-15Z",
+              "format": "2d",
+              "version": "VO"
+            }
+          ]
+        },
+        {
+          "name": "Cinemas NOS Leiria Shopping",
+          "regionId": "9bc0dffe-6a18-4257-86a8-a3a492934055",
+          "theaterId": "d7476e6c-db47-437c-ad99-3ce65600345c",
+          "location": "39.73307148922868, -8.823637815342861",
+          "sessions": [
+            {
+              "uuid": "c98015f1-f678-478b-bceb-340a71ee152e",
+              "time": "21:00",
+              "type": "Normal",
+              "description": "Sala NOS XVision",
+              "operationalDate": "2026-12-15Z",
+              "format": "xvision atmos",
+              "version": "VO"
+            }
+          ]
+        },
+        {
+          "name": "Cinemas NOS Évora Plaza",
+          "regionId": "b96ae19e-81ce-4b04-a2c8-0563dffe910d",
+          "theaterId": "0c0f89fb-504c-4e98-9ba0-e31f3d01e28b",
+          "location": "38.5495148,-7.9052461",
+          "sessions": [
+            {
+              "uuid": "ea202000-2b96-4797-8bce-7d4dcbbe925d",
+              "time": "18:40",
+              "type": "Normal",
+              "description": "Sala 1",
+              "operationalDate": "2026-12-15Z",
+              "format": "atmos",
+              "version": "VO"
+            },
+            {
+              "uuid": "40e3863a-069e-4bbc-ae01-20cb9c109465",
+              "time": "21:40",
+              "type": "Normal",
+              "description": "Sala 1",
+              "operationalDate": "2026-12-15Z",
+              "format": "atmos",
+              "version": "VO"
+            }
+          ]
+        },
+        {
+          "name": "Cinemas NOS Glicinias",
+          "regionId": "9bc0dffe-6a18-4257-86a8-a3a492934055",
+          "theaterId": "df3a2f39-5bd2-4b1b-9dbf-84a53e6deb02",
+          "location": "40.626833,-8.644924",
+          "sessions": [
+            {
+              "uuid": "eeaa637e-9438-49c8-8c16-9a6309c51971",
+              "time": "20:20",
+              "type": "Normal",
+              "description": "Sala 1",
+              "operationalDate": "2026-12-15Z",
+              "format": "atmos",
+              "version": "VO"
+            },
+            {
+              "uuid": "b988cfae-fec2-4b8e-8a5f-3c207abfe83d",
+              "time": "23:40",
+              "type": "Normal",
+              "description": "Sala 1",
+              "operationalDate": "2026-12-15Z",
+              "format": "atmos",
+              "version": "VO"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "regions": [
+    { "regionId": "f989907b-97ae-4ab7-a8a8-b6c22cc8584d", "name": "Grande Lisboa", "order": "1" },
+    { "regionId": "f889907b-97ae-4ab7-a8a8-b6c22cc8584d", "name": "Grande Porto", "order": "2" },
+    { "regionId": "26ef691e-ab57-4449-98ca-78460896aa2b", "name": "Norte", "order": "22" },
+    { "regionId": "9bc0dffe-6a18-4257-86a8-a3a492934055", "name": "Centro", "order": "23" },
+    { "regionId": "b96ae19e-81ce-4b04-a2c8-0563dffe910d", "name": "Sul", "order": "24" },
+    { "regionId": "f789907b-97ae-4ab7-a8a8-b6c22cc8584d", "name": "Madeira", "order": "25" },
+    { "regionId": "0cf6ebc6-de24-42c1-a975-e51cd7db97e3", "name": "Açores", "order": "26" }
+  ]
+}

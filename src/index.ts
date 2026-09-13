@@ -7,6 +7,7 @@ import { sendCinecartazEntriesByEmail } from "@rss/scrapers/cinecartaz";
 import { sendCinemaxRtpPassatemposEntriesByEmail } from "@rss/scrapers/cinemaxRtpPassatempos";
 import { addXEndpoints } from "@x";
 import { addIcs2GcalEndpoint } from "./ics2gcal";
+import { addNosCinemasEndpoints, sendNosCinemasSessionsByEmail } from "./nosCinemas";
 import { addScrapedRssEndpoints, cacheAgendaLx } from "@rss/scrapers";
 import { array, boolean, looseObject, nullish, parse, string, type InferOutput } from "valibot";
 import {
@@ -206,6 +207,7 @@ const app = new Hono<{ Bindings: CloudflareBindings }>();
 addCoverflexEndpoints(app);
 addXEndpoints(app);
 addIcs2GcalEndpoint(app);
+addNosCinemasEndpoints(app);
 addScrapedRssEndpoints(app);
 
 app.get("/rss.sendCinecartazEntriesByEmail", async (ctx) => {
@@ -433,6 +435,19 @@ export default withSentry(
               "rss.sendCinemaxRtpPassatemposEntriesByEmail",
               async () => {
                 await sendCinemaxRtpPassatemposEntriesByEmail(env);
+              },
+              {
+                checkinMargin: 2,
+                schedule: {
+                  type: "crontab",
+                  value: "* * * * *",
+                },
+              },
+            ),
+            withMonitor(
+              "nosCinemas.sendMovieSessionsByEmail",
+              async () => {
+                await sendNosCinemasSessionsByEmail(env);
               },
               {
                 checkinMargin: 2,
