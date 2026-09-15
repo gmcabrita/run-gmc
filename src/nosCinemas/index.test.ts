@@ -7,7 +7,9 @@ import {
   getNosCinemasIdempotencyKey,
   getNosCinemasMoviePageUrl,
   getNosCinemasSearchUrl,
+  isRetryableNosCinemasFailure,
   parseNosCinemasSearchResults,
+  retryNosCinemasRequest,
 } from "./index";
 import sessionsJson from "./__fixtures__/dune-sessions.json";
 import searchJson from "./__fixtures__/dune-search.json";
@@ -143,5 +145,71 @@ describe("nosCinemas email", () => {
     expect(key).toMatch(/^nos-cinemas-dune-[0-9a-f]{64}$/);
     expect(sameKey).toBe(key);
     expect(otherKey).not.toBe(key);
+  });
+});
+
+const noSleep = async () => {};
+
+describe("nosCinemas request retries", () => {
+  it("retries timeouts with exponential backoff and returns the first success", async () => {
+    const delays: Array<number> = [];
+    let attempts = 0;
+    const result = await retryNosCinemasRequest(
+      async () => {
+        attempts++;
+        if (attempts < 3) {
+          throw new DOMException("The operation was aborted due to timeout", "TimeoutError");
+        }
+        return "ok";
+      },
+      {
+        sleep: async (ms) => {
+          delays.push(ms);
+        },
+      },
+    );
+    expect(result).toBe("ok");
+    expect(attempts).toBe(3);
+    expect(delays).toEqual([1000, 2000]);
+  });
+
+  it("rethrows after the retry budget is spent", async () => {
+    let attempts = 0;
+    await expect(
+      retryNosCinemasRequest(
+        async () => {
+          attempts++;
+          throw new TypeError("fetch failed");
+        },
+        { retryCount: 2, sleep: noSleep },
+      ),
+    ).rejects.toThrow("fetch failed");
+    expect(attempts).toBe(3);
+  });
+
+  it("does not retry non transient errors", async () => {
+    let attempts = 0;
+    await expect(
+      retryNosCinemasRequest(
+        async () => {
+          attempts++;
+          throw new Error("bad json");
+        },
+        { sleep: noSleep },
+      ),
+    ).rejects.toThrow("bad json");
+    expect(attempts).toBe(1);
+  });
+
+  it("classifies failures", () => {
+    expect(isRetryableNosCinemasFailure({ name: "TimeoutError" })).toBe(true);
+    expect(isRetryableNosCinemasFailure({ name: "TypeError" })).toBe(true);
+    expect(isRetryableNosCinemasFailure({ name: "Error" })).toBe(false);
+    expect(isRetryableNosCinemasFailure({ name: "NosCinemasRequestError", status: 503 })).toBe(
+      true,
+    );
+    expect(isRetryableNosCinemasFailure({ name: "NosCinemasRequestError", status: 404 })).toBe(
+      false,
+    );
   });
 });

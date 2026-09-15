@@ -3,9 +3,12 @@ import { idempotentSendEmail } from "@email";
 import { USERAGENT } from "@rss/common";
 import {
   array,
+  fallback,
   looseObject,
+  number,
   optional,
   parse as parseValibot,
+  safeParse,
   string,
   type GenericSchema,
   type InferOutput,
@@ -21,6 +24,10 @@ const NOS_CINEMAS_SEARCH_PAGE_SIZE = 10;
 // Upper bound on search pages per keyword so a broad keyword cannot run away.
 const NOS_CINEMAS_SEARCH_MAX_PAGES = 5;
 const NOS_CINEMAS_REQUEST_TIMEOUT_MS = 15_000;
+// cinemas.nos.pt intermittently times out or returns 5xx. Each request is
+// retried this many times with exponential backoff before the watch fails.
+const NOS_CINEMAS_REQUEST_RETRY_COUNT = 3;
+const NOS_CINEMAS_REQUEST_RETRY_BASE_DELAY_MS = 1000;
 
 export type NosCinemasWatch = {
   // Session dates to keep, formatted as YYYY-MM-DD. Empty or missing keeps all dates.
@@ -271,28 +278,87 @@ ${sections.join("\n")}`;
   return { body, subject };
 }
 
+class NosCinemasRequestError extends Error {
+  readonly status: number;
+
+  constructor(url: string, status: number) {
+    super(`NOS Cinemas request failed with ${status}: ${url}`);
+    this.name = "NosCinemasRequestError";
+    this.status = status;
+  }
+}
+
+// Shape of a caught request failure. `name` covers DOMException timeouts and
+// TypeError network failures; `status` is set by NosCinemasRequestError.
+const NosCinemasRequestFailureSchema = looseObject({
+  name: fallback(string(), ""),
+  status: optional(number()),
+});
+
+type NosCinemasRequestFailure = InferOutput<typeof NosCinemasRequestFailureSchema>;
+
+// Timeouts, network failures, and server side errors are transient.
+// Client errors (4xx) and parse failures are not, so they fail immediately.
+export function isRetryableNosCinemasFailure(failure: NosCinemasRequestFailure): boolean {
+  if (failure.status !== undefined) {
+    return failure.status >= 500 || failure.status === 429;
+  }
+  return (
+    failure.name === "TimeoutError" || failure.name === "AbortError" || failure.name === "TypeError"
+  );
+}
+
+export async function retryNosCinemasRequest<T>(
+  request: () => Promise<T>,
+  options: {
+    retryCount?: number;
+    sleep?: (ms: number) => Promise<void>;
+  } = {},
+): Promise<T> {
+  const retryCount = options.retryCount ?? NOS_CINEMAS_REQUEST_RETRY_COUNT;
+  const sleep =
+    options.sleep ?? ((ms: number) => new Promise<void>((resolve) => setTimeout(resolve, ms)));
+
+  for (let attempt = 0; ; attempt++) {
+    try {
+      return await request();
+    } catch (error) {
+      const failure = safeParse(NosCinemasRequestFailureSchema, error);
+      if (
+        !failure.success ||
+        !isRetryableNosCinemasFailure(failure.output) ||
+        attempt >= retryCount
+      ) {
+        throw error;
+      }
+      await sleep(NOS_CINEMAS_REQUEST_RETRY_BASE_DELAY_MS * 2 ** attempt);
+    }
+  }
+}
+
+async function fetchNosCinemasResponse(url: string, accept: string): Promise<Response> {
+  return retryNosCinemasRequest(async () => {
+    const response = await fetch(url, {
+      headers: { accept, "user-agent": USERAGENT },
+      signal: AbortSignal.timeout(NOS_CINEMAS_REQUEST_TIMEOUT_MS),
+    });
+    if (!response.ok) {
+      throw new NosCinemasRequestError(url, response.status);
+    }
+    return response;
+  });
+}
+
 async function fetchNosCinemasJson<TSchema extends GenericSchema>(
   url: string,
   schema: TSchema,
 ): Promise<InferOutput<TSchema>> {
-  const response = await fetch(url, {
-    headers: { accept: "application/json", "user-agent": USERAGENT },
-    signal: AbortSignal.timeout(NOS_CINEMAS_REQUEST_TIMEOUT_MS),
-  });
-  if (!response.ok) {
-    throw new Error(`NOS Cinemas request failed with ${response.status}: ${url}`);
-  }
+  const response = await fetchNosCinemasResponse(url, "application/json");
   return parseValibot(schema, JSON.parse(decodeNosCinemasBody(await response.arrayBuffer())));
 }
 
 async function fetchNosCinemasHtml(url: string): Promise<string> {
-  const response = await fetch(url, {
-    headers: { accept: "text/html", "user-agent": USERAGENT },
-    signal: AbortSignal.timeout(NOS_CINEMAS_REQUEST_TIMEOUT_MS),
-  });
-  if (!response.ok) {
-    throw new Error(`NOS Cinemas request failed with ${response.status}: ${url}`);
-  }
+  const response = await fetchNosCinemasResponse(url, "text/html");
   return response.text();
 }
 
