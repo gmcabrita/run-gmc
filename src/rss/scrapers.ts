@@ -7,7 +7,6 @@ import { get as adAgeNews } from "./scrapers/adAgeNews";
 import { get as adsOfTheWorldBlog } from "./scrapers/adsOfTheWorldBlog";
 import { cacheAgendaLx } from "./scrapers/agendaLx";
 import { get as agendaLxPdf } from "./scrapers/agendaLxPdf";
-import { get as antibotBlog } from "./scrapers/antibotBlog";
 import { get as autoRegulacaoPublicitariaDeliberacoes } from "./scrapers/autoRegulacaoPublicitariaDeliberacoes";
 import { get as azerpasBlog } from "./scrapers/azerpasBlog";
 
@@ -50,7 +49,6 @@ import { get as kitLangtonBlog } from "./scrapers/kitLangtonBlog";
 import { get as lbbonlineInternational } from "./scrapers/lbbonlineInternational";
 import { get as marktestPodScope } from "./scrapers/marktestPodScope";
 import { get as mfeMediaForEuropeDocuments } from "./scrapers/mfeMediaForEuropeDocuments";
-import { get as museuDoOrienteCinema } from "./scrapers/museuDoOrienteCinema";
 import { get as nimas } from "./scrapers/nimas";
 import { get as observadorMedia } from "./scrapers/observadorMedia";
 import { getParlamentoCccjd as parlamentoCccjd } from "./scrapers/parlamentoCccjd";
@@ -80,7 +78,6 @@ const scrapers = {
   adsOfTheWorldBlog,
   agendaLxPdf,
   anteEstreias,
-  antibotBlog,
   autoRegulacaoPublicitariaDeliberacoes,
   azerpasBlog,
   bbcMediaCentreLatestNews,
@@ -119,7 +116,6 @@ const scrapers = {
   lbbonlineInternational,
   marktestPodScope,
   mfeMediaForEuropeDocuments,
-  museuDoOrienteCinema,
   nimas,
   observadorMedia,
   parlamentoCccjd,
