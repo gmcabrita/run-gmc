@@ -120,6 +120,8 @@ export async function sendCinecartazQuestionsByEmail(env: CloudflareBindings) {
 
 export function addCinecartazQuestionEndpoints(app: Hono<{ Bindings: CloudflareBindings }>): void {
   app.get("/cinecartaz.sendPassatempoQuestionsByEmail", async (ctx) => {
-    return ctx.json(await sendCinecartazQuestionsByEmail(ctx.env));
+    return ctx.json(await sendCinecartazQuestionsByEmail(ctx.env), 200, {
+      "Content-Type": "application/json; charset=utf-8",
+    });
   });
 }

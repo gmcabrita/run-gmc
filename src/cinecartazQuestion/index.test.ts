@@ -1,5 +1,10 @@
-import { describe, expect, it } from "vitest";
-import { buildCinecartazQuestionEmail, parseCinecartazQuestionPage } from "./index";
+import { Hono } from "hono";
+import { afterEach, describe, expect, it, vi } from "vitest";
+import {
+  addCinecartazQuestionEndpoints,
+  buildCinecartazQuestionEmail,
+  parseCinecartazQuestionPage,
+} from "./index";
 import pendingHtml from "./__fixtures__/veredito-social-pending.html";
 
 const PLACEHOLDER =
@@ -10,6 +15,23 @@ function htmlResponse(html: string) {
 }
 
 describe("cinecartaz passatempo question", () => {
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  it("serves the endpoint response as utf-8 JSON", async () => {
+    vi.spyOn(globalThis, "fetch").mockResolvedValue(htmlResponse(pendingHtml));
+    const app = new Hono<{ Bindings: CloudflareBindings }>();
+    addCinecartazQuestionEndpoints(app);
+
+    const response = await app.request("/cinecartaz.sendPassatempoQuestionsByEmail");
+
+    expect(response.headers.get("Content-Type")).toBe("application/json; charset=utf-8");
+    const body = new TextDecoder("utf-8").decode(await response.arrayBuffer());
+    expect(body).toContain('"posted":false');
+    expect(body).toContain("será colocada");
+  });
+
   it("reports the question as not posted while the placeholder is shown", async () => {
     const status = await parseCinecartazQuestionPage(htmlResponse(pendingHtml));
 
