@@ -8,6 +8,10 @@ import { sendCinemaxRtpPassatemposEntriesByEmail } from "@rss/scrapers/cinemaxRt
 import { addXEndpoints } from "@x";
 import { addIcs2GcalEndpoint } from "./ics2gcal";
 import { addNosCinemasEndpoints, sendNosCinemasSessionsByEmail } from "./nosCinemas";
+import {
+  addCinecartazQuestionEndpoints,
+  sendCinecartazQuestionsByEmail,
+} from "./cinecartazQuestion";
 import { addScrapedRssEndpoints, cacheAgendaLx } from "@rss/scrapers";
 import { array, boolean, looseObject, nullish, parse, string, type InferOutput } from "valibot";
 import {
@@ -208,6 +212,7 @@ addCoverflexEndpoints(app);
 addXEndpoints(app);
 addIcs2GcalEndpoint(app);
 addNosCinemasEndpoints(app);
+addCinecartazQuestionEndpoints(app);
 addScrapedRssEndpoints(app);
 
 app.get("/rss.sendCinecartazEntriesByEmail", async (ctx) => {
@@ -458,6 +463,21 @@ export default withSentry(
               },
             ),
           ]);
+          break;
+        case "*/5 * * * *":
+          await withMonitor(
+            "cinecartaz.sendPassatempoQuestionsByEmail",
+            async () => {
+              await sendCinecartazQuestionsByEmail(env);
+            },
+            {
+              checkinMargin: 2,
+              schedule: {
+                type: "crontab",
+                value: "*/5 * * * *",
+              },
+            },
+          );
           break;
         case "*/15 * * * *":
           await withMonitor(
