@@ -47,7 +47,7 @@ describe("cinecartaz passatempo question", () => {
 
   it("checks every passatempo on the listing page", async () => {
     mockCinecartazPages({});
-    const app = new Hono<{ Bindings: CloudflareBindings }>();
+    const app = new Hono<{ Bindings: Env }>();
     addCinecartazQuestionEndpoints(app);
 
     const response = await app.request("/cinecartaz.sendPassatempoQuestionsByEmail");
@@ -73,7 +73,7 @@ describe("cinecartaz passatempo question", () => {
 
   it("serves the endpoint response as utf-8 JSON", async () => {
     mockCinecartazPages({});
-    const app = new Hono<{ Bindings: CloudflareBindings }>();
+    const app = new Hono<{ Bindings: Env }>();
     addCinecartazQuestionEndpoints(app);
 
     const response = await app.request("/cinecartaz.sendPassatempoQuestionsByEmail");

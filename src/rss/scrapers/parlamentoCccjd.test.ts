@@ -127,7 +127,7 @@ describe("parlamentoCccjd scraper", () => {
 
   it("serves the registered RSS endpoint through the authenticated HTTP relay", async () => {
     const fetchSpy = vi.spyOn(globalThis, "fetch").mockResolvedValue(createParlamentoResponse());
-    const app = new Hono<{ Bindings: CloudflareBindings }>();
+    const app = new Hono<{ Bindings: Env }>();
     addScrapedRssEndpoints(app);
     const response = await app.request("/rss.parlamentoCccjd", undefined, relayEnv);
     expect(fetchSpy).toHaveBeenCalledTimes(1);
@@ -146,7 +146,7 @@ describe("parlamentoCccjd scraper", () => {
 
   it("returns an error when the source request fails", async () => {
     vi.spyOn(globalThis, "fetch").mockResolvedValue(new Response("Unavailable", { status: 503 }));
-    const app = new Hono<{ Bindings: CloudflareBindings }>();
+    const app = new Hono<{ Bindings: Env }>();
     addScrapedRssEndpoints(app);
     app.onError((error, ctx) => ctx.text(error.message, 502));
     const response = await app.request("/rss.parlamentoCccjd", undefined, relayEnv);

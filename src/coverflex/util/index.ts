@@ -68,7 +68,7 @@ async function refreshSession(refreshToken: string): Promise<CoverflexAuthRespon
   return parse(CoverflexAuthResponseSchema, await response.json());
 }
 
-async function loginWithCredentials(env: CloudflareBindings): Promise<CoverflexAuthResponse> {
+async function loginWithCredentials(env: Env): Promise<CoverflexAuthResponse> {
   const response = await fetch("https://menhir-api.coverflex.com/api/employee/sessions", {
     body: JSON.stringify({
       email: env.COVERFLEX_EMAIL,
@@ -97,7 +97,7 @@ async function loginWithCredentials(env: CloudflareBindings): Promise<CoverflexA
   return parse(CoverflexAuthResponseSchema, await response.json());
 }
 
-export async function getAuthenticationToken(env: CloudflareBindings): Promise<string> {
+export async function getAuthenticationToken(env: Env): Promise<string> {
   const kv = env.RUN_GMC_GENERIC_CACHE_KV;
 
   // Try cached token first

@@ -102,7 +102,7 @@ async function fetchCinecartazPage(url: string): Promise<Response> {
   return response;
 }
 
-async function checkCinecartazQuestion(env: CloudflareBindings, url: string) {
+async function checkCinecartazQuestion(env: Env, url: string) {
   const status = await parseCinecartazQuestionPage(await fetchCinecartazPage(url));
   let emailed = false;
   if (status.posted) {
@@ -115,7 +115,7 @@ async function checkCinecartazQuestion(env: CloudflareBindings, url: string) {
   return { ...status, emailed, url };
 }
 
-export async function sendCinecartazQuestionsByEmail(env: CloudflareBindings) {
+export async function sendCinecartazQuestionsByEmail(env: Env) {
   const results: Array<CinecartazQuestionStatus & { emailed: boolean; url: string }> = [];
   const errors: Array<unknown> = [];
   // Watch every passatempo currently listed on the passatempos page.
@@ -139,7 +139,7 @@ export async function sendCinecartazQuestionsByEmail(env: CloudflareBindings) {
   return results;
 }
 
-export function addCinecartazQuestionEndpoints(app: Hono<{ Bindings: CloudflareBindings }>): void {
+export function addCinecartazQuestionEndpoints(app: Hono<{ Bindings: Env }>): void {
   app.get("/cinecartaz.sendPassatempoQuestionsByEmail", async (ctx) => {
     return ctx.json(await sendCinecartazQuestionsByEmail(ctx.env), 200, {
       "Content-Type": "application/json; charset=utf-8",

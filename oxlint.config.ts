@@ -19,7 +19,7 @@ export default defineConfig({
     ".roo/**",
     ".windsurf/**",
     "tools/oxlint/anti-slop/**",
-    "worker-configuration.d.ts",
+    ".cloudflare/**",
   ],
   jsPlugins: [
     {

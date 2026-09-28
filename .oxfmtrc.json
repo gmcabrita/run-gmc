@@ -15,6 +15,6 @@
     "src/cinecartazQuestion/__fixtures__/**",
     "src/rss/scrapers/__fixtures__/**",
     "tools/oxlint/anti-slop/**",
-    "worker-configuration.d.ts"
+    ".cloudflare/**"
   ]
 }

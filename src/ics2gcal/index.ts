@@ -312,7 +312,7 @@ export function icsTextToGoogleCalendarUrl(text: string): IcsToGoogleCalendarUrl
   return { status: "ok", url: eventToGoogleCalendarUrl(event).url };
 }
 
-export function addIcs2GcalEndpoint(app: Hono<{ Bindings: CloudflareBindings }>) {
+export function addIcs2GcalEndpoint(app: Hono<{ Bindings: Env }>) {
   app.post("/ics2gcal", async (ctx) => {
     const result = icsTextToGoogleCalendarUrl(await ctx.req.text());
 

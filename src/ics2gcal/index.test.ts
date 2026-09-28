@@ -120,7 +120,7 @@ END:VCALENDAR`);
 
 describe("addIcs2GcalEndpoint", () => {
   it("serves POST /ics2gcal as plaintext", async () => {
-    const app = new Hono<{ Bindings: CloudflareBindings }>();
+    const app = new Hono<{ Bindings: Env }>();
     addIcs2GcalEndpoint(app);
 
     const response = await app.request("/ics2gcal", {
@@ -141,7 +141,7 @@ END:VCALENDAR`,
   });
 
   it("returns 400 for invalid ICS plaintext", async () => {
-    const app = new Hono<{ Bindings: CloudflareBindings }>();
+    const app = new Hono<{ Bindings: Env }>();
     addIcs2GcalEndpoint(app);
 
     const response = await app.request("/ics2gcal", {

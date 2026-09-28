@@ -6,7 +6,7 @@ export type XCredentials = {
 export const PUBLIC_ACCOUNT_INDICES = [1, 2, 3] as const;
 export type PublicAccountIndex = (typeof PUBLIC_ACCOUNT_INDICES)[number];
 type XCredentialsBindings = Pick<
-  CloudflareBindings,
+  Env,
   "X_BEARER" | "X_COOKIE" | "X1_COOKIE" | "X2_COOKIE" | "X3_COOKIE"
 >;
 

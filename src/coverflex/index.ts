@@ -5,7 +5,7 @@ import { idempotentSendEmail } from "@email";
 import { parse } from "valibot";
 import { CoverflexPocketsResponseSchema, CoverflexTechnologyResponseSchema } from "./schemas";
 
-export async function sendAppleCatalogueByEmail(env: CloudflareBindings) {
+export async function sendAppleCatalogueByEmail(env: Env) {
   const { name, url } = await getAppleCatalogueFile(env);
 
   const idempotencyURL = new URL(url);
@@ -19,7 +19,7 @@ export async function sendAppleCatalogueByEmail(env: CloudflareBindings) {
   });
 }
 
-async function getAppleCatalogueFile(env: CloudflareBindings) {
+async function getAppleCatalogueFile(env: Env) {
   const url = "https://menhir-api.coverflex.com/api/employee/benefits/technology";
   const options = {
     headers: {
@@ -63,7 +63,7 @@ async function getAppleCatalogueFile(env: CloudflareBindings) {
   return { name: file.name, url: file.url };
 }
 
-async function getCoverflexBudget(env: CloudflareBindings) {
+async function getCoverflexBudget(env: Env) {
   const url = "https://menhir-api.coverflex.com/api/employee/pockets";
   const options = {
     headers: {
@@ -104,7 +104,7 @@ async function getCoverflexBudget(env: CloudflareBindings) {
   return { budget: `${currentBudget}€` };
 }
 
-export function addCoverflexEndpoints(app: Hono<{ Bindings: CloudflareBindings }>) {
+export function addCoverflexEndpoints(app: Hono<{ Bindings: Env }>) {
   app.get(
     "/coverflex.getBudget",
     async (ctx, next) => {

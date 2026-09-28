@@ -2,12 +2,11 @@
   "name": "run-gmc",
   "type": "module",
   "scripts": {
-    "localflare": "localflare attach",
-    "dev": "wrangler dev",
-    "build": "wrangler deploy --minify --outdir dist --dry-run",
-    "sentry:sourcemaps": "sentry-cli sourcemaps inject dist && sentry-cli sourcemaps upload --org=goncalo-mendes-cabrita --project=run-gmc dist",
-    "deploy": "pnpm build && pnpm sentry:sourcemaps && wrangler deploy dist/index.js --no-bundle --upload-source-maps",
-    "cf-typegen": "wrangler types --env-interface CloudflareBindings",
+    "dev": "cf dev",
+    "build": "cf build",
+    "sentry:sourcemaps": "sentry-cli sourcemaps inject .cloudflare/output/v0/workers/default/bundle && sentry-cli sourcemaps upload --org=goncalo-mendes-cabrita --project=run-gmc .cloudflare/output/v0/workers/default/bundle",
+    "deploy": "pnpm build && pnpm sentry:sourcemaps && cf deploy --prebuilt",
+    "cf-typegen": "cf workers types",
     "coverflex-uat": "pnpm dlx tsx bin/coverflex-uat.ts",
     "test": "vitest",
     "fmt": "oxfmt --write .",
@@ -24,18 +23,18 @@
     "xml2js": "^0.6.2"
   },
   "devDependencies": {
+    "@cloudflare/vite-plugin": "2.0.0-beta.sha-ad79608dd",
     "@cloudflare/vitest-pool-workers": "^0.22.0",
     "@nkzw/oxlint-config": "^1.3.0",
     "@oxlint/plugins": "^1.80.0",
     "@sentry/cli": "^3.6.2",
     "@types/node": "^26.4.0",
     "@types/xml2js": "^0.4.14",
-    "localflare": "^0.5.0",
+    "cf": "1.0.0-beta.5",
     "oxfmt": "^0.65.0",
     "oxlint": "^1.80.0",
     "skills": "^1.5.23",
     "vite": "^8.2.2",
-    "vitest": "^4.1.11",
-    "wrangler": "^4.127.0"
+    "vitest": "^4.1.11"
   }
 }

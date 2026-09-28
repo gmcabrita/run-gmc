@@ -14,6 +14,9 @@ dist/
 # deps
 node_modules/
 .wrangler
+# cf build output. Keep the generated Worker types in Git so typecheck works before a build.
+.cloudflare/*
+!.cloudflare/types/
 
 # env
 .env
@@ -34,8 +37,5 @@ lerna-debug.log*
 
 # Sentry Config File
 .sentryclirc
-
-# Localflare generated files
-.localflare/
 
 .agents/skills/install-anti-slop

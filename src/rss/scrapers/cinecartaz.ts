@@ -72,7 +72,7 @@ export async function get(): Promise<RSSData> {
   return parse(response);
 }
 
-export async function sendCinecartazEntriesByEmail(env: CloudflareBindings) {
+export async function sendCinecartazEntriesByEmail(env: Env) {
   const data = await get();
 
   for (const entry of data.entries) {

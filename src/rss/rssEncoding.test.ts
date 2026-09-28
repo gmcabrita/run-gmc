@@ -7,7 +7,7 @@ const PORTUGUESE_TITLE = "Música, audições e petições";
 const CACHED_RSS = `<?xml version="1.0" encoding="utf-8"?><rss version="2.0"><channel><title>${PORTUGUESE_TITLE}</title></channel></rss>`;
 
 function createRssEncodingApp() {
-  const app = new Hono<{ Bindings: CloudflareBindings }>();
+  const app = new Hono<{ Bindings: Env }>();
   addScrapedRssEndpoints(app);
   addXEndpoints(app);
   return app;

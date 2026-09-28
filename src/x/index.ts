@@ -16,7 +16,7 @@ import { buildXApiHeaders, resolveCredentials, type XCredentials } from "./crede
 import { createPrivateProfileNoticeFeed, getTimelineEntries, isProtectedProfile } from "./feed";
 
 async function fetchUser(
-  env: CloudflareBindings,
+  env: Env,
   credentials: XCredentials,
   userName: string,
 ): Promise<XUserByScreenNameResponse> {
@@ -39,7 +39,7 @@ async function fetchUser(
 }
 
 async function fetchPosts(
-  env: CloudflareBindings,
+  env: Env,
   credentials: XCredentials,
   userId: string,
 ): Promise<XUserTweetsResponse> {
@@ -57,10 +57,7 @@ async function fetchPosts(
   return parse(XUserTweetsResponseSchema, await response.json());
 }
 
-async function transformPost(
-  env: CloudflareBindings,
-  post: XPost | undefined,
-): Promise<FeedItem | undefined> {
+async function transformPost(env: Env, post: XPost | undefined): Promise<FeedItem | undefined> {
   if (post?.legacy && post.core) {
     const postUrl = `https://x.com/${post.core.user_results.result.legacy.screen_name}/status/${post.legacy.id_str}`;
 
@@ -81,7 +78,7 @@ async function transformPost(
 }
 
 async function getEmbedWithRetries(
-  env: CloudflareBindings,
+  env: Env,
   postUrl: string,
   retryCount: number,
 ): Promise<string | undefined> {
@@ -99,7 +96,7 @@ async function getEmbedWithRetries(
   }
 }
 
-async function getEmbed(env: CloudflareBindings, postUrl: string): Promise<string> {
+async function getEmbed(env: Env, postUrl: string): Promise<string> {
   const cachedHtml = await env.RUN_GMC_X_CACHE_KV.get(postUrl);
 
   if (cachedHtml) {
@@ -193,7 +190,7 @@ function createXFeed(userName: string, entries: ReadonlyArray<TimelineEntry>): F
   });
 }
 
-async function x2Rss(env: CloudflareBindings, userName: string, data: XUserTweetsResponse) {
+async function x2Rss(env: Env, userName: string, data: XUserTweetsResponse) {
   const entries = getTimelineEntries(data);
   const feed = createXFeed(userName, entries);
 
@@ -209,7 +206,7 @@ async function x2Rss(env: CloudflareBindings, userName: string, data: XUserTweet
   return feed;
 }
 
-export function addXEndpoints(app: Hono<{ Bindings: CloudflareBindings }>) {
+export function addXEndpoints(app: Hono<{ Bindings: Env }>) {
   app.get(
     "/rss.x",
     async (ctx, next) => {

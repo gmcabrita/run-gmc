@@ -3,6 +3,42 @@ import { defineConfig } from "vitest/config";
 import { resolve } from "node:path";
 import { readFileSync } from "node:fs";
 import type { Plugin } from "vite";
+import cloudflareConfig from "./cloudflare.config";
+
+// vitest-pool-workers reads only Wrangler config files. Pass the runtime
+// settings and bindings from cloudflare.config.ts to Miniflare. Tests use local
+// KV and email bindings. Secrets are not loaded.
+function getMiniflareOptions() {
+  const { compatibilityDate, compatibilityFlags, env } = cloudflareConfig.worker;
+  const bindings: Record<string, string> = {};
+  const kvNamespaces: Record<string, string> = {};
+  const sendEmail: Array<{ name: string }> = [];
+  let versionMetadata: string | undefined;
+  for (const [name, binding] of Object.entries(env)) {
+    switch (binding.type) {
+      case "text":
+        bindings[name] = binding.value;
+        break;
+      case "kv":
+        kvNamespaces[name] = name;
+        break;
+      case "send-email":
+        sendEmail.push({ name });
+        break;
+      case "version-metadata":
+        versionMetadata = name;
+        break;
+    }
+  }
+  return {
+    bindings,
+    compatibilityDate,
+    compatibilityFlags,
+    email: { send_email: sendEmail },
+    kvNamespaces,
+    versionMetadata,
+  };
+}
 
 function rawTextPlugin(): Plugin {
   return {
@@ -23,8 +59,9 @@ export default defineConfig({
   plugins: [
     rawTextPlugin(),
     cloudflareTest({
+      main: cloudflareConfig.worker.entrypoint,
+      miniflare: getMiniflareOptions(),
       remoteBindings: false,
-      wrangler: { configPath: "./wrangler.jsonc" },
     }),
   ],
   resolve: {

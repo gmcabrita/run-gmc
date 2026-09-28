@@ -1,5 +1,5 @@
 export async function idempotentSendEmail(
-  env: CloudflareBindings,
+  env: Env,
   {
     body,
     idempotencyKey,
@@ -26,7 +26,7 @@ export async function idempotentSendEmail(
 }
 
 export async function sendEmail(
-  env: CloudflareBindings,
+  env: Env,
   {
     body,
     subject,

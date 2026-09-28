@@ -131,7 +131,7 @@ async function main() {
   console.log("\nUser Agent Token:", userAgentToken);
 
   console.log(
-    "\nMake sure to update:\n$EDITOR .dev.vars\npnpm wrangler secret put COVERFLEX_USER_AGENT_TOKEN",
+    "\nMake sure to update:\n$EDITOR .dev.vars\npnpm cf workers secrets update COVERFLEX_USER_AGENT_TOKEN --worker run-gmc --text <token>",
   );
 }
 

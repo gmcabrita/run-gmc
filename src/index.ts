@@ -128,7 +128,7 @@ function reportDiscordHealthcheckPayload(
 
 async function fetchRssHealthcheckUrl(
   url: string,
-  env: CloudflareBindings,
+  env: Env,
   executionCtx: HonoExecutionContext,
 ): Promise<RssHealthcheckFetchResult> {
   const response = await app.fetch(new Request(url), env, executionCtx);
@@ -155,7 +155,7 @@ async function fetchHttpHealthcheckUrl(url: string): Promise<RssHealthcheckFetch
 function fetchHealthcheckUrl(
   url: string,
   externalUrls: ReadonlyArray<string>,
-  env: CloudflareBindings,
+  env: Env,
   executionCtx: HonoExecutionContext,
 ): Promise<RssHealthcheckFetchResult> {
   return externalUrls.includes(url)
@@ -165,7 +165,7 @@ function fetchHealthcheckUrl(
 
 function reportRssHealthcheck(
   summary: RssHealthcheckResponse,
-  env: CloudflareBindings,
+  env: Env,
   executionCtx: HonoExecutionContext,
 ): void {
   const passed = summary.failures.length === 0;
@@ -181,7 +181,7 @@ function reportRssHealthcheck(
 
 async function runRssHealthcheckAndReport(
   origin: string,
-  env: CloudflareBindings,
+  env: Env,
   executionCtx: HonoExecutionContext,
 ): Promise<RssHealthcheckResponse> {
   try {
@@ -207,7 +207,7 @@ async function runRssHealthcheckAndReport(
   }
 }
 
-const app = new Hono<{ Bindings: CloudflareBindings }>();
+const app = new Hono<{ Bindings: Env }>();
 addCoverflexEndpoints(app);
 addXEndpoints(app);
 addIcs2GcalEndpoint(app);
@@ -405,7 +405,7 @@ app.get(
 );
 
 export default withSentry(
-  (env: CloudflareBindings) => {
+  (env: Env) => {
     const { id: versionId } = env.CF_VERSION_METADATA;
     return {
       dsn: env.SENTRY_DSN,
@@ -526,5 +526,5 @@ export default withSentry(
           break;
       }
     },
-  } satisfies ExportedHandler<CloudflareBindings>,
+  } satisfies ExportedHandler<Env>,
 );

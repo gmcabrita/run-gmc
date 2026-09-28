@@ -147,7 +147,7 @@ function addEventsToFeed(feed: Feed, responses: Array<Array<AgendaLxEvent>>, now
   }
 }
 
-export async function cacheAgendaLx(env: CloudflareBindings) {
+export async function cacheAgendaLx(env: Env) {
   const feed = new Feed({
     copyright: "",
     description: "Cultural events in Lisbon from AgendaLX",

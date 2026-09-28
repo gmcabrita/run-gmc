@@ -176,7 +176,7 @@ function createRssHandler(getFn: (ctx: ScraperContext) => Promise<RSSData>) {
   };
 }
 
-export function addScrapedRssEndpoints(app: Hono<{ Bindings: CloudflareBindings }>) {
+export function addScrapedRssEndpoints(app: Hono<{ Bindings: Env }>) {
   // Standard scrapers
   for (const [name, scraper] of Object.entries(scrapers)) {
     app.get(`/rss.${name}`, createRssHandler(scraper));

@@ -470,7 +470,7 @@ export async function findNosCinemasMatches(
 }
 
 async function notifyNosCinemasWatch(
-  env: CloudflareBindings,
+  env: Env,
   watch: NosCinemasWatch,
 ): Promise<NosCinemasWatchResult> {
   const matches = await findNosCinemasMatches(watch);
@@ -497,7 +497,7 @@ export type NosCinemasWatchResult = {
 // Every watch runs even when an earlier one fails. Failures are rethrown
 // together at the end so the Sentry cron monitor still records the run as failed.
 export async function sendNosCinemasSessionsByEmail(
-  env: CloudflareBindings,
+  env: Env,
   watches: ReadonlyArray<NosCinemasWatch> = NOS_CINEMAS_WATCHES,
 ): Promise<Array<NosCinemasWatchResult>> {
   const results: Array<NosCinemasWatchResult> = [];
@@ -518,7 +518,7 @@ export async function sendNosCinemasSessionsByEmail(
   return results;
 }
 
-export function addNosCinemasEndpoints(app: Hono<{ Bindings: CloudflareBindings }>): void {
+export function addNosCinemasEndpoints(app: Hono<{ Bindings: Env }>): void {
   app.get("/nosCinemas.sendMovieSessionsByEmail", async (ctx) => {
     return ctx.json(await sendNosCinemasSessionsByEmail(ctx.env));
   });

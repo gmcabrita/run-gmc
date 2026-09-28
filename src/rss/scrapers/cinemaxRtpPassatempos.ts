@@ -141,7 +141,7 @@ export async function get(_ctx?: ScraperContext): Promise<RSSData> {
   return parse(response);
 }
 
-export async function sendCinemaxRtpPassatemposEntriesByEmail(env: CloudflareBindings) {
+export async function sendCinemaxRtpPassatemposEntriesByEmail(env: Env) {
   const data = await get();
   const unfinishedEntries = data.entries.filter(
     (entry) => !entry.title.includes(FINISHED_TITLE_MARKER),
