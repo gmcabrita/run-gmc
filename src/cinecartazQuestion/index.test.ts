@@ -1,17 +1,43 @@
+import { env } from "cloudflare:workers";
 import { Hono } from "hono";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import {
   addCinecartazQuestionEndpoints,
   buildCinecartazQuestionEmail,
   parseCinecartazQuestionPage,
+  sendCinecartazQuestionsByEmail,
 } from "./index";
 import pendingHtml from "./__fixtures__/veredito-social-pending.html";
 
 const PLACEHOLDER =
   "Os convites ser&#227;o atribu&#237;dos aos primeiros leitores que respondam correctamente &#224; quest&#227;o que aqui ser&#225; colocada hoje, dia 24 de Setembro de 2026, a partir das 11h30.";
 
-function htmlResponse(html: string) {
-  return new Response(html, { headers: { "Content-Type": "text/html" } });
+const PASSATEMPOS_URL = "https://cinecartaz.publico.pt/passatempos";
+const FIRST_PASSATEMPO_URL = "https://cinecartaz.publico.pt/passatempos/primeiro-1";
+const SECOND_PASSATEMPO_URL = "https://cinecartaz.publico.pt/passatempos/segundo-2";
+const LISTING_HTML = [FIRST_PASSATEMPO_URL, SECOND_PASSATEMPO_URL]
+  .map(
+    (url) => `<div class="hobbie-card">
+  <h3 class="hobbie-card__title">${url}</h3>
+  <a class="button--hobbie" href="${new URL(url).pathname}">Participar</a>
+</div>`,
+  )
+  .join("\n");
+
+function htmlResponse(html: string, status = 200) {
+  return new Response(html, { headers: { "Content-Type": "text/html" }, status });
+}
+
+// Serves the listing and every passatempo page. `failures` maps a URL to an HTTP error status.
+function mockCinecartazPages(failures: Record<string, number>) {
+  return vi.spyOn(globalThis, "fetch").mockImplementation(async (input) => {
+    const url = String(input);
+    const failureStatus = failures[url];
+    if (failureStatus !== undefined) {
+      return htmlResponse("", failureStatus);
+    }
+    return htmlResponse(url === PASSATEMPOS_URL ? LISTING_HTML : pendingHtml);
+  });
 }
 
 describe("cinecartaz passatempo question", () => {
@@ -19,8 +45,34 @@ describe("cinecartaz passatempo question", () => {
     vi.restoreAllMocks();
   });
 
+  it("checks every passatempo on the listing page", async () => {
+    mockCinecartazPages({});
+    const app = new Hono<{ Bindings: CloudflareBindings }>();
+    addCinecartazQuestionEndpoints(app);
+
+    const response = await app.request("/cinecartaz.sendPassatempoQuestionsByEmail");
+
+    expect(await response.json()).toEqual([
+      expect.objectContaining({ posted: false, url: FIRST_PASSATEMPO_URL }),
+      expect.objectContaining({ posted: false, url: SECOND_PASSATEMPO_URL }),
+    ]);
+  });
+
+  it("checks the other passatempos when one page fails", async () => {
+    const fetchSpy = mockCinecartazPages({ [FIRST_PASSATEMPO_URL]: 500 });
+
+    await expect(sendCinecartazQuestionsByEmail(env)).rejects.toThrow(AggregateError);
+    expect(fetchSpy.mock.calls.map(([input]) => String(input))).toContain(SECOND_PASSATEMPO_URL);
+  });
+
+  it("fails when the listing page fails", async () => {
+    mockCinecartazPages({ [PASSATEMPOS_URL]: 503 });
+
+    await expect(sendCinecartazQuestionsByEmail(env)).rejects.toThrow("returned 503");
+  });
+
   it("serves the endpoint response as utf-8 JSON", async () => {
-    vi.spyOn(globalThis, "fetch").mockResolvedValue(htmlResponse(pendingHtml));
+    mockCinecartazPages({});
     const app = new Hono<{ Bindings: CloudflareBindings }>();
     addCinecartazQuestionEndpoints(app);
 

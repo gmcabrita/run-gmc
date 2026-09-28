@@ -1,10 +1,11 @@
 import type { Hono } from "hono";
 import { idempotentSendEmail } from "@email";
 import { USERAGENT, consume, decodeHtmlEntities } from "@rss/common";
-import { CINECARTAZ_QUESTION_WATCHES } from "./watches";
+import { parse as parseCinecartazPassatempos } from "../rss/scrapers/cinecartaz";
 
 const NO_BREAK_SPACE = String.fromCodePoint(0xa0);
 const ZERO_WIDTH_SPACE = String.fromCodePoint(0x20_0b);
+const CINECARTAZ_PASSATEMPOS_URL = "https://cinecartaz.publico.pt/passatempos";
 const NOTIFICATION_EMAIL = "goncalo.mendes.cabrita@gmail.com";
 // Before the question goes live the description says it "aqui será colocada".
 const QUESTION_PLACEHOLDER_PATTERN = /ser[áa]\s+colocad[ao]/i;
@@ -88,31 +89,51 @@ export function buildCinecartazQuestionEmail(url: string, status: CinecartazQues
   };
 }
 
+async function fetchCinecartazPage(url: string): Promise<Response> {
+  const response = await fetch(url, {
+    headers: {
+      "Content-Type": "text/html",
+      "user-agent": USERAGENT,
+    },
+  });
+  if (!response.ok) {
+    throw new Error(`Cinecartaz page ${url} returned ${response.status}`);
+  }
+  return response;
+}
+
+async function checkCinecartazQuestion(env: CloudflareBindings, url: string) {
+  const status = await parseCinecartazQuestionPage(await fetchCinecartazPage(url));
+  let emailed = false;
+  if (status.posted) {
+    emailed = await idempotentSendEmail(env, {
+      ...buildCinecartazQuestionEmail(url, status),
+      idempotencyKey: `cinecartaz-question-${url}`,
+      to: NOTIFICATION_EMAIL,
+    });
+  }
+  return { ...status, emailed, url };
+}
+
 export async function sendCinecartazQuestionsByEmail(env: CloudflareBindings) {
   const results: Array<CinecartazQuestionStatus & { emailed: boolean; url: string }> = [];
+  const errors: Array<unknown> = [];
+  // Watch every passatempo currently listed on the passatempos page.
+  const passatempos = await parseCinecartazPassatempos(
+    await fetchCinecartazPage(CINECARTAZ_PASSATEMPOS_URL),
+  );
 
-  for (const url of CINECARTAZ_QUESTION_WATCHES) {
-    const response = await fetch(url, {
-      headers: {
-        "Content-Type": "text/html",
-        "user-agent": USERAGENT,
-      },
-    });
-    if (!response.ok) {
-      throw new Error(`Cinecartaz passatempo ${url} returned ${response.status}`);
+  for (const { link: url } of passatempos.entries) {
+    try {
+      results.push(await checkCinecartazQuestion(env, url));
+    } catch (error) {
+      // Check the other passatempos first, then report the failures.
+      errors.push(error);
     }
+  }
 
-    const status = await parseCinecartazQuestionPage(response);
-    let emailed = false;
-    if (status.posted) {
-      emailed = await idempotentSendEmail(env, {
-        ...buildCinecartazQuestionEmail(url, status),
-        idempotencyKey: `cinecartaz-question-${url}`,
-        to: NOTIFICATION_EMAIL,
-      });
-    }
-
-    results.push({ ...status, emailed, url });
+  if (errors.length > 0) {
+    throw new AggregateError(errors, "Some Cinecartaz passatempo checks failed");
   }
 
   return results;
