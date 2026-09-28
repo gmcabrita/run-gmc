@@ -7,6 +7,7 @@ import {
   getNosCinemasIdempotencyKey,
   getNosCinemasMoviePageUrl,
   getNosCinemasSearchUrl,
+  isNosCinemasUpstreamServiceError,
   isRetryableNosCinemasFailure,
   parseNosCinemasSearchResults,
   retryNosCinemasRequest,
@@ -211,5 +212,28 @@ describe("nosCinemas request retries", () => {
     expect(isRetryableNosCinemasFailure({ name: "NosCinemasRequestError", status: 404 })).toBe(
       false,
     );
+  });
+});
+
+describe("nosCinemas upstream service error", () => {
+  const body = JSON.stringify({
+    errorCode: "NOK-500",
+    errorMessage: "Upstream service error",
+    status: "NOK",
+  });
+
+  it("detects the 502 NOK-500 response", () => {
+    expect(isNosCinemasUpstreamServiceError(502, body)).toBe(true);
+  });
+
+  it("ignores other statuses and bodies", () => {
+    expect(isNosCinemasUpstreamServiceError(500, body)).toBe(false);
+    expect(isNosCinemasUpstreamServiceError(502, "<html>Bad Gateway</html>")).toBe(false);
+    expect(
+      isNosCinemasUpstreamServiceError(
+        502,
+        JSON.stringify({ errorCode: "NOK-404", status: "NOK" }),
+      ),
+    ).toBe(false);
   });
 });

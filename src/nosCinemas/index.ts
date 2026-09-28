@@ -336,13 +336,41 @@ export async function retryNosCinemasRequest<T>(
   }
 }
 
-async function fetchNosCinemasResponse(url: string, accept: string): Promise<Response> {
+const NosCinemasUpstreamServiceErrorSchema = looseObject({
+  errorCode: string(),
+  status: string(),
+});
+
+// The sessions endpoint answers 502 with
+// {"status":"NOK","errorCode":"NOK-500","errorMessage":"Upstream service error"}
+// for movies that have no sessions scheduled yet.
+export function isNosCinemasUpstreamServiceError(status: number, body: string): boolean {
+  if (status !== 502) {
+    return false;
+  }
+  let json: unknown;
+  try {
+    json = JSON.parse(body);
+  } catch {
+    return false;
+  }
+  const parsed = safeParse(NosCinemasUpstreamServiceErrorSchema, json);
+  return parsed.success && parsed.output.status === "NOK" && parsed.output.errorCode === "NOK-500";
+}
+
+async function fetchNosCinemasResponse(
+  url: string,
+  accept: string,
+  // Returns true for a failed response that the caller handles itself.
+  // Such a response is returned to the caller without a retry.
+  isExpectedFailure: (response: Response) => Promise<boolean> = async () => false,
+): Promise<Response> {
   return retryNosCinemasRequest(async () => {
     const response = await fetch(url, {
       headers: { accept, "user-agent": USERAGENT },
       signal: AbortSignal.timeout(NOS_CINEMAS_REQUEST_TIMEOUT_MS),
     });
-    if (!response.ok) {
+    if (!response.ok && !(await isExpectedFailure(response.clone()))) {
       throw new NosCinemasRequestError(url, response.status);
     }
     return response;
@@ -355,6 +383,23 @@ async function fetchNosCinemasJson<TSchema extends GenericSchema>(
 ): Promise<InferOutput<TSchema>> {
   const response = await fetchNosCinemasResponse(url, "application/json");
   return parseValibot(schema, JSON.parse(decodeNosCinemasBody(await response.arrayBuffer())));
+}
+
+async function fetchNosCinemasMovieSessions(
+  aggregateFormatNumber: string,
+): Promise<NosCinemasMovieSessions> {
+  const response = await fetchNosCinemasResponse(
+    getNosCinemasMovieSessionsUrl(aggregateFormatNumber),
+    "application/json",
+    async (failed) => isNosCinemasUpstreamServiceError(failed.status, await failed.text()),
+  );
+  if (!response.ok) {
+    return { days: [] };
+  }
+  return parseValibot(
+    NosCinemasMovieSessionsSchema,
+    JSON.parse(decodeNosCinemasBody(await response.arrayBuffer())),
+  );
 }
 
 async function fetchNosCinemasHtml(url: string): Promise<string> {
@@ -413,10 +458,7 @@ export async function findNosCinemasMatches(
 
   for (const movie of movies) {
     const sessions = filterNosCinemasSessions(
-      await fetchNosCinemasJson(
-        getNosCinemasMovieSessionsUrl(movie.aggregateFormatNumber),
-        NosCinemasMovieSessionsSchema,
-      ),
+      await fetchNosCinemasMovieSessions(movie.aggregateFormatNumber),
       watch,
     );
     if (sessions.length > 0) {
