@@ -12,6 +12,7 @@ import { get as azerpasBlog } from "./scrapers/azerpasBlog";
 
 export { cacheAgendaLx } from "./scrapers/agendaLx";
 import { get as anteEstreias } from "./scrapers/anteEstreias";
+import { get as campaignLive } from "./scrapers/campaignLive";
 import { get as ccbEventos } from "./scrapers/ccbEventos";
 import { get as cinecartaz } from "./scrapers/cinecartaz";
 import { get as ccpjDestaques } from "./scrapers/ccpjDestaques";
@@ -83,6 +84,7 @@ const scrapers = {
   bbcMediaCentreLatestNews,
   berserk,
   brokenBrowserBlog,
+  campaignLive,
   ccbEventos,
   ccpjDestaques,
   cinecartaz,
