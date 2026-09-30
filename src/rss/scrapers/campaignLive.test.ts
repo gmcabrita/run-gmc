@@ -72,7 +72,7 @@ describe("campaignLive scraper", () => {
     ]);
   });
 
-  it("requests all five sections through the relay", async () => {
+  it("requests all four sections through the relay", async () => {
     const requests: Array<Request> = [];
     const fetchFn: typeof fetch = async (input, init) => {
       requests.push(new Request(input, init));
@@ -86,7 +86,6 @@ describe("campaignLive scraper", () => {
       "https://relay.example.com/fetch/https://www.campaignlive.co.uk/in-depth",
       "https://relay.example.com/fetch/https://www.campaignlive.co.uk/the-work",
       "https://relay.example.com/fetch/https://www.campaignlive.co.uk/the-knowledge",
-      "https://relay.example.com/fetch/https://www.campaignlive.co.uk/partner-content",
     ]);
     expect(requests[0]?.headers.get("authorization")).toBe("Bearer relay-token");
     expect(requests[0]?.headers.get("sec-fetch-mode")).toBe("navigate");

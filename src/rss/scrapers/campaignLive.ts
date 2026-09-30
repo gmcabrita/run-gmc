@@ -8,7 +8,6 @@ const SECTION_URLS = [
   `${SITE_ORIGIN}/in-depth`,
   `${SITE_ORIGIN}/the-work`,
   `${SITE_ORIGIN}/the-knowledge`,
-  `${SITE_ORIGIN}/partner-content`,
 ];
 const USER_AGENT =
   "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36";
@@ -227,7 +226,7 @@ export async function scrape(
   const sections = await Promise.all(SECTION_URLS.map((url) => scrapeSection(proxiedFetch, url)));
 
   return {
-    description: "News, in depth, the work, the knowledge and partner content from Campaign UK",
+    description: "News, in depth, the work and the knowledge from Campaign UK",
     entries: mergeEntries(sections),
     id: SITE_ORIGIN,
     language: "en",
