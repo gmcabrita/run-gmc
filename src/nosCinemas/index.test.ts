@@ -9,6 +9,7 @@ import {
   getNosCinemasSearchUrl,
   isNosCinemasUpstreamServiceError,
   isRetryableNosCinemasFailure,
+  parseNosCinemasMovieSessions,
   parseNosCinemasSearchResults,
   retryNosCinemasRequest,
 } from "./index";
@@ -113,6 +114,48 @@ describe("nosCinemas session filtering", () => {
     expect(new Set(sessions.map((session) => session.theater))).toEqual(
       new Set(["Cinemas NOS Colombo", "Cinemas NOS Almada Forum"]),
     );
+  });
+});
+
+describe("nosCinemas sessions without a version", () => {
+  // Shape seen on 2026-09-30 for CascaiShopping "infinity vision" sessions.
+  const body = JSON.stringify({
+    days: [
+      {
+        name: "Qua, 16 Dez",
+        theaters: [
+          {
+            name: "Cinemas NOS CascaiShopping",
+            sessions: [
+              {
+                description: "Sala 5",
+                format: "infinity vision",
+                operationalDate: "2026-12-16Z",
+                time: "13:30",
+                type: "Normal",
+                uuid: "e0e009c2-971d-4d7a-8841-eb63c7f6bfb2",
+              },
+            ],
+            theaterId: "1",
+          },
+        ],
+      },
+    ],
+  });
+
+  it("parses and renders the session", () => {
+    const watch = { keyword: "doomsday" };
+    const sessions = filterNosCinemasSessions(parseNosCinemasMovieSessions(body), watch);
+    expect(sessions).toHaveLength(1);
+    expect(sessions[0].version).toBeUndefined();
+
+    const email = buildNosCinemasEmail(watch, [
+      {
+        movie: { aggregateFormatNumber: "x", title: "Vingadores - Doomsday", url: "https://x" },
+        sessions,
+      },
+    ]);
+    expect(email.body).toContain("<td>infinity vision Normal</td>");
   });
 });
 

@@ -54,7 +54,9 @@ const NosCinemasSessionSchema = looseObject({
   time: string(),
   type: string(),
   uuid: string(),
-  version: string(),
+  // Some sessions come without a version, for example CascaiShopping
+  // "infinity vision" sessions of "Vingadores - Doomsday".
+  version: optional(string()),
 });
 
 const NosCinemasMovieSessionsSchema = looseObject({
@@ -91,7 +93,7 @@ export type NosCinemasMatchedSession = {
   time: string;
   type: string;
   uuid: string;
-  version: string;
+  version?: string;
 };
 
 export type NosCinemasMatch = {
@@ -262,7 +264,7 @@ export function buildNosCinemasEmail(
     const rows = match.sessions
       .map(
         (session) =>
-          `<tr><td>${session.date}</td><td>${session.time}</td><td>${escapeHtml(session.theater)}</td><td>${escapeHtml(session.room)}</td><td>${escapeHtml(session.format)} ${escapeHtml(session.version)} ${escapeHtml(session.type)}</td></tr>`,
+          `<tr><td>${session.date}</td><td>${session.time}</td><td>${escapeHtml(session.theater)}</td><td>${escapeHtml(session.room)}</td><td>${escapeHtml([session.format, session.version, session.type].filter((part) => part !== undefined).join(" "))}</td></tr>`,
       )
       .join("\n");
     return `<h2><a href="${match.movie.url}">${escapeHtml(match.movie.title)}</a></h2>
@@ -396,10 +398,11 @@ async function fetchNosCinemasMovieSessions(
   if (!response.ok) {
     return { days: [] };
   }
-  return parseValibot(
-    NosCinemasMovieSessionsSchema,
-    JSON.parse(decodeNosCinemasBody(await response.arrayBuffer())),
-  );
+  return parseNosCinemasMovieSessions(decodeNosCinemasBody(await response.arrayBuffer()));
+}
+
+export function parseNosCinemasMovieSessions(body: string): NosCinemasMovieSessions {
+  return parseValibot(NosCinemasMovieSessionsSchema, JSON.parse(body));
 }
 
 async function fetchNosCinemasHtml(url: string): Promise<string> {
