@@ -21,7 +21,8 @@ const LbbOnlinePayloadSchema = looseObject({
   hits: array(
     looseObject({
       date: string(),
-      description: string(),
+      // The LBB API sometimes returns null for posts without a summary.
+      description: nullish(string()),
       id: pipe(union([string(), number()]), transform(String)),
       image: nullish(string()),
       slug: string(),
@@ -46,7 +47,7 @@ export async function parse(payload: LbbOnlinePayload): Promise<RSSData> {
         id: post.id,
         imageURL: imageUrl,
         link,
-        text: post.description,
+        text: post.description ?? undefined,
         title: post.title,
       };
     })

@@ -49,6 +49,24 @@ describe("lbbonlineInternational json parser", () => {
     expect(result.entries[0]?.id).toBe("152622");
   });
 
+  it("accepts posts with a null description", async () => {
+    const result = await parse({
+      hits: [
+        {
+          date: "2025-12-28T10:00:00Z",
+          description: null,
+          id: 154_373,
+          image: null,
+          slug: "post-without-description",
+          title: "Post without description",
+        },
+      ],
+    });
+
+    expect(result.entries).toHaveLength(1);
+    expect(result.entries[0]?.text).toBeUndefined();
+  });
+
   it("filters out future posts", async () => {
     const result = await parse(json);
 
