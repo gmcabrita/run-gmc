@@ -3,7 +3,7 @@ import { defineConfig } from "vitest/config";
 import { resolve } from "node:path";
 import { readFileSync } from "node:fs";
 import type { Plugin } from "vite";
-import cloudflareConfig from "./cloudflare.config";
+import cloudflareConfig from "./cloudflare.config.ts";
 
 // vitest-pool-workers reads only Wrangler config files. Pass the runtime
 // settings and bindings from cloudflare.config.ts to Miniflare. Tests use local
