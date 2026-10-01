@@ -27,6 +27,7 @@ export default defineConfig({
       POKE_API_KEY: bindings.secret(),
       PRIVATE_BASIC_AUTH_PASSWORD: bindings.secret(),
       PRIVATE_BASIC_AUTH_USERNAME: bindings.secret(),
+      REUTERS_DATADOME_COOKIE: bindings.secret(),
       RUN_GMC_EMAIL_IDEMPOTENCY_KV: bindings.kv({
         id: "67a6fccf562346b386524702eca9f08a",
       }),

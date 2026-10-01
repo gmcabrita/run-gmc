@@ -1,4 +1,4 @@
-import { isValidRSSEntry, type ScraperContext } from "@rss/common";
+import { isValidRSSEntry, USERAGENT, type ScraperContext } from "@rss/common";
 import { createProxiedFetch } from "../../proxiedFetch";
 import type { RSSData, RSSEntry } from "@rss/types";
 import {
@@ -160,17 +160,68 @@ export function parse(payload: ReutersApiPayload): RSSData {
   };
 }
 
-export async function get(_ctx: ScraperContext): Promise<RSSData> {
-  const response = await createProxiedFetch(_ctx.env)(buildApiUrl(), {
-    headers: {
-      accept: "application/json, text/plain, */*",
-      "accept-language": ACCEPT_LANGUAGE,
-      Referer: "https://www.reuters.com/business/media-telecom/",
-    },
+// Reuters sits behind DataDome bot protection. The relay passes only when the
+// request sends a `datadome` cookie from a browser session that solved the
+// challenge on the relay's IP, plus a browser User-Agent. Refresh the
+// REUTERS_DATADOME_COOKIE secret when the cookie expires.
+function buildRequestHeaders(datadomeCookie?: string): Headers {
+  const headers = new Headers({
+    accept: "application/json, text/plain, */*",
+    "accept-language": ACCEPT_LANGUAGE,
+    Referer: BASE_URL,
+    "User-Agent": USERAGENT,
   });
+  if (datadomeCookie) {
+    headers.set("Cookie", `datadome=${datadomeCookie}`);
+  }
+  return headers;
+}
+
+interface ReutersFetchResult {
+  // Status of the failed request with the DataDome cookie, when a retry without
+  // the cookie followed it. A 401 here means the cookie expired.
+  cookieFailureStatus?: number;
+  response: Response;
+}
+
+async function fetchReuters(ctx: ScraperContext): Promise<ReutersFetchResult> {
+  const proxiedFetch = createProxiedFetch(ctx.env);
+  const datadomeCookie = ctx.env.REUTERS_DATADOME_COOKIE;
+
+  if (!datadomeCookie) {
+    return { response: await proxiedFetch(buildApiUrl(), { headers: buildRequestHeaders() }) };
+  }
+
+  const cookieResponse = await proxiedFetch(buildApiUrl(), {
+    headers: buildRequestHeaders(datadomeCookie),
+  });
+  if (cookieResponse.ok) {
+    return { response: cookieResponse };
+  }
+
+  // Release the unused body of the failed request before the retry.
+  await cookieResponse.body?.cancel();
+
+  try {
+    return {
+      cookieFailureStatus: cookieResponse.status,
+      response: await proxiedFetch(buildApiUrl(), { headers: buildRequestHeaders() }),
+    };
+  } catch (error) {
+    throw new Error(
+      `Reuters request failed without cookie (with DataDome cookie: ${cookieResponse.status})`,
+      { cause: error },
+    );
+  }
+}
+
+export async function get(ctx: ScraperContext): Promise<RSSData> {
+  const { cookieFailureStatus, response } = await fetchReuters(ctx);
 
   if (!response.ok) {
-    throw new Error(`Reuters request failed: ${response.status}`);
+    const cookieDetail =
+      cookieFailureStatus === undefined ? "" : ` (with DataDome cookie: ${cookieFailureStatus})`;
+    throw new Error(`Reuters request failed: ${response.status}${cookieDetail}`);
   }
 
   const payloadResult = safeParse(ReutersApiPayloadSchema, await response.json());

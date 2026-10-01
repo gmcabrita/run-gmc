@@ -31,6 +31,10 @@ SENTRY_DSN=
 HTTP_RELAY_URL=https://relay.example.com
 HTTP_RELAY_TOKEN=auth-token
 
+# Reuters DataDome cookie value (without `datadome=`). Solve the captcha on
+# reuters.com from the relay's IP, then copy the `datadome` cookie.
+REUTERS_DATADOME_COOKIE=
+
 # Healthcheck Discord webhooks
 HEALTHCHECK_DISCORD_SUCCEEDED_WEBHOOK_URL=https://discord.com/api/webhooks/...
 HEALTHCHECK_DISCORD_FAILED_WEBHOOK_URL=https://discord.com/api/webhooks/...
