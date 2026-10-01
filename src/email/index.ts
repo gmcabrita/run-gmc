@@ -2,11 +2,14 @@ export async function idempotentSendEmail(
   env: Env,
   {
     body,
+    expirationTtl,
     idempotencyKey,
     subject,
     to,
   }: {
     body: string;
+    // Seconds until the key expires. Omit to keep the key forever.
+    expirationTtl?: number;
     idempotencyKey: string;
     subject: string;
     to: string;
@@ -20,7 +23,11 @@ export async function idempotentSendEmail(
 
   await sendEmail(env, { body, subject, to });
 
-  await env.RUN_GMC_EMAIL_IDEMPOTENCY_KV.put(idempotencyKey, "1");
+  await env.RUN_GMC_EMAIL_IDEMPOTENCY_KV.put(
+    idempotencyKey,
+    "1",
+    expirationTtl === undefined ? undefined : { expirationTtl },
+  );
 
   return true;
 }

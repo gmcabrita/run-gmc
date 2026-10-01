@@ -12,6 +12,7 @@ import {
   addCinecartazQuestionEndpoints,
   sendCinecartazQuestionsByEmail,
 } from "./cinecartazQuestion";
+import { BRILLIANT_MADE_STORES, checkBrilliantMadeStore } from "./brilliantMade";
 import { addScrapedRssEndpoints, cacheAgendaLx } from "@rss/scrapers";
 import { array, boolean, looseObject, nullish, parse, string, type InferOutput } from "valibot";
 import {
@@ -464,21 +465,47 @@ export default withSentry(
             ),
           ]);
           break;
-        case "*/5 * * * *":
-          await withMonitor(
-            "cinecartaz.sendPassatempoQuestionsByEmail",
-            async () => {
-              await sendCinecartazQuestionsByEmail(env);
-            },
-            {
-              checkinMargin: 2,
-              schedule: {
-                type: "crontab",
-                value: "*/5 * * * *",
+        case "*/5 * * * *": {
+          // Wait for every check so one failure does not cut off the others.
+          const results = await Promise.allSettled([
+            withMonitor(
+              "cinecartaz.sendPassatempoQuestionsByEmail",
+              async () => {
+                await sendCinecartazQuestionsByEmail(env);
               },
-            },
+              {
+                checkinMargin: 2,
+                schedule: {
+                  type: "crontab",
+                  value: "*/5 * * * *",
+                },
+              },
+            ),
+            // One monitor per store so a failure on one URL does not hide the other.
+            ...BRILLIANT_MADE_STORES.map((store) =>
+              withMonitor(
+                `brilliantMade.${store.name}`,
+                async () => {
+                  await checkBrilliantMadeStore(env, store);
+                },
+                {
+                  checkinMargin: 2,
+                  schedule: {
+                    type: "crontab",
+                    value: "*/5 * * * *",
+                  },
+                },
+              ),
+            ),
+          ]);
+          const errors = results.flatMap((result) =>
+            result.status === "rejected" ? [result.reason] : [],
           );
+          if (errors.length > 0) {
+            throw new AggregateError(errors, "Some */5 cron checks failed");
+          }
           break;
+        }
         case "*/15 * * * *":
           await withMonitor(
             "coverflex.sendAppleCatalogueByEmail",
