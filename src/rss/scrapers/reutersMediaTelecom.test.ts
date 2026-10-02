@@ -1,32 +1,12 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { Hono } from "hono";
 import { addScrapedRssEndpoints } from "../scrapers";
-import { parse } from "./reutersMediaTelecom";
+import { parse, scrape } from "./reutersMediaTelecom";
 import json from "./__fixtures__/reuters-media-telecom.json";
 
-const relayEnv = {
-  HTTP_RELAY_TOKEN: "relay-token",
-  HTTP_RELAY_URL: "https://relay.example.com/fetch",
-};
-
-function createDataDomeResponse(): Response {
-  return Response.json({ url: "https://geo.captcha-delivery.com/captcha/" }, { status: 401 });
+function sentHeaders(call: Parameters<typeof fetch> | undefined): Headers {
+  return new Headers(call?.[1]?.headers);
 }
-
-function requestRss(env: Record<string, string>) {
-  const app = new Hono<{ Bindings: Env }>();
-  addScrapedRssEndpoints(app);
-  app.onError((error, ctx) => ctx.text(error.message, 502));
-  return app.request("/rss.reutersMediaTelecom", undefined, env);
-}
-
-function sentHeaders(call: Parameters<typeof fetch>): Headers {
-  return new Request(call[0], call[1]).headers;
-}
-
-afterEach(() => {
-  vi.restoreAllMocks();
-});
 
 describe("reutersMediaTelecom parser", () => {
   it("parses Reuters section articles", () => {
@@ -98,63 +78,60 @@ describe("reutersMediaTelecom parser", () => {
   });
 });
 
-describe("reutersMediaTelecom fetch", () => {
-  it("sends the DataDome cookie and a browser User-Agent", async () => {
-    const fetchSpy = vi.spyOn(globalThis, "fetch").mockResolvedValue(Response.json(json));
+describe("reutersMediaTelecom scrape", () => {
+  it("requests the API with the WhatsApp client headers and the plain relay client", async () => {
+    const fetcher = vi.fn<typeof fetch>(async () => Response.json(json));
 
-    const response = await requestRss({ ...relayEnv, REUTERS_DATADOME_COOKIE: "cookie-value" });
+    const result = await scrape(fetcher);
 
-    expect(response.status).toBe(200);
-    expect(fetchSpy).toHaveBeenCalledTimes(1);
-    const headers = sentHeaders(fetchSpy.mock.calls[0]);
-    expect(headers.get("cookie")).toBe("datadome=cookie-value");
-    expect(headers.get("user-agent")).toContain("Chrome/");
-  });
-
-  it("retries without the cookie when the cookie request fails", async () => {
-    const fetchSpy = vi
-      .spyOn(globalThis, "fetch")
-      .mockResolvedValueOnce(createDataDomeResponse())
-      .mockResolvedValueOnce(Response.json(json));
-
-    const response = await requestRss({ ...relayEnv, REUTERS_DATADOME_COOKIE: "expired" });
-
-    expect(response.status).toBe(200);
-    expect(fetchSpy).toHaveBeenCalledTimes(2);
-    expect(sentHeaders(fetchSpy.mock.calls[0]).get("cookie")).toBe("datadome=expired");
-    expect(sentHeaders(fetchSpy.mock.calls[1]).get("cookie")).toBeNull();
-  });
-
-  it("fails when both requests are blocked", async () => {
-    vi.spyOn(globalThis, "fetch").mockImplementation(async () => createDataDomeResponse());
-
-    const response = await requestRss({ ...relayEnv, REUTERS_DATADOME_COOKIE: "expired" });
-
-    expect(response.status).toBe(502);
-    expect(await response.text()).toBe("Reuters request failed: 401 (with DataDome cookie: 401)");
-  });
-
-  it("keeps the cookie status when the retry without cookie throws", async () => {
-    vi.spyOn(globalThis, "fetch")
-      .mockResolvedValueOnce(createDataDomeResponse())
-      .mockRejectedValue(new Error("network down"));
-
-    const response = await requestRss({ ...relayEnv, REUTERS_DATADOME_COOKIE: "expired" });
-
-    expect(response.status).toBe(502);
-    expect(await response.text()).toBe(
-      "Reuters request failed without cookie (with DataDome cookie: 401)",
+    expect(result.entries).toHaveLength(2);
+    expect(fetcher).toHaveBeenCalledTimes(1);
+    expect(String(fetcher.mock.calls[0]?.[0])).toMatch(
+      /^https:\/\/www\.reuters\.com\/pf\/api\/v3\/content\/fetch\/articles-by-section-alias-or-id-v1\?/,
     );
+    const headers = sentHeaders(fetcher.mock.calls[0]);
+    expect(headers.get("user-agent")).toBe("WhatsApp/2.23.20.0");
+    expect(headers.get("accept")).toBe("*/*");
+    expect(headers.get("accept-language")).toBe("en-US,en;q=0.9");
+    expect(headers.get("x-relay-client")).toBe("plain");
+    expect(headers.get("cookie")).toBeNull();
   });
 
-  it("requests once without a cookie when the secret is missing", async () => {
-    const fetchSpy = vi.spyOn(globalThis, "fetch").mockResolvedValue(createDataDomeResponse());
+  it("fails with the status when DataDome blocks the request", async () => {
+    const fetcher = vi.fn<typeof fetch>(async () =>
+      Response.json({ url: "https://geo.captcha-delivery.com/captcha/" }, { status: 401 }),
+    );
 
-    const response = await requestRss(relayEnv);
+    await expect(scrape(fetcher)).rejects.toThrow("Reuters request failed: 401");
+  });
+});
 
-    expect(response.status).toBe(502);
-    expect(await response.text()).toBe("Reuters request failed: 401");
+describe("reutersMediaTelecom endpoint", () => {
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  it("sends the request through the relay with the WhatsApp client headers", async () => {
+    const fetchSpy = vi.spyOn(globalThis, "fetch").mockResolvedValue(Response.json(json));
+    const app = new Hono<{ Bindings: Env }>();
+    addScrapedRssEndpoints(app);
+
+    const response = await app.request("/rss.reutersMediaTelecom", undefined, {
+      HTTP_RELAY_TOKEN: "relay-token",
+      HTTP_RELAY_URL: "https://relay.example.com",
+    });
+
+    expect(response.status).toBe(200);
     expect(fetchSpy).toHaveBeenCalledTimes(1);
-    expect(sentHeaders(fetchSpy.mock.calls[0]).get("cookie")).toBeNull();
+    const call = fetchSpy.mock.calls[0];
+    expect(String(call?.[0])).toMatch(
+      /^https:\/\/relay\.example\.com\/https:\/\/www\.reuters\.com\/pf\/api\//,
+    );
+    const headers = sentHeaders(call);
+    expect(headers.get("authorization")).toBe("Bearer relay-token");
+    expect(headers.get("user-agent")).toBe("WhatsApp/2.23.20.0");
+    expect(headers.get("accept")).toBe("*/*");
+    expect(headers.get("accept-language")).toBe("en-US,en;q=0.9");
+    expect(headers.get("x-relay-client")).toBe("plain");
   });
 });

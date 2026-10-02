@@ -35,7 +35,10 @@ type RelayForwardedHeader =
   | "Sec-Fetch-Mode"
   | "Sec-Fetch-User"
   | "Sec-Fetch-Dest"
-  | "Priority";
+  | "Priority"
+  // Relay control header. `plain` sends the request without the browser
+  // fingerprint. The relay removes it before it forwards the request.
+  | "X-Relay-Client";
 
 const RELAY_RETRY_COUNT = 3;
 const RELAY_RETRY_BASE_DELAY_MS = 250;
@@ -56,6 +59,7 @@ const RELAY_FORWARDED_HEADERS: Array<RelayForwardedHeader> = [
   "Sec-Fetch-User",
   "Sec-Fetch-Dest",
   "Priority",
+  "X-Relay-Client",
 ];
 
 function getRelayRequestUrl(relayUrl: string, targetUrl: string): string {

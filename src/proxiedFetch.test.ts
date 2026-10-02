@@ -48,6 +48,25 @@ describe("createProxiedFetch", () => {
     expect(headers.get("User-Agent")).toBeNull();
   });
 
+  it("forwards the relay client header", async () => {
+    let relayInput: RequestInfo | URL | undefined;
+    let relayInit: RequestInit | undefined;
+
+    const fetcher: typeof fetch = async (input, init) => {
+      relayInput = input;
+      relayInit = init;
+      return new Response("ok");
+    };
+
+    await createProxiedFetch(relayEnv, fetcher)("https://target.example.com/api", {
+      headers: { "X-Relay-Client": "plain" },
+    });
+
+    const request = requireRelayRequest(relayInput, relayInit);
+
+    expect(request.headers.get("X-Relay-Client")).toBe("plain");
+  });
+
   it("does not forward arbitrary target headers", async () => {
     let relayInput: RequestInfo | URL | undefined;
     let relayInit: RequestInit | undefined;
