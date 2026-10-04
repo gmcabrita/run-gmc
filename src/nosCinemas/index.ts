@@ -114,7 +114,7 @@ export function getNosCinemasSearchUrl(keyword: string, resultsOffset = 0): stri
     "/content/cinemas/language-masters/pt/cinemas.searchresults.json/_jcr_content/root/header/search",
     NOS_CINEMAS_ORIGIN,
   );
-  url.searchParams.set("fulltext", `${keyword}*`);
+  url.searchParams.set("fulltext", keyword);
   url.searchParams.set("resultsOffset", String(resultsOffset));
   return url.href;
 }

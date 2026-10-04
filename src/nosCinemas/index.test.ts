@@ -19,7 +19,7 @@ import searchJson from "./__fixtures__/dune-search.json";
 describe("nosCinemas search", () => {
   it("builds the search URL with a wildcard suffix", () => {
     expect(getNosCinemasSearchUrl("dune")).toBe(
-      "https://www.cinemas.nos.pt/content/cinemas/language-masters/pt/cinemas.searchresults.json/_jcr_content/root/header/search?fulltext=dune*&resultsOffset=0",
+      "https://www.cinemas.nos.pt/content/cinemas/language-masters/pt/cinemas.searchresults.json/_jcr_content/root/header/search?fulltext=dune&resultsOffset=0",
     );
     expect(getNosCinemasSearchUrl("dune", 10)).toContain("resultsOffset=10");
   });
