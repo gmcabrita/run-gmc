@@ -1,6 +1,6 @@
 import { Hono } from "hono";
 import { Feed } from "feed";
-import type { RSSData } from "@rss/types";
+import type { RSSData, RSSEntry } from "@rss/types";
 import { stripInvalidXmlChars, type ScraperContext } from "@rss/common";
 
 import { get as adAgeNews } from "./scrapers/adAgeNews";
@@ -144,6 +144,15 @@ const mobileGameScrapers = {
   epicFreeiOSGames,
 };
 
+// Builds the HTML body of a feed item. Some sources have no summary text, so
+// the text paragraph is only added when the entry has text.
+export function renderRssEntryContent(entry: RSSEntry): string {
+  const text = entry.text ? `<p>${entry.text}</p>` : "";
+  const image = entry.imageURL ? `<p><img src="${entry.imageURL}" alt="${entry.title}" /></p>` : "";
+
+  return `${text}<a href="${entry.link}">${entry.link}</a>${image}`;
+}
+
 function createRssHandler(getFn: (ctx: ScraperContext) => Promise<RSSData>) {
   return async (ctx: ScraperContext) => {
     const { description, entries, id, language, link, title } = await getFn(ctx);
@@ -161,8 +170,7 @@ function createRssHandler(getFn: (ctx: ScraperContext) => Promise<RSSData>) {
 
     entries.forEach((entry) => {
       feed.addItem({
-        content:
-          `<p>${entry.text}</p><a href="${entry.link}">${entry.link}</a>${entry.imageURL ? `<p><img src="${entry.imageURL}" alt="${entry.title}" /></p>` : ""}`.trim(),
+        content: renderRssEntryContent(entry),
         date: entry.datetime || now,
         id: entry.id,
         link: entry.link,
