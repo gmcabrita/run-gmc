@@ -1,35 +1,75 @@
 {
-  "hits": [
+  "items": [
     {
-      "id": "abc123",
-      "title": "Test Campaign Title",
-      "slug": "test-campaign-title",
-      "description": "This is a test campaign description for LBB Online.",
-      "image": "/images/test-image.jpg",
-      "date": "2025-12-28T10:00:00Z"
+      "id": 154711,
+      "slug": "farmschool-d-stepping-out-of-the-classroom-and-into-something-wilder",
+      "title": "'FARM SCHOOL’D': Stepping Out of the Classroom and into Something Wilder",
+      "image": "news/2026-10/farm-schoold-farmuse.TwvzJ-MH.png",
+      "date": "2026-10-05T18:10:00.000Z",
+      "views": 27,
+      "channel": "Creative",
+      "channelId": 8,
+      "companyName": "FARMUSE",
+      "companyLocation": "Nashville, US",
+      "companySlug": "farmuse",
+      "companyOfficeId": 9010
     },
     {
-      "id": "def456",
-      "title": "Another Great Ad",
-      "slug": "another-great-ad",
-      "description": "Description of another great advertising campaign.",
-      "image": "/images/another-image.png",
-      "date": "2025-12-27T15:30:00Z"
+      "id": 154710,
+      "slug": "electric-theatre-collective-launches-in-warsaw",
+      "title": "Electric Theatre Collective Launches in Warsaw",
+      "image": "news/2026-10/etc-warsaw.1Jfo9liu.png",
+      "date": "2026-10-05T16:54:00.000Z",
+      "views": 42,
+      "channel": "Hires, Wins & Business",
+      "channelId": 7,
+      "companyName": "Electric Theatre Collective",
+      "companyLocation": "London, UK",
+      "companySlug": "electric-theatre-collective",
+      "companyOfficeId": 1395
     },
     {
-      "id": "ghi789",
-      "title": "Campaign Without Image",
-      "slug": "campaign-without-image",
-      "description": "This campaign has no image.",
-      "date": "2025-12-26T08:00:00Z"
+      "id": 154708,
+      "slug": "mountainfilm-on-tour-returns-to-chicago-for-first-time-since-2019",
+      "title": "Mountainfilm on Tour Returns to Chicago for First Time Since 2019",
+      "image": "news/2026-10/caymanite-1.f4pp9Xzj.png",
+      "date": "2026-10-05T16:53:00.000Z",
+      "views": 18,
+      "channel": "Awards and Events",
+      "channelId": 3,
+      "companyName": "Caymanite",
+      "companyLocation": "Chicago, US",
+      "companySlug": "caymanite-prodcutions",
+      "companyOfficeId": 9521
     },
     {
-      "id": "future123",
-      "title": "Future Campaign",
-      "slug": "future-campaign",
-      "description": "This campaign is in the future and should be filtered out.",
-      "image": "/images/future.jpg",
-      "date": "2099-12-31T23:59:59Z"
+      "id": 154706,
+      "slug": "superbloom-house-sean-daly-director-growth-business",
+      "title": "SuperBloom House Appoints Sean Daly as Director of Growth and New Business",
+      "image": null,
+      "date": "2026-10-05T16:46:00.000Z",
+      "views": 22,
+      "channel": "Hires, Wins & Business",
+      "channelId": 7,
+      "companyName": "SuperBloom House",
+      "companyLocation": "Los Angeles, US",
+      "companySlug": "superbloom",
+      "companyOfficeId": 7429
+    },
+    {
+      "id": 999999,
+      "slug": "future-post",
+      "title": "How Rethink and Orchestre symphonique de Montréal Hijacked Montreal’s Metro Chime",
+      "image": "news/2026-10/orchestre-symphonique-de-montreal._HpdnyqW.png",
+      "date": "2099-01-01T00:00:00.000Z",
+      "views": 41,
+      "channel": "Creative",
+      "channelId": 8,
+      "companyName": "Rethink",
+      "companyLocation": "Toronto, CA",
+      "companySlug": "rethink",
+      "companyOfficeId": 5930
     }
-  ]
+  ],
+  "total": 110364
 }

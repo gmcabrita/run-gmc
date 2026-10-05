@@ -12,17 +12,17 @@ import {
   union,
   type InferInput,
 } from "valibot";
+import { createProxiedFetch } from "../../proxiedFetch";
 
 const BASE_URL = "https://lbbonline.com/news?edition=international";
-const API_URL = "https://search.lbbonline.com/indexes/lbb_news/search";
+// `limit=48` is the page size that the lbbonline.com news page uses.
+const API_URL = "https://lbbonline.com/api/news?edition=international&limit=48&sort=latest";
 const IMAGE_BASE_URL = "https://d3q27bh1u24u2o.cloudfront.net";
 
 const LbbOnlinePayloadSchema = looseObject({
-  hits: array(
+  items: array(
     looseObject({
       date: string(),
-      // The LBB API sometimes returns null for posts without a summary.
-      description: nullish(string()),
       id: pipe(union([string(), number()]), transform(String)),
       image: nullish(string()),
       slug: string(),
@@ -36,7 +36,7 @@ type LbbOnlinePayload = InferInput<typeof LbbOnlinePayloadSchema>;
 export async function parse(payload: LbbOnlinePayload): Promise<RSSData> {
   const json = parseValibot(LbbOnlinePayloadSchema, payload);
   const now = new Date();
-  const entries: Array<RSSEntry> = json.hits
+  const entries: Array<RSSEntry> = json.items
     .filter((post) => new Date(post.date) < now)
     .map((post) => {
       const link = new URL(`news/${post.slug}`, BASE_URL).href;
@@ -47,7 +47,6 @@ export async function parse(payload: LbbOnlinePayload): Promise<RSSData> {
         id: post.id,
         imageURL: imageUrl,
         link,
-        text: post.description ?? undefined,
         title: post.title,
       };
     })
@@ -63,23 +62,20 @@ export async function parse(payload: LbbOnlinePayload): Promise<RSSData> {
   };
 }
 
-export async function get(_ctx: ScraperContext): Promise<RSSData> {
-  const response = await fetch(API_URL, {
-    body: JSON.stringify({
-      limit: 150,
-      offset: 0,
-      q: "",
-      sort: ["date:desc"],
-    }),
+// lbbonline.com sits behind a Cloudflare challenge. Direct requests get a 403.
+// The relay passes the challenge when the request has a browser User-Agent.
+export async function get(ctx: ScraperContext): Promise<RSSData> {
+  const response = await createProxiedFetch(ctx.env)(API_URL, {
     headers: {
-      "user-agent": USERAGENT,
-      // If this Bearer token stops working we can always:
-      // - Fetch the baseUrl -> Find the relevant .js -> Find the Bearer token inside the .js
-      Authorization: "Bearer 0282cf3b4b18a23017eb4e2a7dabd69092783b710ea98f926a5bc1bf02e10b67",
-      "Content-Type": "application/json",
+      Accept: "application/json",
+      "User-Agent": USERAGENT,
     },
-    method: "POST",
   });
+
+  if (!response.ok) {
+    await response.body?.cancel();
+    throw new Error(`LBB request failed: ${response.status}`);
+  }
 
   return parse(await response.json());
 }

@@ -12,65 +12,36 @@ describe("lbbonlineInternational json parser", () => {
     expect(result.description).toBe("Little Black Book");
     expect(result.language).toBe("en");
 
-    // Should have 3 entries (future post filtered out)
-    expect(result.entries.length).toBe(3);
+    // Should have 4 entries (future post filtered out)
+    expect(result.entries.length).toBe(4);
 
     const firstEntry = result.entries[0];
-    expect(firstEntry.id).toBe("abc123");
-    expect(firstEntry.link).toBe("https://lbbonline.com/news/test-campaign-title");
-    expect(firstEntry.title).toBe("Test Campaign Title");
-    expect(firstEntry.text).toBe("This is a test campaign description for LBB Online.");
-    expect(firstEntry.imageURL).toBe("https://d3q27bh1u24u2o.cloudfront.net/images/test-image.jpg");
-    expect(firstEntry.datetime).toEqual(new Date("2025-12-28T10:00:00Z"));
+    expect(firstEntry.id).toBe("154711");
+    expect(firstEntry.link).toBe(
+      "https://lbbonline.com/news/farmschool-d-stepping-out-of-the-classroom-and-into-something-wilder",
+    );
+    expect(firstEntry.title).toBe(
+      "'FARM SCHOOL’D': Stepping Out of the Classroom and into Something Wilder",
+    );
+    expect(firstEntry.text).toBeUndefined();
+    expect(firstEntry.imageURL).toBe(
+      "https://d3q27bh1u24u2o.cloudfront.net/news/2026-10/farm-schoold-farmuse.TwvzJ-MH.png",
+    );
+    expect(firstEntry.datetime).toEqual(new Date("2026-10-05T18:10:00.000Z"));
   });
 
   it("handles posts without images", async () => {
     const result = await parse(json);
 
-    const entryWithoutImage = result.entries.find((e) => e.id === "ghi789");
+    const entryWithoutImage = result.entries.find((e) => e.id === "154706");
     expect(entryWithoutImage).toBeDefined();
     expect(entryWithoutImage?.imageURL).toBeUndefined();
-  });
-
-  it("normalizes the numeric IDs returned by the LBB API", async () => {
-    const result = await parse({
-      hits: [
-        {
-          date: "2025-12-28T10:00:00Z",
-          description: "The live API returns numeric IDs.",
-          id: 152_622,
-          image: null,
-          slug: "current-api-response",
-          title: "Current API response",
-        },
-      ],
-    });
-
-    expect(result.entries[0]?.id).toBe("152622");
-  });
-
-  it("accepts posts with a null description", async () => {
-    const result = await parse({
-      hits: [
-        {
-          date: "2025-12-28T10:00:00Z",
-          description: null,
-          id: 154_373,
-          image: null,
-          slug: "post-without-description",
-          title: "Post without description",
-        },
-      ],
-    });
-
-    expect(result.entries).toHaveLength(1);
-    expect(result.entries[0]?.text).toBeUndefined();
   });
 
   it("filters out future posts", async () => {
     const result = await parse(json);
 
-    const futureEntry = result.entries.find((e) => e.id === "future123");
+    const futureEntry = result.entries.find((e) => e.id === "999999");
     expect(futureEntry).toBeUndefined();
   });
 
