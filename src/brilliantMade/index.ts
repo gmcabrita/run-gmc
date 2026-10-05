@@ -35,15 +35,22 @@ export async function checkBrilliantMadeStore(env: Env, { name, url }: Brilliant
   const location = response.headers.get("location");
   await response.body?.cancel();
 
+  const today = new Date().toISOString().slice(0, 10);
+  const idempotencyKey = `brilliant-made-${name}-${today}`;
+
   if (isBrilliantMadeStoreClosed(response.status, location)) {
+    // Clear today's key so a reopening later the same day emails again.
+    // Read first so the every-5-minute check only spends a KV write after an email.
+    if ((await env.RUN_GMC_EMAIL_IDEMPOTENCY_KV.get(idempotencyKey)) !== null) {
+      await env.RUN_GMC_EMAIL_IDEMPOTENCY_KV.delete(idempotencyKey);
+    }
     return { emailed: false, location, status: response.status, url };
   }
 
-  const today = new Date().toISOString().slice(0, 10);
   const emailed = await idempotentSendEmail(env, {
     ...buildBrilliantMadeEmail(url, response.status, location),
     expirationTtl: DAILY_IDEMPOTENCY_TTL_SECONDS,
-    idempotencyKey: `brilliant-made-${name}-${today}`,
+    idempotencyKey,
     to: NOTIFICATION_EMAIL,
   });
   return { emailed, location, status: response.status, url };

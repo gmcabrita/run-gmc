@@ -62,6 +62,20 @@ describe("brilliantMade", () => {
     expect((await checkBrilliantMadeStore(env, STICKERS)).emailed).toBe(true);
   });
 
+  it("emails again when the store reopens after closing", async () => {
+    let open = true;
+    mockFetch({
+      [PLUSHIES_URL]: () =>
+        open ? new Response("open", { status: 200 }) : sorryRedirect(PLUSHIES_URL),
+    });
+
+    expect((await checkBrilliantMadeStore(env, PLUSHIES)).emailed).toBe(true);
+    open = false;
+    expect((await checkBrilliantMadeStore(env, PLUSHIES)).emailed).toBe(false);
+    open = true;
+    expect((await checkBrilliantMadeStore(env, PLUSHIES)).emailed).toBe(true);
+  });
+
   it("does not follow the redirect", async () => {
     const fetchSpy = mockFetch({ [STICKERS_URL]: () => sorryRedirect(STICKERS_URL) });
 
