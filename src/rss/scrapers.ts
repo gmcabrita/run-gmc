@@ -144,16 +144,33 @@ const mobileGameScrapers = {
   epicFreeiOSGames,
 };
 
-// Builds the HTML body of a feed item. Some sources have no summary text, so
-// the text paragraph is only added when the entry has text.
-export function renderRssEntryContent(entry: RSSEntry): string {
-  const text = entry.text ? `<p>${entry.text}</p>` : "";
-  const image = entry.imageURL ? `<p><img src="${entry.imageURL}" alt="${entry.title}" /></p>` : "";
-
-  return `${text}<a href="${entry.link}">${entry.link}</a>${image}`;
+// Titles and URLs are plain text that scrapers already decoded, so a title
+// such as `Waitrose & Partners "It's not fine"` must be escaped before it goes
+// into HTML. Without this, a quote closes the attribute early and breaks the tag.
+// Some scrapers (for example waltDisneyPressReleases) still pass encoded
+// entities such as `&amp;`, so existing entities are kept as they are.
+export function escapeHtml(value: string): string {
+  return value
+    .replaceAll(/&(?!#\d+;|#x[\da-f]+;|[a-z][\da-z]*;)/gi, "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;");
 }
 
-function createRssHandler(getFn: (ctx: ScraperContext) => Promise<RSSData>) {
+// Builds the HTML body of a feed item. Some sources have no summary text, so
+// the text paragraph is only added when the entry has text. `entry.text` is
+// inserted as HTML because some scrapers (for example mangaDex) put markup in it.
+export function renderRssEntryContent(entry: RSSEntry): string {
+  const link = escapeHtml(entry.link);
+  const text = entry.text ? `<p>${entry.text}</p>` : "";
+  const image = entry.imageURL
+    ? `<p><img src="${escapeHtml(entry.imageURL)}" alt="${escapeHtml(entry.title)}" /></p>`
+    : "";
+
+  return `${text}<a href="${link}">${link}</a>${image}`;
+}
+
+export function createRssHandler(getFn: (ctx: ScraperContext) => Promise<RSSData>) {
   return async (ctx: ScraperContext) => {
     const { description, entries, id, language, link, title } = await getFn(ctx);
 
@@ -161,6 +178,8 @@ function createRssHandler(getFn: (ctx: ScraperContext) => Promise<RSSData>) {
     const feed = new Feed({
       copyright: "",
       description,
+      // Adds <atom:link rel="self">, which feed validators expect.
+      feedLinks: { rss: ctx.req.url },
       id,
       language,
       link,
@@ -172,6 +191,8 @@ function createRssHandler(getFn: (ctx: ScraperContext) => Promise<RSSData>) {
       feed.addItem({
         content: renderRssEntryContent(entry),
         date: entry.datetime || now,
+        // Some readers expect <description> before <content:encoded>.
+        description: escapeHtml(entry.title),
         id: entry.id,
         link: entry.link,
         title: entry.title,
