@@ -14,6 +14,7 @@
     ".windsurf/**",
     "src/cinecartazQuestion/__fixtures__/**",
     "src/rss/scrapers/__fixtures__/**",
+    "src/testflight/__fixtures__/**",
     "tools/oxlint/anti-slop/**",
     ".cloudflare/**"
   ]

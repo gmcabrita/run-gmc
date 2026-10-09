@@ -13,6 +13,7 @@ import {
   sendCinecartazQuestionsByEmail,
 } from "./cinecartazQuestion";
 import { BRILLIANT_MADE_STORES, checkBrilliantMadeStore } from "./brilliantMade";
+import { TESTFLIGHT_BETA_IDS, checkTestflightBeta } from "./testflight";
 import { addScrapedRssEndpoints, cacheAgendaLx } from "@rss/scrapers";
 import { array, boolean, looseObject, nullish, parse, string, type InferOutput } from "valibot";
 import {
@@ -487,6 +488,22 @@ export default withSentry(
                 `brilliantMade.${store.name}`,
                 async () => {
                   await checkBrilliantMadeStore(env, store);
+                },
+                {
+                  checkinMargin: 2,
+                  schedule: {
+                    type: "crontab",
+                    value: "*/5 * * * *",
+                  },
+                },
+              ),
+            ),
+            // One monitor per beta so a failure on one link does not hide the others.
+            ...TESTFLIGHT_BETA_IDS.map((id) =>
+              withMonitor(
+                `testflight.${id}`,
+                async () => {
+                  await checkTestflightBeta(env, id);
                 },
                 {
                   checkinMargin: 2,
