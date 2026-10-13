@@ -14,10 +14,7 @@ const BETA_CLOSED_TEXTS = [
 ] as const;
 
 // Public TestFlight link ids, from `https://testflight.apple.com/join/<id>`.
-export const TESTFLIGHT_BETA_IDS = [
-  // tldraw notes
-  "ewR5xmUu",
-] as const;
+export const TESTFLIGHT_BETA_IDS: ReadonlyArray<string> = [];
 
 export type TestflightBetaStatus = {
   closed: boolean;
