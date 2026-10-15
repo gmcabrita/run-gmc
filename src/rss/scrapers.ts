@@ -48,6 +48,7 @@ import { get as kernelShBlog } from "./scrapers/kernelShBlog";
 import { get as kirShatrovBlog } from "./scrapers/kirShatrovBlog";
 import { get as kitLangtonBlog } from "./scrapers/kitLangtonBlog";
 import { get as lbbonlineInternational } from "./scrapers/lbbonlineInternational";
+import { get as marktestBaremeRadioRank } from "./scrapers/marktestBaremeRadioRank";
 import { get as marktestPodScope } from "./scrapers/marktestPodScope";
 import { get as mfeMediaForEuropeDocuments } from "./scrapers/mfeMediaForEuropeDocuments";
 import { get as nimas } from "./scrapers/nimas";
@@ -116,6 +117,7 @@ const scrapers = {
   kirShatrovBlog,
   kitLangtonBlog,
   lbbonlineInternational,
+  marktestBaremeRadioRank,
   marktestPodScope,
   mfeMediaForEuropeDocuments,
   nimas,

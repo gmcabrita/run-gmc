@@ -1,0 +1,1196 @@
+{
+  "Setembro 2025 (Mai-Set)": {
+    "descricao": "Vaga de Setembro 2025 (Mai-Set) ",
+    "radios": [
+      {
+        "emissora": "Total Rádio",
+        "reach": "83.6",
+        "aud": "53.9",
+        "share": "100.0"
+      },
+      {
+        "emissora": "RFM",
+        "reach": "34.9",
+        "aud": "17.0",
+        "share": "21.5"
+      },
+      {
+        "emissora": "R.Renascença",
+        "reach": "16.3",
+        "aud": "5.8",
+        "share": "6.9"
+      },
+      {
+        "emissora": "Mega Hits",
+        "reach": "9.1",
+        "aud": "3.0",
+        "share": "2.1"
+      },
+      {
+        "emissora": "R.Comercial",
+        "reach": "38.4",
+        "aud": "19.4",
+        "share": "25.2"
+      },
+      {
+        "emissora": "M80",
+        "reach": "20.2",
+        "aud": "8.2",
+        "share": "9.9"
+      },
+      {
+        "emissora": "Cidade FM",
+        "reach": "12.0",
+        "aud": "4.7",
+        "share": "4.1"
+      },
+      {
+        "emissora": "Smooth FM",
+        "reach": "2.7",
+        "aud": "1.0",
+        "share": "1.2"
+      },
+      {
+        "emissora": "Batida FM",
+        "reach": "0.7",
+        "aud": "-",
+        "share": "-"
+      },
+      {
+        "emissora": "Antena 1",
+        "reach": "11.3",
+        "aud": "4.5",
+        "share": "5.6"
+      },
+      {
+        "emissora": "Antena 3",
+        "reach": "4.4",
+        "aud": "1.5",
+        "share": "1.3"
+      },
+      {
+        "emissora": "Antena 2",
+        "reach": "1.0",
+        "aud": "0.4",
+        "share": "0.4"
+      },
+      {
+        "emissora": "TSF",
+        "reach": "8.7",
+        "aud": "2.6",
+        "share": "2.7"
+      },
+      {
+        "emissora": "R.Observador",
+        "reach": "4.6",
+        "aud": "2.3",
+        "share": "2.4"
+      },
+      {
+        "emissora": "R.Nova Era",
+        "reach": "2.0",
+        "aud": "0.6",
+        "share": "0.7"
+      },
+      {
+        "emissora": "Estação Orbital",
+        "reach": "1.4",
+        "aud": "-",
+        "share": "-"
+      },
+      {
+        "emissora": "Correio da Manhã Rádio",
+        "reach": "1.3",
+        "aud": "-",
+        "share": "-"
+      },
+      {
+        "emissora": "R.Sudoeste",
+        "reach": "1.2",
+        "aud": "0.7",
+        "share": "0.4"
+      },
+      {
+        "emissora": "R. Amália",
+        "reach": "1.1",
+        "aud": "-",
+        "share": "-"
+      },
+      {
+        "emissora": "R.NOAR",
+        "reach": "0.8",
+        "aud": "-",
+        "share": "-"
+      },
+      {
+        "emissora": "R.Marginal",
+        "reach": "0.7",
+        "aud": "-",
+        "share": "-"
+      },
+      {
+        "emissora": "Nove3Cinco",
+        "reach": "0.5",
+        "aud": "-",
+        "share": "-"
+      },
+      {
+        "emissora": "Radar",
+        "reach": "0.5",
+        "aud": "-",
+        "share": "-"
+      },
+      {
+        "emissora": "R.Hiper FM",
+        "reach": "0.4",
+        "aud": "-",
+        "share": "-"
+      },
+      {
+        "emissora": "R.Oxigénio",
+        "reach": "0.4",
+        "aud": "-",
+        "share": "-"
+      },
+      {
+        "emissora": "Outras Estações",
+        "reach": "10.2",
+        "aud": "8.9",
+        "share": "14.3"
+      },
+      {
+        "emissora": "Não sabe estação/posto",
+        "reach": "4.3",
+        "aud": "1.6",
+        "share": "1.1"
+      }
+    ],
+    "redes": [
+      {
+        "emissora": "GRUPO Renascença Multimédia",
+        "reach": "48.3",
+        "aud": "23.7",
+        "share": "30.6"
+      },
+      {
+        "emissora": "GRUPO Bauer Media Audio Portugal",
+        "reach": "54.8",
+        "aud": "29.9",
+        "share": "40.6"
+      },
+      {
+        "emissora": "GRUPO RTP",
+        "reach": "15.1",
+        "aud": "6.2",
+        "share": "7.4"
+      }
+    ]
+  },
+  "Dezembro 2025 (Set-Dez)": {
+    "descricao": "Vaga de Dezembro 2025 (Set-Dez) ",
+    "radios": [
+      {
+        "emissora": "Total Rádio",
+        "reach": "83.1",
+        "aud": "60.1",
+        "share": "100.0"
+      },
+      {
+        "emissora": "RFM",
+        "reach": "34.0",
+        "aud": "16.7",
+        "share": "18.2"
+      },
+      {
+        "emissora": "R.Renascença",
+        "reach": "15.9",
+        "aud": "6.1",
+        "share": "7.1"
+      },
+      {
+        "emissora": "Mega Hits",
+        "reach": "8.0",
+        "aud": "2.7",
+        "share": "1.7"
+      },
+      {
+        "emissora": "R.Comercial",
+        "reach": "39.3",
+        "aud": "20.2",
+        "share": "27.9"
+      },
+      {
+        "emissora": "M80",
+        "reach": "20.7",
+        "aud": "9.4",
+        "share": "11.4"
+      },
+      {
+        "emissora": "Cidade FM",
+        "reach": "11.0",
+        "aud": "4.0",
+        "share": "3.4"
+      },
+      {
+        "emissora": "Smooth FM",
+        "reach": "2.3",
+        "aud": "0.9",
+        "share": "1.0"
+      },
+      {
+        "emissora": "Batida FM",
+        "reach": "0.6",
+        "aud": "-",
+        "share": "-"
+      },
+      {
+        "emissora": "Antena 1",
+        "reach": "10.9",
+        "aud": "4.9",
+        "share": "6.5"
+      },
+      {
+        "emissora": "Antena 3",
+        "reach": "4.4",
+        "aud": "2.2",
+        "share": "2.4"
+      },
+      {
+        "emissora": "Antena 2",
+        "reach": "1.5",
+        "aud": "0.5",
+        "share": "0.5"
+      },
+      {
+        "emissora": "TSF",
+        "reach": "8.6",
+        "aud": "3.3",
+        "share": "2.7"
+      },
+      {
+        "emissora": "R.Observador",
+        "reach": "4.8",
+        "aud": "2.5",
+        "share": "2.9"
+      },
+      {
+        "emissora": "R.Nova Era",
+        "reach": "1.5",
+        "aud": "0.3",
+        "share": "0.3"
+      },
+      {
+        "emissora": "Estação Orbital",
+        "reach": "1.4",
+        "aud": "-",
+        "share": "-"
+      },
+      {
+        "emissora": "Correio da Manhã Rádio",
+        "reach": "1.3",
+        "aud": "-",
+        "share": "-"
+      },
+      {
+        "emissora": "R.NOAR",
+        "reach": "1.3",
+        "aud": "-",
+        "share": "-"
+      },
+      {
+        "emissora": "R.Sudoeste",
+        "reach": "1.2",
+        "aud": "0.5",
+        "share": "0.4"
+      },
+      {
+        "emissora": "R. Amália",
+        "reach": "1.0",
+        "aud": "-",
+        "share": "-"
+      },
+      {
+        "emissora": "Nove3Cinco",
+        "reach": "0.8",
+        "aud": "-",
+        "share": "-"
+      },
+      {
+        "emissora": "R.Hiper FM",
+        "reach": "0.6",
+        "aud": "-",
+        "share": "-"
+      },
+      {
+        "emissora": "Radar",
+        "reach": "0.6",
+        "aud": "-",
+        "share": "-"
+      },
+      {
+        "emissora": "105.4 FM",
+        "reach": "0.4",
+        "aud": "-",
+        "share": "-"
+      },
+      {
+        "emissora": "R.Oxigénio",
+        "reach": "0.4",
+        "aud": "-",
+        "share": "-"
+      },
+      {
+        "emissora": "R.Marginal",
+        "reach": "0.2",
+        "aud": "-",
+        "share": "-"
+      },
+      {
+        "emissora": "R.Nova",
+        "reach": "0.2",
+        "aud": "-",
+        "share": "-"
+      },
+      {
+        "emissora": "RDS",
+        "reach": "0.2",
+        "aud": "-",
+        "share": "-"
+      },
+      {
+        "emissora": "Outras Estações",
+        "reach": "9.8",
+        "aud": "8.6",
+        "share": "12.4"
+      },
+      {
+        "emissora": "Não sabe estação/posto",
+        "reach": "4.1",
+        "aud": "1.0",
+        "share": "1.0"
+      }
+    ],
+    "redes": [
+      {
+        "emissora": "GRUPO Renascença Multimédia",
+        "reach": "46.6",
+        "aud": "23.6",
+        "share": "27.0"
+      },
+      {
+        "emissora": "GRUPO Bauer Media Audio Portugal",
+        "reach": "52.7",
+        "aud": "31.0",
+        "share": "43.8"
+      },
+      {
+        "emissora": "GRUPO RTP",
+        "reach": "15.6",
+        "aud": "7.4",
+        "share": "9.5"
+      }
+    ]
+  },
+  "Fevereiro 2026 (Nov-Fev)": {
+    "descricao": "Vaga de Fevereiro 2026 (Nov-Fev) ",
+    "radios": [
+      {
+        "emissora": "Total Rádio",
+        "reach": "83.6",
+        "aud": "59.6",
+        "share": "100.0"
+      },
+      {
+        "emissora": "RFM",
+        "reach": "34.9",
+        "aud": "16.3",
+        "share": "19.7"
+      },
+      {
+        "emissora": "R.Renascença",
+        "reach": "17.6",
+        "aud": "7.0",
+        "share": "7.5"
+      },
+      {
+        "emissora": "Mega Hits",
+        "reach": "7.8",
+        "aud": "1.9",
+        "share": "1.3"
+      },
+      {
+        "emissora": "R.Comercial",
+        "reach": "38.9",
+        "aud": "19.4",
+        "share": "26.0"
+      },
+      {
+        "emissora": "M80",
+        "reach": "19.9",
+        "aud": "9.1",
+        "share": "10.7"
+      },
+      {
+        "emissora": "Cidade FM",
+        "reach": "9.9",
+        "aud": "3.9",
+        "share": "3.7"
+      },
+      {
+        "emissora": "Smooth FM",
+        "reach": "2.4",
+        "aud": "1.0",
+        "share": "1.2"
+      },
+      {
+        "emissora": "Batida FM",
+        "reach": "0.3",
+        "aud": "-",
+        "share": "-"
+      },
+      {
+        "emissora": "Antena 1",
+        "reach": "11.1",
+        "aud": "4.9",
+        "share": "6.4"
+      },
+      {
+        "emissora": "Antena 3",
+        "reach": "3.7",
+        "aud": "2.1",
+        "share": "2.1"
+      },
+      {
+        "emissora": "Antena 2",
+        "reach": "1.6",
+        "aud": "0.4",
+        "share": "0.4"
+      },
+      {
+        "emissora": "TSF",
+        "reach": "8.3",
+        "aud": "3.6",
+        "share": "3.1"
+      },
+      {
+        "emissora": "R.Observador",
+        "reach": "4.4",
+        "aud": "2.3",
+        "share": "2.6"
+      },
+      {
+        "emissora": "R.NOAR",
+        "reach": "1.8",
+        "aud": "-",
+        "share": "-"
+      },
+      {
+        "emissora": "R.Nova Era",
+        "reach": "1.5",
+        "aud": "0.5",
+        "share": "0.4"
+      },
+      {
+        "emissora": "Estação Orbital",
+        "reach": "1.3",
+        "aud": "0.3",
+        "share": "0.4"
+      },
+      {
+        "emissora": "R. Amália",
+        "reach": "1.3",
+        "aud": "0.6",
+        "share": "0.7"
+      },
+      {
+        "emissora": "Correio da Manhã Rádio",
+        "reach": "1.0",
+        "aud": "-",
+        "share": "-"
+      },
+      {
+        "emissora": "Nove3Cinco",
+        "reach": "1.0",
+        "aud": "-",
+        "share": "-"
+      },
+      {
+        "emissora": "R.Sudoeste",
+        "reach": "1.0",
+        "aud": "-",
+        "share": "-"
+      },
+      {
+        "emissora": "Radar",
+        "reach": "0.8",
+        "aud": "0.2",
+        "share": "0.3"
+      },
+      {
+        "emissora": "R.Hiper FM",
+        "reach": "0.7",
+        "aud": "-",
+        "share": "-"
+      },
+      {
+        "emissora": "105.4 FM",
+        "reach": "0.5",
+        "aud": "-",
+        "share": "-"
+      },
+      {
+        "emissora": "R.Oxigénio",
+        "reach": "0.5",
+        "aud": "-",
+        "share": "-"
+      },
+      {
+        "emissora": "R.Nova",
+        "reach": "0.3",
+        "aud": "-",
+        "share": "-"
+      },
+      {
+        "emissora": "R.Marginal",
+        "reach": "0.2",
+        "aud": "-",
+        "share": "-"
+      },
+      {
+        "emissora": "Outras Estações",
+        "reach": "10.2",
+        "aud": "8.7",
+        "share": "11.8"
+      },
+      {
+        "emissora": "Não sabe estação/posto",
+        "reach": "3.2",
+        "aud": "1.0",
+        "share": "1.4"
+      }
+    ],
+    "redes": [
+      {
+        "emissora": "GRUPO Renascença Multimédia",
+        "reach": "49.6",
+        "aud": "24.0",
+        "share": "28.5"
+      },
+      {
+        "emissora": "GRUPO Bauer Media Audio Portugal",
+        "reach": "51.9",
+        "aud": "29.7",
+        "share": "41.8"
+      },
+      {
+        "emissora": "GRUPO RTP",
+        "reach": "15.2",
+        "aud": "7.3",
+        "share": "9.1"
+      }
+    ]
+  },
+  "Abril 2026 (Jan-Abr)": {
+    "descricao": "Vaga de Abril 2026 (Jan-Abr) ",
+    "radios": [
+      {
+        "emissora": "Total Rádio",
+        "reach": "82.6",
+        "aud": "59.2",
+        "share": "100.0"
+      },
+      {
+        "emissora": "RFM",
+        "reach": "33.8",
+        "aud": "16.1",
+        "share": "20.8"
+      },
+      {
+        "emissora": "R.Renascença",
+        "reach": "18.9",
+        "aud": "8.3",
+        "share": "9.5"
+      },
+      {
+        "emissora": "Mega Hits",
+        "reach": "8.8",
+        "aud": "2.3",
+        "share": "1.4"
+      },
+      {
+        "emissora": "R.Comercial",
+        "reach": "40.1",
+        "aud": "21.0",
+        "share": "28.0"
+      },
+      {
+        "emissora": "M80",
+        "reach": "19.8",
+        "aud": "8.6",
+        "share": "10.0"
+      },
+      {
+        "emissora": "Cidade FM",
+        "reach": "8.9",
+        "aud": "3.2",
+        "share": "3.0"
+      },
+      {
+        "emissora": "Smooth FM",
+        "reach": "2.3",
+        "aud": "1.1",
+        "share": "1.0"
+      },
+      {
+        "emissora": "Batida FM",
+        "reach": "0.7",
+        "aud": "-",
+        "share": "-"
+      },
+      {
+        "emissora": "RTP Antena 1",
+        "reach": "11.9",
+        "aud": "5.2",
+        "share": "5.5"
+      },
+      {
+        "emissora": "RTP Antena 3",
+        "reach": "4.9",
+        "aud": "2.5",
+        "share": "2.1"
+      },
+      {
+        "emissora": "RTP Antena 2",
+        "reach": "1.4",
+        "aud": "0.5",
+        "share": "0.4"
+      },
+      {
+        "emissora": "TSF",
+        "reach": "7.3",
+        "aud": "2.6",
+        "share": "2.2"
+      },
+      {
+        "emissora": "R.Observador",
+        "reach": "4.2",
+        "aud": "2.3",
+        "share": "2.4"
+      },
+      {
+        "emissora": "R.Nova Era",
+        "reach": "1.7",
+        "aud": "0.4",
+        "share": "0.3"
+      },
+      {
+        "emissora": "R.NOAR",
+        "reach": "1.3",
+        "aud": "-",
+        "share": "-"
+      },
+      {
+        "emissora": "Estação Orbital",
+        "reach": "1.2",
+        "aud": "0.4",
+        "share": "0.4"
+      },
+      {
+        "emissora": "R. Amália",
+        "reach": "1.2",
+        "aud": "-",
+        "share": "-"
+      },
+      {
+        "emissora": "Nove3Cinco",
+        "reach": "0.9",
+        "aud": "-",
+        "share": "-"
+      },
+      {
+        "emissora": "Correio da Manhã Rádio",
+        "reach": "0.7",
+        "aud": "-",
+        "share": "-"
+      },
+      {
+        "emissora": "R.Sudoeste",
+        "reach": "0.7",
+        "aud": "-",
+        "share": "-"
+      },
+      {
+        "emissora": "105.4 FM",
+        "reach": "0.5",
+        "aud": "-",
+        "share": "-"
+      },
+      {
+        "emissora": "R.Oxigénio",
+        "reach": "0.5",
+        "aud": "-",
+        "share": "-"
+      },
+      {
+        "emissora": "R.Hiper FM",
+        "reach": "0.4",
+        "aud": "-",
+        "share": "-"
+      },
+      {
+        "emissora": "R.Marginal",
+        "reach": "0.4",
+        "aud": "-",
+        "share": "-"
+      },
+      {
+        "emissora": "Radar",
+        "reach": "0.4",
+        "aud": "0.2",
+        "share": "0.3"
+      },
+      {
+        "emissora": "R.Nova",
+        "reach": "0.3",
+        "aud": "-",
+        "share": "-"
+      },
+      {
+        "emissora": "Outras Estações",
+        "reach": "9.6",
+        "aud": "9.1",
+        "share": "11.3"
+      },
+      {
+        "emissora": "Não sabe estação/posto",
+        "reach": "3.3",
+        "aud": "1.4",
+        "share": "1.3"
+      }
+    ],
+    "redes": [
+      {
+        "emissora": "GRUPO Renascença Multimédia",
+        "reach": "50.3",
+        "aud": "24.9",
+        "share": "31.7"
+      },
+      {
+        "emissora": "GRUPO Bauer Media Audio Portugal",
+        "reach": "53.3",
+        "aud": "30.0",
+        "share": "42.0"
+      },
+      {
+        "emissora": "GRUPO RTP",
+        "reach": "16.1",
+        "aud": "7.9",
+        "share": "8.1"
+      }
+    ]
+  },
+  "Junho 2026 (Mar-Jun)": {
+    "descricao": "Vaga de Junho 2026 (Mar-Jun) ",
+    "radios": [
+      {
+        "emissora": "Total Rádio",
+        "reach": "82.4",
+        "aud": "57.6",
+        "share": "100.0"
+      },
+      {
+        "emissora": "R.Comercial",
+        "reach": "39.8",
+        "aud": "20.9",
+        "share": "27.0"
+      },
+      {
+        "emissora": "M80",
+        "reach": "18.7",
+        "aud": "7.8",
+        "share": "9.4"
+      },
+      {
+        "emissora": "Cidade FM",
+        "reach": "10.9",
+        "aud": "4.2",
+        "share": "4.4"
+      },
+      {
+        "emissora": "Smooth FM",
+        "reach": "3.2",
+        "aud": "1.6",
+        "share": "1.4"
+      },
+      {
+        "emissora": "Batida FM",
+        "reach": "0.7",
+        "aud": "-",
+        "share": "-"
+      },
+      {
+        "emissora": "RFM",
+        "reach": "34.6",
+        "aud": "14.9",
+        "share": "18.3"
+      },
+      {
+        "emissora": "R.Renascença",
+        "reach": "17.6",
+        "aud": "7.2",
+        "share": "9.6"
+      },
+      {
+        "emissora": "Mega Hits",
+        "reach": "9.0",
+        "aud": "3.3",
+        "share": "2.3"
+      },
+      {
+        "emissora": "RTP Antena 1",
+        "reach": "11.0",
+        "aud": "5.0",
+        "share": "5.7"
+      },
+      {
+        "emissora": "RTP Antena 3",
+        "reach": "3.8",
+        "aud": "1.6",
+        "share": "1.6"
+      },
+      {
+        "emissora": "RTP Antena 2",
+        "reach": "1.6",
+        "aud": "0.3",
+        "share": "0.3"
+      },
+      {
+        "emissora": "TSF",
+        "reach": "7.5",
+        "aud": "2.9",
+        "share": "2.3"
+      },
+      {
+        "emissora": "R.Observador",
+        "reach": "3.9",
+        "aud": "2.2",
+        "share": "2.5"
+      },
+      {
+        "emissora": "R.Nova Era",
+        "reach": "2.2",
+        "aud": "0.6",
+        "share": "1.1"
+      },
+      {
+        "emissora": "R.NOAR",
+        "reach": "1.7",
+        "aud": "0.9",
+        "share": "1.7"
+      },
+      {
+        "emissora": "Correio da Manhã Rádio",
+        "reach": "1.2",
+        "aud": "0.3",
+        "share": "0.2"
+      },
+      {
+        "emissora": "Estação Orbital",
+        "reach": "1.2",
+        "aud": "0.5",
+        "share": "0.3"
+      },
+      {
+        "emissora": "R. Amália",
+        "reach": "1.2",
+        "aud": "-",
+        "share": "-"
+      },
+      {
+        "emissora": "105.4 FM",
+        "reach": "0.7",
+        "aud": "-",
+        "share": "-"
+      },
+      {
+        "emissora": "R.Hiper FM",
+        "reach": "0.7",
+        "aud": "-",
+        "share": "-"
+      },
+      {
+        "emissora": "Nove3Cinco",
+        "reach": "0.5",
+        "aud": "-",
+        "share": "-"
+      },
+      {
+        "emissora": "R.Oxigénio",
+        "reach": "0.5",
+        "aud": "-",
+        "share": "-"
+      },
+      {
+        "emissora": "R.Sudoeste",
+        "reach": "0.5",
+        "aud": "-",
+        "share": "-"
+      },
+      {
+        "emissora": "R.Marginal",
+        "reach": "0.4",
+        "aud": "-",
+        "share": "-"
+      },
+      {
+        "emissora": "R.Nova",
+        "reach": "0.3",
+        "aud": "-",
+        "share": "-"
+      },
+      {
+        "emissora": "Radar",
+        "reach": "0.3",
+        "aud": "0.2",
+        "share": "0.2"
+      },
+      {
+        "emissora": "Outras Estações",
+        "reach": "10.2",
+        "aud": "7.5",
+        "share": "10.7"
+      },
+      {
+        "emissora": "Não sabe estação/posto",
+        "reach": "3.7",
+        "aud": "1.5",
+        "share": "0.9"
+      }
+    ],
+    "redes": [
+      {
+        "emissora": "Grupo Bauer Media Audio Portugal",
+        "reach": "53.7",
+        "aud": "30.5",
+        "share": "42.3"
+      },
+      {
+        "emissora": "Grupo Renascença Multimédia",
+        "reach": "49.4",
+        "aud": "23.2",
+        "share": "30.2"
+      },
+      {
+        "emissora": "Grupo RTP",
+        "reach": "14.4",
+        "aud": "6.6",
+        "share": "7.6"
+      }
+    ]
+  },
+  "Setembro 2026 (Mai-Set)": {
+    "descricao": "Vaga de Setembro 2026 (Mai-Set) ",
+    "radios": [
+      {
+        "emissora": "Total Rádio",
+        "reach": "82.7",
+        "aud": "57.2",
+        "share": "100.0"
+      },
+      {
+        "emissora": "R.Comercial",
+        "reach": "39.0",
+        "aud": "19.1",
+        "share": "25.9"
+      },
+      {
+        "emissora": "M80",
+        "reach": "18.4",
+        "aud": "6.4",
+        "share": "7.9"
+      },
+      {
+        "emissora": "Cidade FM",
+        "reach": "11.5",
+        "aud": "4.1",
+        "share": "3.7"
+      },
+      {
+        "emissora": "Smooth FM",
+        "reach": "3.0",
+        "aud": "1.4",
+        "share": "1.9"
+      },
+      {
+        "emissora": "Batida FM",
+        "reach": "0.8",
+        "aud": "-",
+        "share": "-"
+      },
+      {
+        "emissora": "RFM",
+        "reach": "35.7",
+        "aud": "16.4",
+        "share": "20.0"
+      },
+      {
+        "emissora": "R.Renascença",
+        "reach": "15.6",
+        "aud": "6.8",
+        "share": "9.4"
+      },
+      {
+        "emissora": "Mega Hits",
+        "reach": "9.0",
+        "aud": "3.4",
+        "share": "3.3"
+      },
+      {
+        "emissora": "RTP Antena 1",
+        "reach": "9.6",
+        "aud": "3.9",
+        "share": "4.4"
+      },
+      {
+        "emissora": "RTP Antena 3",
+        "reach": "3.5",
+        "aud": "1.3",
+        "share": "1.4"
+      },
+      {
+        "emissora": "RTP Antena 2",
+        "reach": "1.9",
+        "aud": "0.4",
+        "share": "0.3"
+      },
+      {
+        "emissora": "TSF",
+        "reach": "7.6",
+        "aud": "3.2",
+        "share": "3.4"
+      },
+      {
+        "emissora": "R.Observador",
+        "reach": "3.4",
+        "aud": "1.8",
+        "share": "1.8"
+      },
+      {
+        "emissora": "R.NOAR",
+        "reach": "2.3",
+        "aud": "1.3",
+        "share": "2.4"
+      },
+      {
+        "emissora": "R.Nova Era",
+        "reach": "2.3",
+        "aud": "1.0",
+        "share": "1.3"
+      },
+      {
+        "emissora": "R. Amália",
+        "reach": "1.6",
+        "aud": "-",
+        "share": "-"
+      },
+      {
+        "emissora": "Estação Orbital",
+        "reach": "1.5",
+        "aud": "0.5",
+        "share": "0.3"
+      },
+      {
+        "emissora": "Correio da Manhã Rádio",
+        "reach": "1.2",
+        "aud": "-",
+        "share": "-"
+      },
+      {
+        "emissora": "R.Sudoeste",
+        "reach": "0.8",
+        "aud": "-",
+        "share": "-"
+      },
+      {
+        "emissora": "105.4 FM",
+        "reach": "0.6",
+        "aud": "-",
+        "share": "-"
+      },
+      {
+        "emissora": "Nove3Cinco",
+        "reach": "0.5",
+        "aud": "-",
+        "share": "-"
+      },
+      {
+        "emissora": "R.Hiper FM",
+        "reach": "0.5",
+        "aud": "-",
+        "share": "-"
+      },
+      {
+        "emissora": "RDS",
+        "reach": "0.5",
+        "aud": "-",
+        "share": "-"
+      },
+      {
+        "emissora": "R.Nova",
+        "reach": "0.4",
+        "aud": "-",
+        "share": "-"
+      },
+      {
+        "emissora": "R.Marginal",
+        "reach": "0.3",
+        "aud": "-",
+        "share": "-"
+      },
+      {
+        "emissora": "R.Oxigénio",
+        "reach": "0.3",
+        "aud": "-",
+        "share": "-"
+      },
+      {
+        "emissora": "Radar",
+        "reach": "0.2",
+        "aud": "-",
+        "share": "-"
+      },
+      {
+        "emissora": "Outras Estações",
+        "reach": "9.8",
+        "aud": "8.0",
+        "share": "11.2"
+      },
+      {
+        "emissora": "Não sabe estação/posto",
+        "reach": "3.4",
+        "aud": "1.2",
+        "share": "1.0"
+      }
+    ],
+    "redes": [
+      {
+        "emissora": "Grupo Bauer Media Audio Portugal",
+        "reach": "53.4",
+        "aud": "27.5",
+        "share": "39.5"
+      },
+      {
+        "emissora": "Grupo Renascença Multimédia",
+        "reach": "48.4",
+        "aud": "24.5",
+        "share": "32.7"
+      },
+      {
+        "emissora": "Grupo RTP",
+        "reach": "13.2",
+        "aud": "5.5",
+        "share": "6.5"
+      }
+    ]
+  }
+}
