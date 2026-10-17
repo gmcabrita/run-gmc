@@ -16,6 +16,7 @@ import { get as campaignLive } from "./scrapers/campaignLive";
 import { get as ccbEventos } from "./scrapers/ccbEventos";
 import { get as cinecartaz } from "./scrapers/cinecartaz";
 import { get as ccpjDestaques } from "./scrapers/ccpjDestaques";
+import { get as clubeDaCriatividadeNoticias } from "./scrapers/clubeDaCriatividadeNoticias";
 import { get as cmJornalTvMedia } from "./scrapers/cmJornalTvMedia";
 import { get as colossusArticles } from "./scrapers/colossusArticles";
 import { get as culturgestEventos } from "./scrapers/culturgestEventos";
@@ -91,6 +92,7 @@ const scrapers = {
   cinecartaz,
   cinemateca,
   cinemaxRtpPassatempos,
+  clubeDaCriatividadeNoticias,
   cmJornalTvMedia,
   colossusArticles,
   culturgestEventos,
