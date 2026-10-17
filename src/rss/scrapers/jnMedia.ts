@@ -1,74 +1,226 @@
-import { USERAGENT, consume, isValidRSSEntry, type ScraperContext } from "@rss/common";
+import { USERAGENT, type ScraperContext } from "@rss/common";
 import type { RSSData, RSSEntry } from "@rss/types";
+import {
+  array,
+  check,
+  fallback,
+  literal,
+  looseObject,
+  nullish,
+  minLength,
+  number,
+  pipe,
+  safeParse,
+  string,
+  tuple,
+  unknown,
+  type InferOutput,
+} from "valibot";
 
 const SITE_ORIGIN = "https://www.jn.pt";
 const SECTION_PATH = "/media";
 const BASE_URL = new URL(SECTION_PATH, SITE_ORIGIN).href;
+const PAGE_COUNT = 2;
+
+// JN is a Next.js app. Each page embeds its React Server Components (RSC) payload
+// in scripts like `self.__next_f.push([1,"<payload chunk>"])`. The scraper reads the
+// article list from that payload, because the rendered markup uses CSS module class
+// names that change with each JN build.
+const NEXT_PUSH_PATTERN = /self\.__next_f\.push\((\[[\s\S]*?\])\)<\/script>/g;
+const COLON = 0x3a;
+const COMMA = 0x2c;
+const NEWLINE = 0x0a;
+const TEXT_ROW_TAG = 0x54; // "T"
 
 type FetchFn = typeof fetch;
 
-interface DraftEntry extends RSSEntry {
-  section: string;
+const OptionalTextSchema = fallback(nullish(string()), undefined);
+// Next.js uses `[1, "<chunk>"]` for payload text. Other push types carry no page data.
+const NextPayloadPushSchema = tuple([literal(1), string()]);
+const JnMediaSchema = looseObject({
+  MediaType: OptionalTextSchema,
+  Url: OptionalTextSchema,
+});
+const JnArticleSchema = looseObject({
+  Abstract: OptionalTextSchema,
+  Date: OptionalTextSchema,
+  Media: fallback(nullish(array(unknown())), undefined),
+  PreTitle: OptionalTextSchema,
+  Title: OptionalTextSchema,
+  Url: OptionalTextSchema,
+});
+// The section list object also has "PageContext", "PageSize" and "Offset".
+// "Page" separates it from navigation menus, which also have "Items".
+const JnArticleListSchema = looseObject({
+  Items: array(unknown()),
+  Page: number(),
+});
+
+// Fallback when JN renames the list fields: any array of objects with a title and a
+// section URL. Navigation links use "Name", so the "Title" field excludes them.
+const JnSectionArticlesSchema = pipe(
+  array(looseObject({ Title: string(), Url: string() })),
+  minLength(1),
+  check((articles) => articles.every((article) => isSectionUrl(resolveUrl(article.Url)))),
+);
+
+type JnArticle = InferOutput<typeof JnArticleSchema>;
+
+function readNextPayload(html: string): string {
+  let payload = "";
+  for (const match of html.matchAll(NEXT_PUSH_PATTERN)) {
+    const result = safeParse(NextPayloadPushSchema, JSON.parse(match[1]));
+    if (result.success) {
+      payload += result.output[1];
+    }
+  }
+
+  return payload;
 }
 
-interface ParsedPage {
-  entries: Array<RSSEntry>;
-  nextPageURL?: string;
+// Splits an RSC payload into the JSON text of its JSON rows.
+// Each row is `<hex id>:<value>\n`. Text rows are `<hex id>:T<hex byte length>,<text>`.
+// They have no newline terminator, and their text can contain newlines.
+export function readFlightJsonRows(payload: string): Array<string> {
+  const bytes = new TextEncoder().encode(payload);
+  const decoder = new TextDecoder();
+  const rows: Array<string> = [];
+  let position = 0;
+
+  while (position < bytes.length) {
+    const colon = bytes.indexOf(COLON, position);
+    if (colon < 0) {
+      break;
+    }
+
+    if (bytes[colon + 1] === TEXT_ROW_TAG) {
+      const comma = bytes.indexOf(COMMA, colon);
+      const textLength = Number.parseInt(decoder.decode(bytes.subarray(colon + 2, comma)), 16);
+      if (comma < 0 || Number.isNaN(textLength)) {
+        break;
+      }
+
+      position = comma + 1 + textLength;
+      continue;
+    }
+
+    const newline = bytes.indexOf(NEWLINE, colon);
+    const end = newline < 0 ? bytes.length : newline;
+    const value = decoder.decode(bytes.subarray(colon + 1, end));
+    if (value.startsWith("[") || value.startsWith("{")) {
+      rows.push(value);
+    }
+
+    position = end + 1;
+  }
+
+  return rows;
 }
 
-const HTML_ENTITY_BY_NAME = new Map([
-  ["amp", "&"],
-  ["apos", "'"],
-  ["gt", ">"],
-  ["lt", "<"],
-  ["nbsp", " "],
-  ["quot", '"'],
-]);
+function findArticleList(jsonRows: Array<string>): Array<unknown> | undefined {
+  let listItems: Array<unknown> | undefined;
+  let sectionArticles: Array<unknown> | undefined;
+  for (const row of jsonRows) {
+    // The list sits deep in the React element tree. The reviver visits every value.
+    JSON.parse(row, (_key, value) => {
+      const listResult = listItems ? undefined : safeParse(JnArticleListSchema, value);
+      if (listResult?.success) {
+        listItems = listResult.output.Items;
+      }
 
-function decodeHtmlEntities(text: string): string {
-  return text.replaceAll(/&(#x[0-9a-f]+|#\d+|[a-z]+);/gi, (match, entity) => {
-    const normalizedEntity = entity.toLowerCase();
-    if (normalizedEntity.startsWith("#x")) {
-      const codePoint = Number.parseInt(normalizedEntity.slice(2), 16);
-      return Number.isFinite(codePoint) ? String.fromCodePoint(codePoint) : match;
+      const articlesResult = sectionArticles
+        ? undefined
+        : safeParse(JnSectionArticlesSchema, value);
+      if (articlesResult?.success) {
+        sectionArticles = articlesResult.output;
+      }
+
+      return value;
+    });
+  }
+
+  return listItems ?? sectionArticles;
+}
+
+function normalizeText(value: string | null | undefined): string | undefined {
+  return value?.replaceAll("\u00A0", " ").replaceAll(/\s+/g, " ").trim() || undefined;
+}
+
+function parseDate(value: string | null | undefined): Date | undefined {
+  if (!value) {
+    return undefined;
+  }
+
+  const date = new Date(value);
+  return Number.isNaN(date.getTime()) ? undefined : date;
+}
+
+function resolveUrl(value: string | null | undefined): string | undefined {
+  if (!value || !URL.canParse(value, SITE_ORIGIN)) {
+    return undefined;
+  }
+
+  const url = new URL(value, SITE_ORIGIN);
+  return url.protocol === "https:" || url.protocol === "http:" ? url.href : undefined;
+}
+
+// Keeps only JN links inside the section, so a wrong list cannot fill the feed
+// with articles from other sections.
+function isSectionUrl(link: string | undefined): boolean {
+  if (!link) {
+    return false;
+  }
+
+  const url = new URL(link);
+  return url.origin === SITE_ORIGIN && url.pathname.startsWith(`${SECTION_PATH}/`);
+}
+
+function findImageUrl(media: Array<unknown> | null | undefined): string | undefined {
+  for (const item of media ?? []) {
+    const result = safeParse(JnMediaSchema, item);
+    if (result.success && result.output.MediaType === "image") {
+      return resolveUrl(result.output.Url);
     }
+  }
 
-    if (normalizedEntity.startsWith("#")) {
-      const codePoint = Number.parseInt(normalizedEntity.slice(1), 10);
-      return Number.isFinite(codePoint) ? String.fromCodePoint(codePoint) : match;
-    }
+  return undefined;
+}
 
-    return HTML_ENTITY_BY_NAME.get(normalizedEntity) ?? match;
+function parseArticle(article: JnArticle): RSSEntry | undefined {
+  const link = resolveUrl(article.Url);
+  const title = normalizeText(article.Title);
+  if (!link || !isSectionUrl(link) || !title) {
+    return undefined;
+  }
+
+  return {
+    datetime: parseDate(article.Date),
+    id: link,
+    imageURL: findImageUrl(article.Media),
+    link,
+    text: normalizeText(article.PreTitle) ?? normalizeText(article.Abstract) ?? title,
+    title,
+  };
+}
+
+export function parsePage(html: string): Array<RSSEntry> {
+  const items = findArticleList(readFlightJsonRows(readNextPayload(html)));
+  if (!items) {
+    throw new Error("JN media page has no article list in its RSC payload");
+  }
+
+  return items.flatMap((item) => {
+    const result = safeParse(JnArticleSchema, item);
+    const entry = result.success ? parseArticle(result.output) : undefined;
+    return entry ? [entry] : [];
   });
 }
 
-function normalizeWhitespace(text: string): string {
-  return decodeHtmlEntities(text).replaceAll("\u00A0", " ").replaceAll(/\s+/g, " ").trim();
+function pageUrl(page: number): string {
+  return page === 1 ? BASE_URL : `${BASE_URL}?page=${page}`;
 }
 
-function getLastEntry(entries: Array<DraftEntry>): DraftEntry | undefined {
-  return entries.at(-1);
-}
-
-function getImageURL(el: Element): string | undefined {
-  const src = el.getAttribute("src");
-  if (!src) {
-    return undefined;
-  }
-
-  const decodedSrc = decodeHtmlEntities(src);
-  if (decodedSrc.startsWith("data:")) {
-    return undefined;
-  }
-
-  return new URL(decodedSrc, SITE_ORIGIN).href;
-}
-
-function normalizePageUrl(href: string): string {
-  return new URL(decodeHtmlEntities(href), SITE_ORIGIN).href;
-}
-
-async function fetchPage(url: string, fetchFn: FetchFn): Promise<Response> {
+async function fetchPage(url: string, fetchFn: FetchFn): Promise<string> {
   const response = await fetchFn(url, {
     headers: {
       accept: "text/html,application/xhtml+xml",
@@ -80,10 +232,22 @@ async function fetchPage(url: string, fetchFn: FetchFn): Promise<Response> {
     throw new Error(`JN media request failed: ${response.status}`);
   }
 
-  return response;
+  return response.text();
 }
 
-function buildFeed(entries: Array<RSSEntry>): RSSData {
+export async function scrapeFirstPages(fetchFn: FetchFn): Promise<RSSData> {
+  const entries: Array<RSSEntry> = [];
+  const seenIds = new Set<string>();
+
+  for (let page = 1; page <= PAGE_COUNT; page += 1) {
+    for (const entry of parsePage(await fetchPage(pageUrl(page), fetchFn))) {
+      if (!seenIds.has(entry.id)) {
+        seenIds.add(entry.id);
+        entries.push(entry);
+      }
+    }
+  }
+
   return {
     description: "Jornal de Notícias Média",
     entries,
@@ -94,131 +258,6 @@ function buildFeed(entries: Array<RSSEntry>): RSSData {
   };
 }
 
-export async function parsePage(response: Response): Promise<ParsedPage> {
-  // JN wraps server-rendered articles in <noscript>; unwrap them before the
-  // parsing pass because HTMLRewriter otherwise treats their markup as text.
-  const unwrappedResponse = new HTMLRewriter()
-    .on("main#main-content noscript", {
-      element(el) {
-        el.removeAndKeepContent();
-      },
-    })
-    .transform(response);
-  const draftEntries: Array<DraftEntry> = [];
-  let nextPageURL: string | undefined;
-  const articleSelector =
-    'main#main-content [class*="section-regular"][class*="ArticlesList"] article[class*="ArticleWrap"]';
-
-  const rewriter = new HTMLRewriter()
-    .on(articleSelector, {
-      element() {
-        draftEntries.push({
-          id: "",
-          link: "",
-          section: "",
-          text: "",
-          title: "",
-        });
-      },
-    })
-    .on(`${articleSelector} a[class*="TitleLink"]`, {
-      element(el) {
-        const entry = getLastEntry(draftEntries);
-        const href = el.getAttribute("href");
-        if (!entry || !href) {
-          return;
-        }
-
-        const link = normalizePageUrl(href);
-        entry.id = link;
-        entry.link = link;
-      },
-      text(text) {
-        const entry = getLastEntry(draftEntries);
-        if (entry) {
-          entry.title += text.text;
-        }
-      },
-    })
-    .on(`${articleSelector} span[class*="Section"]`, {
-      text(text) {
-        const entry = getLastEntry(draftEntries);
-        if (entry) {
-          entry.section += text.text;
-        }
-      },
-    })
-    .on(`${articleSelector} img`, {
-      element(el) {
-        const entry = getLastEntry(draftEntries);
-        const imageURL = getImageURL(el);
-        if (entry && imageURL && !entry.imageURL) {
-          entry.imageURL = imageURL;
-        }
-      },
-    })
-    .on('main#main-content a[href*="?page="]', {
-      element(el) {
-        if (nextPageURL) {
-          return;
-        }
-
-        const href = el.getAttribute("href");
-        if (href) {
-          nextPageURL = normalizePageUrl(href);
-        }
-      },
-    });
-
-  const body = rewriter.transform(unwrappedResponse).body;
-  if (!body) {
-    throw new Error("Missing response body");
-  }
-
-  await consume(body);
-
-  return {
-    entries: draftEntries
-      .map((entry) => {
-        const title = normalizeWhitespace(entry.title);
-        const section = normalizeWhitespace(entry.section);
-
-        return {
-          id: entry.id,
-          imageURL: entry.imageURL,
-          link: entry.link,
-          text: section || title,
-          title,
-        };
-      })
-      .filter(isValidRSSEntry),
-    nextPageURL,
-  };
-}
-
-export async function scrapeFirstTwoPages(fetchFn: FetchFn): Promise<RSSData> {
-  const entries: Array<RSSEntry> = [];
-  const seenIds = new Set<string>();
-  let currentPageURL: string | undefined = BASE_URL;
-
-  for (let pageNumber = 0; pageNumber < 2 && currentPageURL; pageNumber += 1) {
-    const page = await parsePage(await fetchPage(currentPageURL, fetchFn));
-
-    for (const entry of page.entries) {
-      if (seenIds.has(entry.id)) {
-        continue;
-      }
-
-      seenIds.add(entry.id);
-      entries.push(entry);
-    }
-
-    currentPageURL = page.nextPageURL;
-  }
-
-  return buildFeed(entries);
-}
-
 export async function get(_ctx: ScraperContext, fetchFn: FetchFn = fetch): Promise<RSSData> {
-  return scrapeFirstTwoPages(fetchFn);
+  return scrapeFirstPages(fetchFn);
 }
