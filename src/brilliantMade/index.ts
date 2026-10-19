@@ -38,6 +38,11 @@ export async function checkBrilliantMadeStore(env: Env, { name, url }: Brilliant
   const today = new Date().toISOString().slice(0, 10);
   const idempotencyKey = `brilliant-made-${name}-${today}`;
 
+  // Rate limited: the store state is unknown, so neither email nor clear the key.
+  if (response.status === 429) {
+    return { emailed: false, location, status: response.status, url };
+  }
+
   if (isBrilliantMadeStoreClosed(response.status, location)) {
     // Clear today's key so a reopening later the same day emails again.
     // Read first so the every-5-minute check only spends a KV write after an email.

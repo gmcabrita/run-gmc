@@ -50,6 +50,14 @@ describe("brilliantMade", () => {
     expect(result).toMatchObject({ emailed: false, status: 302 });
   });
 
+  it("does not email when rate limited", async () => {
+    mockFetch({ [PLUSHIES_URL]: () => new Response("Too Many Requests", { status: 429 }) });
+
+    const result = await checkBrilliantMadeStore(env, PLUSHIES);
+
+    expect(result).toMatchObject({ emailed: false, status: 429 });
+  });
+
   it("emails at most once per day for each store", async () => {
     mockFetch({
       [PLUSHIES_URL]: () => new Response("open", { status: 200 }),
