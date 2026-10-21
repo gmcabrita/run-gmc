@@ -1,4 +1,4 @@
-import { USERAGENT, consume, isValidRSSEntry, type ScraperContext } from "@rss/common";
+import { consume, isValidRSSEntry, type ScraperContext } from "@rss/common";
 import type { RSSData, RSSEntry } from "@rss/types";
 
 const BASE_URL = "https://www.thedrum.com/latest";
@@ -184,13 +184,25 @@ export async function parse(response: Response, now: Date = new Date()): Promise
   };
 }
 
-export async function get(_ctx: ScraperContext): Promise<RSSData> {
-  const response = await fetch(BASE_URL, {
-    headers: {
-      accept: "text/html",
-      "user-agent": USERAGENT,
-    },
-  });
+// The Drum sits behind AWS WAF. Browser User-Agents get a JavaScript challenge
+// page (HTTP 202) with no articles. The WhatsApp link preview client gets the
+// full page, because the site allows link preview bots.
+const REQUEST_HEADERS = {
+  accept: "text/html",
+  "user-agent": "WhatsApp/2.23.20.0",
+};
+
+export async function scrape(fetcher: typeof fetch = fetch): Promise<RSSData> {
+  const response = await fetcher(BASE_URL, { headers: REQUEST_HEADERS });
+  // A 202 response is the WAF challenge page. Fail loudly so the feed does not
+  // silently go empty.
+  if (response.status !== 200) {
+    throw new Error(`The Drum request failed with status ${response.status}`);
+  }
 
   return parse(response);
+}
+
+export async function get(_ctx: ScraperContext): Promise<RSSData> {
+  return scrape();
 }
