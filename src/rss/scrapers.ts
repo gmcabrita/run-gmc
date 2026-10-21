@@ -67,7 +67,6 @@ import { get as rtpRelatorioServicoPublico } from "./scrapers/rtpRelatorioServic
 import { get as sqliteNews } from "./scrapers/sqliteNews";
 import { get as theDrumLatest } from "./scrapers/theDrumLatest";
 import { get as bbcMediaCentreLatestNews } from "./scrapers/bbcMediaCentreLatestNews";
-import { get as berserk } from "./scrapers/berserk";
 import { get as brokenBrowserBlog } from "./scrapers/brokenBrowserBlog";
 import { get as uciPromocoes } from "./scrapers/uciPromocoes";
 import { get as viralAgendaAlmada } from "./scrapers/viralAgendaAlmada";
@@ -84,7 +83,6 @@ const scrapers = {
   autoRegulacaoPublicitariaDeliberacoes,
   azerpasBlog,
   bbcMediaCentreLatestNews,
-  berserk,
   brokenBrowserBlog,
   campaignLive,
   ccbEventos,
@@ -163,7 +161,7 @@ export function escapeHtml(value: string): string {
 
 // Builds the HTML body of a feed item. Some sources have no summary text, so
 // the text paragraph is only added when the entry has text. `entry.text` is
-// inserted as HTML because some scrapers (for example mangaDex) put markup in it.
+// inserted as HTML because some scrapers put markup in it.
 export function renderRssEntryContent(entry: RSSEntry): string {
   const link = escapeHtml(entry.link);
   const text = entry.text ? `<p>${entry.text}</p>` : "";

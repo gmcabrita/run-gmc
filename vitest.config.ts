@@ -71,7 +71,6 @@ export default defineConfig({
       // Specific aliases must precede the matching prefix alias.
       "@rss/common": resolve(import.meta.dirname, "src/rss/common.ts"),
       "@rss/healthcheck": resolve(import.meta.dirname, "src/rss/healthcheck.ts"),
-      "@rss/mangaDex": resolve(import.meta.dirname, "src/rss/mangaDex.ts"),
       "@rss/types": resolve(import.meta.dirname, "src/rss/types.ts"),
       // Keep this prefix alias after all specific RSS aliases.
       "@rss": resolve(import.meta.dirname, "src/rss/index.ts"),
