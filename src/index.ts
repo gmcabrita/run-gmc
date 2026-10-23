@@ -531,6 +531,9 @@ export default withSentry(
             },
             {
               checkinMargin: 2,
+              // Coverflex sometimes hangs for ~50s and returns HTTP 520.
+              // Open an issue only after two failed runs in a row.
+              failureIssueThreshold: 2,
               schedule: {
                 type: "crontab",
                 value: "*/15 * * * *",
