@@ -36,5 +36,6 @@
     "skills": "^1.5.23",
     "vite": "^8.2.2",
     "vitest": "^4.1.11"
-  }
+  },
+  "packageManager": "pnpm@12.15.0"
 }
