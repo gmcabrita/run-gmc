@@ -8,6 +8,7 @@ import { sendCinemaxRtpPassatemposEntriesByEmail } from "@rss/scrapers/cinemaxRt
 import { addXEndpoints } from "@x";
 import { addIcs2GcalEndpoint } from "./ics2gcal";
 import { addNosCinemasEndpoints, sendNosCinemasSessionsByEmail } from "./nosCinemas";
+import { addBolEndpoints, sendBolEventsByEmail } from "./bol";
 import {
   addCinecartazQuestionEndpoints,
   sendCinecartazQuestionsByEmail,
@@ -214,6 +215,7 @@ addCoverflexEndpoints(app);
 addXEndpoints(app);
 addIcs2GcalEndpoint(app);
 addNosCinemasEndpoints(app);
+addBolEndpoints(app);
 addCinecartazQuestionEndpoints(app);
 addScrapedRssEndpoints(app);
 
@@ -455,6 +457,19 @@ export default withSentry(
               "nosCinemas.sendMovieSessionsByEmail",
               async () => {
                 await sendNosCinemasSessionsByEmail(env);
+              },
+              {
+                checkinMargin: 2,
+                schedule: {
+                  type: "crontab",
+                  value: "* * * * *",
+                },
+              },
+            ),
+            withMonitor(
+              "bol.sendEventsByEmail",
+              async () => {
+                await sendBolEventsByEmail(env);
               },
               {
                 checkinMargin: 2,
