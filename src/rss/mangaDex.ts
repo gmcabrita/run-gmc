@@ -211,6 +211,9 @@ export async function getMangaDexFeed(
     headers: {
       Accept: "application/json",
       "Accept-Language": config.language,
+      // MangaDex returns 403 "Bot challenge not passed" to the relay's
+      // browser fingerprint when no User-Agent is set. Plain mode passes.
+      "X-Relay-Client": "plain",
     },
   });
 
