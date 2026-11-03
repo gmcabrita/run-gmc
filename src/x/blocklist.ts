@@ -5,7 +5,7 @@ import { buildXApiHeaders, getDefaultCredentials, type XCredentials } from "./cr
 // Each source returns targets by screen name or by numeric user ID. A cron
 // run every 4 hours mutes and blocks each target with each configured X account. The
 // default is only the main account (`X_COOKIE`). After a target is done for an
-// account, a KV entry skips it for that account for 5 to 7 days.
+// account, a KV entry skips it for that account for 7 to 21 days.
 // The random TTL spreads expiries so the targets do not all expire on the same
 // day. Each run handles at most `X_BLOCKLIST_MAX_TARGETS_PER_RUN` targets per account to
 // stay below X rate limits. Targets above the limit wait for a later run.
@@ -65,8 +65,8 @@ export const X_BROWSER_USER_AGENT =
   "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36";
 
 const X_BLOCKLIST_CACHE_PREFIX = "x.blocklist:";
-const X_BLOCKLIST_MIN_TTL_SECONDS = 5 * 24 * 60 * 60;
-const X_BLOCKLIST_MAX_TTL_SECONDS = 7 * 24 * 60 * 60;
+const X_BLOCKLIST_MIN_TTL_SECONDS = 7 * 24 * 60 * 60;
+const X_BLOCKLIST_MAX_TTL_SECONDS = 21 * 24 * 60 * 60;
 export const X_BLOCKLIST_MAX_TARGETS_PER_RUN = 75;
 const X_BLOCKLIST_DELAY_BETWEEN_TARGETS_MS = 1000;
 // See `isLikelyRejectedByX`.

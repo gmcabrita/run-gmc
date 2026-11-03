@@ -86,9 +86,9 @@ describe("x blocklist selection", () => {
     });
   });
 
-  it("keeps the cache TTL between 5 and 7 days", () => {
-    expect(getBlocklistCacheTtlSeconds(() => 0)).toBe(5 * DAY_SECONDS);
-    expect(getBlocklistCacheTtlSeconds(() => 1 - Number.EPSILON)).toBe(7 * DAY_SECONDS);
+  it("keeps the cache TTL between 7 and 21 days", () => {
+    expect(getBlocklistCacheTtlSeconds(() => 0)).toBe(7 * DAY_SECONDS);
+    expect(getBlocklistCacheTtlSeconds(() => 1 - Number.EPSILON)).toBe(21 * DAY_SECONDS);
   });
 
   it("sends screen_name or user_id", () => {
