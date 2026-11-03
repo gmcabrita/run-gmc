@@ -212,7 +212,9 @@ async function x2Rss(env: Env, userName: string, data: XUserTweetsResponse) {
 export function addXEndpoints(app: Hono<{ Bindings: Env }>) {
   // Manual blocklist run. The cron runs the same code every 4 hours.
   // `limit` sets the maximum number of targets for this run (default 75).
-  app.post(
+  // GET is also accepted so the run can start from a browser.
+  app.on(
+    ["GET", "POST"],
     "/x.blocklist",
     async (ctx, next) => {
       const auth = basicAuth({
