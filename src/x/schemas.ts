@@ -3,6 +3,7 @@ import {
   boolean,
   looseObject,
   nullish,
+  number,
   optional,
   string,
   unknown,
@@ -131,10 +132,19 @@ export const XListMembersResponseSchema = looseObject({
   }),
 });
 
+// https://nobots.fyi/suspects.json: `h` is the screen name, `s` is the bot score (0 to 100).
+export const NobotsSuspectsResponseSchema = array(
+  looseObject({
+    h: string(),
+    s: number(),
+  }),
+);
+
 export const XOEmbedResponseSchema = looseObject({
   html: string(),
 });
 
+export type NobotsSuspectsResponse = InferOutput<typeof NobotsSuspectsResponseSchema>;
 export type XListMembersResponse = InferOutput<typeof XListMembersResponseSchema>;
 export type XPost = InferOutput<typeof XPostSchema>;
 export type XUserByScreenNameResponse = InferOutput<typeof XUserByScreenNameResponseSchema>;

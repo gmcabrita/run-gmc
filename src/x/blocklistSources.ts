@@ -8,7 +8,12 @@ import {
   type BlocklistTargetList,
 } from "./blocklist";
 import { buildXApiHeaders, getDefaultCredentials } from "./credentials";
-import { XListMembersResponseSchema, type XListMembersResponse } from "./schemas";
+import {
+  NobotsSuspectsResponseSchema,
+  XListMembersResponseSchema,
+  type NobotsSuspectsResponse,
+  type XListMembersResponse,
+} from "./schemas";
 
 // To add a source, write a `BlocklistSource` and add it to `X_BLOCKLIST_SOURCES`.
 // Use `parseScreenName` for handles and `parseUserId` for numeric user IDs.
@@ -24,6 +29,38 @@ export const clankwallSource: BlocklistSource = {
     return parseTargetList(await response.text(), parseScreenName);
   },
   name: "clankwall",
+};
+
+const NOBOTS_SUSPECTS_URL = "https://nobots.fyi/suspects.json";
+// Only suspects with a bot score at or above this value are muted and blocked.
+const NOBOTS_MIN_SCORE = 80;
+
+export function parseNobotsSuspects(suspects: NobotsSuspectsResponse): BlocklistTargetList {
+  const targets: Array<BlocklistTarget> = [];
+  const invalid: Array<string> = [];
+  for (const { h, s } of suspects) {
+    if (s < NOBOTS_MIN_SCORE) {
+      continue;
+    }
+    const target = parseScreenName(h);
+    if (target) {
+      targets.push(target);
+    } else {
+      invalid.push(h);
+    }
+  }
+  return { invalid, targets };
+}
+
+export const nobotsSource: BlocklistSource = {
+  async fetchTargets() {
+    const response = await fetch(NOBOTS_SUSPECTS_URL);
+    if (!response.ok) {
+      throw new Error(`${NOBOTS_SUSPECTS_URL} returned HTTP ${response.status}`);
+    }
+    return parseNobotsSuspects(parse(NobotsSuspectsResponseSchema, await response.json()));
+  },
+  name: "nobots",
 };
 
 const X_LIST_MEMBERS_URL = "https://x.com/i/api/graphql/_RDpx--fQKSccuRlGpEIoA/ListMembers";
@@ -150,5 +187,6 @@ export const X_BLOCKLIST_LIST_IDS: ReadonlyArray<string> = ["2116659176894071283
 
 export const X_BLOCKLIST_SOURCES: ReadonlyArray<BlocklistSource> = [
   clankwallSource,
+  nobotsSource,
   ...X_BLOCKLIST_LIST_IDS.map(createXListMembersSource),
 ];

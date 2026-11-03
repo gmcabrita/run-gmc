@@ -5,6 +5,7 @@ import {
   buildListMembersUrl,
   clankwallSource,
   createXListMembersSource,
+  nobotsSource,
   parseListMembersPage,
 } from "./blocklistSources";
 import { XListMembersResponseSchema } from "./schemas";
@@ -32,6 +33,31 @@ describe("clankwallSource", () => {
   it("throws on HTTP errors", async () => {
     vi.spyOn(globalThis, "fetch").mockImplementation(async () => new Response("", { status: 500 }));
     await expect(clankwallSource.fetchTargets(testEnv)).rejects.toThrow("HTTP 500");
+  });
+});
+
+describe("nobotsSource", () => {
+  it("keeps suspects with a score of 80 or more", async () => {
+    vi.spyOn(globalThis, "fetch").mockImplementation(async () =>
+      Response.json([
+        { h: "Ultrademic", s: 94 },
+        { h: "edge_case", s: 80 },
+        { h: "human", s: 79 },
+        { h: "bad name", s: 99 },
+      ]),
+    );
+    expect(await nobotsSource.fetchTargets(testEnv)).toEqual({
+      invalid: ["bad name"],
+      targets: [
+        { kind: "screenName", screenName: "ultrademic" },
+        { kind: "screenName", screenName: "edge_case" },
+      ],
+    });
+  });
+
+  it("throws on HTTP errors", async () => {
+    vi.spyOn(globalThis, "fetch").mockImplementation(async () => new Response("", { status: 500 }));
+    await expect(nobotsSource.fetchTargets(testEnv)).rejects.toThrow("HTTP 500");
   });
 });
 
