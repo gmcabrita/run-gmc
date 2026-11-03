@@ -3,6 +3,8 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import {
   buildModerationRequestBody,
   getBlocklistCacheTtlSeconds,
+  getErrorMessages,
+  parseBlocklistLimit,
   parseScreenName,
   parseTargetList,
   parseUserId,
@@ -54,6 +56,25 @@ describe("x blocklist parsing", () => {
       invalid: ["bad name"],
       targets: [screenName("a"), screenName("b")],
     });
+  });
+});
+
+describe("x blocklist endpoint helpers", () => {
+  it("parses the limit", () => {
+    expect(parseBlocklistLimit(undefined)).toBe(75);
+    expect(parseBlocklistLimit("400")).toBe(400);
+    expect(parseBlocklistLimit("0")).toBeUndefined();
+    expect(parseBlocklistLimit("1001")).toBeUndefined();
+    expect(parseBlocklistLimit("1.5")).toBeUndefined();
+    expect(parseBlocklistLimit("abc")).toBeUndefined();
+  });
+
+  it("lists error messages with causes", () => {
+    const error = new AggregateError(
+      [new Error("target failed", { cause: new Error("HTTP 500") }), "text"],
+      "2 errors",
+    );
+    expect(getErrorMessages(error)).toEqual(["target failed: HTTP 500", "text"]);
   });
 });
 

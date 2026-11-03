@@ -14,6 +14,9 @@ import {
 } from "./schemas";
 import { buildXApiHeaders, resolveCredentials, type XCredentials } from "./credentials";
 import { createPrivateProfileNoticeFeed, getTimelineEntries, isProtectedProfile } from "./feed";
+import { captureException } from "@sentry/cloudflare";
+import { getErrorMessages, parseBlocklistLimit, runXBlocklist } from "./blocklist";
+import { X_BLOCKLIST_SOURCES } from "./blocklistSources";
 
 async function fetchUser(
   env: Env,
@@ -207,6 +210,34 @@ async function x2Rss(env: Env, userName: string, data: XUserTweetsResponse) {
 }
 
 export function addXEndpoints(app: Hono<{ Bindings: Env }>) {
+  // Manual blocklist run. The cron runs the same code every 4 hours.
+  // `limit` sets the maximum number of targets for this run (default 75).
+  app.post(
+    "/x.blocklist",
+    async (ctx, next) => {
+      const auth = basicAuth({
+        password: ctx.env.PRIVATE_BASIC_AUTH_PASSWORD,
+        username: ctx.env.PRIVATE_BASIC_AUTH_USERNAME,
+      });
+      return auth(ctx, next);
+    },
+    async (ctx) => {
+      const limit = parseBlocklistLimit(ctx.req.query("limit"));
+      if (limit === undefined) {
+        ctx.status(400);
+        return ctx.text("limit must be a whole number from 1 to 1000");
+      }
+
+      try {
+        return ctx.json(await runXBlocklist(ctx.env, X_BLOCKLIST_SOURCES, undefined, { limit }));
+      } catch (error) {
+        captureException(error);
+        const errors = error instanceof Error ? getErrorMessages(error) : [String(error)];
+        return ctx.json({ errors }, 500);
+      }
+    },
+  );
+
   app.get(
     "/rss.x",
     async (ctx, next) => {

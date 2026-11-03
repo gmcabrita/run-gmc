@@ -227,6 +227,35 @@ export function isLikelyRejectedByX(result: BlocklistAccountResult): boolean {
   return result.done.length === 0 && result.notFound.length >= X_BLOCKLIST_MIN_NOT_FOUND_FOR_ALERT;
 }
 
+const X_BLOCKLIST_MAX_LIMIT = 1000;
+
+// Parses the `limit` query parameter of the manual run endpoint.
+export function parseBlocklistLimit(value: string | undefined): number | undefined {
+  if (value === undefined) {
+    return X_BLOCKLIST_MAX_TARGETS_PER_RUN;
+  }
+  if (!/^\d+$/.test(value)) {
+    return undefined;
+  }
+  const limit = Number(value);
+  return limit >= 1 && limit <= X_BLOCKLIST_MAX_LIMIT ? limit : undefined;
+}
+
+// Lists each error message with its causes, for example
+// `X blocklist target "screenName:a" failed: X rate limited ...`.
+export function getErrorMessages(error: Error): Array<string> {
+  const errors = error instanceof AggregateError ? error.errors : [error];
+  return errors.map((entry) => {
+    const messages: Array<string> = [];
+    let current: unknown = entry;
+    while (current instanceof Error) {
+      messages.push(current.message);
+      current = current.cause;
+    }
+    return messages.length > 0 ? messages.join(": ") : String(entry);
+  });
+}
+
 async function listCachedBlocklistKeys(kv: KVNamespace, prefix: string): Promise<Set<string>> {
   const keys = new Set<string>();
   let cursor: string | undefined;
