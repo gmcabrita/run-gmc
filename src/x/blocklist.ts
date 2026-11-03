@@ -3,13 +3,15 @@ import { buildXApiHeaders, getDefaultCredentials, type XCredentials } from "./cr
 // Mutes and blocks X accounts that come from one or more blocklist sources.
 //
 // Each source returns targets by screen name or by numeric user ID. A cron
-// run every 4 hours mutes and blocks each target with each configured X account. The
+// run every 30 minutes mutes and blocks each target with each configured X account. The
 // default is only the main account (`X_COOKIE`). After a target is done for an
 // account, a KV entry skips it for that account for 7 to 21 days.
 // The random TTL spreads expiries so the targets do not all expire on the same
 // day. Each run handles at most `X_BLOCKLIST_MAX_TARGETS_PER_RUN` targets per account to
 // stay below X rate limits. Targets above the limit wait for a later run.
-// 6 runs a day at 75 targets each gives 450 targets a day for each account.
+// Logs show that X allows about 187 mute requests in a 15-minute window for each
+// account, and 404 responses count. 175 leaves a margin for mutes from the browser.
+// 48 runs a day at 175 targets each gives 8400 targets a day for each account.
 
 export type BlocklistTarget =
   | { kind: "screenName"; screenName: string }
@@ -67,7 +69,7 @@ export const X_BROWSER_USER_AGENT =
 const X_BLOCKLIST_CACHE_PREFIX = "x.blocklist:";
 const X_BLOCKLIST_MIN_TTL_SECONDS = 7 * 24 * 60 * 60;
 const X_BLOCKLIST_MAX_TTL_SECONDS = 21 * 24 * 60 * 60;
-export const X_BLOCKLIST_MAX_TARGETS_PER_RUN = 75;
+export const X_BLOCKLIST_MAX_TARGETS_PER_RUN = 175;
 const X_BLOCKLIST_DELAY_BETWEEN_TARGETS_MS = 1000;
 // See `isLikelyRejectedByX`.
 const X_BLOCKLIST_MIN_NOT_FOUND_FOR_ALERT = 5;

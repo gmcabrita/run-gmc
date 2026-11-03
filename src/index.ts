@@ -573,7 +573,7 @@ export default withSentry(
             },
           );
           break;
-        case "0 */4 * * *":
+        case "*/30 * * * *":
           await withMonitor(
             "x.blocklist",
             async () => {
@@ -584,7 +584,7 @@ export default withSentry(
               maxRuntime: 15,
               schedule: {
                 type: "crontab",
-                value: "0 */4 * * *",
+                value: "*/30 * * * *",
               },
             },
           );

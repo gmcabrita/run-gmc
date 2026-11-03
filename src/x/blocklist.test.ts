@@ -60,7 +60,7 @@ describe("x blocklist parsing", () => {
 
 describe("x blocklist endpoint helpers", () => {
   it("parses the limit", () => {
-    expect(parseBlocklistLimit(undefined)).toBe(75);
+    expect(parseBlocklistLimit(undefined)).toBe(175);
     expect(parseBlocklistLimit("400")).toBe(400);
     expect(parseBlocklistLimit("0")).toBeUndefined();
     expect(parseBlocklistLimit("1001")).toBeUndefined();

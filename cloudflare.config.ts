@@ -71,7 +71,7 @@ export default defineConfig({
         schedule: "0 1 * * *",
       }),
       triggers.scheduled({
-        schedule: "0 */4 * * *",
+        schedule: "*/30 * * * *",
       }),
       triggers.scheduled({
         schedule: "0 12 * * *",
