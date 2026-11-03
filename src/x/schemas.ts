@@ -97,10 +97,45 @@ export const XUserTweetsResponseSchema = looseObject({
   }),
 });
 
+const XListMembersEntrySchema = looseObject({
+  content: looseObject({
+    cursorType: nullish(string()),
+    itemContent: nullish(
+      looseObject({
+        user_results: nullish(
+          looseObject({
+            // `UserUnavailable` results have no `rest_id`.
+            result: nullish(looseObject({ rest_id: nullish(string()) })),
+          }),
+        ),
+      }),
+    ),
+    value: nullish(string()),
+  }),
+  entryId: string(),
+});
+
+export const XListMembersResponseSchema = looseObject({
+  data: looseObject({
+    list: looseObject({
+      members_timeline: looseObject({
+        timeline: looseObject({
+          instructions: array(
+            looseObject({
+              entries: nullish(array(XListMembersEntrySchema)),
+            }),
+          ),
+        }),
+      }),
+    }),
+  }),
+});
+
 export const XOEmbedResponseSchema = looseObject({
   html: string(),
 });
 
+export type XListMembersResponse = InferOutput<typeof XListMembersResponseSchema>;
 export type XPost = InferOutput<typeof XPostSchema>;
 export type XUserByScreenNameResponse = InferOutput<typeof XUserByScreenNameResponseSchema>;
 export type XUserTweetsResponse = InferOutput<typeof XUserTweetsResponseSchema>;

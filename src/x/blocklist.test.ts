@@ -14,7 +14,6 @@ import {
   type BlocklistTarget,
   type XBlocklistAccount,
 } from "./blocklist";
-import { clankwallSource } from "./blocklistSources";
 
 const DAY_SECONDS = 24 * 60 * 60;
 
@@ -204,24 +203,5 @@ describe("runXBlocklist", () => {
     ).rejects.toThrow("1 X blocklist error(s)");
     const { keys } = await env.RUN_GMC_X_CACHE_KV.list({ prefix: "x.blocklist:" });
     expect(keys.map(({ name }) => name)).toEqual(["x.blocklist:test:screenName:a"]);
-  });
-});
-
-describe("clankwallSource", () => {
-  afterEach(() => {
-    vi.restoreAllMocks();
-  });
-
-  it("parses the username list", async () => {
-    vi.spyOn(globalThis, "fetch").mockImplementation(async () => new Response("KaiBGR\ngrok\n\n"));
-    expect(await clankwallSource.fetchTargets()).toEqual({
-      invalid: [],
-      targets: [screenName("kaibgr"), screenName("grok")],
-    });
-  });
-
-  it("throws on HTTP errors", async () => {
-    vi.spyOn(globalThis, "fetch").mockImplementation(async () => new Response("", { status: 500 }));
-    await expect(clankwallSource.fetchTargets()).rejects.toThrow("HTTP 500");
   });
 });

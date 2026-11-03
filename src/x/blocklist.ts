@@ -22,7 +22,7 @@ export type BlocklistTargetList = {
 };
 
 export type BlocklistSource = {
-  fetchTargets: () => Promise<BlocklistTargetList>;
+  fetchTargets: (env: Env) => Promise<BlocklistTargetList>;
   name: string;
 };
 
@@ -61,7 +61,7 @@ const X_BLOCK_ENDPOINT: XModerationEndpoint = {
   url: "https://x.com/i/api/1.1/blocks/create.json",
 };
 
-const X_BROWSER_USER_AGENT =
+export const X_BROWSER_USER_AGENT =
   "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36";
 
 const X_BLOCKLIST_CACHE_PREFIX = "x.blocklist:";
@@ -275,13 +275,13 @@ function sleep(milliseconds: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, milliseconds));
 }
 
-async function fetchBlocklistTargets(sources: ReadonlyArray<BlocklistSource>) {
+async function fetchBlocklistTargets(env: Env, sources: ReadonlyArray<BlocklistSource>) {
   const errors: Array<Error> = [];
   const invalid: Array<string> = [];
   const targets: Array<BlocklistTarget> = [];
   for (const source of sources) {
     try {
-      const list = await source.fetchTargets();
+      const list = await source.fetchTargets(env);
       targets.push(...list.targets);
       invalid.push(...list.invalid.map((entry) => `${source.name}: ${entry}`));
     } catch (error) {
@@ -351,7 +351,7 @@ export async function runXBlocklist(
     limit = X_BLOCKLIST_MAX_TARGETS_PER_RUN,
   }: BlocklistRunOptions = {},
 ): Promise<BlocklistRunResult> {
-  const { errors, invalid, targets } = await fetchBlocklistTargets(sources);
+  const { errors, invalid, targets } = await fetchBlocklistTargets(env, sources);
   const results: Record<string, BlocklistAccountResult> = {};
 
   for (const account of accounts) {
