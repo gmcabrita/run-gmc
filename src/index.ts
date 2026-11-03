@@ -6,6 +6,8 @@ import { addCoverflexEndpoints, sendAppleCatalogueByEmail } from "@coverflex";
 import { sendCinecartazEntriesByEmail } from "@rss/scrapers/cinecartaz";
 import { sendCinemaxRtpPassatemposEntriesByEmail } from "@rss/scrapers/cinemaxRtpPassatempos";
 import { addXEndpoints } from "@x";
+import { runXBlocklist } from "./x/blocklist";
+import { X_BLOCKLIST_SOURCES } from "./x/blocklistSources";
 import { addIcs2GcalEndpoint } from "./ics2gcal";
 import { addNosCinemasEndpoints, sendNosCinemasSessionsByEmail } from "./nosCinemas";
 import { addBolEndpoints, sendBolEventsByEmail } from "./bol";
@@ -567,6 +569,22 @@ export default withSentry(
               schedule: {
                 type: "crontab",
                 value: "0 1 * * *",
+              },
+            },
+          );
+          break;
+        case "0 */4 * * *":
+          await withMonitor(
+            "x.blocklist",
+            async () => {
+              console.log("x.blocklist", await runXBlocklist(env, X_BLOCKLIST_SOURCES));
+            },
+            {
+              checkinMargin: 10,
+              maxRuntime: 15,
+              schedule: {
+                type: "crontab",
+                value: "0 */4 * * *",
               },
             },
           );
