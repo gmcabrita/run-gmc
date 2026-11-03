@@ -143,7 +143,12 @@ export function createXListMembersSource(listId: string): BlocklistSource {
   };
 }
 
+// X lists whose members are muted and blocked. Each list is a separate source,
+// so a failure on one list does not stop the others. A member of more than one
+// list is handled once for each run.
+export const X_BLOCKLIST_LIST_IDS: ReadonlyArray<string> = ["2116659176894071283"];
+
 export const X_BLOCKLIST_SOURCES: ReadonlyArray<BlocklistSource> = [
   clankwallSource,
-  createXListMembersSource("2116659176894071283"),
+  ...X_BLOCKLIST_LIST_IDS.map(createXListMembersSource),
 ];
