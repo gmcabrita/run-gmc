@@ -2,7 +2,11 @@ import { Hono, type ExecutionContext as HonoExecutionContext } from "hono";
 import { consoleLoggingIntegration, withMonitor, withSentry } from "@sentry/cloudflare";
 import { basicAuth } from "hono/basic-auth";
 import { cors } from "hono/cors";
-import { addCoverflexEndpoints, sendAppleCatalogueByEmail } from "@coverflex";
+import {
+  addCoverflexEndpoints,
+  sendAppleCatalogueByEmail,
+  sendNewCoverflexDiscountsByEmail,
+} from "@coverflex";
 import { sendCinecartazEntriesByEmail } from "@rss/scrapers/cinecartaz";
 import { sendCinemaxRtpPassatemposEntriesByEmail } from "@rss/scrapers/cinemaxRtpPassatempos";
 import { addXEndpoints } from "@x";
@@ -600,6 +604,21 @@ export default withSentry(
               schedule: {
                 type: "crontab",
                 value: "0 12 * * *",
+              },
+            },
+          );
+          break;
+        case "0 5 * * *":
+          await withMonitor(
+            "coverflex.sendNewDiscountsByEmail",
+            async () => {
+              await sendNewCoverflexDiscountsByEmail(env);
+            },
+            {
+              checkinMargin: 10,
+              schedule: {
+                type: "crontab",
+                value: "0 5 * * *",
               },
             },
           );

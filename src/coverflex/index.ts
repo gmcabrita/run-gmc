@@ -4,6 +4,9 @@ import { basicAuth } from "hono/basic-auth";
 import { idempotentSendEmail } from "@email";
 import { parse } from "valibot";
 import { CoverflexPocketsResponseSchema, CoverflexTechnologyResponseSchema } from "./schemas";
+import { sendNewCoverflexDiscountsByEmail } from "./discounts";
+
+export { sendNewCoverflexDiscountsByEmail };
 
 export async function sendAppleCatalogueByEmail(env: Env) {
   const { name, url } = await getAppleCatalogueFile(env);
@@ -147,6 +150,20 @@ export function addCoverflexEndpoints(app: Hono<{ Bindings: Env }>) {
       await sendAppleCatalogueByEmail(ctx.env);
 
       return ctx.text("");
+    },
+  );
+
+  app.get(
+    "/coverflex.sendNewDiscountsByEmail",
+    async (ctx, next) => {
+      const auth = basicAuth({
+        password: ctx.env.PRIVATE_BASIC_AUTH_PASSWORD,
+        username: ctx.env.PRIVATE_BASIC_AUTH_USERNAME,
+      });
+      return auth(ctx, next);
+    },
+    async (ctx) => {
+      return ctx.json(await sendNewCoverflexDiscountsByEmail(ctx.env));
     },
   );
 }

@@ -1,0 +1,70 @@
+{
+  "discounts": {
+    "list": [
+      {
+        "id": "7fe149b7-51bd-4e73-a994-a1d98facb4b3",
+        "type": "percentage",
+        "value": "25",
+        "category": "meals",
+        "partner_name": "111_dig_in",
+        "logo_url": "https://static.coverflex.com/discounts/7fe149b7-51bd-4e73-a994-a1d98facb4b3/logo.png",
+        "conditions_links": {
+          "en_gb": "https://www.dig-in.pt/",
+          "pt_pt": "https://www.dig-in.pt/",
+          "de_de": null
+        },
+        "promo_code": "COVERFLEX",
+        "provider_infos": null
+      },
+      {
+        "id": "c0bb8bc1-cb30-4fee-9760-4e7b85140c9b",
+        "type": "amount",
+        "value": {
+          "currency": "EUR",
+          "amount": 25000
+        },
+        "category": "benefits",
+        "partner_name": "Credilink",
+        "logo_url": "https://static.coverflex.com/discounts/c0bb8bc1-cb30-4fee-9760-4e7b85140c9b/logo.svg",
+        "conditions_links": {
+          "en_gb": "https://credilink.pt/#simulador-credito",
+          "pt_pt": "https://credilink.pt/#simulador-credito",
+          "de_de": null
+        },
+        "promo_code": "VIPDISTRICT1",
+        "provider_infos": {
+          "vip_district": {
+            "offer_id": {
+              "es": null,
+              "pt": "203844",
+              "de": null,
+              "it": null
+            }
+          }
+        }
+      },
+      {
+        "id": "ab923923-c2ee-43e0-992a-072a2ff72fa4",
+        "type": "amount",
+        "value": {
+          "currency": "EUR",
+          "amount": 700
+        },
+        "category": "gym_fitness",
+        "partner_name": "Fitness_Up",
+        "logo_url": "https://static.coverflex.com/discounts/ab923923-c2ee-43e0-992a-072a2ff72fa4/logo.png",
+        "conditions_links": {
+          "en_gb": "https://www.fitnessup.pt/empresas/home",
+          "pt_pt": "https://www.fitnessup.pt/empresas/home",
+          "de_de": null
+        },
+        "promo_code": "8a9be657bf",
+        "provider_infos": null
+      }
+    ],
+    "total_pages": 1,
+    "total_results": 3,
+    "current_page": 1,
+    "results_per_page": 3
+  }
+}
