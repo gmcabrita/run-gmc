@@ -120,13 +120,16 @@ export const XListMembersResponseSchema = looseObject({
   data: looseObject({
     list: looseObject({
       members_timeline: looseObject({
-        timeline: looseObject({
-          instructions: array(
-            looseObject({
-              entries: nullish(array(XListMembersEntrySchema)),
-            }),
-          ),
-        }),
+        // X omits `timeline` when the list does not exist or the account cannot see it.
+        timeline: optional(
+          looseObject({
+            instructions: array(
+              looseObject({
+                entries: nullish(array(XListMembersEntrySchema)),
+              }),
+            ),
+          }),
+        ),
       }),
     }),
   }),

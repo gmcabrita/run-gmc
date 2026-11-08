@@ -7,6 +7,7 @@ import {
   createXListMembersSource,
   nobotsSource,
   parseListMembersPage,
+  UNAVAILABLE_LIST_MESSAGE,
 } from "./blocklistSources";
 import { XListMembersResponseSchema } from "./schemas";
 import firstPage from "./__fixtures__/list-members-page.json";
@@ -103,6 +104,32 @@ describe("X list members source", () => {
     expect(JSON.parse(secondUrl.searchParams.get("variables") ?? "").cursor).toBe(
       "0|2117421357531660232",
     );
+  });
+
+  it("returns no targets when the list does not exist or is private", async () => {
+    vi.spyOn(globalThis, "fetch").mockImplementation(async () =>
+      Response.json({ data: { list: { members_timeline: {} } } }),
+    );
+    expect(await createXListMembersSource("123").fetchTargets(testEnv)).toEqual({
+      invalid: [UNAVAILABLE_LIST_MESSAGE],
+      targets: [],
+    });
+  });
+
+  it("throws when a later page has no members timeline", async () => {
+    vi.spyOn(globalThis, "fetch")
+      .mockImplementationOnce(async () => Response.json(firstPage))
+      .mockImplementationOnce(async () =>
+        Response.json({ data: { list: { members_timeline: {} } } }),
+      );
+    await expect(createXListMembersSource("123").fetchTargets(testEnv)).rejects.toThrow(
+      "no members timeline on page 2",
+    );
+  });
+
+  it("throws when the response has no list", async () => {
+    vi.spyOn(globalThis, "fetch").mockImplementation(async () => Response.json({ data: {} }));
+    await expect(createXListMembersSource("123").fetchTargets(testEnv)).rejects.toThrow();
   });
 
   it("throws on HTTP errors", async () => {

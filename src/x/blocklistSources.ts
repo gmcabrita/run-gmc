@@ -120,10 +120,21 @@ export type XListMembersPage = {
   userIds: Array<string>;
 };
 
-export function parseListMembersPage(response: XListMembersResponse): XListMembersPage {
+// Returns undefined when X has no timeline for the list. X does this with HTTP 200
+// when the list does not exist or the account cannot see it.
+export function parseListMembersPage(response: XListMembersResponse): XListMembersPage | undefined {
+  const timeline = response.data.list.members_timeline.timeline;
+  return timeline ? parseListMembersTimeline(timeline) : undefined;
+}
+
+type XListMembersTimeline = NonNullable<
+  XListMembersResponse["data"]["list"]["members_timeline"]["timeline"]
+>;
+
+function parseListMembersTimeline(timeline: XListMembersTimeline): XListMembersPage {
   const userIds: Array<string> = [];
   let bottomCursor: string | undefined;
-  for (const instruction of response.data.list.members_timeline.timeline.instructions) {
+  for (const instruction of timeline.instructions) {
     for (const entry of instruction.entries ?? []) {
       const userId = entry.content.itemContent?.user_results?.result?.rest_id;
       if (entry.entryId.startsWith("user-") && userId) {
@@ -147,6 +158,8 @@ export function buildListMembersUrl(listId: string, cursor: string | undefined):
   return url.toString();
 }
 
+export const UNAVAILABLE_LIST_MESSAGE = "list not found or not visible";
+
 // Reads the members of an X list with the default account (`X_COOKIE`).
 // The account must be able to see the list.
 export function createXListMembersSource(listId: string): BlocklistSource {
@@ -163,9 +176,18 @@ export function createXListMembersSource(listId: string): BlocklistSource {
         if (!response.ok) {
           throw new Error(`X list ${listId} members returned HTTP ${response.status}`);
         }
-        const { nextCursor, userIds } = parseListMembersPage(
+        const membersPage = parseListMembersPage(
           parse(XListMembersResponseSchema, await response.json()),
         );
+        if (!membersPage && page === 0) {
+          // A deleted or private list is not a fault in this code. Report it in
+          // `invalid` so the run logs show it, and do not fail the cron run.
+          return { invalid: [UNAVAILABLE_LIST_MESSAGE], targets: [] };
+        }
+        if (!membersPage) {
+          throw new Error(`X list ${listId} has no members timeline on page ${page + 1}`);
+        }
+        const { nextCursor, userIds } = membersPage;
         targets.push(...userIds.map((userId): BlocklistTarget => ({ kind: "userId", userId })));
         if (!nextCursor) {
           return { invalid: [], targets };
