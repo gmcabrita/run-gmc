@@ -6,6 +6,11 @@ export const NOS_CINEMAS_WATCHES: ReadonlyArray<NosCinemasWatch> = [
   {
     date: ["2026-11-15", "2026-11-20", "2026-11-21", "2026-11-22"],
     keyword: "you can see everything",
-    venue: ["vasco da gama", "amoreiras", "colombo"],
+    venue: ["vasco da gama"],
+  },
+  {
+    date: ["2026-11-15", "2026-11-20", "2026-11-21", "2026-11-22"],
+    keyword: "you can see everything",
+    venue: ["colombo"],
   },
 ];
