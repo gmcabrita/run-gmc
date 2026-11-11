@@ -4,7 +4,7 @@ import type { NosCinemasWatch } from "./index";
 // sessions that match its filters appear. Edit this list to add or remove watches.
 export const NOS_CINEMAS_WATCHES: ReadonlyArray<NosCinemasWatch> = [
   {
-    date: ["2026-12-10", "2026-12-11", "2026-12-12", "2026-12-13", "2026-12-14", "2026-12-15"],
+    date: ["2026-12-10", "2026-12-11", "2026-12-12", "2026-12-13", "2026-12-14"],
     keyword: "dune",
     venue: ["colombo"],
   },
