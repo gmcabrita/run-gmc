@@ -1,11 +1,17 @@
-import { consume, decodeHtmlEntities, type ScraperContext } from "@rss/common";
+import { consume, decodeHtmlEntities, type ScraperContext, WHATSAPP_USER_AGENT } from "@rss/common";
 import type { RSSData, RSSEntry } from "@rss/types";
 import { createProxiedFetch, type ProxiedFetchEnv } from "../../proxiedFetch";
 
 const SITE_ORIGIN = "https://www.campaignlive.co.uk";
 const SECTION_URLS = [`${SITE_ORIGIN}/news`];
-const USER_AGENT =
-  "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36";
+// Campaign sits behind Cloudflare and an Azure WAF JS challenge. Cloudflare
+// challenges requests from Worker IPs, so requests go through the relay with
+// its browser TLS fingerprint. Azure WAF challenges browser User-Agents from
+// the relay, but lets the WhatsApp link preview client through.
+const REQUEST_HEADERS = {
+  Accept: "text/html",
+  "User-Agent": WHATSAPP_USER_AGENT,
+};
 const MONTHS = [
   "january",
   "february",
@@ -176,26 +182,8 @@ export function mergeEntries(sections: Array<Array<RSSEntry>>): Array<RSSEntry> 
   return [...entries.values()];
 }
 
-function getRequestHeaders(): HeadersInit {
-  return {
-    Accept:
-      "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8",
-    "Accept-Language": "en-GB,en;q=0.9",
-    Priority: "u=0, i",
-    "Sec-CH-UA": '"Chromium";v="146", "Not-A.Brand";v="24", "Google Chrome";v="146"',
-    "Sec-CH-UA-Mobile": "?0",
-    "Sec-CH-UA-Platform": '"macOS"',
-    "Sec-Fetch-Dest": "document",
-    "Sec-Fetch-Mode": "navigate",
-    "Sec-Fetch-Site": "none",
-    "Sec-Fetch-User": "?1",
-    "Upgrade-Insecure-Requests": "1",
-    "User-Agent": USER_AGENT,
-  };
-}
-
 async function scrapeSection(fetchFn: typeof fetch, url: string): Promise<Array<RSSEntry>> {
-  const response = await fetchFn(url, { headers: getRequestHeaders() });
+  const response = await fetchFn(url, { headers: REQUEST_HEADERS });
 
   if (!response.ok) {
     await response.body?.cancel();
@@ -211,8 +199,6 @@ async function scrapeSection(fetchFn: typeof fetch, url: string): Promise<Array<
   return entries;
 }
 
-// Campaign sits behind a Cloudflare challenge. Direct requests get a 403, so
-// all requests go through the relay with full browser navigation headers.
 export async function scrape(
   env: ProxiedFetchEnv,
   fetchFn: typeof fetch = fetch,

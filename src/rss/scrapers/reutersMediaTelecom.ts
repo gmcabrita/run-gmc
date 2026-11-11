@@ -1,4 +1,4 @@
-import { isValidRSSEntry, type ScraperContext } from "@rss/common";
+import { isValidRSSEntry, type ScraperContext, WHATSAPP_USER_AGENT } from "@rss/common";
 import { createProxiedFetch } from "../../proxiedFetch";
 import type { RSSData, RSSEntry } from "@rss/types";
 import {
@@ -26,7 +26,7 @@ const API_URL =
 const REQUEST_HEADERS = {
   Accept: "*/*",
   "Accept-Language": "en-US,en;q=0.9",
-  "User-Agent": "WhatsApp/2.23.20.0",
+  "User-Agent": WHATSAPP_USER_AGENT,
   "X-Relay-Client": "plain",
 };
 const API_QUERY = {

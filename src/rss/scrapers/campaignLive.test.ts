@@ -72,7 +72,7 @@ describe("campaignLive scraper", () => {
     ]);
   });
 
-  it("requests the news section through the relay", async () => {
+  it("requests the news section through the browser relay with the WhatsApp User-Agent", async () => {
     const requests: Array<Request> = [];
     const fetchFn: typeof fetch = async (input, init) => {
       requests.push(new Request(input, init));
@@ -85,7 +85,8 @@ describe("campaignLive scraper", () => {
       "https://relay.example.com/fetch/https://www.campaignlive.co.uk/news",
     ]);
     expect(requests[0]?.headers.get("authorization")).toBe("Bearer relay-token");
-    expect(requests[0]?.headers.get("sec-fetch-mode")).toBe("navigate");
+    expect(requests[0]?.headers.get("user-agent")).toBe("WhatsApp/2.23.20.0");
+    expect(requests[0]?.headers.get("x-relay-client")).toBeNull();
     expect(result).toMatchObject({ id: "https://www.campaignlive.co.uk", title: "Campaign UK" });
     expect(result.entries).toHaveLength(3);
   });

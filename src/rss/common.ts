@@ -6,6 +6,10 @@ export type ScraperContext = Context<{ Bindings: Env }>;
 export const USERAGENT =
   "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36";
 
+// The WhatsApp link preview client. Some bot protections (AWS WAF, DataDome,
+// Azure WAF) let link preview bots through when they block browser User-Agents.
+export const WHATSAPP_USER_AGENT = "WhatsApp/2.23.20.0";
+
 export function isValidRSSEntry(entry: RSSEntry) {
   return Boolean(entry.id) && Boolean(entry.link) && Boolean(entry.title);
 }

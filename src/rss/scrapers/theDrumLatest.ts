@@ -1,4 +1,4 @@
-import { consume, isValidRSSEntry, type ScraperContext } from "@rss/common";
+import { consume, isValidRSSEntry, type ScraperContext, WHATSAPP_USER_AGENT } from "@rss/common";
 import type { RSSData, RSSEntry } from "@rss/types";
 
 const BASE_URL = "https://www.thedrum.com/latest";
@@ -189,7 +189,7 @@ export async function parse(response: Response, now: Date = new Date()): Promise
 // full page, because the site allows link preview bots.
 const REQUEST_HEADERS = {
   accept: "text/html",
-  "user-agent": "WhatsApp/2.23.20.0",
+  "user-agent": WHATSAPP_USER_AGENT,
 };
 
 export async function scrape(fetcher: typeof fetch = fetch): Promise<RSSData> {
