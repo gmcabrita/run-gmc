@@ -17,6 +17,15 @@ export const CoverflexAuthResponseSchema = object({
   token: string(),
 });
 
+// The renew endpoint (POST employee/sessions/renew) answers with a different shape than login:
+// { "data": { "access_token": "…", "refresh_token": "…" } }
+export const CoverflexRenewResponseSchema = object({
+  data: object({
+    access_token: string(),
+    refresh_token: string(),
+  }),
+});
+
 const CoverflexFileSchema = object({
   name: string(),
   slug: string(),
@@ -47,6 +56,7 @@ export const CoverflexPocketsResponseSchema = object({
 });
 
 export type CoverflexAuthResponse = InferOutput<typeof CoverflexAuthResponseSchema>;
+export type CoverflexRenewResponse = InferOutput<typeof CoverflexRenewResponseSchema>;
 
 const CoverflexDiscountFieldsSchema = {
   category: string(),

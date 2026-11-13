@@ -1,5 +1,15 @@
 import { number, object, parse } from "valibot";
-import { CoverflexAuthResponseSchema, type CoverflexAuthResponse } from "../schemas";
+import {
+  CoverflexAuthResponseSchema,
+  CoverflexRenewResponseSchema,
+  type CoverflexAuthResponse,
+  type CoverflexRenewResponse,
+} from "../schemas";
+
+// Maps the renew response to the login token shape that callers store.
+export function toCoverflexAuthResponse({ data }: CoverflexRenewResponse): CoverflexAuthResponse {
+  return { refresh_token: data.refresh_token, token: data.access_token };
+}
 
 const JwtPayloadSchema = object({
   exp: number(),
@@ -65,7 +75,7 @@ async function refreshSession(refreshToken: string): Promise<CoverflexAuthRespon
     throw new Error(`Refresh failed: ${response.status}`);
   }
 
-  return parse(CoverflexAuthResponseSchema, await response.json());
+  return toCoverflexAuthResponse(parse(CoverflexRenewResponseSchema, await response.json()));
 }
 
 async function loginWithCredentials(env: Env): Promise<CoverflexAuthResponse> {
