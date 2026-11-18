@@ -31,7 +31,7 @@ function htmlResponse(html: string, status = 200) {
 // Serves the listing and every passatempo page. `failures` maps a URL to an HTTP error status.
 function mockCinecartazPages(failures: Record<string, number>) {
   return vi.spyOn(globalThis, "fetch").mockImplementation(async (input) => {
-    const url = String(input);
+    const url = new Request(input).url;
     const failureStatus = failures[url];
     if (failureStatus !== undefined) {
       return htmlResponse("", failureStatus);
@@ -62,7 +62,9 @@ describe("cinecartaz passatempo question", () => {
     const fetchSpy = mockCinecartazPages({ [FIRST_PASSATEMPO_URL]: 500 });
 
     await expect(sendCinecartazQuestionsByEmail(env)).rejects.toThrow(AggregateError);
-    expect(fetchSpy.mock.calls.map(([input]) => String(input))).toContain(SECOND_PASSATEMPO_URL);
+    expect(fetchSpy.mock.calls.map(([input]) => new Request(input).url)).toContain(
+      SECOND_PASSATEMPO_URL,
+    );
   });
 
   it("fails when the listing page fails", async () => {

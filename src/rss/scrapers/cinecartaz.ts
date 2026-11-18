@@ -48,12 +48,14 @@ export async function parse(response: Response): Promise<RSSData> {
   return {
     description: "Passatempos | Cinecartaz",
     entries: entries
+      .values()
       .map((entry) => ({
         ...entry,
         text: entry.title.trim().replaceAll("\n", " | "),
         title: entry.title.trim().replaceAll("\n", " | "),
       }))
-      .filter((entry: RSSEntry) => isValidRSSEntry(entry)),
+      .filter((entry: RSSEntry) => isValidRSSEntry(entry))
+      .toArray(),
     id: "https://cinecartaz.publico.pt/passatempos",
     language: "pt",
     link: "https://cinecartaz.publico.pt/passatempos",

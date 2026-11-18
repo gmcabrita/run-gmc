@@ -72,6 +72,7 @@ export async function parse(response: Response): Promise<RSSData> {
   return {
     description: "Highlighted Campaigns – Ads of the World",
     entries: entries
+      .values()
       .map((entry) => {
         const parts = [entry.brand, entry.campaign, entry.agency].filter((p) => p && p.trim());
         const title = parts.join(" | ").trim();
@@ -83,7 +84,8 @@ export async function parse(response: Response): Promise<RSSData> {
           title,
         };
       })
-      .filter((entry: RSSEntry) => isValidRSSEntry(entry)),
+      .filter((entry: RSSEntry) => isValidRSSEntry(entry))
+      .toArray(),
     id: "https://www.adsoftheworld.com/blog/feed",
     language: "en",
     link: "https://www.adsoftheworld.com/blog/feed",

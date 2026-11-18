@@ -90,7 +90,7 @@ describe("viralAgendaAlmada scraper", () => {
     const fetchFn: typeof fetch = async (input, init) => {
       requests.push({
         headers: new Headers(init?.headers),
-        url: String(input),
+        url: new Request(input).url,
       });
 
       const response = responses.shift();

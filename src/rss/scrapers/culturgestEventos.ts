@@ -318,7 +318,7 @@ export async function parse(response: Response): Promise<RSSData> {
 
   return {
     description: "Agenda de eventos da Culturgest",
-    entries: events.map(buildEntry).filter(isValidRSSEntry),
+    entries: events.values().map(buildEntry).filter(isValidRSSEntry).toArray(),
     id: BASE_URL,
     language: "pt",
     link: BASE_URL,

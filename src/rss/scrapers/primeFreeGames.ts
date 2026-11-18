@@ -200,7 +200,7 @@ export async function get(_ctx: ScraperContext): Promise<RSSData> {
       "cache-control": "no-cache",
       "client-id": "CarboniteApp",
       "content-type": "application/json",
-      cookie: cookie,
+      cookie,
       "csrf-token": csrfToken,
       pragma: "no-cache",
       "prime-gaming-language": "en-US",

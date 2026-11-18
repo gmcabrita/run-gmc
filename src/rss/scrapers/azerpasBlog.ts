@@ -127,6 +127,7 @@ export async function parse(response: Response): Promise<RSSData> {
   return {
     description: DESCRIPTION,
     entries: entries
+      .values()
       .map((entry) => {
         const title = normalizeWhitespace(entry.title);
         const metadata = normalizeWhitespace(entry.metadata);
@@ -139,7 +140,8 @@ export async function parse(response: Response): Promise<RSSData> {
           title,
         };
       })
-      .filter(isValidRSSEntry),
+      .filter(isValidRSSEntry)
+      .toArray(),
     id: BASE_URL,
     language: "en",
     link: BASE_URL,

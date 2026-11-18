@@ -52,6 +52,7 @@ export async function parseRtpFinancialDocumentPage(
   return {
     description: config.description,
     entries: entries
+      .values()
       .map((entry) => {
         const title = normalizeWhitespace(entry.title);
         return {
@@ -60,7 +61,8 @@ export async function parseRtpFinancialDocumentPage(
           title,
         };
       })
-      .filter((entry) => isValidRSSEntry(entry)),
+      .filter((entry) => isValidRSSEntry(entry))
+      .toArray(),
     id: config.pageUrl,
     language: "pt",
     link: config.pageUrl,

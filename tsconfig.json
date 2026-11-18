@@ -24,6 +24,5 @@
     }
   },
   // `cf workers types` and the Vite plugin write Worker types here. TypeScript skips dot directories by default.
-  "include": ["**/*", ".cloudflare/types/index.d.ts"],
-  "exclude": ["tools/oxlint/anti-slop"]
+  "include": ["**/*", ".cloudflare/types/index.d.ts"]
 }

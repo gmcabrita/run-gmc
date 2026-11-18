@@ -27,7 +27,7 @@ export async function parse(response: Response): Promise<RSSData> {
           const link = href.startsWith("http") ? href : `https://www.group.dentsu.com${href}`;
           currentEntry = {
             id: link,
-            link: link,
+            link,
             text: "",
             title: "",
           };

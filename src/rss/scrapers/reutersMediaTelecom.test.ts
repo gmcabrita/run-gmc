@@ -86,7 +86,7 @@ describe("reutersMediaTelecom scrape", () => {
 
     expect(result.entries).toHaveLength(2);
     expect(fetcher).toHaveBeenCalledTimes(1);
-    expect(String(fetcher.mock.calls[0]?.[0])).toMatch(
+    expect(new Request(fetcher.mock.calls[0][0]).url).toMatch(
       /^https:\/\/www\.reuters\.com\/pf\/api\/v3\/content\/fetch\/articles-by-section-alias-or-id-v1\?/,
     );
     const headers = sentHeaders(fetcher.mock.calls[0]);
@@ -124,7 +124,7 @@ describe("reutersMediaTelecom endpoint", () => {
     expect(response.status).toBe(200);
     expect(fetchSpy).toHaveBeenCalledTimes(1);
     const call = fetchSpy.mock.calls[0];
-    expect(String(call?.[0])).toMatch(
+    expect(new Request(call[0]).url).toMatch(
       /^https:\/\/relay\.example\.com\/https:\/\/www\.reuters\.com\/pf\/api\//,
     );
     const headers = sentHeaders(call);

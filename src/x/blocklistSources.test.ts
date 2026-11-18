@@ -1,6 +1,6 @@
 import { env } from "cloudflare:workers";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { parse } from "valibot";
+import { parse, ValiError } from "valibot";
 import {
   buildListMembersUrl,
   clankwallSource,
@@ -100,7 +100,7 @@ describe("X list members source", () => {
       ],
     });
     expect(fetchSpy).toHaveBeenCalledTimes(2);
-    const secondUrl = new URL(String(fetchSpy.mock.calls[1][0]));
+    const secondUrl = new URL(new Request(fetchSpy.mock.calls[1][0]).url);
     expect(JSON.parse(secondUrl.searchParams.get("variables") ?? "").cursor).toBe(
       "0|2117421357531660232",
     );
@@ -129,7 +129,7 @@ describe("X list members source", () => {
 
   it("throws when the response has no list", async () => {
     vi.spyOn(globalThis, "fetch").mockImplementation(async () => Response.json({ data: {} }));
-    await expect(createXListMembersSource("123").fetchTargets(testEnv)).rejects.toThrow();
+    await expect(createXListMembersSource("123").fetchTargets(testEnv)).rejects.toThrow(ValiError);
   });
 
   it("throws on HTTP errors", async () => {

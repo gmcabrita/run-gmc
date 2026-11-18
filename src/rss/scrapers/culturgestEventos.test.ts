@@ -137,7 +137,9 @@ describe("culturgestEventos scraper", () => {
 
     await scrape(fetchFn);
 
-    expect(String(requestInput)).toBe("https://www.culturgest.pt/pt/programacao/schedule/events/");
+    expect(requestInput && new Request(requestInput).url).toBe(
+      "https://www.culturgest.pt/pt/programacao/schedule/events/",
+    );
 
     const headers = new Headers(requestInit?.headers);
     expect(headers.get("X-Requested-With")).toBe("XMLHttpRequest");

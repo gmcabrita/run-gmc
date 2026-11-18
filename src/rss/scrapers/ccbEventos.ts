@@ -87,8 +87,10 @@ function parseDatetimeFromLink(link: string): Date | undefined {
 
 function buildEntryText(card: CCBCard): string | undefined {
   const parts = [card.dateLabel, card.description, card.venue, ...card.tags]
+    .values()
     .map(normalizeText)
-    .filter((value) => value.length > 0);
+    .filter((value) => value.length > 0)
+    .toArray();
 
   return parts.length > 0 ? parts.join(" | ") : undefined;
 }
@@ -243,9 +245,11 @@ export async function parse(response: Response): Promise<RSSData> {
   return {
     description: "Agenda de eventos do CCB",
     entries: cards
+      .values()
       .filter((card) => !shouldIgnoreCard(card))
       .map(buildEntry)
-      .filter(isValidRSSEntry),
+      .filter(isValidRSSEntry)
+      .toArray(),
     id: BASE_URL,
     language: "pt",
     link: BASE_URL,

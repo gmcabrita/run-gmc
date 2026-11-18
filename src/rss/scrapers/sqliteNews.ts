@@ -101,6 +101,7 @@ export async function parse(response: Response): Promise<RSSData> {
   return {
     description: DESCRIPTION,
     entries: entries
+      .values()
       .map((entry) => {
         const heading = normalizeWhitespace(entry.heading);
         const headingMatch = heading.match(/^(\d{4}-\d{2}-\d{2})\s+-\s+(.+)$/);
@@ -125,6 +126,7 @@ export async function parse(response: Response): Promise<RSSData> {
       })
       .filter(isValidRSSEntry)
       .map(({ heading: _heading, ...entry }) => entry)
+      .toArray()
       .sort((a, b) => {
         const aTime = a.datetime?.getTime() ?? 0;
         const bTime = b.datetime?.getTime() ?? 0;

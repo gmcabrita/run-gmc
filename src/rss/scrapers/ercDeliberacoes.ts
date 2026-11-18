@@ -96,6 +96,7 @@ export async function parse(response: Response): Promise<RSSData> {
   return {
     description: "Deliberações ERC",
     entries: entries
+      .values()
       .map((entry, index) => {
         let text = entry.text?.trim().replaceAll(/\s+/g, " ") || "";
         // Handle both decoded "Tópicos:" and HTML entity encoded "T&oacute;picos:"
@@ -114,7 +115,8 @@ export async function parse(response: Response): Promise<RSSData> {
           title: entry.title.trim().replaceAll("\n", " | "),
         };
       })
-      .filter((entry: RSSEntry) => isValidRSSEntry(entry)),
+      .filter((entry: RSSEntry) => isValidRSSEntry(entry))
+      .toArray(),
     id: BASE_URL,
     language: "pt",
     link: BASE_URL,

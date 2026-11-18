@@ -10,7 +10,7 @@ export async function parse(response: Response): Promise<RSSData> {
         const link = new URL(href, "https://kirshatrov.com").href;
         entries.push({
           id: link,
-          link: link,
+          link,
           text: "",
           title: "",
         });
@@ -28,12 +28,14 @@ export async function parse(response: Response): Promise<RSSData> {
   return {
     description: "Kir Shatrov",
     entries: entries
+      .values()
       .map((entry) => ({
         ...entry,
         text: entry.title.trim().replaceAll("\n", " | "),
         title: entry.title.trim().replaceAll("\n", " | "),
       }))
-      .filter((entry: RSSEntry) => isValidRSSEntry(entry)),
+      .filter((entry: RSSEntry) => isValidRSSEntry(entry))
+      .toArray(),
     id: "https://kirshatrov.com/posts/",
     language: "en",
     link: "https://kirshatrov.com/posts/",

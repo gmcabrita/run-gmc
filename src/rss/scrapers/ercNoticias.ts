@@ -46,12 +46,14 @@ export async function parse(response: Response): Promise<RSSData> {
   return {
     description: "Noticias ERC",
     entries: entries
+      .values()
       .map((entry) => ({
         ...entry,
         text: entry.text?.trim().replaceAll("\n", " | "),
         title: entry.title.trim().replaceAll("\n", " | "),
       }))
-      .filter((entry: RSSEntry) => isValidRSSEntry(entry)),
+      .filter((entry: RSSEntry) => isValidRSSEntry(entry))
+      .toArray(),
     id: "https://www.erc.pt/pt/a-erc/noticias/",
     language: "pt",
     link: "https://www.erc.pt/pt/a-erc/noticias/",

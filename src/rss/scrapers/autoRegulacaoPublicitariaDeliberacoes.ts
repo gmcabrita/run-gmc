@@ -146,6 +146,7 @@ export async function parse(response: Response): Promise<RSSData> {
   await consume(transformed.body);
 
   const rssEntries = entries
+    .values()
     .map((entry) => {
       const title = normalizeWhitespace(entry.title);
       const year = normalizeWhitespace(entry.year);
@@ -162,7 +163,8 @@ export async function parse(response: Response): Promise<RSSData> {
         title,
       };
     })
-    .filter((entry: RSSEntry) => isValidRSSEntry(entry));
+    .filter((entry: RSSEntry) => isValidRSSEntry(entry))
+    .toArray();
 
   return {
     description: "Deliberações da Auto Regulação Publicitária",

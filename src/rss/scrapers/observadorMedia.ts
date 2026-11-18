@@ -181,6 +181,7 @@ export async function parsePage(response: Response): Promise<RSSData> {
 
   return buildFeed(
     draftEntries
+      .values()
       .map((entry) => {
         const title = normalizeWhitespace(entry.title);
         const lead = normalizeWhitespace(entry.text ?? "");
@@ -196,7 +197,8 @@ export async function parsePage(response: Response): Promise<RSSData> {
           title,
         };
       })
-      .filter(isValidRSSEntry),
+      .filter(isValidRSSEntry)
+      .toArray(),
   );
 }
 

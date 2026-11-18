@@ -34,7 +34,7 @@ async function fetchUser(
     },
   );
 
-  if (response.status == 429) {
+  if (response.status === 429) {
     throw new Error("Rate Limited");
   }
 
@@ -54,7 +54,7 @@ async function fetchPosts(
     },
   );
 
-  if (response.status == 429) {
+  if (response.status === 429) {
     throw new Error("Rate Limited");
   }
   return parse(XUserTweetsResponseSchema, await response.json());
@@ -290,7 +290,7 @@ export function addXEndpoints(app: Hono<{ Bindings: Env }>) {
         ctx.header("Cache-Control", `max-age=${maxAge + 1}`);
         return ctx.body(rss2);
       } catch (error: unknown) {
-        if (error instanceof Error && error.message == "Rate Limited") {
+        if (error instanceof Error && error.message === "Rate Limited") {
           ctx.header("Retry-After", `${Math.floor(Math.random() * (240 - 120 + 1)) + 120}`);
           ctx.status(429);
           return ctx.text("Rate Limited");

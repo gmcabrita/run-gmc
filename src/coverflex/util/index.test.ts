@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { parse } from "valibot";
+import { parse, ValiError } from "valibot";
 import { CoverflexRenewResponseSchema } from "../schemas";
 import { toCoverflexAuthResponse } from "./index";
 
@@ -16,6 +16,6 @@ describe("Coverflex renew response", () => {
   it("rejects the top-level login shape", () => {
     expect(() =>
       parse(CoverflexRenewResponseSchema, { refresh_token: "refresh", token: "access" }),
-    ).toThrow();
+    ).toThrow(ValiError);
   });
 });

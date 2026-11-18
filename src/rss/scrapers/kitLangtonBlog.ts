@@ -34,6 +34,7 @@ export async function parse(response: Response): Promise<RSSData> {
   return {
     description: "Kit Langton",
     entries: entries
+      .values()
       .map((entry) => {
         const title = entry.title.trim().replaceAll("\n", " | ");
         return {
@@ -42,7 +43,8 @@ export async function parse(response: Response): Promise<RSSData> {
           title,
         };
       })
-      .filter((entry: RSSEntry) => isValidRSSEntry(entry)),
+      .filter((entry: RSSEntry) => isValidRSSEntry(entry))
+      .toArray(),
     id: "https://www.kitlangton.com/",
     language: "en",
     link: "https://www.kitlangton.com/",

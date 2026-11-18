@@ -63,6 +63,7 @@ export async function parse(response: Response): Promise<RSSData> {
   return {
     description: "Destaques publicados pelo Conselho Geral Independente da RTP.",
     entries: entries
+      .values()
       .map((entry) => {
         const title = normalizeWhitespace(entry.title);
         return {
@@ -71,7 +72,8 @@ export async function parse(response: Response): Promise<RSSData> {
           title,
         };
       })
-      .filter((entry) => isValidRSSEntry(entry)),
+      .filter((entry) => isValidRSSEntry(entry))
+      .toArray(),
     id: PAGE_URL,
     language: "pt",
     link: PAGE_URL,

@@ -33,7 +33,7 @@ describe("RSS response encoding", () => {
         { id: 1, link: "https://example.com/event", title: { rendered: PORTUGUESE_TITLE } },
       ]),
     );
-    const put = vi.fn(async () => {});
+    const put = vi.fn<(key: string, value: string) => Promise<void>>(async () => {});
     const response = await createRssEncodingApp().request("/rss.cacheAgendaLx", undefined, {
       RUN_GMC_GENERIC_CACHE_KV: { put },
     });
@@ -82,9 +82,7 @@ describe("RSS response encoding", () => {
       expect(response.headers.get("Content-Type")).toBe("application/rss+xml; charset=utf-8");
       const rss = await response.text();
       expect(rss).toContain('<?xml version="1.0" encoding="utf-8"?>');
-      if (cached) {
-        expect(rss).toBe(CACHED_RSS);
-      }
+      expect(rss === CACHED_RSS).toBe(cached);
     },
   );
 });

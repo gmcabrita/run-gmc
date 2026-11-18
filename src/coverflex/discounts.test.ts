@@ -24,13 +24,13 @@ function discountsResponse(list: ReadonlyArray<unknown>) {
 
 function mockFetch(list: ReadonlyArray<unknown>) {
   return vi.spyOn(globalThis, "fetch").mockImplementation(async (input) => {
-    switch (String(input)) {
+    switch (new Request(input).url) {
       case COVERFLEX_DISCOUNTS_URL:
         return discountsResponse(list);
       case COVERFLEX_TRANSLATIONS_URL:
         return Response.json(translationsFixture);
       default:
-        throw new Error(`Unexpected fetch: ${String(input)}`);
+        throw new Error(`Unexpected fetch: ${new Request(input).url}`);
     }
   });
 }
@@ -89,7 +89,9 @@ describe("coverflex discounts", () => {
     fetchSpy.mockClear();
     expect((await sendNewCoverflexDiscountsByEmail(env)).emailed).toBe(false);
     expect(sendSpy).toHaveBeenCalledTimes(1);
-    expect(fetchSpy.mock.calls.map(([input]) => String(input))).toEqual([COVERFLEX_DISCOUNTS_URL]);
+    expect(fetchSpy.mock.calls.map(([input]) => new Request(input).url)).toEqual([
+      COVERFLEX_DISCOUNTS_URL,
+    ]);
 
     // A discount was added: email only that one.
     fetchSpy.mockRestore();

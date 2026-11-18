@@ -74,6 +74,7 @@ export async function parse(response: Response): Promise<RSSData> {
   return {
     description: "Broken Browser blog posts",
     entries: entries
+      .values()
       .map((entry) => {
         const title = normalizeWhitespace(entry.title);
         return {
@@ -83,6 +84,7 @@ export async function parse(response: Response): Promise<RSSData> {
         };
       })
       .filter(isValidRSSEntry)
+      .toArray()
       .sort((a, b) => {
         const aTime = a.datetime?.getTime() ?? 0;
         const bTime = b.datetime?.getTime() ?? 0;

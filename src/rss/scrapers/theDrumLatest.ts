@@ -165,6 +165,7 @@ export async function parse(response: Response, now: Date = new Date()): Promise
     description:
       "Get the latest marketing news here at The Drum. Browse the latest industry and brand news as it happens, including in-depth journalism and analysis.",
     entries: entries
+      .values()
       .map((entry) => {
         const title = normalizeWhitespace(entry.title);
         return {
@@ -176,7 +177,8 @@ export async function parse(response: Response, now: Date = new Date()): Promise
           title,
         };
       })
-      .filter(isValidRSSEntry),
+      .filter(isValidRSSEntry)
+      .toArray(),
     id: BASE_URL,
     language: "en",
     link: BASE_URL,

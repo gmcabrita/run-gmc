@@ -116,14 +116,14 @@ describe("runXBlocklist", () => {
       accounts: { test: { deferred: 0, done: ["screenName:a", "screenName:b"], notFound: [] } },
       invalid: [],
     });
-    expect(fetchSpy.mock.calls.map(([url]) => String(url))).toEqual([
+    expect(fetchSpy.mock.calls.map(([url]) => new Request(url).url)).toEqual([
       "https://x.com/i/api/1.1/mutes/users/create.json",
       "https://x.com/i/api/1.1/blocks/create.json",
       "https://x.com/i/api/1.1/mutes/users/create.json",
       "https://x.com/i/api/1.1/blocks/create.json",
     ]);
     const init = fetchSpy.mock.calls[0][1];
-    expect(String(init?.body)).toBe("screen_name=a");
+    expect(await new Response(init?.body).text()).toBe("screen_name=a");
     expect(init?.headers).toMatchObject({
       "content-type": "application/x-www-form-urlencoded",
       "x-csrf-token": "csrf",

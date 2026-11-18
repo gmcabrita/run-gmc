@@ -12,9 +12,9 @@ const STICKERS_URL = STICKERS.url;
 
 function mockFetch(responses: Record<string, () => Response>) {
   return vi.spyOn(globalThis, "fetch").mockImplementation(async (input) => {
-    const respond = responses[String(input)];
+    const respond = responses[new Request(input).url];
     if (!respond) {
-      throw new Error(`Unexpected fetch: ${String(input)}`);
+      throw new Error(`Unexpected fetch: ${new Request(input).url}`);
     }
     return respond();
   });

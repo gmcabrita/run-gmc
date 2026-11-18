@@ -59,7 +59,7 @@ describe("theDrumLatest scrape", () => {
     const result = await scrape(fetcher);
 
     expect(result.entries).toHaveLength(3);
-    expect(String(fetcher.mock.calls[0]?.[0])).toBe("https://www.thedrum.com/latest");
+    expect(new Request(fetcher.mock.calls[0][0]).url).toBe("https://www.thedrum.com/latest");
     const headers = new Headers(fetcher.mock.calls[0]?.[1]?.headers);
     expect(headers.get("user-agent")).toBe("WhatsApp/2.23.20.0");
   });

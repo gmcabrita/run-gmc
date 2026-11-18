@@ -115,6 +115,7 @@ export async function parse(response: Response): Promise<RSSData> {
   await consume(transformed.body);
 
   const rssEntries: Array<RSSEntry> = entries
+    .values()
     .map((entry) => ({
       datetime: parseCardDate(entry.dateParts.map(normalizeWhitespace)),
       id: entry.link,
@@ -123,7 +124,8 @@ export async function parse(response: Response): Promise<RSSData> {
       text: normalizeWhitespace(entry.text) || undefined,
       title: normalizeWhitespace(entry.title),
     }))
-    .filter((entry) => isValidRSSEntry(entry));
+    .filter((entry) => isValidRSSEntry(entry))
+    .toArray();
 
   return {
     description: "Notícias do Clube da Criatividade de Portugal",

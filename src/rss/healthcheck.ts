@@ -151,10 +151,14 @@ function getUrlPathname(url: string): string {
 }
 
 export function getRssHealthcheckPaths(routes: ReadonlyArray<RouteLike>): Array<string> {
-  return [...new Set(routes.filter((route) => route.method === "GET").map((route) => route.path))]
-    .filter((path) => path.startsWith("/rss."))
-    .filter((path) => !rssHealthcheckExcludedPaths.has(path))
-    .sort();
+  const paths = new Set(
+    routes
+      .values()
+      .filter((route) => route.method === "GET")
+      .map((route) => route.path)
+      .filter((path) => path.startsWith("/rss.") && !rssHealthcheckExcludedPaths.has(path)),
+  );
+  return [...paths].sort((a, b) => (a < b ? -1 : 1));
 }
 
 export function rssFeedHasAtLeastOneEntry(body: string): boolean {
@@ -215,12 +219,14 @@ export function summarizeRssHealthcheck(
   results: ReadonlyArray<RssHealthcheckResult>,
 ): RssHealthcheckResponse {
   const failures = results
+    .values()
     .filter((result) => !result.passed)
     .map((result) => ({
       url: result.url,
       // Keep the established JSON field order used in healthcheck messages.
       statusCode: result.statusCode,
-    }));
+    }))
+    .toArray();
 
   return {
     failures,

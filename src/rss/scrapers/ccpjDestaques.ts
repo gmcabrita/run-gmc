@@ -121,6 +121,7 @@ export async function parse(response: Response): Promise<RSSData> {
   await consume(transformed.body);
 
   const rssEntries: Array<RSSEntry> = entries
+    .values()
     .map((entry) => {
       const category = normalizeWhitespace(entry.category);
       const text = category ? `<strong>Categoria:</strong> ${category}` : "";
@@ -133,7 +134,8 @@ export async function parse(response: Response): Promise<RSSData> {
         title: normalizeWhitespace(entry.title),
       };
     })
-    .filter(hasRequiredFields);
+    .filter(hasRequiredFields)
+    .toArray();
 
   return {
     description: "CCPJ - Destaques",

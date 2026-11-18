@@ -216,6 +216,7 @@ async function parsePageWithFallback(
     isPartial,
     page: {
       entries: draftEntries
+        .values()
         .map((entry) => {
           const title = normalizeWhitespace(entry.title);
           const authorName = normalizeWhitespace(entry.authorName);
@@ -229,7 +230,8 @@ async function parsePageWithFallback(
             title,
           };
         })
-        .filter(isValidRSSEntry),
+        .filter(isValidRSSEntry)
+        .toArray(),
       nextPageURL,
     },
   };

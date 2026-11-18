@@ -44,12 +44,14 @@ export async function parse(response: Response): Promise<RSSData> {
   return {
     description: "Impresa – Investidores",
     entries: entries
+      .values()
       .map((entry) => ({
         ...entry,
         text: entry.title.trim().replaceAll("\n", " | "),
         title: entry.title.trim().replaceAll("\n", " | "),
       }))
-      .filter((entry: RSSEntry) => isValidRSSEntry(entry)),
+      .filter((entry: RSSEntry) => isValidRSSEntry(entry))
+      .toArray(),
     id: "https://www.impresa.pt/pt/investidores",
     language: "pt",
     link: "https://www.impresa.pt/pt/investidores",

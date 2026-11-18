@@ -16,7 +16,7 @@ export async function sendAppleCatalogueByEmail(env: Env) {
 
   await idempotentSendEmail(env, {
     body: `<a href="${url}" target="_blank">${url}</a>`,
-    idempotencyKey: `coverflex-apple-catalogue-${idempotencyURL}`,
+    idempotencyKey: `coverflex-apple-catalogue-${idempotencyURL.href}`,
     subject: `New Coverflex Apple catalogue available: ${name}`,
     to: "goncalo.mendes.cabrita@gmail.com",
   });
@@ -52,11 +52,11 @@ async function getAppleCatalogueFile(env: Env) {
   }
 
   const json = parse(CoverflexTechnologyResponseSchema, await response.json());
-  if (json.benefit.slug != "technology") {
+  if (json.benefit.slug !== "technology") {
     throw new Error(`Response: ${JSON.stringify(json)}`);
   }
 
-  const product = json.benefit.products.find((product) => product.slug == "apple");
+  const product = json.benefit.products.find((product) => product.slug === "apple");
   const file = product?.files.find((file) => file.slug.includes("-en-"));
 
   if (!file) {
@@ -96,7 +96,7 @@ async function getCoverflexBudget(env: Env) {
   }
 
   const json = parse(CoverflexPocketsResponseSchema, await response.json());
-  const pocket = json.pockets.find((pocket) => pocket.type == "meals");
+  const pocket = json.pockets.find((pocket) => pocket.type === "meals");
 
   if (!pocket) {
     throw new Error("Meals pocket not found");
