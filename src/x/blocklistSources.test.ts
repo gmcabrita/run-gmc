@@ -3,7 +3,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import { parse, ValiError } from "valibot";
 import {
   buildListMembersUrl,
-  clankwallSource,
+  createUsernamesTextSource,
   createXListMembersSource,
   nobotsSource,
   parseListMembersPage,
@@ -19,21 +19,26 @@ afterEach(() => {
   vi.restoreAllMocks();
 });
 
-describe("clankwallSource", () => {
+describe("createUsernamesTextSource", () => {
+  const source = createUsernamesTextSource("test", "https://example.com/usernames.txt");
+
   it("parses the username list", async () => {
-    vi.spyOn(globalThis, "fetch").mockImplementation(async () => new Response("KaiBGR\ngrok\n\n"));
-    expect(await clankwallSource.fetchTargets(testEnv)).toEqual({
+    const fetchSpy = vi
+      .spyOn(globalThis, "fetch")
+      .mockImplementation(async () => new Response("KaiBGR\ngrok\n\n"));
+    expect(await source.fetchTargets(testEnv)).toEqual({
       invalid: [],
       targets: [
         { kind: "screenName", screenName: "kaibgr" },
         { kind: "screenName", screenName: "grok" },
       ],
     });
+    expect(fetchSpy).toHaveBeenCalledWith("https://example.com/usernames.txt");
   });
 
   it("throws on HTTP errors", async () => {
     vi.spyOn(globalThis, "fetch").mockImplementation(async () => new Response("", { status: 500 }));
-    await expect(clankwallSource.fetchTargets(testEnv)).rejects.toThrow("HTTP 500");
+    await expect(source.fetchTargets(testEnv)).rejects.toThrow("HTTP 500");
   });
 });
 

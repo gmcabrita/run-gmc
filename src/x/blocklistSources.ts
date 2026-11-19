@@ -18,18 +18,29 @@ import {
 // To add a source, write a `BlocklistSource` and add it to `X_BLOCKLIST_SOURCES`.
 // Use `parseScreenName` for handles and `parseUserId` for numeric user IDs.
 
-const CLANKWALL_USERNAMES_URL = "https://clankwall.vogel.dev/api/usernames.txt";
+// Reads a plain-text list with one screen name per line.
+export function createUsernamesTextSource(name: string, url: string): BlocklistSource {
+  return {
+    async fetchTargets() {
+      const response = await fetch(url);
+      if (!response.ok) {
+        throw new Error(`${url} returned HTTP ${response.status}`);
+      }
+      return parseTargetList(await response.text(), parseScreenName);
+    },
+    name,
+  };
+}
 
-export const clankwallSource: BlocklistSource = {
-  async fetchTargets() {
-    const response = await fetch(CLANKWALL_USERNAMES_URL);
-    if (!response.ok) {
-      throw new Error(`${CLANKWALL_USERNAMES_URL} returned HTTP ${response.status}`);
-    }
-    return parseTargetList(await response.text(), parseScreenName);
-  },
-  name: "clankwall",
-};
+const clankwallSource = createUsernamesTextSource(
+  "clankwall",
+  "https://clankwall.vogel.dev/api/usernames.txt",
+);
+
+const blockedForAiReplySource = createUsernamesTextSource(
+  "blockedforaireply",
+  "https://blockedforaireply.levels.io/api/usernames.txt",
+);
 
 const NOBOTS_SUSPECTS_URL = "https://nobots.fyi/suspects.json";
 // Only suspects with a bot score at or above this value are muted and blocked.
@@ -209,6 +220,7 @@ export const X_BLOCKLIST_LIST_IDS: ReadonlyArray<string> = ["2116659176894071283
 
 export const X_BLOCKLIST_SOURCES: ReadonlyArray<BlocklistSource> = [
   clankwallSource,
+  blockedForAiReplySource,
   nobotsSource,
   ...X_BLOCKLIST_LIST_IDS.map(createXListMembersSource),
 ];
