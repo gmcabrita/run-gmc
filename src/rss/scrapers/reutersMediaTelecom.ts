@@ -1,4 +1,5 @@
-import { isValidRSSEntry, type ScraperContext, WHATSAPP_USER_AGENT } from "@rss/common";
+import { isValidRSSEntry, WHATSAPP_USER_AGENT } from "@rss/common";
+import type { ScraperContext } from "@rss/common";
 import { createProxiedFetch } from "../../proxiedFetch";
 import type { RSSData, RSSEntry } from "@rss/types";
 import {
@@ -10,8 +11,8 @@ import {
   safeParse,
   string,
   unknown,
-  type InferOutput,
 } from "valibot";
+import type { InferOutput } from "valibot";
 
 const SITE_URL = "https://www.reuters.com";
 const SECTION_PATH = "/business/media-telecom/";

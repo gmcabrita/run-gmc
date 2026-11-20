@@ -10,9 +10,8 @@ import {
   parse as parseValibot,
   safeParse,
   string,
-  type GenericSchema,
-  type InferOutput,
 } from "valibot";
+import type { GenericSchema, InferOutput } from "valibot";
 import { NOS_CINEMAS_WATCHES } from "./watches";
 
 const NOS_CINEMAS_ORIGIN = "https://www.cinemas.nos.pt";
@@ -319,7 +318,11 @@ export async function retryNosCinemasRequest<T>(
 ): Promise<T> {
   const retryCount = options.retryCount ?? NOS_CINEMAS_REQUEST_RETRY_COUNT;
   const sleep =
-    options.sleep ?? ((ms: number) => new Promise<void>((resolve) => setTimeout(resolve, ms)));
+    options.sleep ??
+    ((ms: number) =>
+      new Promise<void>((resolve) => {
+        setTimeout(resolve, ms);
+      }));
 
   for (let attempt = 0; ; attempt++) {
     try {

@@ -1,7 +1,8 @@
 import type { Hono } from "hono";
 import { idempotentSendEmail } from "@email";
 import { USERAGENT } from "@rss/common";
-import { literal, looseObject, optional, safeParse, string, type InferOutput } from "valibot";
+import { literal, looseObject, optional, safeParse, string } from "valibot";
+import type { InferOutput } from "valibot";
 import { BOL_WATCHES } from "./watches";
 
 const NOTIFICATION_EMAIL = "goncalo.mendes.cabrita@gmail.com";

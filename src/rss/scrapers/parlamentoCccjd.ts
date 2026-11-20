@@ -1,4 +1,5 @@
-import { USERAGENT, consume, decodeHtmlEntities, type ScraperContext } from "@rss/common";
+import { USERAGENT, consume, decodeHtmlEntities } from "@rss/common";
+import type { ScraperContext } from "@rss/common";
 import type { RSSData, RSSEntry } from "@rss/types";
 import { createProxiedFetch } from "../../proxiedFetch";
 

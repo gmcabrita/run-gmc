@@ -1,4 +1,5 @@
-import { USERAGENT, decodeHtmlEntities, isValidRSSEntry, type ScraperContext } from "@rss/common";
+import { USERAGENT, decodeHtmlEntities, isValidRSSEntry } from "@rss/common";
+import type { ScraperContext } from "@rss/common";
 import type { RSSData, RSSEntry } from "@rss/types";
 
 const BASE_URL = "https://anteestreias.blogspot.com";

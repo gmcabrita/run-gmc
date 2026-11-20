@@ -1,13 +1,8 @@
-import { USERAGENT, isValidRSSEntry, consume, type ScraperContext } from "@rss/common";
+import { USERAGENT, isValidRSSEntry, consume } from "@rss/common";
+import type { ScraperContext } from "@rss/common";
 import type { RSSData, RSSEntry } from "@rss/types";
-import {
-  array,
-  looseObject,
-  nullish,
-  parse as parseValibot,
-  string,
-  type InferOutput,
-} from "valibot";
+import { array, looseObject, nullish, parse as parseValibot, string } from "valibot";
+import type { InferOutput } from "valibot";
 
 const BASE_URL = "https://gaming.amazon.com/home";
 const GRAPHQL_URL = "https://gaming.amazon.com/graphql";
@@ -137,7 +132,13 @@ export function parse(json: PrimeGamingPayload): RSSData {
     .flatMap((game) => {
       const { externalClaimLink, id, title } = game.assets;
       const offer = game.offers[0];
-      if (title == null || externalClaimLink == null || !offer) {
+      if (
+        title === null ||
+        title === undefined ||
+        externalClaimLink === null ||
+        externalClaimLink === undefined ||
+        !offer
+      ) {
         return [];
       }
 
@@ -179,7 +180,7 @@ async function fetchCsrfTokenAndCookie(): Promise<{ cookie: string; csrfToken: s
   });
 
   const rewritten = rewriter.transform(initialResponse);
-  await consume(rewritten.body!);
+  await consume(rewritten.body);
 
   return { cookie, csrfToken };
 }

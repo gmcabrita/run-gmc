@@ -1,4 +1,5 @@
-import { USERAGENT, type ScraperContext } from "@rss/common";
+import { USERAGENT } from "@rss/common";
+import type { ScraperContext } from "@rss/common";
 import type { RSSData, RSSEntry } from "@rss/types";
 import {
   array,
@@ -14,8 +15,8 @@ import {
   string,
   tuple,
   unknown,
-  type InferOutput,
 } from "valibot";
+import type { InferOutput } from "valibot";
 
 const SITE_ORIGIN = "https://www.jn.pt";
 const SECTION_PATH = "/media";
@@ -122,7 +123,7 @@ function findArticleList(jsonRows: Array<string>): Array<unknown> | undefined {
   let sectionArticles: Array<unknown> | undefined;
   for (const row of jsonRows) {
     // The list sits deep in the React element tree. The reviver visits every value.
-    JSON.parse(row, (_key, value) => {
+    JSON.parse(row, (_key, value: unknown) => {
       const listResult = listItems ? undefined : safeParse(JnArticleListSchema, value);
       if (listResult?.success) {
         listItems = listResult.output.Items;

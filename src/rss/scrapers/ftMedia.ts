@@ -1,6 +1,8 @@
-import { decodeHtmlEntities, isValidRSSEntry, type ScraperContext } from "@rss/common";
+import { decodeHtmlEntities, isValidRSSEntry } from "@rss/common";
+import type { ScraperContext } from "@rss/common";
 import type { RSSData, RSSEntry } from "@rss/types";
-import { createProxiedFetch, type ProxiedFetchEnv } from "../../proxiedFetch";
+import { createProxiedFetch } from "../../proxiedFetch";
+import type { ProxiedFetchEnv } from "../../proxiedFetch";
 
 const BASE_URL = "https://www.ft.com/media";
 const FT_ORIGIN = "https://www.ft.com";

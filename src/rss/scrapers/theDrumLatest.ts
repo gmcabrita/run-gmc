@@ -1,4 +1,5 @@
-import { consume, isValidRSSEntry, type ScraperContext, WHATSAPP_USER_AGENT } from "@rss/common";
+import { consume, isValidRSSEntry, WHATSAPP_USER_AGENT } from "@rss/common";
+import type { ScraperContext } from "@rss/common";
 import type { RSSData, RSSEntry } from "@rss/types";
 
 const BASE_URL = "https://www.thedrum.com/latest";
@@ -58,7 +59,7 @@ function parseRelativeDate(value: string, now: Date): Date | undefined {
   }
 
   const durationMillis = toDurationMillis(count, unit);
-  return durationMillis == null ? undefined : new Date(now.getTime() - durationMillis);
+  return durationMillis === undefined ? undefined : new Date(now.getTime() - durationMillis);
 }
 
 function parseAbsoluteDate(value: string): Date | undefined {
@@ -70,7 +71,7 @@ function parseAbsoluteDate(value: string): Date | undefined {
   const day = Number(match[1]);
   const monthIndex = RELEASE_MONTHS.get(match[2]);
   const year = Number(match[3]);
-  if (!Number.isFinite(day) || monthIndex == null || !Number.isFinite(year)) {
+  if (!Number.isFinite(day) || monthIndex === undefined || !Number.isFinite(year)) {
     return undefined;
   }
 

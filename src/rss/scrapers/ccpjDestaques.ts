@@ -1,4 +1,5 @@
-import { USERAGENT, consume, type ScraperContext } from "@rss/common";
+import { USERAGENT, consume } from "@rss/common";
+import type { ScraperContext } from "@rss/common";
 import type { RSSData, RSSEntry } from "@rss/types";
 
 const BASE_URL = "https://www.ccpj.pt";

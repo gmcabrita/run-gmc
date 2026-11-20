@@ -44,7 +44,7 @@ export async function parse(response: Response): Promise<RSSData> {
       },
     });
 
-  await consume(rewriter.transform(response).body!);
+  await consume(rewriter.transform(response).body);
   return {
     description: "Passatempos | Cinecartaz",
     entries: entries

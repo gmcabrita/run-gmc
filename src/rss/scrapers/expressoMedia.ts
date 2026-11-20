@@ -1,6 +1,8 @@
-import { decodeHtmlEntities, isValidRSSEntry, USERAGENT, type ScraperContext } from "@rss/common";
+import { decodeHtmlEntities, isValidRSSEntry, USERAGENT } from "@rss/common";
+import type { ScraperContext } from "@rss/common";
 import type { RSSData, RSSEntry } from "@rss/types";
-import { createProxiedFetch, type ProxiedFetch, type ProxiedFetchEnv } from "../../proxiedFetch";
+import { createProxiedFetch } from "../../proxiedFetch";
+import type { ProxiedFetch, ProxiedFetchEnv } from "../../proxiedFetch";
 import {
   array,
   fallback,
@@ -10,8 +12,8 @@ import {
   safeParse,
   string,
   unknown,
-  type InferOutput,
 } from "valibot";
+import type { InferOutput } from "valibot";
 
 const SITE_ORIGIN = "https://expresso.pt";
 const BASE_URL = `${SITE_ORIGIN}/media-comunicacao`;

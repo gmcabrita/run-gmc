@@ -1,4 +1,5 @@
-import { USERAGENT, consume, isValidRSSEntry, type ScraperContext } from "@rss/common";
+import { USERAGENT, consume, isValidRSSEntry } from "@rss/common";
+import type { ScraperContext } from "@rss/common";
 import type { RSSData, RSSEntry } from "@rss/types";
 
 const NEWS_URL = "https://www.sqlite.org/news.html";

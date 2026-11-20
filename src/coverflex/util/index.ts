@@ -1,10 +1,6 @@
 import { number, object, parse } from "valibot";
-import {
-  CoverflexAuthResponseSchema,
-  CoverflexRenewResponseSchema,
-  type CoverflexAuthResponse,
-  type CoverflexRenewResponse,
-} from "../schemas";
+import { CoverflexAuthResponseSchema, CoverflexRenewResponseSchema } from "../schemas";
+import type { CoverflexAuthResponse, CoverflexRenewResponse } from "../schemas";
 
 // Maps the renew response to the login token shape that callers store.
 export function toCoverflexAuthResponse({ data }: CoverflexRenewResponse): CoverflexAuthResponse {

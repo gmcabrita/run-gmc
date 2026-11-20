@@ -1,4 +1,5 @@
-import { Hono, type ExecutionContext as HonoExecutionContext } from "hono";
+import { Hono } from "hono";
+import type { ExecutionContext as HonoExecutionContext } from "hono";
 import { consoleLoggingIntegration, withMonitor, withSentry } from "@sentry/cloudflare";
 import { basicAuth } from "hono/basic-auth";
 import { cors } from "hono/cors";
@@ -22,7 +23,8 @@ import {
 import { BRILLIANT_MADE_STORES, checkBrilliantMadeStore } from "./brilliantMade";
 import { TESTFLIGHT_BETA_IDS, checkTestflightBeta } from "./testflight";
 import { addScrapedRssEndpoints, cacheAgendaLx } from "@rss/scrapers";
-import { array, boolean, looseObject, nullish, parse, string, type InferOutput } from "valibot";
+import { array, boolean, looseObject, nullish, parse, string } from "valibot";
+import type { InferOutput } from "valibot";
 import {
   getDiscordHealthcheckErrorPayload,
   getDiscordHealthcheckFailurePayload,
@@ -30,9 +32,11 @@ import {
   getHttpRelayHealthcheckUrl,
   getRssHealthcheckPaths,
   runRssHealthcheck,
-  type DiscordWebhookPayload,
-  type RssHealthcheckFetchResult,
-  type RssHealthcheckResponse,
+} from "@rss/healthcheck";
+import type {
+  DiscordWebhookPayload,
+  RssHealthcheckFetchResult,
+  RssHealthcheckResponse,
 } from "@rss/healthcheck";
 
 const rssHealthcheckOrigin = "https://run.gmcabrita.com";
@@ -130,7 +134,7 @@ function reportDiscordHealthcheckPayload(
   webhookUrl: string,
   payload: DiscordWebhookPayload,
 ): Promise<void> {
-  return sendDiscordHealthcheckPayload(webhookUrl, payload).catch((error) => {
+  return sendDiscordHealthcheckPayload(webhookUrl, payload).catch((error: unknown) => {
     console.error("Failed to send Discord healthcheck message", error);
   });
 }
@@ -537,7 +541,7 @@ export default withSentry(
             ),
           ]);
           const errors = results.flatMap((result) =>
-            result.status === "rejected" ? [result.reason] : [],
+            result.status === "rejected" ? [result.reason as unknown] : [],
           );
           if (errors.length > 0) {
             throw new AggregateError(errors, "Some */5 cron checks failed");

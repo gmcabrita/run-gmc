@@ -1,6 +1,8 @@
-import { USERAGENT, consume, isValidRSSEntry, type ScraperContext } from "@rss/common";
+import { USERAGENT, consume, isValidRSSEntry } from "@rss/common";
+import type { ScraperContext } from "@rss/common";
 import type { RSSData, RSSEntry } from "@rss/types";
-import { boolean, fallback, looseObject, safeParse, string, type InferOutput } from "valibot";
+import { boolean, fallback, looseObject, safeParse, string } from "valibot";
+import type { InferOutput } from "valibot";
 
 const SITE_ORIGIN = "https://www.jornaldenegocios.pt";
 const SECTION_PATH = "/empresas/media";

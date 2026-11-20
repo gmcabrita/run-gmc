@@ -1,10 +1,6 @@
 import type { ScraperContext } from "@rss/common";
-import {
-  getMangaDexFeed,
-  parseMangaDexFeed,
-  type MangaDexFeedConfig,
-  type MangaDexFeedPayload,
-} from "@rss/mangaDex";
+import { getMangaDexFeed, parseMangaDexFeed } from "@rss/mangaDex";
+import type { MangaDexFeedConfig, MangaDexFeedPayload } from "@rss/mangaDex";
 import type { RSSData } from "@rss/types";
 
 const config = {

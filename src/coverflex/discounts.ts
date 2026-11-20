@@ -2,12 +2,8 @@ import { array, is, parse, string } from "valibot";
 import { sendEmail } from "@email";
 import { escapeHtml } from "../rss/scrapers";
 import { getAuthenticationToken } from "./util";
-import {
-  CoverflexDiscountsResponseSchema,
-  CoverflexTranslationsSchema,
-  type CoverflexDiscount,
-  type CoverflexTranslations,
-} from "./schemas";
+import { CoverflexDiscountsResponseSchema, CoverflexTranslationsSchema } from "./schemas";
+import type { CoverflexDiscount, CoverflexTranslations } from "./schemas";
 
 export const COVERFLEX_DISCOUNTS_URL =
   "https://menhir-api.coverflex.com/api/employee/discounts?pagination=no";

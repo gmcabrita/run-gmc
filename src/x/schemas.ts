@@ -1,14 +1,5 @@
-import {
-  array,
-  boolean,
-  looseObject,
-  nullish,
-  number,
-  optional,
-  string,
-  unknown,
-  type InferOutput,
-} from "valibot";
+import { array, boolean, looseObject, nullish, number, optional, string, unknown } from "valibot";
+import type { InferOutput } from "valibot";
 
 const XUserLegacySchema = looseObject({
   description: nullish(string()),

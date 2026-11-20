@@ -1,13 +1,8 @@
-import { USERAGENT, isValidRSSEntry, type ScraperContext } from "@rss/common";
+import { USERAGENT, isValidRSSEntry } from "@rss/common";
+import type { ScraperContext } from "@rss/common";
 import type { RSSData, RSSEntry } from "@rss/types";
-import {
-  array,
-  looseObject,
-  nullish,
-  parse as parseValibot,
-  string,
-  type InferOutput,
-} from "valibot";
+import { array, looseObject, nullish, parse as parseValibot, string } from "valibot";
+import type { InferOutput } from "valibot";
 
 const BASE_URL = "https://www.imagensdemarca.pt/";
 const API_URL = "https://repeater.bondlayer.com/fetch";

@@ -14,8 +14,8 @@ import {
   transform,
   union,
   unknown,
-  type InferOutput,
 } from "valibot";
+import type { InferOutput } from "valibot";
 
 const NamedValueSchema = looseObject({
   name: string(),

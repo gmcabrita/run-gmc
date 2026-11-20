@@ -1,4 +1,5 @@
-import { USERAGENT, isValidRSSEntry, type ScraperContext } from "@rss/common";
+import { USERAGENT, isValidRSSEntry } from "@rss/common";
+import type { ScraperContext } from "@rss/common";
 import type { RSSData, RSSEntry } from "@rss/types";
 import {
   array,
@@ -11,8 +12,8 @@ import {
   string,
   union,
   unknown,
-  type InferOutput,
 } from "valibot";
+import type { InferOutput } from "valibot";
 
 const SITE_ORIGIN = "https://www.publico.pt";
 const SECTION_PATH = "/media";
@@ -78,7 +79,7 @@ const HTML_ENTITY_BY_NAME = new Map([
 ]);
 
 function decodeHtmlEntities(text: string): string {
-  return text.replaceAll(/&(#x[0-9a-f]+|#\d+|[a-z]+);/gi, (match, entity) => {
+  return text.replaceAll(/&(#x[0-9a-f]+|#\d+|[a-z]+);/gi, (match: string, entity: string) => {
     const normalizedEntity = entity.toLowerCase();
     if (normalizedEntity.startsWith("#x")) {
       const codePoint = Number.parseInt(normalizedEntity.slice(2), 16);

@@ -1,4 +1,5 @@
-import { USERAGENT, isValidRSSEntry, type ScraperContext } from "@rss/common";
+import { USERAGENT, isValidRSSEntry } from "@rss/common";
+import type { ScraperContext } from "@rss/common";
 import type { RSSData, RSSEntry } from "@rss/types";
 import {
   array,
@@ -9,8 +10,8 @@ import {
   safeParse,
   string,
   unknown,
-  type InferOutput,
 } from "valibot";
+import type { InferOutput } from "valibot";
 
 const BASE_URL = "https://www.kernel.sh/";
 const BLOG_URL = "https://www.kernel.sh/blog";

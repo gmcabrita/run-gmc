@@ -1,4 +1,5 @@
-import { USERAGENT, isValidRSSEntry, consume, type ScraperContext } from "@rss/common";
+import { USERAGENT, isValidRSSEntry, consume } from "@rss/common";
+import type { ScraperContext } from "@rss/common";
 import type { RSSData, RSSEntry } from "@rss/types";
 
 interface CampaignEntry extends RSSEntry {
@@ -68,7 +69,7 @@ export async function parse(response: Response): Promise<RSSData> {
       },
     });
 
-  await consume(rewriter.transform(response).body!);
+  await consume(rewriter.transform(response).body);
   return {
     description: "Highlighted Campaigns – Ads of the World",
     entries: entries

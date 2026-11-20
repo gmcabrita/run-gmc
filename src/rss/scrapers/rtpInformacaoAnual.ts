@@ -3,8 +3,8 @@ import type { RSSData } from "@rss/types";
 import {
   fetchRtpFinancialDocumentPage,
   parseRtpFinancialDocumentPage,
-  type RtpFinancialDocumentPageConfig,
 } from "./rtpFinancialDocuments";
+import type { RtpFinancialDocumentPageConfig } from "./rtpFinancialDocuments";
 
 const CONFIG: RtpFinancialDocumentPageConfig = {
   description: "Relatórios e contas publicados pela RTP.",

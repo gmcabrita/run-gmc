@@ -10,10 +10,8 @@ import {
   parseUserId,
   runXBlocklist,
   selectPendingTargets,
-  type BlocklistSource,
-  type BlocklistTarget,
-  type XBlocklistAccount,
 } from "./blocklist";
+import type { BlocklistSource, BlocklistTarget, XBlocklistAccount } from "./blocklist";
 
 const DAY_SECONDS = 24 * 60 * 60;
 

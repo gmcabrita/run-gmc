@@ -1,4 +1,5 @@
-import { consume, decodeHtmlEntities, type ScraperContext } from "@rss/common";
+import { consume, decodeHtmlEntities } from "@rss/common";
+import type { ScraperContext } from "@rss/common";
 import type { RSSData, RSSEntry } from "@rss/types";
 import { literal, looseObject, parse as parseSchema, string } from "valibot";
 

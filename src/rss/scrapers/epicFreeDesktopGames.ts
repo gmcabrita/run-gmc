@@ -1,14 +1,8 @@
-import { USERAGENT, isValidRSSEntry, type ScraperContext } from "@rss/common";
+import { USERAGENT, isValidRSSEntry } from "@rss/common";
+import type { ScraperContext } from "@rss/common";
 import type { RSSData, RSSEntry } from "@rss/types";
-import {
-  array,
-  looseObject,
-  nullish,
-  number,
-  parse as parseValibot,
-  string,
-  type InferOutput,
-} from "valibot";
+import { array, looseObject, nullish, number, parse as parseValibot, string } from "valibot";
+import type { InferOutput } from "valibot";
 
 const BASE_URL = "https://store.epicgames.com/en-US/free-games";
 const API_URL =

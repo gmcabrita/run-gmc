@@ -1,4 +1,5 @@
-import { USERAGENT, consume, isValidRSSEntry, type ScraperContext } from "@rss/common";
+import { USERAGENT, consume, isValidRSSEntry } from "@rss/common";
+import type { ScraperContext } from "@rss/common";
 import type { RSSData, RSSEntry } from "@rss/types";
 
 const BASE_URL = "https://auto-regulacaopublicitaria.pt/deliberacoes/";
@@ -36,7 +37,7 @@ const NAMED_HTML_ENTITIES = new Map([
 
 function decodeHtmlEntities(value: string): string {
   return value
-    .replaceAll(/&#(\d+);/g, (entity, decimal) => {
+    .replaceAll(/&#(\d+);/g, (entity: string, decimal: string) => {
       const codePoint = Number(decimal);
       if (!Number.isInteger(codePoint) || codePoint < 0) {
         return entity;
@@ -48,7 +49,7 @@ function decodeHtmlEntities(value: string): string {
         return entity;
       }
     })
-    .replaceAll(/&#x([\da-f]+);/gi, (entity, hexadecimal) => {
+    .replaceAll(/&#x([\da-f]+);/gi, (entity: string, hexadecimal: string) => {
       const codePoint = Number.parseInt(hexadecimal, 16);
       if (!Number.isInteger(codePoint) || codePoint < 0) {
         return entity;
@@ -62,7 +63,8 @@ function decodeHtmlEntities(value: string): string {
     })
     .replaceAll(
       /&([a-z]+);/gi,
-      (entity, name) => NAMED_HTML_ENTITIES.get(name.toLocaleLowerCase("en-US")) ?? entity,
+      (entity: string, name: string) =>
+        NAMED_HTML_ENTITIES.get(name.toLocaleLowerCase("en-US")) ?? entity,
     );
 }
 

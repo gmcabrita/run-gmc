@@ -1,5 +1,7 @@
-import { USERAGENT, isValidRSSEntry, type ScraperContext } from "@rss/common";
+import { USERAGENT, isValidRSSEntry } from "@rss/common";
+import type { ScraperContext } from "@rss/common";
 import type { RSSData, RSSEntry } from "@rss/types";
+import { array, looseObject, nullish, optional, record, safeParse, string } from "valibot";
 
 const BASE_URL = "https://medeiafilmes.com/cinemas/cinema-medeia-nimas";
 const UPLOADS_BASE = "https://medeiafilmes.com/uploads/library/";
@@ -13,34 +15,38 @@ const PT_WEEKDAYS = [
   "sábado",
 ];
 
-interface NimasFilm {
-  cycle_title: string | null;
-  film_age_rating: string;
-  film_director: string;
-  film_genre: string;
-  film_image: string;
-  film_length: string;
-  film_title: string;
-  film_uri_title: string;
-}
+const NimasFilmSchema = looseObject({
+  cycle_title: nullish(string()),
+  film_age_rating: nullish(string()),
+  film_director: nullish(string()),
+  film_genre: nullish(string()),
+  film_image: nullish(string()),
+  film_length: nullish(string()),
+  film_title: string(),
+  film_uri_title: string(),
+});
 
-interface NimasSession {
-  films: Array<NimasFilm>;
-  time: string;
-}
+const NimasSessionSchema = looseObject({
+  films: array(NimasFilmSchema),
+  time: string(),
+});
 
-interface NimasDay {
-  date: string;
-  sessions: Record<string, NimasSession>;
-}
+const NimasTheaterSchema = looseObject({
+  programme: record(string(), looseObject({ sessions: record(string(), NimasSessionSchema) })),
+});
 
-interface NimasData {
-  theater?: {
-    programme: Record<string, NimasDay>;
-  };
-  theatre?: {
-    programme: Record<string, NimasDay>;
-  };
+const NimasDataSchema = looseObject({
+  theater: optional(NimasTheaterSchema),
+  theatre: optional(NimasTheaterSchema),
+});
+
+function parseProgramme(json: string) {
+  const result = safeParse(NimasDataSchema, JSON.parse(json));
+  if (!result.success) {
+    return undefined;
+  }
+
+  return result.output.theater?.programme || result.output.theatre?.programme;
 }
 
 function getPTWeekday(date: Date): string {
@@ -61,8 +67,7 @@ export function parse(html: string): RSSData {
     };
   }
 
-  const data: NimasData = JSON.parse(match[1]);
-  const programme = data.theater?.programme || data.theatre?.programme;
+  const programme = parseProgramme(match[1]);
 
   if (!programme) {
     return {

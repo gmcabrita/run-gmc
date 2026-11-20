@@ -1,19 +1,9 @@
 import { parse } from "valibot";
-import {
-  parseScreenName,
-  parseTargetList,
-  X_BROWSER_USER_AGENT,
-  type BlocklistSource,
-  type BlocklistTarget,
-  type BlocklistTargetList,
-} from "./blocklist";
+import { parseScreenName, parseTargetList, X_BROWSER_USER_AGENT } from "./blocklist";
+import type { BlocklistSource, BlocklistTarget, BlocklistTargetList } from "./blocklist";
 import { buildXApiHeaders, getDefaultCredentials } from "./credentials";
-import {
-  NobotsSuspectsResponseSchema,
-  XListMembersResponseSchema,
-  type NobotsSuspectsResponse,
-  type XListMembersResponse,
-} from "./schemas";
+import { NobotsSuspectsResponseSchema, XListMembersResponseSchema } from "./schemas";
+import type { NobotsSuspectsResponse, XListMembersResponse } from "./schemas";
 
 // To add a source, write a `BlocklistSource` and add it to `X_BLOCKLIST_SOURCES`.
 // Use `parseScreenName` for handles and `parseUserId` for numeric user IDs.

@@ -1,13 +1,8 @@
-import { USERAGENT, isValidRSSEntry, type ScraperContext } from "@rss/common";
+import { USERAGENT, isValidRSSEntry } from "@rss/common";
+import type { ScraperContext } from "@rss/common";
 import type { RSSData, RSSEntry } from "@rss/types";
-import {
-  array,
-  looseObject,
-  parse as parseValibot,
-  record,
-  string,
-  type InferOutput,
-} from "valibot";
+import { array, looseObject, parse as parseValibot, record, string } from "valibot";
+import type { InferOutput } from "valibot";
 
 const PAGE_URL = "https://www.marktest.com/BaremeRadioRank/";
 // The page loads its data from this file. It is JSON with an .svg extension.

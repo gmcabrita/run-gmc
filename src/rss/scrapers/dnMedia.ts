@@ -1,4 +1,5 @@
-import { USERAGENT, type ScraperContext } from "@rss/common";
+import { USERAGENT } from "@rss/common";
+import type { ScraperContext } from "@rss/common";
 import type { RSSData, RSSEntry } from "@rss/types";
 import {
   array,
@@ -10,8 +11,8 @@ import {
   safeParse,
   string,
   unknown,
-  type InferOutput,
 } from "valibot";
+import type { InferOutput } from "valibot";
 
 const SITE_ORIGIN = "https://www.dn.pt";
 const BASE_URL = `${SITE_ORIGIN}/media-geral`;

@@ -1,4 +1,4 @@
-import { Hono } from "hono";
+import type { Hono } from "hono";
 import { getAuthenticationToken } from "./util";
 import { basicAuth } from "hono/basic-auth";
 import { idempotentSendEmail } from "@email";

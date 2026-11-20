@@ -88,7 +88,6 @@ describe("jornalDeNegociosMedia scraper", () => {
         firstPageAttempts += 1;
 
         if (firstPageAttempts === 1) {
-          // oxlint-disable-next-line no-throw-literal -- Covers retry handling for thrown values that are not Error instances.
           throw { message: "Network connection lost." };
         }
 

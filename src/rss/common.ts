@@ -48,7 +48,7 @@ export function decodeHtmlEntities(value: string) {
 export function stripInvalidXmlChars(value: string) {
   return Array.from(value)
     .filter((character) => {
-      const codePoint = character.codePointAt(0)!;
+      const codePoint = character.codePointAt(0) ?? 0;
       return (
         codePoint === 0x09 ||
         codePoint === 0x0a ||
@@ -61,7 +61,11 @@ export function stripInvalidXmlChars(value: string) {
     .join("");
 }
 
-export async function consume(stream: ReadableStream) {
+export async function consume(stream: ReadableStream | null) {
+  if (!stream) {
+    throw new Error("Missing response body");
+  }
+
   const reader = stream.getReader();
   while (true) {
     if ((await reader.read()).done) {

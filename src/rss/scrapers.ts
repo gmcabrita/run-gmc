@@ -1,7 +1,8 @@
-import { Hono } from "hono";
+import type { Hono } from "hono";
 import { Feed } from "feed";
 import type { RSSData, RSSEntry } from "@rss/types";
-import { stripInvalidXmlChars, type ScraperContext } from "@rss/common";
+import { stripInvalidXmlChars } from "@rss/common";
+import type { ScraperContext } from "@rss/common";
 
 import { get as adAgeNews } from "./scrapers/adAgeNews";
 import { get as adsOfTheWorldBlog } from "./scrapers/adsOfTheWorldBlog";

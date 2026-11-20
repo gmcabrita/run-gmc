@@ -1,6 +1,8 @@
-import { consume, decodeHtmlEntities, type ScraperContext, WHATSAPP_USER_AGENT } from "@rss/common";
+import { consume, decodeHtmlEntities, WHATSAPP_USER_AGENT } from "@rss/common";
+import type { ScraperContext } from "@rss/common";
 import type { RSSData, RSSEntry } from "@rss/types";
-import { createProxiedFetch, type ProxiedFetchEnv } from "../../proxiedFetch";
+import { createProxiedFetch } from "../../proxiedFetch";
+import type { ProxiedFetchEnv } from "../../proxiedFetch";
 
 const SITE_ORIGIN = "https://www.campaignlive.co.uk";
 const SECTION_URLS = [`${SITE_ORIGIN}/news`];
@@ -79,7 +81,7 @@ export function parseBylineDate(byline: string): Date | undefined {
   }
 
   const [, day, monthName, year] = match;
-  const month = MONTHS.indexOf(monthName!.toLowerCase());
+  const month = MONTHS.indexOf(monthName.toLowerCase());
   if (month === -1) {
     return undefined;
   }

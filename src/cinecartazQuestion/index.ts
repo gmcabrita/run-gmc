@@ -45,7 +45,7 @@ export async function parseCinecartazQuestionPage(
       },
     });
 
-  await consume(rewriter.transform(response).body!);
+  await consume(rewriter.transform(response).body);
 
   const normalizedDescription = decodeHtmlEntities(description)
     .replaceAll(NO_BREAK_SPACE, " ")

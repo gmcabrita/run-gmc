@@ -28,6 +28,8 @@ function getMiniflareOptions() {
       case "version-metadata":
         versionMetadata = name;
         break;
+      case "secret":
+        break;
     }
   }
   return {

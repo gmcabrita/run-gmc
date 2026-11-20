@@ -1,4 +1,5 @@
-import { buildXApiHeaders, getDefaultCredentials, type XCredentials } from "./credentials";
+import { buildXApiHeaders, getDefaultCredentials } from "./credentials";
+import type { XCredentials } from "./credentials";
 
 // Mutes and blocks X accounts that come from one or more blocklist sources.
 //
@@ -274,7 +275,9 @@ async function listCachedBlocklistKeys(kv: KVNamespace, prefix: string): Promise
 }
 
 function sleep(milliseconds: number): Promise<void> {
-  return new Promise((resolve) => setTimeout(resolve, milliseconds));
+  return new Promise((resolve) => {
+    setTimeout(resolve, milliseconds);
+  });
 }
 
 async function fetchBlocklistTargets(env: Env, sources: ReadonlyArray<BlocklistSource>) {

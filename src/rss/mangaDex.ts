@@ -1,15 +1,8 @@
-import { isValidRSSEntry, type ScraperContext } from "@rss/common";
+import { isValidRSSEntry } from "@rss/common";
+import type { ScraperContext } from "@rss/common";
 import type { RSSData, RSSEntry } from "@rss/types";
-import {
-  array,
-  fallback,
-  looseObject,
-  nullish,
-  safeParse,
-  string,
-  unknown,
-  type InferOutput,
-} from "valibot";
+import { array, fallback, looseObject, nullish, safeParse, string, unknown } from "valibot";
+import type { InferOutput } from "valibot";
 import { createProxiedFetch } from "../proxiedFetch";
 
 const MANGADEX_API_URL = "https://api.mangadex.org";

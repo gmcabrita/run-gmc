@@ -1,14 +1,8 @@
-import { USERAGENT, decodeHtmlEntities, isValidRSSEntry, type ScraperContext } from "@rss/common";
+import { USERAGENT, decodeHtmlEntities, isValidRSSEntry } from "@rss/common";
+import type { ScraperContext } from "@rss/common";
 import type { RSSData, RSSEntry } from "@rss/types";
-import {
-  fallback,
-  looseObject,
-  nullish,
-  number,
-  safeParse,
-  string,
-  type InferOutput,
-} from "valibot";
+import { fallback, looseObject, nullish, number, safeParse, string } from "valibot";
+import type { InferOutput } from "valibot";
 
 const BASE_URL = "https://www.viralagenda.com/pt/setubal/almada";
 const PAGE_SIZE = 30;

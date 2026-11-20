@@ -1,4 +1,5 @@
-import { USERAGENT, isValidRSSEntry, type ScraperContext } from "@rss/common";
+import { USERAGENT, isValidRSSEntry } from "@rss/common";
+import type { ScraperContext } from "@rss/common";
 import type { RSSData, RSSEntry } from "@rss/types";
 import {
   array,
@@ -10,8 +11,8 @@ import {
   string,
   transform,
   union,
-  type InferInput,
 } from "valibot";
+import type { InferInput } from "valibot";
 import { createProxiedFetch } from "../../proxiedFetch";
 
 const BASE_URL = "https://lbbonline.com/news?edition=international";

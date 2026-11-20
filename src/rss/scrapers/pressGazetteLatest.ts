@@ -1,6 +1,8 @@
-import { consume, decodeHtmlEntities, type ScraperContext } from "@rss/common";
+import { consume, decodeHtmlEntities } from "@rss/common";
+import type { ScraperContext } from "@rss/common";
 import type { RSSData, RSSEntry } from "@rss/types";
-import { createProxiedFetch, type ProxiedFetchEnv } from "../../proxiedFetch";
+import { createProxiedFetch } from "../../proxiedFetch";
+import type { ProxiedFetchEnv } from "../../proxiedFetch";
 
 const SITE_ORIGIN = "https://pressgazette.co.uk";
 const BASE_URL = `${SITE_ORIGIN}/all-articles/`;

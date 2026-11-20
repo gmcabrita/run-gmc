@@ -1,10 +1,5 @@
-import {
-  USERAGENT,
-  consume,
-  decodeHtmlEntities,
-  isValidRSSEntry,
-  type ScraperContext,
-} from "@rss/common";
+import { USERAGENT, consume, decodeHtmlEntities, isValidRSSEntry } from "@rss/common";
+import type { ScraperContext } from "@rss/common";
 import type { RSSData, RSSEntry } from "@rss/types";
 
 const BASE_URL = "https://www.clubedacriatividade.pt/lista-de-noticias/";

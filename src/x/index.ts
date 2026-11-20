@@ -1,4 +1,4 @@
-import { Hono } from "hono";
+import type { Hono } from "hono";
 import { basicAuth } from "hono/basic-auth";
 import { Feed } from "feed";
 import { stripInvalidXmlChars } from "@rss/common";
@@ -8,11 +8,10 @@ import {
   XOEmbedResponseSchema,
   XUserByScreenNameResponseSchema,
   XUserTweetsResponseSchema,
-  type XPost,
-  type XUserByScreenNameResponse,
-  type XUserTweetsResponse,
 } from "./schemas";
-import { buildXApiHeaders, resolveCredentials, type XCredentials } from "./credentials";
+import type { XPost, XUserByScreenNameResponse, XUserTweetsResponse } from "./schemas";
+import { buildXApiHeaders, resolveCredentials } from "./credentials";
+import type { XCredentials } from "./credentials";
 import { createPrivateProfileNoticeFeed, getTimelineEntries, isProtectedProfile } from "./feed";
 import { captureException } from "@sentry/cloudflare";
 import { getErrorMessages, parseBlocklistLimit, runXBlocklist } from "./blocklist";
@@ -85,7 +84,7 @@ async function getEmbedWithRetries(
   postUrl: string,
   retryCount: number,
 ): Promise<string | undefined> {
-  let lastError;
+  let lastError: unknown;
   for (let i = 0; i < retryCount; i++) {
     try {
       return await getEmbed(env, postUrl);
@@ -94,8 +93,11 @@ async function getEmbedWithRetries(
     }
   }
 
-  if (lastError) {
+  if (lastError instanceof Error) {
     throw lastError;
+  }
+  if (lastError) {
+    throw new Error("Failed to fetch embed", { cause: lastError });
   }
 }
 

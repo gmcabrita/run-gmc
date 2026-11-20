@@ -1,4 +1,5 @@
-import { USERAGENT, isValidRSSEntry, type ScraperContext } from "@rss/common";
+import { USERAGENT, isValidRSSEntry } from "@rss/common";
+import type { ScraperContext } from "@rss/common";
 import type { RSSData, RSSEntry } from "@rss/types";
 import { idempotentSendEmail } from "@email";
 
@@ -35,13 +36,16 @@ function decodeXmlText(value: string) {
       : trimmed;
 
   return unwrapped
-    .replaceAll(/&#x([0-9a-fA-F]+);/g, (entity, hex) =>
+    .replaceAll(/&#x([0-9a-fA-F]+);/g, (entity: string, hex: string) =>
       decodeCodePoint(Number.parseInt(hex, 16), entity),
     )
-    .replaceAll(/&#([0-9]+);/g, (entity, decimal) =>
+    .replaceAll(/&#([0-9]+);/g, (entity: string, decimal: string) =>
       decodeCodePoint(Number.parseInt(decimal, 10), entity),
     )
-    .replaceAll(/&([a-zA-Z]+);/g, (entity, name) => XML_ENTITIES.get(name) ?? entity);
+    .replaceAll(
+      /&([a-zA-Z]+);/g,
+      (entity: string, name: string) => XML_ENTITIES.get(name) ?? entity,
+    );
 }
 
 function tagText(xml: string, tagName: string) {

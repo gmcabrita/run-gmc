@@ -9,8 +9,8 @@ import {
   string,
   unknown,
   variant,
-  type InferOutput,
 } from "valibot";
+import type { InferOutput } from "valibot";
 
 export const CoverflexAuthResponseSchema = object({
   refresh_token: string(),

@@ -1,4 +1,5 @@
-import { USERAGENT, consume, isValidRSSEntry, type ScraperContext } from "@rss/common";
+import { USERAGENT, consume, isValidRSSEntry } from "@rss/common";
+import type { ScraperContext } from "@rss/common";
 import type { RSSData, RSSEntry } from "@rss/types";
 
 const SITE_ORIGIN = "https://www.culturgest.pt";
@@ -115,7 +116,7 @@ function parsePtDate(value: string): Date | undefined {
     const day = Number(crossMonthMatch[1]);
     const monthIndex = PT_MONTH_INDEX.get(crossMonthMatch[2] ?? "");
     const year = Number(crossMonthMatch[4]);
-    return monthIndex == null ? undefined : parseUtcDate(year, monthIndex, day);
+    return monthIndex === undefined ? undefined : parseUtcDate(year, monthIndex, day);
   }
 
   const rangeMatch = normalized.match(/^(\d{1,2})\s*-\s*\d{1,2}\s+([a-z]+)\s+(\d{4})$/);
@@ -123,7 +124,7 @@ function parsePtDate(value: string): Date | undefined {
     const day = Number(rangeMatch[1]);
     const monthIndex = PT_MONTH_INDEX.get(rangeMatch[2] ?? "");
     const year = Number(rangeMatch[3]);
-    return monthIndex == null ? undefined : parseUtcDate(year, monthIndex, day);
+    return monthIndex === undefined ? undefined : parseUtcDate(year, monthIndex, day);
   }
 
   const singleMatch = normalized.match(/^(\d{1,2})\s+([a-z]+)\s+(\d{4})$/);
@@ -134,7 +135,7 @@ function parsePtDate(value: string): Date | undefined {
   const day = Number(singleMatch[1]);
   const monthIndex = PT_MONTH_INDEX.get(singleMatch[2] ?? "");
   const year = Number(singleMatch[3]);
-  return monthIndex == null ? undefined : parseUtcDate(year, monthIndex, day);
+  return monthIndex === undefined ? undefined : parseUtcDate(year, monthIndex, day);
 }
 
 function buildTitle(event: DraftEvent): string {
@@ -310,7 +311,7 @@ export async function parse(response: Response): Promise<RSSData> {
     });
 
   const transformed = rewriter.transform(response);
-  if (transformed.body == null) {
+  if (transformed.body === null) {
     throw new Error("Missing response body");
   }
 

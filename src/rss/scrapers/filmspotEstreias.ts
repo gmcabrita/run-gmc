@@ -1,4 +1,5 @@
-import { USERAGENT, isValidRSSEntry, consume, type ScraperContext } from "@rss/common";
+import { USERAGENT, isValidRSSEntry, consume } from "@rss/common";
+import type { ScraperContext } from "@rss/common";
 import type { RSSData, RSSEntry } from "@rss/types";
 import type { FilmspotMovie } from "@types";
 
@@ -123,7 +124,7 @@ export async function parse(response: Response, maxDateStr?: string): Promise<RS
       },
     });
 
-  await consume(rewriter.transform(response).body!);
+  await consume(rewriter.transform(response).body);
 
   const entries: Array<RSSEntry> = movies.map((m) => {
     const link = `https://filmspot.pt${m.url ?? ""}`;
