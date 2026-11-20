@@ -1,70 +1,12 @@
 import type { Hono } from "hono";
 import { getAuthenticationToken } from "./util";
 import { basicAuth } from "hono/basic-auth";
-import { idempotentSendEmail } from "@email";
 import { parse } from "valibot";
-import { CoverflexPocketsResponseSchema, CoverflexTechnologyResponseSchema } from "./schemas";
+import { CoverflexPocketsResponseSchema } from "./schemas";
+import { getAppleCatalogueFile, sendAppleCatalogueByEmail } from "./catalogue";
 import { sendNewCoverflexDiscountsByEmail } from "./discounts";
 
-export { sendNewCoverflexDiscountsByEmail };
-
-export async function sendAppleCatalogueByEmail(env: Env) {
-  const { name, url } = await getAppleCatalogueFile(env);
-
-  const idempotencyURL = new URL(url);
-  idempotencyURL.search = "";
-
-  await idempotentSendEmail(env, {
-    body: `<a href="${url}" target="_blank">${url}</a>`,
-    idempotencyKey: `coverflex-apple-catalogue-${idempotencyURL.href}`,
-    subject: `New Coverflex Apple catalogue available: ${name}`,
-    to: "goncalo.mendes.cabrita@gmail.com",
-  });
-}
-
-async function getAppleCatalogueFile(env: Env) {
-  const url = "https://menhir-api.coverflex.com/api/employee/benefits/technology";
-  const options = {
-    headers: {
-      accept: "application/json, text/plain, */*",
-      "accept-language": "en-US,en;q=0.9,pt-PT;q=0.8,pt;q=0.7",
-      authorization: `Bearer ${await getAuthenticationToken(env)}`,
-      "cache-control": "no-cache",
-      pragma: "no-cache",
-      priority: "u=1, i",
-      "sec-ch-ua": '"Chromium";v="140", "Not=A?Brand";v="24", "Google Chrome";v="140"',
-      "sec-ch-ua-mobile": "?0",
-      "sec-ch-ua-platform": '"macOS"',
-      "sec-fetch-dest": "empty",
-      "sec-fetch-mode": "cors",
-      "sec-fetch-site": "same-site",
-      "x-coverflex-channel": "web",
-      "x-coverflex-language": "en-GB",
-      "x-coverflex-version": "1.218.3",
-    },
-    method: "GET",
-  };
-
-  const response = await fetch(url, options);
-
-  if (response.status !== 200) {
-    throw new Error(`Error:  ${response.status}`);
-  }
-
-  const json = parse(CoverflexTechnologyResponseSchema, await response.json());
-  if (json.benefit.slug !== "technology") {
-    throw new Error(`Response: ${JSON.stringify(json)}`);
-  }
-
-  const product = json.benefit.products.find((product) => product.slug === "apple");
-  const file = product?.files.find((file) => file.slug.includes("-en-"));
-
-  if (!file) {
-    throw new Error("Apple catalogue file not found");
-  }
-
-  return { name: file.name, url: file.url };
-}
+export { sendAppleCatalogueByEmail, sendNewCoverflexDiscountsByEmail };
 
 async function getCoverflexBudget(env: Env) {
   const url = "https://menhir-api.coverflex.com/api/employee/pockets";
