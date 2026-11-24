@@ -3,12 +3,13 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import { parse, ValiError } from "valibot";
 import {
   buildListMembersUrl,
-  createUsernamesTextSource,
+  createTextListSource,
   createXListMembersSource,
   nobotsSource,
   parseListMembersPage,
   UNAVAILABLE_LIST_MESSAGE,
 } from "./blocklistSources";
+import { parseScreenName, parseUserId } from "./blocklist";
 import { XListMembersResponseSchema } from "./schemas";
 import firstPage from "./__fixtures__/list-members-page.json";
 import lastPage from "./__fixtures__/list-members-last-page.json";
@@ -19,8 +20,8 @@ afterEach(() => {
   vi.restoreAllMocks();
 });
 
-describe("createUsernamesTextSource", () => {
-  const source = createUsernamesTextSource("test", "https://example.com/usernames.txt");
+describe("createTextListSource", () => {
+  const source = createTextListSource("test", "https://example.com/usernames.txt", parseScreenName);
 
   it("parses the username list", async () => {
     const fetchSpy = vi
@@ -34,6 +35,17 @@ describe("createUsernamesTextSource", () => {
       ],
     });
     expect(fetchSpy).toHaveBeenCalledWith("https://example.com/usernames.txt");
+  });
+
+  it("parses a user ID list and reports invalid lines", async () => {
+    const idSource = createTextListSource("test", "https://example.com/ids.txt", parseUserId);
+    vi.spyOn(globalThis, "fetch").mockImplementation(
+      async () => new Response("2111879261669957632\r\nnot-an-id\n"),
+    );
+    expect(await idSource.fetchTargets(testEnv)).toEqual({
+      invalid: ["not-an-id"],
+      targets: [{ kind: "userId", userId: "2111879261669957632" }],
+    });
   });
 
   it("throws on HTTP errors", async () => {

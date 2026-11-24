@@ -1,5 +1,5 @@
 import { parse } from "valibot";
-import { parseScreenName, parseTargetList, X_BROWSER_USER_AGENT } from "./blocklist";
+import { parseScreenName, parseTargetList, parseUserId, X_BROWSER_USER_AGENT } from "./blocklist";
 import type { BlocklistSource, BlocklistTarget, BlocklistTargetList } from "./blocklist";
 import { buildXApiHeaders, getDefaultCredentials } from "./credentials";
 import { NobotsSuspectsResponseSchema, XListMembersResponseSchema } from "./schemas";
@@ -8,28 +8,35 @@ import type { NobotsSuspectsResponse, XListMembersResponse } from "./schemas";
 // To add a source, write a `BlocklistSource` and add it to `X_BLOCKLIST_SOURCES`.
 // Use `parseScreenName` for handles and `parseUserId` for numeric user IDs.
 
-// Reads a plain-text list with one screen name per line.
-export function createUsernamesTextSource(name: string, url: string): BlocklistSource {
+// Reads a plain-text list with one target per line.
+export function createTextListSource(
+  name: string,
+  url: string,
+  parseLine: (line: string) => BlocklistTarget | undefined,
+): BlocklistSource {
   return {
     async fetchTargets() {
       const response = await fetch(url);
       if (!response.ok) {
         throw new Error(`${url} returned HTTP ${response.status}`);
       }
-      return parseTargetList(await response.text(), parseScreenName);
+      return parseTargetList(await response.text(), parseLine);
     },
     name,
   };
 }
 
-const clankwallSource = createUsernamesTextSource(
+const clankwallSource = createTextListSource(
   "clankwall",
   "https://clankwall.vogel.dev/api/usernames.txt",
+  parseScreenName,
 );
 
-const blockedForAiReplySource = createUsernamesTextSource(
+// User IDs, unlike screen names, still match accounts that were renamed.
+const blockedForAiReplySource = createTextListSource(
   "blockedforaireply",
-  "https://blockedforaireply.levels.io/api/usernames.txt",
+  "https://blockedforaireply.com/api/ids.txt",
+  parseUserId,
 );
 
 const NOBOTS_SUSPECTS_URL = "https://nobots.fyi/suspects.json";
