@@ -22,6 +22,9 @@ X1_COOKIE=
 X2_COOKIE=
 X3_COOKIE=
 
+# Value of the letterboxd.user session cookie
+LETTERBOXD_COOKIE=
+
 # Discord Tokens
 DISCORD_AUTHORIZATION_TOKEN=
 

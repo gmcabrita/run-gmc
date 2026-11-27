@@ -16,6 +16,7 @@ import { X_BLOCKLIST_SOURCES } from "./x/blocklistSources";
 import { addIcs2GcalEndpoint } from "./ics2gcal";
 import { addNosCinemasEndpoints, sendNosCinemasSessionsByEmail } from "./nosCinemas";
 import { addBolEndpoints, sendBolEventsByEmail } from "./bol";
+import { addLetterboxdEndpoints } from "./letterboxd";
 import {
   addCinecartazQuestionEndpoints,
   sendCinecartazQuestionsByEmail,
@@ -226,6 +227,7 @@ addXEndpoints(app);
 addIcs2GcalEndpoint(app);
 addNosCinemasEndpoints(app);
 addBolEndpoints(app);
+addLetterboxdEndpoints(app);
 addCinecartazQuestionEndpoints(app);
 addScrapedRssEndpoints(app);
 

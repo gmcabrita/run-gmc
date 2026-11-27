@@ -24,6 +24,8 @@ export default defineConfig({
       HEALTHCHECK_DISCORD_SUCCEEDED_WEBHOOK_URL: bindings.secret(),
       HTTP_RELAY_TOKEN: bindings.secret(),
       HTTP_RELAY_URL: bindings.secret(),
+      // Value of the `letterboxd.user` session cookie.
+      LETTERBOXD_COOKIE: bindings.secret(),
       POKE_API_KEY: bindings.secret(),
       PRIVATE_BASIC_AUTH_PASSWORD: bindings.secret(),
       PRIVATE_BASIC_AUTH_USERNAME: bindings.secret(),
